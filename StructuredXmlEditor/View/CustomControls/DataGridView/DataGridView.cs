@@ -248,7 +248,6 @@ namespace StructuredXmlEditor.View
 				lbi.ListBox = this;
 				lbi.Items = source.Items;
 				lbi.Level = data.Level;
-				lbi.EnableDoubleClickExpandMode = true;
 			}
 		}
 

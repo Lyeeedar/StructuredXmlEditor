@@ -87,7 +87,7 @@ namespace StructuredXmlEditor.Data
 					}
 					catch (Exception ex)
 					{
-						MessageBox.Show(ex.Message + ex.ToString());
+						Message.Show(ex.Message + ex.ToString(), "Exception!");
 						Settings = new SerializableDictionary<string, string>();
 					}
 				}
@@ -122,7 +122,7 @@ namespace StructuredXmlEditor.Data
 				}
 				else
 				{
-					MessageBox.Show("Cannot run without a project settings file. Shutting down.");
+					Message.Show("Cannot run without a project settings file. Shutting down.", "Startup Failed");
 					Environment.Exit(0);
 				}
 			}
@@ -170,7 +170,7 @@ namespace StructuredXmlEditor.Data
 
 			if (!SupportedResourceTypes.ContainsKey(rootname))
 			{
-				MessageBox.Show("No definition found for xml '" + rootname + "'! Cannot open document.");
+				Message.Show("No definition found for xml '" + rootname + "'! Cannot open document.", "Load Failed!");
 				return;
 			}
 
@@ -294,7 +294,7 @@ namespace StructuredXmlEditor.Data
 				}
 				catch (Exception e)
 				{
-					MessageBox.Show(e.Message);
+					Message.Show(e.Message, "Exception!");
 				}
 			}
 		}

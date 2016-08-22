@@ -98,6 +98,9 @@
     <Compile Include="View\CustomControls\ColourPicker\ColorSpectrumSlider.cs" />
     <Compile Include="View\CustomControls\ColourPicker\ColourUtilities.cs" />
     <Compile Include="View\CustomControls\ColourPicker\HsvColor.cs" />
+    <Compile Include="View\CustomControls\Message.xaml.cs">
+      <DependentUpon>Message.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\CustomControls\NumericTextBox.cs" />
     <Compile Include="View\ValueConverters\ConverterBase.cs" />
     <Compile Include="Util\DeferableObservableCollection.cs" />
@@ -126,6 +129,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View\CustomControls\Message.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\Styles\Brushes.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -213,12 +220,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="TestDataDefinition.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="TestCreatedData.xml" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icon.ico" />

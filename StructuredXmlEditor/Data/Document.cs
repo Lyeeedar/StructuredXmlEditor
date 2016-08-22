@@ -40,9 +40,9 @@ namespace StructuredXmlEditor.Data
 		{
 			if (UndoRedo.IsModified)
 			{
-				var result = MessageBox.Show("There are unsaved changes in this document. Do you wish to save before closing?", "Unsaved Changes", MessageBoxButton.YesNoCancel);
-				if (result == MessageBoxResult.Cancel) return true;
-				else if (result == MessageBoxResult.Yes)
+				var result = Message.Show("There are unsaved changes in this document. Do you wish to save before closing?", "Unsaved Changes", "Yes", "No", "Cancel");
+				if (result == "Cancel") return true;
+				else if (result == "Yes")
 				{
 					Save();
 				}
