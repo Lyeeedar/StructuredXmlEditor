@@ -6,7 +6,7 @@
 	xmlns:v="clr-namespace:StructuredXmlEditor.View"
 	Title="Structured Xml Editor"
 	WindowStartupLocation="CenterScreen"
-	Icon="/Resources/Icon.png"
+	Icon="pack://application:,,,/StructuredXmlEditor;component/Resources/Icon.png"
 	WindowState="Maximized">
 	<Grid>
 		<Grid.Resources>

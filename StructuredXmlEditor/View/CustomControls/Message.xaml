@@ -5,7 +5,7 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:local="clr-namespace:StructuredXmlEditor.View"
-	Icon="/Resources/Icon.png"
+	Icon="pack://application:,,,/StructuredXmlEditor;component/Resources/Icon.png"
 	WindowStartupLocation="CenterScreen"
 	Width="400"
 	SizeToContent="Height"

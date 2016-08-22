@@ -223,42 +223,18 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icon.ico" />
-    <Content Include="Resources\Add.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icon.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\New.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Open.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Redo.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Remove.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Save.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\SaveAs.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Settings.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Shuffle.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Undo.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Warning.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Resource Include="Resources\Add.png" />
+    <Resource Include="Resources\Icon.png" />
+    <Resource Include="Resources\New.png" />
+    <Resource Include="Resources\Open.png" />
+    <Resource Include="Resources\Redo.png" />
+    <Resource Include="Resources\Remove.png" />
+    <Resource Include="Resources\Save.png" />
+    <Resource Include="Resources\SaveAs.png" />
+    <Resource Include="Resources\Settings.png" />
+    <Resource Include="Resources\Shuffle.png" />
+    <Resource Include="Resources\Undo.png" />
+    <Resource Include="Resources\Warning.png" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
