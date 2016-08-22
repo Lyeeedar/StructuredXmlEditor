@@ -34,6 +34,7 @@
 			HorizontalAlignment="Stretch" />
 
 		<ItemsControl
+			HorizontalAlignment="Right"
 			Margin="10"
 			Grid.Row="2"
 			ItemsSource="{Binding Buttons}">

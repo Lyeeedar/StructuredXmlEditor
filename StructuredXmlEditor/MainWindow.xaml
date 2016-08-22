@@ -323,7 +323,7 @@
 										</Button>
 
 										<TextBox
-											Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}"
+											Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged, Delay=500}"
 											VerticalContentAlignment="Center"
 											Margin="5,0,0,0" />
 									</DockPanel>

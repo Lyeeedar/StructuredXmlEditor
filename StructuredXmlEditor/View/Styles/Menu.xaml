@@ -67,7 +67,7 @@
 					HorizontalAlignment="Left"
 					Width="1"
 					Margin="30,2,0,2"
-					Fill="#3000" />
+					Fill="{StaticResource BorderDarkBrush}" />
 				<ContentPresenter
 					Grid.ColumnSpan="2"
 					Margin="1,0" />
@@ -224,7 +224,7 @@
 						<Rectangle
 							Height="1"
 							Margin="30,0,1,1"
-							Fill="#2000" />
+							Fill="{StaticResource BackgroundLightBrush}" />
 					</Grid>
 				</ControlTemplate>
 			</Setter.Value>

@@ -309,6 +309,34 @@ namespace StructuredXmlEditor.Data
 
 			menu.Items.Add(focusItem);
 
+			menu.Items.Add(new Separator());
+
+			MenuItem collapseItem = new MenuItem();
+			collapseItem.Header = "Collapse All";
+
+			collapseItem.Click += delegate
+			{
+				foreach (var item in this.GetAllBreadthFirst())
+				{
+					item.IsExpanded = false;
+				}
+			};
+
+			menu.Items.Add(collapseItem);
+
+			MenuItem expandItem = new MenuItem();
+			expandItem.Header = "Expand All";
+
+			expandItem.Click += delegate
+			{
+				foreach (var item in this.GetAllBreadthFirst())
+				{
+					item.IsExpanded = true;
+				}
+			};
+
+			menu.Items.Add(expandItem);
+
 			return menu;
 		}
 
@@ -416,6 +444,13 @@ namespace StructuredXmlEditor.Data
 			else if (!matchFound)
 			{
 				matchFound = Name.ToLower().Contains(filter);
+
+				if (IsPrimitive && !matchFound)
+				{
+					var val = GetType().GetProperty("Value").GetValue(this).ToString(); // reflection cause cant cast to PrimitiveDataType<>
+					matchFound = val.ToLower().Contains(filter);
+				}
+
 				m_isSearchFiltered = !matchFound;
 			}
 			else
