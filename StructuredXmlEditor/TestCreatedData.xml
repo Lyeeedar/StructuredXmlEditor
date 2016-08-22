@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Root>
+  <Title>Sir Lordyport</Title>
+  <Fullname>Jeff,Goldblum</Fullname>
+  <Partners>
+    <Jeff />
+    <Adriana />
+  </Partners>
+  <Age>44</Age>
+  <DoesHeSmell>true</DoesHeSmell>
+  <Yourface>233,18,235,255</Yourface>
+  <Dinner>Val1</Dinner>
+</Root>

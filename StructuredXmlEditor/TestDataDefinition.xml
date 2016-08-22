@@ -1,0 +1,20 @@
+﻿<Definition>
+  <Struct Name="Root">
+    <String Name="Title" Default="Mr McFuzzypants" />
+    <Struct Name="Fullname" Key="Name" Collapse="true" />
+    <Collection Name="Partners" MinCount="1" MaxCount="4">
+      <String Name="Partner" ValueAsName="true" />
+    </Collection>
+    <Number Name="Age" Min="18" Max="100" ShowSlider="true" />
+    <Boolean Name="DoesHeSmell" />
+    <Colour Name="Yourface" />
+    <Enum Name="Dinner" Key="Dinner" />
+  </Struct>
+
+  <StructDef Name="Name">
+    <String Name="Firstname" />
+    <String Name="Surname" />
+  </StructDef>
+
+  <EnumDef Name="Dinner" EnumValues="V1,R2,Chesse2,Pie8" />
+</Definition>
