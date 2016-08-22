@@ -5,6 +5,7 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:local="clr-namespace:StructuredXmlEditor.View"
+	Icon="/Resources/Icon.png"
 	WindowStartupLocation="CenterScreen"
 	Width="400"
 	SizeToContent="Height"
@@ -47,9 +48,10 @@
 			<ItemsControl.ItemTemplate>
 				<DataTemplate>
 					<Button
+						Width="75"
 						Content="{Binding}"
 						Click="Button_Click"
-						Padding="5"
+						Padding="2"
 						Margin="5" />
 				</DataTemplate>
 			</ItemsControl.ItemTemplate>
