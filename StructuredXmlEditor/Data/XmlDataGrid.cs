@@ -161,7 +161,7 @@ namespace StructuredXmlEditor.Data
 				DataItem current = item.Parent;
 				while (current != null)
 				{
-					m_focusedItemsPath.Add(current);
+					if (current is CollectionChildItem || !(current.Parent is CollectionChildItem)) m_focusedItemsPath.Add(current);
 					current = current.Parent;
 				}
 				m_focusedItemsPath.Remove(m_focusedItemsPath.Last());

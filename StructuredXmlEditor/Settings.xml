@@ -17,12 +17,12 @@
       <string>&lt;?xml version="1.0" encoding="utf-16"?&gt;
 &lt;ArrayOfString xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
   &lt;string&gt;D:\Users\Philip\workspace\Match3\android\assets\Particles\Fire.xml&lt;/string&gt;
+  &lt;string&gt;D:\Users\Philip\workspace\Match3\android\assets\Factions\Spider.xml&lt;/string&gt;
   &lt;string&gt;D:\Users\Philip\workspace\Match3\android\assets\UnlockTrees\Equipment.xml&lt;/string&gt;
   &lt;string&gt;D:\Users\Philip\workspace\Match3\android\assets\World\Levels\Dungeon\Fight\BasicMonster.xml&lt;/string&gt;
   &lt;string&gt;D:\Users\Philip\workspace\Match3\android\assets\Themes\Dungeon.xml&lt;/string&gt;
   &lt;string&gt;D:\Users\Philip\workspace\Match3\android\assets\UnlockTrees\Fire.xml&lt;/string&gt;
   &lt;string&gt;D:\Users\Philip\workspace\Match3\android\assets\Factions\Rats.xml&lt;/string&gt;
-  &lt;string&gt;D:\Users\Philip\workspace\Match3\android\assets\Factions\Spider.xml&lt;/string&gt;
 &lt;/ArrayOfString&gt;</string>
     </value>
   </item>

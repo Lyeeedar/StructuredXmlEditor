@@ -12,6 +12,15 @@ namespace StructuredXmlEditor.Data
 	public class FileItem : PrimitiveDataItem<string>
 	{
 		//-----------------------------------------------------------------------
+		public override string Description
+		{
+			get
+			{
+				return Path.GetFileNameWithoutExtension(Value);
+			}
+		}
+
+		//-----------------------------------------------------------------------
 		public virtual Command<object> BrowseCMD { get { return new Command<object>((e) => Browse()); } }
 
 		//-----------------------------------------------------------------------

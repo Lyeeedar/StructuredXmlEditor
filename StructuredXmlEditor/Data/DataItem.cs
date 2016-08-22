@@ -95,6 +95,11 @@ namespace StructuredXmlEditor.Data
 				{
 					m_parent = value;
 
+					if (m_parent != null)
+					{
+						Grid = m_parent.Grid;
+					}
+
 					RaisePropertyChangedEvent();
 
 					UpdateVisibleIfBinding();
@@ -161,7 +166,27 @@ namespace StructuredXmlEditor.Data
 					m_name = value;
 
 					RaisePropertyChangedEvent();
+					RaisePropertyChangedEvent("FocusName");
 				}
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public string FocusName
+		{
+			get
+			{
+				var name = Name;
+				var desc = Description;
+
+				if (string.IsNullOrWhiteSpace(desc)) return name;
+
+				if (desc.Length > 13)
+				{
+					desc = desc.Substring(0, 10) + "...";
+				}
+
+				return name + ":" + desc;
 			}
 		}
 
@@ -203,7 +228,20 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public XmlDataGrid Grid { get; set; }
+		public XmlDataGrid Grid
+		{
+			get
+			{
+				if (m_grid == null && Parent != null)
+				{
+					m_grid = Parent.Grid;
+				}
+
+				return m_grid;
+			}
+			set { m_grid = value; }
+		}
+		private XmlDataGrid m_grid;
 
 
 		//-----------------------------------------------------------------------
@@ -250,6 +288,14 @@ namespace StructuredXmlEditor.Data
 			this.UndoRedo = undoRedo;
 
 			Children = new ObservableCollection<DataItem>();
+
+			PropertyChanged += (e, a) =>
+			{
+				if (a.PropertyName == "Description")
+				{
+					RaisePropertyChangedEvent("FocusName");
+				}
+			};
 		}
 
 		//-----------------------------------------------------------------------

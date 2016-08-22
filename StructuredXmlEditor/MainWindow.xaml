@@ -44,7 +44,7 @@
 										FontWeight="Bold"
 										VerticalAlignment="Center"
 										Foreground="{StaticResource FontDarkBrush}"
-										Text="{Binding Name}" />
+										Text="{Binding FocusName}" />
 								</Border>
 								<Border
 									x:Name="seperator"

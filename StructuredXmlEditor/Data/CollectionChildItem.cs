@@ -41,7 +41,7 @@ namespace StructuredXmlEditor.Data
 
 				if (Parent != null)
 				{
-					Name = "[" + Parent.Children.IndexOf(this) + "]";
+					Name = "[" + Parent.Children.IndexOf(this) + "] " + WrappedItem.Name;
 				}
 			}
 		}
@@ -134,7 +134,7 @@ namespace StructuredXmlEditor.Data
 		{
 			if (Parent != null)
 			{
-				Name = "[" + Parent.Children.IndexOf(this) + "]";
+				Name = "[" + Parent.Children.IndexOf(this) + "] " + WrappedItem.Name;
 			}
 		}
 

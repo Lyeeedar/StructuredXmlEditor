@@ -13,7 +13,7 @@ namespace StructuredXmlEditor.Data
 		{
 			get
 			{
-				throw new NotImplementedException();
+				return "";
 			}
 		}
 
