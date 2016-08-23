@@ -245,7 +245,9 @@ namespace StructuredXmlEditor.Data
 				Indent = true,
 				IndentChars = "\t",
 				NewLineChars = "\r\n",
-				NewLineHandling = NewLineHandling.Replace
+				NewLineHandling = NewLineHandling.Replace,
+				OmitXmlDeclaration = true,
+				Encoding = new UTF8Encoding(false)
 			};
 
 			using (XmlWriter writer = XmlTextWriter.Create(path, settings))

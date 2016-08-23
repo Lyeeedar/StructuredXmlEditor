@@ -34,7 +34,7 @@ namespace StructuredXmlEditor.Definition
 
 		public override void Parse(XElement definition)
 		{
-			Name = "Pair";
+			if (Name == null) Name = "Pair";
 			Key = LoadDefinition(definition.Elements().First()) as PrimitiveDataDefinition;
 			Value = LoadDefinition(definition.Elements().Last()) as PrimitiveDataDefinition;
 		}
