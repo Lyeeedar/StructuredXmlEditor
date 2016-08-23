@@ -165,6 +165,16 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void Open(string path)
 		{
+			foreach (var openDoc in Documents)
+			{
+				if (openDoc.Path == path)
+				{
+					MainWindow.Instance.TabControl.SelectedItem = openDoc;
+
+					return;
+				}
+			}
+
 			var doc = XDocument.Load(path);
 			var rootname = doc.Elements().First().Name.ToString().ToLower();
 

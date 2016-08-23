@@ -24,10 +24,13 @@ namespace StructuredXmlEditor
     /// </summary>
     public partial class MainWindow : Window
     {
+		public static MainWindow Instance { get; set; }
+
 		public Workspace Workspace { get; set; }
 
         public MainWindow()
         {
+			Instance = this;
 			Workspace = new Workspace();
 
 			DataContext = Workspace;
