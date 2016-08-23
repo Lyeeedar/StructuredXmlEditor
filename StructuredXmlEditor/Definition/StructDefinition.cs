@@ -12,6 +12,7 @@ namespace StructuredXmlEditor.Definition
 	{
 		public string ChildAsName { get; set; }
 		public bool Collapse { get; set; }
+		public bool HadCollapse { get; set; }
 		public string Seperator { get; set; }
 		public List<DataDefinition> Children { get; set; } = new List<DataDefinition>();
 		public string Key { get; set; }
@@ -125,7 +126,13 @@ namespace StructuredXmlEditor.Definition
 				Children.Add(childDef);
 			}
 
-			Collapse = TryParseBool(definition, "Collapse");
+			var collapseAtt = definition.Attribute("Collapse");
+			if (collapseAtt != null)
+			{
+				Collapse = TryParseBool(definition, "Collapse");
+				HadCollapse = true;
+			}
+			
 			Seperator = definition.Attribute("Seperator")?.Value;
 			if (Collapse && Seperator == null) Seperator = ",";
 
@@ -218,6 +225,7 @@ namespace StructuredXmlEditor.Definition
 				if (DescriptionChild == null) DescriptionChild = def.DescriptionChild;
 				if (ChildAsName == null) ChildAsName = def.ChildAsName;
 				if (Seperator == null) Seperator = def.Seperator;
+				if (!HadCollapse) Collapse = def.Collapse;
 
 				if (Collapse)
 				{

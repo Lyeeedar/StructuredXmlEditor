@@ -37,7 +37,7 @@ namespace StructuredXmlEditor.Data
 				}
 				else
 				{
-					return String.Join(", ", Children.Select(e => e.Description));
+					return String.Join(", ", Children.Where(e => e.IsVisibleFromBindings).Select(e => e.Description));
 				}
 			}
 		}
