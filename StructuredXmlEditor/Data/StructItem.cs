@@ -15,7 +15,7 @@ namespace StructuredXmlEditor.Data
 	public class StructItem : ComplexDataItem
 	{
 		//-----------------------------------------------------------------------
-		public bool ShowClearButton { get { return HasContent && !(Parent is CollectionChildItem); } }
+		public bool ShowClearButton { get { return HasContent && !(Parent is CollectionChildItem || Parent is StructRefItem); } }
 
 		//-----------------------------------------------------------------------
 		public Command<object> ClearCMD { get { return new Command<object>((e) => Clear()); } }

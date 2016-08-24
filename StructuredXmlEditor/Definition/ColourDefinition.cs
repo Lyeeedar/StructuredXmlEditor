@@ -82,5 +82,10 @@ namespace StructuredXmlEditor.Definition
 			var asString = ci.ValueToString(ci.Value);
 			return asString;
 		}
+
+		public override string DefaultValueString()
+		{
+			return HasAlpha ? "255,255,255,255" : "255,255,255";
+		}
 	}
 }

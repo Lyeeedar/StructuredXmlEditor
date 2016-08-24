@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -39,6 +40,9 @@ namespace StructuredXmlEditor.Data
 		public Dictionary<string, DataDefinition> ReferenceableDefinitions { get; set; } = new Dictionary<string, DataDefinition>();
 		public Dictionary<string, DataDefinition> SupportedResourceTypes { get; set; } = new Dictionary<string, DataDefinition>();
 
+		public Dictionary<string, DataDefinition> DataTypes { get; set; } = new Dictionary<string, DataDefinition>();
+		public DataDefinition RootDefinition { get; set; }
+
 		//-----------------------------------------------------------------------
 		public string SettingsPath = Path.GetFullPath("Settings.xml");
 		public SerializableDictionary<string, string> Settings { get; set; }
@@ -55,6 +59,9 @@ namespace StructuredXmlEditor.Data
 				foreach (var ext in ordered) yield return ext.Capitalise();
 			}
 		}
+
+		//-----------------------------------------------------------------------
+		public Command<object> NewDefCMD { get { return new Command<object>((e) => NewDef()); } }
 
 		//-----------------------------------------------------------------------
 		public Command<object> OpenCMD { get { return new Command<object>((e) => OpenNew()); } }
@@ -138,7 +145,7 @@ namespace StructuredXmlEditor.Data
 					var def = DataDefinition.LoadDefinition(el);
 					var defname = def.Name.ToLower();
 					var name = el.Name.ToString().ToLower();
-					if (name == "structdef" || name == "enumdef")
+					if (name.EndsWith("def"))
 					{
 						if (ReferenceableDefinitions.ContainsKey(defname)) throw new Exception("Duplicate definitions for def " + defname);
 						ReferenceableDefinitions[defname] = def;
@@ -160,6 +167,41 @@ namespace StructuredXmlEditor.Data
 			{
 				def.RecursivelyResolve(ReferenceableDefinitions);
 			}
+
+			// load xmldef definition
+			var assembly = Assembly.GetExecutingAssembly();
+			var resourceName = ("StructuredXmlEditor.Core.xmldef");
+			string fileContents = "";
+
+			using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+			using (StreamReader reader = new StreamReader(stream))
+			{
+				fileContents = reader.ReadToEnd();
+			}
+
+			var xmldefDoc = XDocument.Parse(fileContents);
+			foreach (var el in xmldefDoc.Elements().First().Elements())
+			{
+				var def = DataDefinition.LoadDefinition(el);
+				var defname = def.Name.ToLower();
+				var name = el.Name.ToString().ToLower();
+				if (name.EndsWith("def"))
+				{
+					if (DataTypes.ContainsKey(defname)) throw new Exception("Duplicate definitions for data type " + defname);
+					DataTypes[defname] = def;
+				}
+				else
+				{
+					if (RootDefinition != null) throw new Exception("Duplicate root definition!");
+					RootDefinition = def;
+				}
+			}
+
+			foreach (var type in DataTypes.Values)
+			{
+				type.RecursivelyResolve(DataTypes);
+			}
+			RootDefinition.RecursivelyResolve(DataTypes);
 		}
 
 		//-----------------------------------------------------------------------
@@ -176,17 +218,26 @@ namespace StructuredXmlEditor.Data
 			}
 
 			var doc = XDocument.Load(path);
+
 			var rootname = doc.Elements().First().Name.ToString().ToLower();
 
-			if (!SupportedResourceTypes.ContainsKey(rootname))
+			DataDefinition data = null;
+
+			if (path.EndsWith(".xmldef"))
 			{
-				Message.Show("No definition found for xml '" + rootname + "'! Cannot open document.", "Load Failed!");
-				return;
+				data = RootDefinition;
+			}
+			else
+			{
+				if (!SupportedResourceTypes.ContainsKey(rootname))
+				{
+					Message.Show("No definition found for xml '" + rootname + "'! Cannot open document.", "Load Failed!");
+					return;
+				}
+				data = SupportedResourceTypes[rootname];
 			}
 
 			var document = new Document(path, this);
-
-			var data = SupportedResourceTypes[rootname];
 
 			using (document.UndoRedo.DisableUndoScope())
 			{
@@ -210,12 +261,45 @@ namespace StructuredXmlEditor.Data
 			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
 
 			dlg.DefaultExt = ".xml";
-			dlg.Filter = "Xml File (*.xml)|*.xml";
+			dlg.Filter = "Xml File (*.xml, *.xmldef)|*.xml; *.xmldef";
 			bool? result = dlg.ShowDialog();
 
 			if (result == true)
 			{
 				Open(dlg.FileName);
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public void NewDef()
+		{
+			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+
+			dlg.DefaultExt = ".xmldef";
+			dlg.Filter = "XML Definition File (*.xmldef)|*.xmldef";
+			bool? result = dlg.ShowDialog();
+
+			if (result == true)
+			{
+				var path = dlg.FileName;
+				var data = RootDefinition;
+
+				var document = new Document(path, this);
+
+				using (document.UndoRedo.DisableUndoScope())
+				{
+					var item = data.CreateData(document.UndoRedo);
+					document.SetData(item);
+				}
+
+				Documents.Add(document);
+
+				Current = document;
+
+				RecentFiles.Remove(path);
+				RecentFiles.Insert(0, path);
+
+				StoreSetting("RecentFiles", RecentFiles.ToArray());
 			}
 		}
 

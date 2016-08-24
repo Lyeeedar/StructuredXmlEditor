@@ -37,7 +37,8 @@ namespace StructuredXmlEditor.Definition
 			if (name == "STRING") definition = new StringDefinition();
 			else if (name == "MULTILINESTRING") definition = new MultilineStringDefinition();
 			else if (name == "STRUCT" || name == "STRUCTDEF") definition = new StructDefinition();
-			else if (name == "COLLECTION") definition = new CollectionDefinition();
+			else if (name == "STRUCTREF") definition = new StructRefDefinition();
+			else if (name == "COLLECTION" || name == "COLLECTIONDEF") definition = new CollectionDefinition();
 			else if (name == "NUMBER") definition = new NumberDefinition();
 			else if (name == "BOOLEAN") definition = new BooleanDefinition();
 			else if (name == "COLOUR") definition = new ColourDefinition();

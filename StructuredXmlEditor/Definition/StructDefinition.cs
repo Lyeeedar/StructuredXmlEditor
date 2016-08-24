@@ -15,12 +15,17 @@ namespace StructuredXmlEditor.Definition
 		public bool HadCollapse { get; set; }
 		public string Seperator { get; set; }
 		public List<DataDefinition> Children { get; set; } = new List<DataDefinition>();
-		public string Key { get; set; }
 		public string DescriptionChild { get; set; }
 
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
 			var item = new StructItem(this, undoRedo);
+
+			foreach (var att in Attributes)
+			{
+				var attItem = att.CreateData(undoRedo);
+				item.Attributes.Add(attItem);
+			}
 
 			return item;
 		}
@@ -99,7 +104,22 @@ namespace StructuredXmlEditor.Definition
 					}
 				}
 			}
-			
+
+			foreach (var att in Attributes)
+			{
+				var el = element.Attribute(att.Name);
+				DataItem attItem = null;
+
+				if (el != null)
+				{
+					attItem = att.LoadData(new XElement(el.Name, el.Value.ToString()), undoRedo);
+				}
+				else
+				{
+					attItem = att.CreateData(undoRedo);
+				}
+				item.Attributes.Add(attItem);
+			}
 
 			// only create the missing data if there was some data
 			if (!hadData)
@@ -115,15 +135,31 @@ namespace StructuredXmlEditor.Definition
 		public override void Parse(XElement definition)
 		{
 			ChildAsName = definition.Attribute("ChildAsName")?.Value.ToString();
-			if (ChildAsName == null) Name = definition.Attribute("Name").Value.ToString();
-			Key = definition.Attribute("Key")?.Value?.ToString();
 
 			DescriptionChild = definition.Attribute("DescriptionChild")?.Value?.ToString();
 
 			foreach (var child in definition.Elements())
 			{
-				var childDef = LoadDefinition(child);
-				Children.Add(childDef);
+				if (child.Name == "Attributes")
+				{
+					foreach (var att in child.Elements())
+					{
+						var attDef = LoadDefinition(att);
+						if (attDef is PrimitiveDataDefinition)
+						{
+							Attributes.Add(attDef as PrimitiveDataDefinition);
+						}
+						else
+						{
+							throw new Exception("Cannot put a non-primitive into attributes!");
+						}
+					}
+				}
+				else
+				{
+					var childDef = LoadDefinition(child);
+					Children.Add(childDef);
+				}
 			}
 
 			var collapseAtt = definition.Attribute("Collapse");
@@ -175,9 +211,16 @@ namespace StructuredXmlEditor.Definition
 					var el = new XElement(name, data);
 					parent.Add(el);
 
-					if (Key != null)
+					foreach (var att in si.Attributes)
 					{
-						el.SetAttributeValue("Key", Key);
+						var primDef = att.Definition as PrimitiveDataDefinition;
+						var asString = primDef.WriteToString(att);
+						var defaultAsString = primDef.DefaultValueString();
+
+						if (asString != defaultAsString)
+						{
+							el.SetAttributeValue(att.Name, asString);
+						}
 					}
 				}
 				else
@@ -198,9 +241,16 @@ namespace StructuredXmlEditor.Definition
 					var el = new XElement(name);
 					parent.Add(el);
 
-					if (Key != null)
+					foreach (var att in si.Attributes)
 					{
-						el.SetAttributeValue("Key", Key);
+						var primDef = att.Definition as PrimitiveDataDefinition;
+						var asString = primDef.WriteToString(att);
+						var defaultAsString = primDef.DefaultValueString();
+
+						if (asString != defaultAsString)
+						{
+							el.SetAttributeValue(att.Name, asString);
+						}
 					}
 
 					foreach (var child in si.Children)
@@ -218,33 +268,9 @@ namespace StructuredXmlEditor.Definition
 
 		public override void RecursivelyResolve(Dictionary<string, DataDefinition> defs)
 		{
-			if (Key != null)
+			foreach (var child in Children)
 			{
-				var def = defs[Key.ToLower()] as StructDefinition;
-				Children = def.Children;
-				if (DescriptionChild == null) DescriptionChild = def.DescriptionChild;
-				if (ChildAsName == null) ChildAsName = def.ChildAsName;
-				if (Seperator == null) Seperator = def.Seperator;
-				if (!HadCollapse) Collapse = def.Collapse;
-
-				if (Collapse)
-				{
-					foreach (var type in Children)
-					{
-						if (!(type is PrimitiveDataDefinition))
-						{
-							Collapse = false;
-							break;
-						}
-					}
-				}
-			}
-			else
-			{
-				foreach (var child in Children)
-				{
-					child.RecursivelyResolve(defs);
-				}
+				child.RecursivelyResolve(defs);
 			}
 		}
 	}

@@ -1,0 +1,135 @@
+﻿<Definitions>
+
+	<StructDef Name="Number">
+		<Attributes>
+			<String Name="Name" />
+			<Enum Name="Type" EnumValues="Float,Int" />
+			<Number Name="Min" />
+			<Number Name="Max" />
+			<Number Name="Default" />
+			<String Name="VisibleIf" />
+		</Attributes>
+	</StructDef>
+
+	<StructDef Name="String" >
+		<Attributes>
+			<String Name="Name" />
+			<String Name="Default" />
+			<Boolean Name="ValueAsName" />
+			<String Name="VisibleIf" />
+		</Attributes>
+	</StructDef>
+
+	<StructDef Name="File" >
+		<Attributes>
+			<String Name="Name" />
+			<String Name="BasePath" />
+			<String Name="AllowedFileTypes" />
+			<String Name="Default" />
+			<String Name="VisibleIf" />
+		</Attributes>
+	</StructDef>
+
+	<StructDef Name="Boolean">
+		<Attributes>
+			<String Name="Name" />
+			<Boolean Name="Default" />
+			<String Name="VisibleIf" />
+		</Attributes>
+	</StructDef>
+
+	<StructDef Name="Colour">
+		<Attributes>
+			<String Name="Name" />
+			<Boolean Name="HasAlpha" />
+			<String Name="VisibleIf" />
+		</Attributes>
+	</StructDef>
+
+	<StructDef Name="MultilineString">
+		<Attributes>
+			<String Name="Name" />
+			<String Name="Default" />
+			<Boolean Name="ElementPerLine" />
+			<String Name="VisibleIf" />
+		</Attributes>
+	</StructDef>
+
+	<StructDef Name="Enum">
+		<Attributes>
+			<String Name="Name" />
+			<String Name="Key" />
+			<String Name="EnumValues" VisibleIf="Key==null" />
+			<String Name="Default" />
+			<Boolean Name="ValueAsName" />
+			<String Name="VisibleIf" />
+		</Attributes>
+	</StructDef>
+
+	<StructDef Name="EnumDef" Key="Enum" />
+
+	<StructDef Name="Tree">
+		<Attributes>
+			<String Name="Name" />
+			<String Name="VisibleIf" />
+		</Attributes>
+	</StructDef>
+
+	<StructDef Name="Collection">
+		<Attributes>
+			<String Name="Name" />
+			<Boolean Name="Collapse" />
+			<String Name="Seperator" Default="," />
+			<Number Name="MinCount" Min="0" />
+			<Number Name="MaxCount" Min="1" />
+			<String Name="VisibleIf" />
+		</Attributes>
+		<StructRef Name="Child" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,String,Struct,Tree" />
+	</StructDef>
+
+	<StructDef Name="Pair">
+		<Attributes>
+			<String Name="Name" />
+			<String Name="VisibleIf" />
+		</Attributes>
+		<StructRef Name="Key" Keys="Boolean,Colour,Enum,File,Number,String" />
+		<StructRef Name="Value" Keys="Boolean,Colour,Enum,File,Number,String" />
+	</StructDef>
+
+	<CollectionDef Name="Struct">
+		<Attributes>
+			<String Name="Name" />
+			<Boolean Name="Collapse" />
+			<String Name="Seperator" Default="," />
+			<String Name="ChildAsName" />
+			<String Name="DescriptionChild" />
+			<String Name="VisibleIf" />
+		</Attributes>
+		<StructRef Name="Child" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,String,Struct,StructRef,Tree" />
+	</CollectionDef>
+
+	<CollectionDef Name="StructDef">
+		<Attributes>
+			<String Name="Name" />
+			<Boolean Name="Collapse" />
+			<String Name="Seperator" Default="," />
+			<String Name="ChildAsName" />
+			<String Name="DescriptionChild" />
+			<String Name="VisibleIf" />
+		</Attributes>
+		<StructRef Name="Child" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,String,Struct,StructRef,Tree" />
+	</CollectionDef>
+
+	<StructDef Name="StructRef">
+		<Attributes>
+			<String Name="Name" />
+			<String Name="Keys" />
+			<String Name="VisibleIf" />
+		</Attributes>
+	</StructDef>
+
+	<Collection Name="Definitions">
+		<StructRef Name="Definition" Keys="Struct,StructDef,EnumDef" />
+	</Collection>
+	
+</Definitions>

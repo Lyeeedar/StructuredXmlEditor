@@ -8,5 +8,6 @@ namespace StructuredXmlEditor.Definition
 {
 	public abstract class ComplexDataDefinition : DataDefinition
 	{
+		public List<PrimitiveDataDefinition> Attributes { get; set; } = new List<PrimitiveDataDefinition>();
 	}
 }

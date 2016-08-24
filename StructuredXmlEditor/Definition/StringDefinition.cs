@@ -38,7 +38,6 @@ namespace StructuredXmlEditor.Definition
 
 		public override void Parse(XElement definition)
 		{
-			Name = definition.Attribute("Name").Value.ToString();
 			DefaultValue = definition.Attribute("Default")?.Value?.ToString();
 			if (DefaultValue == null) DefaultValue = "";
 			ValueAsName = TryParseBool(definition, "ValueAsName");
@@ -71,6 +70,11 @@ namespace StructuredXmlEditor.Definition
 			var item = new StringItem(this, undoRedo);
 			item.Value = data;
 			return item;
+		}
+
+		public override string DefaultValueString()
+		{
+			return DefaultValue;
 		}
 	}
 }

@@ -419,7 +419,6 @@ namespace StructuredXmlEditor.Data
 
 						foreach (var i in e.OldItems.OfType<DataItem>())
 						{
-							i.Parent = null;
 							i.PropertyChanged -= ChildPropertyChanged;
 						}
 
@@ -433,7 +432,6 @@ namespace StructuredXmlEditor.Data
 					{
 						foreach (var i in e.OldItems.OfType<DataItem>())
 						{
-							i.Parent = null;
 							i.PropertyChanged -= ChildPropertyChanged;
 						}
 

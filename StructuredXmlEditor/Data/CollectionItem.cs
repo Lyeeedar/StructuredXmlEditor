@@ -121,6 +121,7 @@ namespace StructuredXmlEditor.Data
 				"Adding item " + item.Name + " to collection " + Name);
 
 			IsExpanded = true;
+			if (Parent != null) Parent.IsExpanded = true;
 		}
 
 		//-----------------------------------------------------------------------

@@ -26,6 +26,12 @@ namespace StructuredXmlEditor.Definition
 				item.Children.Add(child);
 			}
 
+			foreach (var att in Attributes)
+			{
+				var attItem = att.CreateData(undoRedo);
+				item.Attributes.Add(attItem);
+			}
+
 			return item;
 		}
 
@@ -62,13 +68,27 @@ namespace StructuredXmlEditor.Definition
 				item.Children.Add(child);
 			}
 
+			foreach (var att in Attributes)
+			{
+				var el = element.Attribute(att.Name);
+				DataItem attItem = null;
+
+				if (el != null)
+				{
+					attItem = att.LoadData(new XElement(el.Name, el.Value.ToString()), undoRedo);
+				}
+				else
+				{
+					attItem = att.CreateData(undoRedo);
+				}
+				item.Attributes.Add(attItem);
+			}
+
 			return item;
 		}
 
 		public override void Parse(XElement definition)
 		{
-			Name = definition.Attribute("Name").Value.ToString();
-
 			Collapse = TryParseBool(definition, "Collapse");
 			Seperator = definition.Attribute("Seperator")?.Value;
 			if (Seperator == null) Seperator = ",";
@@ -77,7 +97,24 @@ namespace StructuredXmlEditor.Definition
 			MaxCount = TryParseInt(definition, "MaxCount", int.MaxValue);
 
 			ChildDefinition = new CollectionChildDefinition();
-			ChildDefinition.Parse(definition.Elements().First());
+			ChildDefinition.Parse(definition.Elements().Where(e => e.Name != "Attributes").First());
+
+			var attEl = definition.Element("Attributes");
+			if (attEl != null)
+			{
+				foreach (var att in attEl.Elements())
+				{
+					var attDef = LoadDefinition(att);
+					if (attDef is PrimitiveDataDefinition)
+					{
+						Attributes.Add(attDef as PrimitiveDataDefinition);
+					}
+					else
+					{
+						throw new Exception("Cannot put a non-primitive into attributes!");
+					}
+				}
+			}
 		}
 
 		public override void DoSaveData(XElement parent, DataItem item)
@@ -101,7 +138,20 @@ namespace StructuredXmlEditor.Definition
 					data = data.Remove(data.Length - Seperator.Length, Seperator.Length);
 				}
 
-				parent.Add(new XElement(Name, data));
+				var el = new XElement(Name, data);
+				parent.Add(el);
+
+				foreach (var att in ci.Attributes)
+				{
+					var attDef = att.Definition as PrimitiveDataDefinition;
+					var asString = attDef.WriteToString(att);
+					var defaultAsString = attDef.DefaultValueString();
+
+					if (asString != defaultAsString)
+					{
+						el.SetAttributeValue(att.Name, asString);
+					}
+				}
 			}
 			else
 			{
@@ -111,6 +161,18 @@ namespace StructuredXmlEditor.Definition
 				foreach (var child in ci.Children)
 				{
 					child.Definition.SaveData(root, child);
+				}
+
+				foreach (var att in ci.Attributes)
+				{
+					var attDef = att.Definition as PrimitiveDataDefinition;
+					var asString = attDef.WriteToString(att);
+					var defaultAsString = attDef.DefaultValueString();
+
+					if (asString != defaultAsString)
+					{
+						root.SetAttributeValue(att.Name, asString);
+					}
 				}
 			}
 		}

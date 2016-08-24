@@ -41,7 +41,7 @@ namespace StructuredXmlEditor.Definition
 		{
 			Name = definition.Attribute("Name").Value.ToString();
 			DefaultValue = TryParseFloat(definition, "Default");
-			MinValue = TryParseFloat(definition, "Min", 0f);
+			MinValue = TryParseFloat(definition, "Min", -float.MaxValue);
 			MaxValue = TryParseFloat(definition, "Max", float.MaxValue);
 			Step = TryParseFloat(definition, "Step", 0.1f);
 			ShowSlider = TryParseBool(definition, "ShowSlider");
@@ -76,6 +76,11 @@ namespace StructuredXmlEditor.Definition
 			float.TryParse(data, out val);
 			item.Value = val;
 			return item;
+		}
+
+		public override string DefaultValueString()
+		{
+			return DefaultValue.ToString();
 		}
 	}
 }

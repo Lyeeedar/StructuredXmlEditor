@@ -40,7 +40,6 @@ namespace StructuredXmlEditor.Definition
 
 		public override void Parse(XElement definition)
 		{
-			Name = definition.Attribute("Name").Value.ToString();
 			Key = definition.Attribute("Key")?.Value?.ToString();
 			ValueAsName = TryParseBool(definition, "ValueAsName");
 
@@ -82,6 +81,11 @@ namespace StructuredXmlEditor.Definition
 				var def = defs[Key.ToLower()] as EnumDefinition;
 				EnumValues = def.EnumValues;
 			}
+		}
+
+		public override string DefaultValueString()
+		{
+			return EnumValues[0];
 		}
 	}
 }

@@ -28,7 +28,6 @@ namespace StructuredXmlEditor.Definition
 
 		public override void Parse(XElement definition)
 		{
-			Name = definition.Attribute("Name").Value.ToString();
 			var defaultValueString = definition.Attribute("Default")?.Value?.ToString();
 
 			bool temp = false;
@@ -53,6 +52,11 @@ namespace StructuredXmlEditor.Definition
 			var item = new BooleanItem(this, undoRedo);
 			item.Value = bool.Parse(data);
 			return item;
+		}
+
+		public override string DefaultValueString()
+		{
+			return DefaultValue.ToString();
 		}
 	}
 }

@@ -2,6 +2,8 @@
 using StructuredXmlEditor.View;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -15,13 +17,16 @@ namespace StructuredXmlEditor.Data
 	public abstract class ComplexDataItem : DataItem
 	{
 		//-----------------------------------------------------------------------
+		public ObservableCollection<DataItem> Attributes { get; set; } = new ObservableCollection<DataItem>();
+
+		//-----------------------------------------------------------------------
 		protected virtual bool CanClear { get { return true; } }
 
 		//-----------------------------------------------------------------------
 		protected abstract string EmptyString { get; }
 
 		//-----------------------------------------------------------------------
-		public bool HasContent { get { return Children.Count > 0; } }
+		public bool HasContent { get { return Children.Count > 0 || Attributes.Count != 0; } }
 
 		//-----------------------------------------------------------------------
 		public override string Description
@@ -35,6 +40,10 @@ namespace StructuredXmlEditor.Data
 				{
 					return Children.FirstOrDefault(e => e.Definition.Name == sdef.DescriptionChild)?.Description;
 				}
+				else if (Attributes.Count > 0)
+				{
+					return string.Join(", ", Attributes.Where(e => e.Description != (e.Definition as PrimitiveDataDefinition).DefaultValueString()).Select(e => e.Name + "=" + e.Description));
+				}
 				else
 				{
 					return String.Join(", ", Children.Where(e => e.IsVisibleFromBindings).Select(e => e.Description));
@@ -45,6 +54,66 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public ComplexDataItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
+			Attributes.CollectionChanged += OnAttributesCollectionChanged;
+		}
+
+		//-----------------------------------------------------------------------
+		void OnAttributesCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			switch (e.Action)
+			{
+				case NotifyCollectionChangedAction.Add:
+					{
+						foreach (var i in e.NewItems.OfType<DataItem>())
+						{
+							i.Parent = this;
+							i.Grid = Grid;
+							i.PropertyChanged += ChildPropertyChanged;
+						}
+
+						break;
+					}
+				case NotifyCollectionChangedAction.Replace:
+					{
+						foreach (var i in e.NewItems.OfType<DataItem>())
+						{
+							i.Parent = this;
+							i.Grid = Grid;
+							i.PropertyChanged += ChildPropertyChanged;
+						}
+
+						foreach (var i in e.OldItems.OfType<DataItem>())
+						{
+							i.PropertyChanged -= ChildPropertyChanged;
+						}
+
+						break;
+					}
+				case NotifyCollectionChangedAction.Move:
+					{
+						break;
+					}
+				case NotifyCollectionChangedAction.Remove:
+					{
+						foreach (var i in e.OldItems.OfType<DataItem>())
+						{
+							i.PropertyChanged -= ChildPropertyChanged;
+						}
+
+						break;
+					}
+				case NotifyCollectionChangedAction.Reset:
+					{
+						break;
+					}
+				default:
+					break;
+			}
+
+			for (int i = 0; i < Children.Count; ++i)
+			{
+				Children[i].Index = i;
+			}
 		}
 
 		//-----------------------------------------------------------------------
@@ -93,7 +162,7 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public void Clear()
+		public virtual void Clear()
 		{
 			var prevChildren = Children.ToList();
 			UndoRedo.ApplyDoUndo(

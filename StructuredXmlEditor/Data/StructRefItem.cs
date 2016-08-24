@@ -5,16 +5,19 @@ using System.Text;
 using System.Threading.Tasks;
 using StructuredXmlEditor.Definition;
 using StructuredXmlEditor.View;
-using System.ComponentModel;
 using System.Windows.Controls;
+using System.ComponentModel;
 using System.Xml.Linq;
 
 namespace StructuredXmlEditor.Data
 {
-	public class CollectionChildItem : DataItem
+	public class StructRefItem : DataItem
 	{
 		//-----------------------------------------------------------------------
-		public override bool IsCollectionChild { get { return true; } }
+		public DataDefinition ChosenDefinition { get; set; }
+
+		//-----------------------------------------------------------------------
+		public DataDefinition SelectedDefinition { get; set; }
 
 		//-----------------------------------------------------------------------
 		public DataItem WrappedItem
@@ -28,6 +31,7 @@ namespace StructuredXmlEditor.Data
 				if (m_wrappedItem != null)
 				{
 					m_wrappedItem.PropertyChanged -= WrappedItemPropertyChanged;
+					Children.Clear();
 				}
 
 				m_wrappedItem = value;
@@ -36,60 +40,54 @@ namespace StructuredXmlEditor.Data
 				{
 					m_wrappedItem.Parent = this;
 					m_wrappedItem.PropertyChanged += WrappedItemPropertyChanged;
-					Children = m_wrappedItem.Children;
+					foreach (var child in m_wrappedItem.Children) Children.Add(child);
+					m_wrappedItem.Children = Children;
 				}
 
-				if (Parent != null)
+				if (WrappedItem != null)
 				{
-					Name = "[" + Parent.Children.IndexOf(this) + "] " + WrappedItem.Name;
+					Name = WrappedItem.Name;
 				}
+				else
+				{
+					Name = Definition.Name;
+				}
+
+				RaisePropertyChangedEvent();
+				RaisePropertyChangedEvent("Children");
 			}
 		}
 		private DataItem m_wrappedItem;
+
+		//-----------------------------------------------------------------------
+		public bool HasContent { get { return ChosenDefinition != null; } }
 
 		//-----------------------------------------------------------------------
 		public override string Description
 		{
 			get
 			{
-				return WrappedItem.Description;
+				return WrappedItem != null ? WrappedItem.Description  : "Unset" ;
 			}
 		}
 
 		//-----------------------------------------------------------------------
-		public override string CopyKey { get { return WrappedItem.CopyKey; } }
+		public bool ShowClearButton { get { return HasContent && !(Parent is CollectionChildItem); } }
 
 		//-----------------------------------------------------------------------
-		public CollectionItem ParentCollection
-		{
-			get
-			{
-				if (Parent is CollectionItem) return Parent as CollectionItem;
-				if (Parent is CollectionChildItem) return (Parent as CollectionChildItem).WrappedItem as CollectionItem;
-				if (Parent is StructRefItem) return (Parent as StructRefItem).WrappedItem as CollectionItem;
-				return null;
-			}
-		}
+		public override string CopyKey { get { return WrappedItem != null ? WrappedItem.CopyKey : Definition.CopyKey; } }
 
 		//-----------------------------------------------------------------------
-		public override bool CanRemove
-		{
-			get
-			{
-				return !ParentCollection.IsAtMin;
-			}
-		}
+		public Command<object> CreateCMD { get { return new Command<object>((e) => Create()); } }
 
 		//-----------------------------------------------------------------------
-		public override Command<object> PasteCMD { get { return WrappedItem.PasteCMD; } }
+		public Command<object> ClearCMD { get { return new Command<object>((e) => Clear()); } }
 
 		//-----------------------------------------------------------------------
-		public override Command<object> RemoveCMD { get { return new Command<object>((e) => Remove()); } }
-
-		//-----------------------------------------------------------------------
-		public CollectionChildItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
+		public StructRefItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
 			PropertyChanged += OnPropertyChanged;
+			SelectedDefinition = (definition as StructRefDefinition).Definitions.Values.First();
 		}
 
 		//-----------------------------------------------------------------------
@@ -101,16 +99,6 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		protected override void AddContextMenuItems(ContextMenu menu)
 		{
-			MenuItem DuplicateItem = new MenuItem();
-			DuplicateItem.Header = "Duplicate";
-
-			DuplicateItem.Click += delegate
-			{
-				Duplicate();
-			};
-
-			menu.Items.Add(DuplicateItem);
-
 			MenuItem CopyItem = new MenuItem();
 			CopyItem.Header = "Copy";
 
@@ -133,9 +121,13 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			if (Parent != null)
+			if (WrappedItem != null)
 			{
-				Name = "[" + Parent.Children.IndexOf(this) + "] " + WrappedItem.Name;
+				Name = WrappedItem.Name;
+			}
+			else
+			{
+				Name = Definition.Name;
 			}
 		}
 
@@ -143,12 +135,6 @@ namespace StructuredXmlEditor.Data
 		public void WrappedItemPropertyChanged(object sender, PropertyChangedEventArgs args)
 		{
 			RaisePropertyChangedEvent("Description");
-		}
-
-		//-----------------------------------------------------------------------
-		public void Remove()
-		{
-			ParentCollection.Remove(this);
 		}
 
 		//-----------------------------------------------------------------------
@@ -164,24 +150,64 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public void Duplicate()
+		public void Create()
 		{
-			var el = new XElement("Root");
-			WrappedItem.Definition.SaveData(el, WrappedItem);
-
-			CollectionChildItem child = null;
-
+			DataItem item = null;
+			var chosen = SelectedDefinition;
 			using (UndoRedo.DisableUndoScope())
 			{
-				var item = WrappedItem.Definition.LoadData(el.Elements().First(), UndoRedo);
-				child = Definition.CreateData(UndoRedo) as CollectionChildItem;
-				child.WrappedItem = item;
+				item = chosen.CreateData(UndoRedo);
+				if (item is StructItem)
+				{
+					(item.Definition as StructDefinition).CreateChildren(item as StructItem, UndoRedo);
+				}
 			}
 
-			var collection = Parent as CollectionItem;
-			var index = collection.Children.IndexOf(this) + 1;
+			UndoRedo.ApplyDoUndo(delegate
+			{
+				ChosenDefinition = chosen;
+				WrappedItem = item;
 
-			collection.Insert(index, child);
+				RaisePropertyChangedEvent("HasContent");
+				RaisePropertyChangedEvent("Description");
+				RaisePropertyChangedEvent("Name");
+			},
+			delegate
+			{
+				WrappedItem = null;
+				ChosenDefinition = null;
+
+				RaisePropertyChangedEvent("HasContent");
+				RaisePropertyChangedEvent("Description");
+				RaisePropertyChangedEvent("Name");
+			},
+			"");
+		}
+
+		public void Clear()
+		{
+			var item = WrappedItem;
+			var oldDef = ChosenDefinition;
+
+			UndoRedo.ApplyDoUndo(delegate
+			{
+				WrappedItem = null;
+				ChosenDefinition = null;
+
+				RaisePropertyChangedEvent("HasContent");
+				RaisePropertyChangedEvent("Description");
+				RaisePropertyChangedEvent("Name");
+			},
+			delegate
+			{
+				item = WrappedItem;
+				ChosenDefinition = oldDef;
+
+				RaisePropertyChangedEvent("HasContent");
+				RaisePropertyChangedEvent("Description");
+				RaisePropertyChangedEvent("Name");
+			},
+			"");
 		}
 	}
 }
