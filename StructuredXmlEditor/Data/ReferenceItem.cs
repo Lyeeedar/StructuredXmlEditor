@@ -8,10 +8,11 @@ using StructuredXmlEditor.View;
 using System.Windows.Controls;
 using System.ComponentModel;
 using System.Xml.Linq;
+using System.Windows;
 
 namespace StructuredXmlEditor.Data
 {
-	public class StructRefItem : DataItem
+	public class ReferenceItem : DataItem
 	{
 		//-----------------------------------------------------------------------
 		public DataDefinition ChosenDefinition { get; set; }
@@ -72,7 +73,16 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public bool ShowClearButton { get { return HasContent && !(Parent is CollectionChildItem); } }
+		public override bool IsCollectionChild { get { return HasContent; } }
+
+		//-----------------------------------------------------------------------
+		public override bool CanRemove
+		{
+			get
+			{
+				return true;
+			}
+		}
 
 		//-----------------------------------------------------------------------
 		public override string CopyKey { get { return WrappedItem != null ? WrappedItem.CopyKey : Definition.CopyKey; } }
@@ -81,13 +91,13 @@ namespace StructuredXmlEditor.Data
 		public Command<object> CreateCMD { get { return new Command<object>((e) => Create()); } }
 
 		//-----------------------------------------------------------------------
-		public Command<object> ClearCMD { get { return new Command<object>((e) => Clear()); } }
+		public override Command<object> RemoveCMD { get { return new Command<object>((e) => Clear()); } }
 
 		//-----------------------------------------------------------------------
-		public StructRefItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
+		public ReferenceItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
 			PropertyChanged += OnPropertyChanged;
-			SelectedDefinition = (definition as StructRefDefinition).Definitions.Values.First();
+			SelectedDefinition = (definition as ReferenceDefinition).Definitions.Values.First();
 		}
 
 		//-----------------------------------------------------------------------
@@ -171,6 +181,7 @@ namespace StructuredXmlEditor.Data
 				RaisePropertyChangedEvent("HasContent");
 				RaisePropertyChangedEvent("Description");
 				RaisePropertyChangedEvent("Name");
+				RaisePropertyChangedEvent("IsCollectionChild");
 			},
 			delegate
 			{
@@ -180,6 +191,7 @@ namespace StructuredXmlEditor.Data
 				RaisePropertyChangedEvent("HasContent");
 				RaisePropertyChangedEvent("Description");
 				RaisePropertyChangedEvent("Name");
+				RaisePropertyChangedEvent("IsCollectionChild");
 			},
 			"");
 		}
@@ -197,6 +209,7 @@ namespace StructuredXmlEditor.Data
 				RaisePropertyChangedEvent("HasContent");
 				RaisePropertyChangedEvent("Description");
 				RaisePropertyChangedEvent("Name");
+				RaisePropertyChangedEvent("IsCollectionChild");
 			},
 			delegate
 			{
@@ -206,6 +219,7 @@ namespace StructuredXmlEditor.Data
 				RaisePropertyChangedEvent("HasContent");
 				RaisePropertyChangedEvent("Description");
 				RaisePropertyChangedEvent("Name");
+				RaisePropertyChangedEvent("IsCollectionChild");
 			},
 			"");
 		}

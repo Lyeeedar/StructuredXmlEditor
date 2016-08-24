@@ -137,6 +137,17 @@ namespace StructuredXmlEditor.Data
 			var rootdoc = XDocument.Load(ProjectRoot);
 			DefsFolder = rootdoc.Elements().First().Element("Definitions").Value;
 
+			LoadDefinitions();
+		}
+
+		//-----------------------------------------------------------------------
+		public void LoadDefinitions()
+		{
+			ReferenceableDefinitions.Clear();
+			SupportedResourceTypes.Clear();
+			DataTypes.Clear();
+			RootDefinition = null;
+
 			foreach (var file in Directory.EnumerateFiles(Path.Combine(Path.GetDirectoryName(ProjectRoot), DefsFolder), "*.xmldef", SearchOption.AllDirectories))
 			{
 				var filedoc = XDocument.Load(file);
@@ -202,6 +213,12 @@ namespace StructuredXmlEditor.Data
 				type.RecursivelyResolve(DataTypes);
 			}
 			RootDefinition.RecursivelyResolve(DataTypes);
+
+			RaisePropertyChangedEvent("ReferenceableDefinitions");
+			RaisePropertyChangedEvent("SupportedResourceTypes");
+			RaisePropertyChangedEvent("DataTypes");
+			RaisePropertyChangedEvent("RootDefinition");
+			RaisePropertyChangedEvent("AllResourceTypes");
 		}
 
 		//-----------------------------------------------------------------------

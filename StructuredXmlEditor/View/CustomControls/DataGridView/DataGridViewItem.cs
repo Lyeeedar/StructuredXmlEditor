@@ -413,7 +413,7 @@ namespace StructuredXmlEditor.View
 			if (DataContext is CollectionChildItem)
 			{
 				CollectionChildItem itemBase = (CollectionChildItem)DataContext;
-				CollectionItem collection = (CollectionItem)itemBase.Parent;
+				CollectionItem collection = itemBase.ParentCollection;
 
 				if (collection != null)
 				{
@@ -456,7 +456,7 @@ namespace StructuredXmlEditor.View
 			if (DataContext is CollectionChildItem)
 			{
 				CollectionChildItem item = e.Data.GetData("CollectionChildItem") as CollectionChildItem;
-				CollectionItem collection = (CollectionItem)((CollectionChildItem)DataContext).Parent;
+				CollectionItem collection = ((CollectionChildItem)DataContext).ParentCollection;
 
 				if (collection.Children.Contains(item))
 				{
@@ -515,7 +515,7 @@ namespace StructuredXmlEditor.View
 			if (DataContext is CollectionChildItem)
 			{
 				CollectionChildItem item = e.Data.GetData("CollectionChildItem") as CollectionChildItem;
-				CollectionItem collection = (CollectionItem)((CollectionChildItem)DataContext).Parent;
+				CollectionItem collection = ((CollectionChildItem)DataContext).ParentCollection;
 
 				if (collection.Children.Contains(item))
 				{
@@ -562,7 +562,7 @@ namespace StructuredXmlEditor.View
 			if (DataContext is CollectionChildItem)
 			{
 				CollectionChildItem item = e.Data.GetData("CollectionChildItem") as CollectionChildItem;
-				CollectionItem collection = (CollectionItem)((CollectionChildItem)DataContext).Parent;
+				CollectionItem collection = ((CollectionChildItem)DataContext).ParentCollection;
 
 				if (collection.Children.Contains(item))
 				{

@@ -73,6 +73,10 @@ namespace StructuredXmlEditor.Definition
 			}
 			else
 			{
+				var refDefs = new List<ReferenceDefinition>();
+				var unassignedEls = new List<XElement>();
+				unassignedEls.AddRange(element.Elements());
+
 				foreach (var def in Children)
 				{
 					var name = def.Name;
@@ -85,6 +89,10 @@ namespace StructuredXmlEditor.Definition
 
 						hadData = true;
 					}
+					else if (def is ReferenceDefinition)
+					{
+						refDefs.Add(def as ReferenceDefinition);
+					}
 					else
 					{
 						var el = element.Element(name);
@@ -95,6 +103,8 @@ namespace StructuredXmlEditor.Definition
 							item.Children.Add(childItem);
 
 							hadData = true;
+
+							unassignedEls.Remove(el);
 						}
 						else
 						{
@@ -102,6 +112,19 @@ namespace StructuredXmlEditor.Definition
 							item.Children.Add(childItem);
 						}
 					}
+				}
+
+				if (refDefs.Count != unassignedEls.Count) throw new Exception("Out of sync data when using reference items! This is bad!");
+
+				for (int i = 0; i < unassignedEls.Count; i++)
+				{
+					var rdef = refDefs[i];
+					var el = unassignedEls[i];
+
+					DataItem childItem = rdef.LoadData(el, undoRedo);
+					item.Children.Add(childItem);
+
+					hadData = true;
 				}
 			}
 
@@ -217,7 +240,7 @@ namespace StructuredXmlEditor.Definition
 						var asString = primDef.WriteToString(att);
 						var defaultAsString = primDef.DefaultValueString();
 
-						if (asString != defaultAsString)
+						if (att.Name == "Name" || asString != defaultAsString)
 						{
 							el.SetAttributeValue(att.Name, asString);
 						}
@@ -247,7 +270,7 @@ namespace StructuredXmlEditor.Definition
 						var asString = primDef.WriteToString(att);
 						var defaultAsString = primDef.DefaultValueString();
 
-						if (asString != defaultAsString)
+						if (att.Name == "Name" || asString != defaultAsString)
 						{
 							el.SetAttributeValue(att.Name, asString);
 						}

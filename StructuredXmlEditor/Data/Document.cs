@@ -63,6 +63,11 @@ namespace StructuredXmlEditor.Data
 		{
 			Data.Save(Path);
 			UndoRedo.MarkSavePoint();
+
+			if (Path.EndsWith(".xmldef"))
+			{
+				Workspace.LoadDefinitions();
+			}
 		}
 
 		public void SaveAs(string path)

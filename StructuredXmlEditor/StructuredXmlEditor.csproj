@@ -70,7 +70,7 @@
     <Compile Include="Data\PairItem.cs" />
     <Compile Include="Data\PrimitiveDataItem.cs" />
     <Compile Include="Data\MultilineStringItem.cs" />
-    <Compile Include="Data\StructRefItem.cs" />
+    <Compile Include="Data\ReferenceItem.cs" />
     <Compile Include="Data\TreeItem.cs" />
     <Compile Include="Data\Workspace.cs" />
     <Compile Include="Definition\BooleanDefinition.cs" />
@@ -91,7 +91,7 @@
     <Compile Include="Definition\MultilineStringDefinition.cs" />
     <Compile Include="Definition\StringDefinition.cs" />
     <Compile Include="Definition\StructDefinition.cs" />
-    <Compile Include="Definition\StructRefDefinition.cs" />
+    <Compile Include="Definition\ReferenceDefinition.cs" />
     <Compile Include="Definition\TreeDefinition.cs" />
     <Compile Include="Util\Extensions.cs" />
     <Compile Include="Util\SerializableDictionary.cs" />

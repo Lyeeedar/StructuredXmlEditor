@@ -131,7 +131,7 @@
 										Grid.Column="1">
 
 										<Grid
-											Visibility="{Binding IsCollectionChild, FallbackValue=Collapsed, Converter={l:ValueTypeConverter}}"
+											Visibility="{Binding CanReorder, FallbackValue=Collapsed, Converter={l:ValueTypeConverter}}"
 											DockPanel.Dock="Left">
 											<Thumb
 												x:Name="PART_ShuffleThumb"

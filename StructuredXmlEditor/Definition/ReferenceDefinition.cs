@@ -8,23 +8,26 @@ using StructuredXmlEditor.Data;
 
 namespace StructuredXmlEditor.Definition
 {
-	public class StructRefDefinition : ComplexDataDefinition
+	public class ReferenceDefinition : ComplexDataDefinition
 	{
 		public List<string> Keys { get; set; } = new List<string>();
 		public Dictionary<string, DataDefinition> Definitions { get; set; } = new Dictionary<string, DataDefinition>();
 
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
-			var item = new StructRefItem(this, undoRedo);
+			var item = new ReferenceItem(this, undoRedo);
 			return item;
 		}
 
 		public override void DoSaveData(XElement parent, DataItem item)
 		{
-			var si = item as StructRefItem;
+			var si = item as ReferenceItem;
 			if (si.ChosenDefinition != null)
 			{
 				si.ChosenDefinition.DoSaveData(parent, si.WrappedItem);
+
+				if (parent.Elements().Count() == 0) return;
+
 				var el = parent.Elements().Last();
 				el.SetAttributeValue("RefKey", si.ChosenDefinition.Name);
 			}
@@ -32,10 +35,10 @@ namespace StructuredXmlEditor.Definition
 
 		public override DataItem LoadData(XElement element, UndoRedoManager undoRedo)
 		{
-			var key = element.Attribute("Key").Value.ToString();
+			var key = element.Attribute("RefKey").Value.ToString();
 			var def = Definitions[key];
 
-			var item = new StructRefItem(this, undoRedo);
+			var item = new ReferenceItem(this, undoRedo);
 			item.ChosenDefinition = def;
 
 			var loaded = def.LoadData(element, undoRedo);

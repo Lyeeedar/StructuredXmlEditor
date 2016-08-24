@@ -102,6 +102,19 @@ namespace StructuredXmlEditor.View
 			DependencyProperty.Register("MinValue", typeof(float), typeof(NumericTextBox), new PropertyMetadata(-float.MaxValue));
 		#endregion MinValue
 
+		#region DefaultValue
+		//--------------------------------------------------------------------------
+		public float DefaultValue
+		{
+			get { return (float)GetValue(DefaultValueProperty); }
+			set { SetValue(DefaultValueProperty, value); }
+		}
+
+		//--------------------------------------------------------------------------
+		public static readonly DependencyProperty DefaultValueProperty =
+			DependencyProperty.Register("DefaultValue", typeof(float), typeof(NumericTextBox), new PropertyMetadata(float.MaxValue));
+		#endregion DefaultValue
+
 		#region UseIntegers
 		//--------------------------------------------------------------------------
 		public bool UseIntegers
@@ -122,6 +135,12 @@ namespace StructuredXmlEditor.View
 		//--------------------------------------------------------------------------
 		public void ValueTextChanged()
 		{
+			if (ValueText == "")
+			{
+				Value = DefaultValue;
+				return;
+			}
+
 			float value = 0f;
 
 			if (UseIntegers)

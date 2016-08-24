@@ -42,7 +42,7 @@ namespace StructuredXmlEditor.Data
 				}
 				else if (Attributes.Count > 0)
 				{
-					return string.Join(", ", Attributes.Where(e => e.Description != (e.Definition as PrimitiveDataDefinition).DefaultValueString()).Select(e => e.Name + "=" + e.Description));
+					return string.Join(", ", Attributes.Where(e => e.Name == "Name" || e.Description != (e.Definition as PrimitiveDataDefinition).DefaultValueString()).Select(e => e.Name + "=" + e.Description));
 				}
 				else
 				{

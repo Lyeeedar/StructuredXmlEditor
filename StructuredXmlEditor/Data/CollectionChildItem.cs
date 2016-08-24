@@ -17,6 +17,9 @@ namespace StructuredXmlEditor.Data
 		public override bool IsCollectionChild { get { return true; } }
 
 		//-----------------------------------------------------------------------
+		public override bool CanReorder { get { return true; } }
+
+		//-----------------------------------------------------------------------
 		public DataItem WrappedItem
 		{
 			get
@@ -65,8 +68,13 @@ namespace StructuredXmlEditor.Data
 			get
 			{
 				if (Parent is CollectionItem) return Parent as CollectionItem;
-				if (Parent is CollectionChildItem) return (Parent as CollectionChildItem).WrappedItem as CollectionItem;
-				if (Parent is StructRefItem) return (Parent as StructRefItem).WrappedItem as CollectionItem;
+				if (Parent is CollectionChildItem)
+				{
+					var parent = (Parent as CollectionChildItem).WrappedItem;
+					if (parent is CollectionItem) return parent as CollectionItem;
+					else if (parent is ReferenceItem) return (parent as ReferenceItem).WrappedItem as CollectionItem;
+				}
+				if (Parent is ReferenceItem) return (Parent as ReferenceItem).WrappedItem as CollectionItem;
 				return null;
 			}
 		}

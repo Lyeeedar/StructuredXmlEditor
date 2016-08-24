@@ -206,6 +206,9 @@ namespace StructuredXmlEditor.Data
 		public virtual bool IsCollectionChild { get { return false; } }
 
 		//-----------------------------------------------------------------------
+		public virtual bool CanReorder { get { return false; } }
+
+		//-----------------------------------------------------------------------
 		public int ZIndex
 		{
 			get { return m_zindex; }
@@ -449,6 +452,8 @@ namespace StructuredXmlEditor.Data
 			{
 				Children[i].Index = i;
 			}
+
+			IsExpanded = true;
 		}
 
 		//-----------------------------------------------------------------------
@@ -489,10 +494,9 @@ namespace StructuredXmlEditor.Data
 			{
 				matchFound = Name.ToLower().Contains(filter);
 
-				if (IsPrimitive && !matchFound)
+				if (!matchFound)
 				{
-					var val = GetType().GetProperty("Value").GetValue(this).ToString(); // reflection cause cant cast to PrimitiveDataType<>
-					matchFound = val.ToLower().Contains(filter);
+					matchFound = Description.ToLower().Contains(filter);
 				}
 
 				m_isSearchFiltered = !matchFound;
