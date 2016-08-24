@@ -133,7 +133,7 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			
+
 		}
 
 		//-----------------------------------------------------------------------

@@ -152,6 +152,10 @@ namespace StructuredXmlEditor.Data
 					RootItems.Add(child);
 				}
 			}
+			else if (RootItems.Contains(item))
+			{
+				return;
+			}
 			else
 			{
 				item.Focus();

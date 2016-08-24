@@ -160,6 +160,10 @@ namespace StructuredXmlEditor.Data
 			{
 				RaisePropertyChangedEvent("Description");
 			}
+			else if (args.PropertyName == "Name")
+			{
+				Name = "[" + Parent.Children.IndexOf(this) + "] " + WrappedItem.Name;
+			}
 		}
 
 		//-----------------------------------------------------------------------

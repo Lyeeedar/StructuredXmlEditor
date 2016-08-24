@@ -77,6 +77,8 @@ namespace StructuredXmlEditor.Definition
 				var unassignedEls = new List<XElement>();
 				unassignedEls.AddRange(element.Elements());
 
+				var createdChildren = new List<DataItem>();
+
 				foreach (var def in Children)
 				{
 					var name = def.Name;
@@ -85,7 +87,7 @@ namespace StructuredXmlEditor.Definition
 					{
 						var primDef = def as PrimitiveDataDefinition;
 						DataItem childItem = primDef.LoadFromString(element.Name.ToString(), undoRedo);
-						item.Children.Add(childItem);
+						createdChildren.Add(childItem);
 
 						hadData = true;
 					}
@@ -100,7 +102,7 @@ namespace StructuredXmlEditor.Definition
 						if (el != null)
 						{
 							DataItem childItem = def.LoadData(el, undoRedo);
-							item.Children.Add(childItem);
+							createdChildren.Add(childItem);
 
 							hadData = true;
 
@@ -109,7 +111,7 @@ namespace StructuredXmlEditor.Definition
 						else
 						{
 							DataItem childItem = def.CreateData(undoRedo);
-							item.Children.Add(childItem);
+							createdChildren.Add(childItem);
 						}
 					}
 				}
@@ -122,10 +124,13 @@ namespace StructuredXmlEditor.Definition
 					var el = unassignedEls[i];
 
 					DataItem childItem = rdef.LoadData(el, undoRedo);
-					item.Children.Add(childItem);
+					createdChildren.Add(childItem);
 
 					hadData = true;
 				}
+
+				var sorted = createdChildren.OrderBy((e) => Children.IndexOf(e.Definition));
+				foreach (var c in sorted) item.Children.Add(c);
 			}
 
 			foreach (var att in Attributes)
