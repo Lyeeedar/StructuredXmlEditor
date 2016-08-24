@@ -103,7 +103,10 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public override void ParentPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			RaisePropertyChangedEvent("CanRemove");
+			if (e.PropertyName == "IsAtMin")
+			{
+				RaisePropertyChangedEvent("CanRemove");
+			}
 		}
 
 		//-----------------------------------------------------------------------
@@ -141,16 +144,22 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			if (Parent != null)
+			if (e.PropertyName == "Parent" || e.PropertyName == "Index")
 			{
-				Name = "[" + Parent.Children.IndexOf(this) + "] " + WrappedItem.Name;
+				if (Parent != null)
+				{
+					Name = "[" + Parent.Children.IndexOf(this) + "] " + WrappedItem.Name;
+				}
 			}
 		}
 
 		//-----------------------------------------------------------------------
 		public void WrappedItemPropertyChanged(object sender, PropertyChangedEventArgs args)
 		{
-			RaisePropertyChangedEvent("Description");
+			if (args.PropertyName == "Description")
+			{
+				RaisePropertyChangedEvent("Description");
+			}
 		}
 
 		//-----------------------------------------------------------------------

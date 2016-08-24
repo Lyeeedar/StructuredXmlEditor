@@ -16,6 +16,8 @@ namespace StructuredXmlEditor.Definition
 
 		public string VisibleIf { get; set; }
 
+		public bool IsDef { get; set; }
+
 		public abstract void Parse(XElement definition);
 		public abstract void DoSaveData(XElement parent, DataItem item);
 		public abstract DataItem LoadData(XElement element, UndoRedoManager undoRedo);
@@ -32,17 +34,22 @@ namespace StructuredXmlEditor.Definition
 		{
 			var name = element.Name.ToString().ToUpper();
 
+			if (name.EndsWith("DEF"))
+			{
+				name = name.Substring(0, name.Length - "DEF".Length);
+			}
+
 			DataDefinition definition = null;
 
 			if (name == "STRING") definition = new StringDefinition();
 			else if (name == "MULTILINESTRING") definition = new MultilineStringDefinition();
-			else if (name == "STRUCT" || name == "STRUCTDEF") definition = new StructDefinition();
+			else if (name == "STRUCT") definition = new StructDefinition();
 			else if (name == "REFERENCE") definition = new ReferenceDefinition();
-			else if (name == "COLLECTION" || name == "COLLECTIONDEF") definition = new CollectionDefinition();
+			else if (name == "COLLECTION") definition = new CollectionDefinition();
 			else if (name == "NUMBER") definition = new NumberDefinition();
 			else if (name == "BOOLEAN") definition = new BooleanDefinition();
 			else if (name == "COLOUR") definition = new ColourDefinition();
-			else if (name == "ENUM" || name == "ENUMDEF") definition = new EnumDefinition();
+			else if (name == "ENUM") definition = new EnumDefinition();
 			else if (name == "PAIR") definition = new PairDefinition();
 			else if (name == "FILE") definition = new FileDefinition();
 			else if (name == "TREE") definition = new TreeDefinition();
@@ -50,6 +57,7 @@ namespace StructuredXmlEditor.Definition
 
 			definition.Name = element.Attribute("Name")?.Value?.ToString();
 			definition.VisibleIf = element.Attribute("VisibleIf")?.Value?.ToString();
+			definition.IsDef = definition.TryParseBool(element, "IsDef");
 
 			definition.Parse(element);
 

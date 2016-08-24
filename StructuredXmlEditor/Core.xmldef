@@ -66,7 +66,16 @@
 		</Attributes>
 	</StructDef>
 
-	<StructDef Name="EnumDef" Key="Enum" />
+	<StructDef Name="EnumDef">
+		<Attributes>
+			<String Name="Name" Default="EnumDef" />
+			<String Name="Key" />
+			<String Name="EnumValues" />
+			<String Name="Default" />
+			<Boolean Name="ValueAsName" />
+			<String Name="VisibleIf" />
+		</Attributes>
+	</StructDef>
 
 	<StructDef Name="Tree">
 		<Attributes>
@@ -78,6 +87,18 @@
 	<StructDef Name="Collection">
 		<Attributes>
 			<String Name="Name" Default="Collection" />
+			<Boolean Name="Collapse" />
+			<String Name="Seperator" Default="," />
+			<Number Name="MinCount" Min="0" />
+			<Number Name="MaxCount" Min="1" Default="99999999" />
+			<String Name="VisibleIf" />
+		</Attributes>
+		<Reference Name="Child" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,String,Struct,Tree" />
+	</StructDef>
+
+	<StructDef Name="CollectionDef">
+		<Attributes>
+			<String Name="Name" Default="CollectionDef" />
 			<Boolean Name="Collapse" />
 			<String Name="Seperator" Default="," />
 			<Number Name="MinCount" Min="0" />

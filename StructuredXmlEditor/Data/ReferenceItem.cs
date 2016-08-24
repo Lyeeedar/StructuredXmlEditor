@@ -55,7 +55,9 @@ namespace StructuredXmlEditor.Data
 				}
 
 				RaisePropertyChangedEvent();
-				RaisePropertyChangedEvent("Children");
+				RaisePropertyChangedEvent("Description");
+				RaisePropertyChangedEvent("HasContent");
+				RaisePropertyChangedEvent("IsCollectionChild");
 			}
 		}
 		private DataItem m_wrappedItem;
@@ -73,7 +75,7 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public override bool IsCollectionChild { get { return HasContent; } }
+		public override bool IsCollectionChild { get { return HasContent && (Definition as ReferenceDefinition).Definitions.Count > 1; } }
 
 		//-----------------------------------------------------------------------
 		public override bool CanRemove
@@ -103,7 +105,7 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public override void ParentPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			RaisePropertyChangedEvent("CanRemove");
+			
 		}
 
 		//-----------------------------------------------------------------------
@@ -131,20 +133,16 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			if (WrappedItem != null)
-			{
-				Name = WrappedItem.Name;
-			}
-			else
-			{
-				Name = Definition.Name;
-			}
+			
 		}
 
 		//-----------------------------------------------------------------------
 		public void WrappedItemPropertyChanged(object sender, PropertyChangedEventArgs args)
 		{
-			RaisePropertyChangedEvent("Description");
+			if (args.PropertyName == "Description")
+			{
+				RaisePropertyChangedEvent("Description");
+			}
 		}
 
 		//-----------------------------------------------------------------------
@@ -177,21 +175,11 @@ namespace StructuredXmlEditor.Data
 			{
 				ChosenDefinition = chosen;
 				WrappedItem = item;
-
-				RaisePropertyChangedEvent("HasContent");
-				RaisePropertyChangedEvent("Description");
-				RaisePropertyChangedEvent("Name");
-				RaisePropertyChangedEvent("IsCollectionChild");
 			},
 			delegate
 			{
 				WrappedItem = null;
 				ChosenDefinition = null;
-
-				RaisePropertyChangedEvent("HasContent");
-				RaisePropertyChangedEvent("Description");
-				RaisePropertyChangedEvent("Name");
-				RaisePropertyChangedEvent("IsCollectionChild");
 			},
 			"");
 		}
@@ -205,21 +193,11 @@ namespace StructuredXmlEditor.Data
 			{
 				WrappedItem = null;
 				ChosenDefinition = null;
-
-				RaisePropertyChangedEvent("HasContent");
-				RaisePropertyChangedEvent("Description");
-				RaisePropertyChangedEvent("Name");
-				RaisePropertyChangedEvent("IsCollectionChild");
 			},
 			delegate
 			{
 				item = WrappedItem;
 				ChosenDefinition = oldDef;
-
-				RaisePropertyChangedEvent("HasContent");
-				RaisePropertyChangedEvent("Description");
-				RaisePropertyChangedEvent("Name");
-				RaisePropertyChangedEvent("IsCollectionChild");
 			},
 			"");
 		}

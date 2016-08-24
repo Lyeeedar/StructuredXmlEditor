@@ -16,6 +16,11 @@ namespace StructuredXmlEditor.Definition
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
 			var item = new ReferenceItem(this, undoRedo);
+			if (Definitions.Count == 1)
+			{
+				item.ChosenDefinition = Definitions.Values.First();
+				item.Create();
+			}
 			return item;
 		}
 
