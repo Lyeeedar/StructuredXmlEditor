@@ -93,7 +93,7 @@
 			<Number Name="MaxCount" Min="1" Default="99999999" />
 			<String Name="VisibleIf" />
 		</Attributes>
-		<Reference Name="Child" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,String,Struct,Tree" />
+		<Reference Name="Child" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,Reference,String,Struct,Tree" />
 	</StructDef>
 
 	<StructDef Name="CollectionDef">
@@ -105,7 +105,7 @@
 			<Number Name="MaxCount" Min="1" Default="99999999" />
 			<String Name="VisibleIf" />
 		</Attributes>
-		<Reference Name="Child" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,String,Struct,Tree" />
+		<Reference Name="Child" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,Reference,String,Struct,Tree" />
 	</StructDef>
 
 	<StructDef Name="Pair">
