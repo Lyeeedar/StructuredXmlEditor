@@ -172,6 +172,21 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public virtual string ToolTip
+		{
+			get { return m_toolTip; }
+			set
+			{
+				if (m_toolTip != value)
+				{
+					m_toolTip = value;
+
+					RaisePropertyChangedEvent();
+				}
+			}
+		}
+
+		//-----------------------------------------------------------------------
 		public string FocusName
 		{
 			get
@@ -195,9 +210,6 @@ namespace StructuredXmlEditor.Data
 
 		//-----------------------------------------------------------------------
 		public bool HasParent { get { return Parent != null; } }
-
-		//-----------------------------------------------------------------------
-		public virtual string ToolTip { get; protected set; }
 
 		//-----------------------------------------------------------------------
 		public virtual Command<object> RemoveCMD { get { return null; } }
@@ -288,7 +300,8 @@ namespace StructuredXmlEditor.Data
 		{
 			Definition = definition;
 			Name = definition.Name;
-			this.UndoRedo = undoRedo;
+			ToolTip = definition.ToolTip;
+			UndoRedo = undoRedo;
 
 			Children = new ObservableCollection<DataItem>();
 
@@ -578,6 +591,7 @@ namespace StructuredXmlEditor.Data
 		int m_index = -1;
 		DispatcherOperation m_deferredUpdateChildren = null;
 		private ObservableCollection<DataItem> m_children;
+		string m_toolTip = null;
 	}
 
 	//-----------------------------------------------------------------------

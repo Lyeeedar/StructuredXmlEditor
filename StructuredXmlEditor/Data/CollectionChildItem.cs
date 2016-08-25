@@ -42,9 +42,15 @@ namespace StructuredXmlEditor.Data
 					Children = m_wrappedItem.Children;
 				}
 
+				Name = "";
 				if (Parent != null)
 				{
-					Name = "[" + Parent.Children.IndexOf(this) + "] " + WrappedItem.Name;
+					Name = "[" + Parent.Children.IndexOf(this) + "] ";
+				}
+				if (WrappedItem != null)
+				{
+					Name += WrappedItem.Name;
+					ToolTip = WrappedItem.ToolTip;
 				}
 			}
 		}
@@ -146,9 +152,14 @@ namespace StructuredXmlEditor.Data
 		{
 			if (e.PropertyName == "Parent" || e.PropertyName == "Index")
 			{
+				Name = "";
 				if (Parent != null)
 				{
-					Name = "[" + Parent.Children.IndexOf(this) + "] " + WrappedItem.Name;
+					Name = "[" + Parent.Children.IndexOf(this) + "] ";
+				}
+				if (WrappedItem != null)
+				{
+					Name += WrappedItem.Name;
 				}
 			}
 		}
@@ -162,7 +173,19 @@ namespace StructuredXmlEditor.Data
 			}
 			else if (args.PropertyName == "Name")
 			{
-				Name = "[" + Parent.Children.IndexOf(this) + "] " + WrappedItem.Name;
+				Name = "";
+				if (Parent != null)
+				{
+					Name = "[" + Parent.Children.IndexOf(this) + "] ";
+				}
+				if (WrappedItem != null)
+				{
+					Name += WrappedItem.Name;
+				}
+			}
+			else if (args.PropertyName == "ToolTip")
+			{
+				ToolTip = WrappedItem.ToolTip;
 			}
 		}
 

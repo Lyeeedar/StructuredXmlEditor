@@ -14,6 +14,8 @@ namespace StructuredXmlEditor.Definition
 
 		public string Name { get; set; }
 
+		public string ToolTip { get; set; }
+
 		public string VisibleIf { get; set; }
 
 		public bool IsDef { get; set; }
@@ -56,6 +58,7 @@ namespace StructuredXmlEditor.Definition
 			else throw new Exception("Unknown definition type " + name + "!");
 
 			definition.Name = element.Attribute("Name")?.Value?.ToString();
+			definition.ToolTip = element.Attribute("ToolTip")?.Value?.ToString();
 			definition.VisibleIf = element.Attribute("VisibleIf")?.Value?.ToString();
 			definition.IsDef = definition.TryParseBool(element, "IsDef");
 

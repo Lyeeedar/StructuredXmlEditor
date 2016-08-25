@@ -1,156 +1,164 @@
 ﻿<Definitions>
 
-	<StructDef Name="Number">
+	<StructDef Name="Number" ToolTip="A number.">
 		<Attributes>
-			<String Name="Name" Default="Number" />
-			<Enum Name="Type" EnumValues="Float,Int" />
-			<Number Name="Min" Default="-9999999" />
-			<Number Name="Max" Default="9999999" />
-			<Number Name="Default" />
-			<String Name="VisibleIf" />
+			<String Name="Name" Default="Number" ToolTip="The name to be written for this element." />
+			<Enum Name="Type" EnumValues="Float,Int" ToolTip="The value type." />
+			<Number Name="Min" Default="-9999999" ToolTip="The minimum value this element can contain." />
+			<Number Name="Max" Default="9999999" ToolTip="The maximum value this element can contain." />
+			<Number Name="Default" ToolTip="The default value for this element." />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 		</Attributes>
 	</StructDef>
 
-	<StructDef Name="String" >
+	<StructDef Name="String" ToolTip="A string." >
 		<Attributes>
-			<String Name="Name" Default="String" />
-			<String Name="Default" />
-			<Boolean Name="ValueAsName" />
-			<String Name="VisibleIf" />
+			<String Name="Name" Default="String" ToolTip="The name to be written for this element." />
+			<String Name="Default" ToolTip="The default value for this element." />
+			<Boolean Name="ValueAsName" ToolTip="If true then write this value as the element name. &gt;Tag&lt;value&gt;/&lt; becomes &gt;value/&lt;." />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 		</Attributes>
 	</StructDef>
 
-	<StructDef Name="File" >
+	<StructDef Name="File" ToolTip="A file path (relative to the project root)." >
 		<Attributes>
-			<String Name="Name" Default="File" />
-			<String Name="BasePath" />
-			<String Name="AllowedFileTypes" />
-			<String Name="Default" />
-			<String Name="VisibleIf" />
+			<String Name="Name" Default="File" ToolTip="The name to be written for this element." />
+			<String Name="BasePath" ToolTip="The base path (relative to the project root) to convert any selected paths to." />
+			<String Name="AllowedFileTypes" ToolTip="A comma seperated list of allowed extensions." />
+			<String Name="Default" ToolTip="The default value for this element." />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 		</Attributes>
 	</StructDef>
 
-	<StructDef Name="Boolean">
+	<StructDef Name="Boolean" ToolTip="A boolean (true/false).">
 		<Attributes>
-			<String Name="Name" Default="Boolean" />
-			<Boolean Name="Default" />
-			<String Name="VisibleIf" />
+			<String Name="Name" Default="Boolean" ToolTip="The name to be written for this element." />
+			<Boolean Name="Default" ToolTip="The default value for this element." />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 		</Attributes>
 	</StructDef>
 
-	<StructDef Name="Colour">
+	<StructDef Name="Colour" ToolTip="A colour (stored as RGB or RGBA in 0-255 range).">
 		<Attributes>
-			<String Name="Name" Default="Colour" />
-			<Boolean Name="HasAlpha" />
-			<String Name="VisibleIf" />
+			<String Name="Name" Default="Colour" ToolTip="The name to be written for this element." />
+			<Boolean Name="HasAlpha" ToolTip="Whether this colour has an alpha value that isnt 255. If set to false then the colour will only write RGB, instead of RGBA." />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 		</Attributes>
 	</StructDef>
 
-	<StructDef Name="MultilineString">
+	<StructDef Name="MultilineString" ToolTip="A string that spans multiple lines.">
 		<Attributes>
-			<String Name="Name" Default="MultilineString" />
-			<String Name="Default" />
-			<Boolean Name="ElementPerLine" />
-			<String Name="VisibleIf" />
+			<String Name="Name" Default="MultilineString" ToolTip="The name to be written for this element." />
+			<String Name="Default" ToolTip="The default value for this element." />
+			<Boolean Name="ElementPerLine" ToolTip="If true then the string will be split line by line into child elements." />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 		</Attributes>
 	</StructDef>
 
-	<StructDef Name="Enum">
+	<StructDef Name="Enum" ToolTip="A value chosen from a series of valid values.">
 		<Attributes>
-			<String Name="Name" Default="Enum" />
-			<String Name="Key" />
-			<String Name="EnumValues" />
-			<String Name="Default" />
-			<Boolean Name="ValueAsName" />
-			<String Name="VisibleIf" />
+			<String Name="Name" Default="Enum" ToolTip="The name to be written for this element." />
+			<String Name="Key" ToolTip="The key of the EnumDef to load the EnumValues from." />
+			<String Name="EnumValues" ToolTip="A comma seperated list of enum values that can be picked." />
+			<String Name="Default" ToolTip="The default value for this element. If not set it defaults to the first EnumValue." />
+			<Boolean Name="ValueAsName" ToolTip="If true then write this value as the element name. &gt;Tag&lt;value&gt;/Tag&lt; becomes &gt;value/&lt;." />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 		</Attributes>
 	</StructDef>
 
-	<StructDef Name="EnumDef">
+	<StructDef Name="EnumDef" ToolTip="The definition for a collection of enumvalues that can be referenced by enums.">
 		<Attributes>
-			<String Name="Name" Default="EnumDef" />
-			<String Name="Key" />
-			<String Name="EnumValues" />
-			<String Name="Default" />
-			<Boolean Name="ValueAsName" />
-			<String Name="VisibleIf" />
+			<String Name="Name" Default="EnumDef" ToolTip="The name to be written for this element. This will be used as the key when referencing it." />
+			<String Name="EnumValues" ToolTip="A comma seperated list of enum values that can be picked." />
+			<String Name="Default" ToolTip="The default value for this element." />
+			<Boolean Name="ValueAsName" ToolTip="If true then write this value as the element name. &gt;Tag&lt;value&gt;/Tag&lt; becomes &gt;value/&lt;." />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 		</Attributes>
 	</StructDef>
 
-	<StructDef Name="Tree">
+	<StructDef Name="Tree" ToolTip="A tree of string values.">
 		<Attributes>
-			<String Name="Name" Default="Tree" />
-			<String Name="VisibleIf" />
+			<String Name="Name" Default="Tree" ToolTip="The name to be written for this element." />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 		</Attributes>
 	</StructDef>
 
-	<StructDef Name="Collection">
+	<StructDef Name="Collection" ToolTip="A collection containing multiple elements of the specified child.">
 		<Attributes>
-			<String Name="Name" Default="Collection" />
-			<Boolean Name="Collapse" />
-			<String Name="Seperator" Default="," />
-			<Number Name="MinCount" Min="0" />
-			<Number Name="MaxCount" Min="1" Default="99999999" />
-			<String Name="VisibleIf" />
+			<String Name="Name" Default="Collection" ToolTip="The name to be written for this element." />
+			<Boolean Name="Collapse" ToolTip="If set to true the collection will be collapsed to a single line seperated by the Seperator string. Only works if the child is a primitive item." />
+			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." />
+			<Number Name="MinCount" Min="0" ToolTip="The minimum number of child elements this can have." />
+			<Number Name="MaxCount" Min="1" Default="99999999" ToolTip="The maximum number of child elements this can have." />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 		</Attributes>
-		<Reference Name="Child" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,Reference,String,Struct,Tree" />
+		<Reference Name="Child" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,Reference,String,Struct,Tree" ToolTip="The child that this collection contains." />
 	</StructDef>
 
-	<StructDef Name="CollectionDef">
+	<StructDef Name="CollectionDef" ToolTip="A definition for a collection that can be referenced.">
 		<Attributes>
-			<String Name="Name" Default="CollectionDef" />
-			<Boolean Name="Collapse" />
-			<String Name="Seperator" Default="," />
-			<Number Name="MinCount" Min="0" />
-			<Number Name="MaxCount" Min="1" Default="99999999" />
-			<String Name="VisibleIf" />
+			<String Name="Name" Default="CollectionDef" ToolTip="The name to be written for this element. This will be used as the key when referencing it." />
+			<Boolean Name="Collapse" ToolTip="If set to true the collection will be collapsed to a single line seperated by the Seperator string. Only works if the child is a primitive item." />
+			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." />
+			<Number Name="MinCount" Min="0" ToolTip="The minimum number of child elements this can have." />
+			<Number Name="MaxCount" Min="1" Default="99999999" ToolTip="The maximum number of child elements this can have." />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 		</Attributes>
-		<Reference Name="Child" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,Reference,String,Struct,Tree" />
+		<Reference Name="Child" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,Reference,String,Struct,Tree" ToolTip="The child that this collection contains." />
 	</StructDef>
 
-	<StructDef Name="Pair">
+	<StructDef Name="Pair" ToolTip="A pair of values. Written as &gt;Key&lt;Value&gt;/Key&lt;.">
 		<Attributes>
-			<String Name="Name" Default="Pair" />
-			<String Name="VisibleIf" />
+			<String Name="Name" Default="Pair" ToolTip="The name to be written for this element." />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 		</Attributes>
-		<Reference Name="Key" Keys="Boolean,Colour,Enum,File,Number,String" />
-		<Reference Name="Value" Keys="Boolean,Colour,Enum,File,Number,String" />
+		<Reference Name="Key" Keys="Boolean,Colour,Enum,File,Number,String" ToolTip="The value to be used for the element name." />
+		<Reference Name="Value" Keys="Boolean,Colour,Enum,File,Number,String" ToolTip="The value to be used for the element contents." />
 	</StructDef>
 
-	<CollectionDef Name="Struct">
+	<StructDef Name="PairDef" ToolTip="A definition for a pair that can be referenced.">
 		<Attributes>
-			<String Name="Name" Default="Struct" />
-			<Boolean Name="Collapse" />
-			<String Name="Seperator" Default="," />
-			<String Name="ChildAsName" />
-			<String Name="DescriptionChild" />
-			<String Name="VisibleIf" />
+			<String Name="Name" Default="Pair" ToolTip="The name to be written for this element. This will be used as the key when referencing it." />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 		</Attributes>
-		<Reference Name="Child" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,String,Struct,Reference,Tree" />
+		<Reference Name="Key" Keys="Boolean,Colour,Enum,File,Number,String" ToolTip="The value to be used for the element name." />
+		<Reference Name="Value" Keys="Boolean,Colour,Enum,File,Number,String" ToolTip="The value to be used for the element contents." />
+	</StructDef>
+
+	<CollectionDef Name="Struct" ToolTip="A collection of elements to be placed within a single element.">
+		<Attributes>
+			<String Name="Name" Default="Struct" ToolTip="The name to be written for this element." />
+			<Boolean Name="Collapse" ToolTip="If set to true the struct will be collapsed to a single line seperated by the Seperator string. Only works all the child are a primitive items." />
+			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." />
+			<String Name="ChildAsName" ToolTip="The child to be used as the element name." />
+			<String Name="DescriptionChild" ToolTip="The child to be used to build the ui side description." />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
+		</Attributes>
+		<Reference Name="Child" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,String,Struct,Reference,Tree" ToolTip="The defined children of the struct" />
 	</CollectionDef>
 
-	<CollectionDef Name="StructDef">
+	<CollectionDef Name="StructDef" ToolTip="A definition for a struct that can be referenced.">
 		<Attributes>
-			<String Name="Name" Default="StructDef" />
-			<Boolean Name="Collapse" />
-			<String Name="Seperator" Default="," />
-			<String Name="ChildAsName" />
-			<String Name="DescriptionChild" />
-			<String Name="VisibleIf" />
+			<String Name="Name" Default="StructDef" ToolTip="The name to be written for this element. This will be used as the key when referencing it." />
+			<Boolean Name="Collapse" ToolTip="If set to true the struct will be collapsed to a single line seperated by the Seperator string. Only works all the child are a primitive items." />
+			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." />
+			<String Name="ChildAsName" ToolTip="The child to be used as the element name." />
+			<String Name="DescriptionChild" ToolTip="The child to be used to build the ui side description." />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 		</Attributes>
-		<Reference Name="Child" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,String,Struct,Reference,Tree" />
+		<Reference Name="Child" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,String,Struct,Reference,Tree" ToolTip="The defined children of the struct" />
 	</CollectionDef>
 
-	<StructDef Name="Reference">
+	<StructDef Name="Reference" ToolTip="An element used to allow the user to pick from a collection of valid elements.">
 		<Attributes>
-			<String Name="Name" Default="Reference" />
-			<String Name="Keys" />
-			<String Name="VisibleIf" />
+			<String Name="Name" Default="Reference" ToolTip="The name to be written for this element." />
+			<String Name="Keys" ToolTip="The names of the definitions that this reference can contain." />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 		</Attributes>
 	</StructDef>
 
-	<Collection Name="Definitions">
-		<Reference Name="Definition" Keys="Struct,StructDef,EnumDef" />
+	<Collection Name="Definitions" ToolTip="The definitions stored in this file. Can contain only a single non-def element.">
+		<Reference Name="Definition" Keys="Struct,StructDef,EnumDef,CollectionDef,PairDef" ToolTip="A single definition." />
 	</Collection>
 	
 </Definitions>

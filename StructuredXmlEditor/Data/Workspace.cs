@@ -9,8 +9,10 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using WPFFolderBrowser;
 
 namespace StructuredXmlEditor.Data
 {
@@ -116,28 +118,115 @@ namespace StructuredXmlEditor.Data
 
 			if (ProjectRoot == null)
 			{
+				ProjectRoot = LoadProjectRoot();
+				StoreSetting("ProjectRoot", ProjectRoot);
+			}
+
+			var rootdoc = XDocument.Load(ProjectRoot);
+			DefsFolder = rootdoc.Elements().First().Element("Definitions").Value;
+
+			if (!Directory.Exists(Path.Combine(Path.GetDirectoryName(ProjectRoot), DefsFolder)))
+			{
+				ProjectRoot = LoadProjectRoot();
+				StoreSetting("ProjectRoot", ProjectRoot);
+
+				rootdoc = XDocument.Load(ProjectRoot);
+				DefsFolder = rootdoc.Elements().First().Element("Definitions").Value;
+			}
+
+			LoadDefinitions();
+		}
+
+		//-----------------------------------------------------------------------
+		public string LoadProjectRoot()
+		{
+			var choice = Message.Show("Could not find a project root file. What do you want to do?", "No Project Root", "Browse", "Create New", "Quit");
+
+			if (choice == "Browse")
+			{
 				Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
 
+				dlg.Title = "Project Root File";
 				dlg.DefaultExt = ".xml";
 				dlg.Filter = "Project Root File (*.xml)|*.xml";
 				bool? result = dlg.ShowDialog();
 
 				if (result == true)
 				{
-					ProjectRoot = dlg.FileName;
-					StoreSetting("ProjectRoot", ProjectRoot);
+					return dlg.FileName;
 				}
 				else
 				{
-					Message.Show("Cannot run without a project settings file. Shutting down.", "Startup Failed");
+					Message.Show("Cannot run without a project root file. Shutting down.", "Startup Failed");
 					Environment.Exit(0);
 				}
 			}
+			else if (choice == "Create New")
+			{
+				Message.Show("Pick a folder that will be the root of your resources. This is used as the base to make all the other paths relative to.", "Pick Root Folder", "Ok");
 
-			var rootdoc = XDocument.Load(ProjectRoot);
-			DefsFolder = rootdoc.Elements().First().Element("Definitions").Value;
+				var dlgRoot = new WPFFolderBrowserDialog();
+				dlgRoot.ShowPlacesList = true;
+				dlgRoot.Title = "Project Root Folder";
+				bool? resultRoot = dlgRoot.ShowDialog();
 
-			LoadDefinitions();
+				if (resultRoot != true)
+				{
+					Message.Show("Cannot run without a project root file. Shutting down.", "Startup Failed");
+					Environment.Exit(0);
+				}
+
+				Message.Show("Now pick the folder to store your resource definitions in.", "Pick Definitions Folder", "Ok");
+
+				var dlgDefs = new WPFFolderBrowserDialog();
+				dlgDefs.ShowPlacesList = true;
+				dlgDefs.Title = "Definitions Folder";
+				bool? resultDefs = dlgDefs.ShowDialog();
+
+				if (resultDefs != true)
+				{
+					Message.Show("Cannot run without a project root file. Shutting down.", "Startup Failed");
+					Environment.Exit(0);
+				}
+
+				// make relative
+				var projRoot = Path.Combine(dlgRoot.FileName, "ProjectRoot.xml");
+				var definitions = Path.Combine(dlgDefs.FileName, "fakefile.fake");
+
+				Uri path1 = new Uri(definitions);
+				Uri path2 = new Uri(projRoot);
+				Uri diff = path2.MakeRelativeUri(path1);
+				var relPath = Path.GetDirectoryName(diff.OriginalString);
+
+				var doc = new XDocument();
+
+				var projEl = new XElement("Project");
+				doc.Add(projEl);
+
+				var defEl = new XElement("Definitions", relPath);
+				projEl.Add(defEl);
+
+				XmlWriterSettings settings = new XmlWriterSettings
+				{
+					Indent = true,
+					IndentChars = "\t",
+					NewLineChars = "\r\n",
+					NewLineHandling = NewLineHandling.Replace,
+					OmitXmlDeclaration = true,
+					Encoding = new UTF8Encoding(false)
+				};
+
+				using (XmlWriter writer = XmlTextWriter.Create(projRoot, settings))
+				{
+					doc.Save(writer);
+				}
+
+				return projRoot;
+			}
+
+			Message.Show("Cannot run without a project root file. Shutting down.", "Startup Failed");
+			Environment.Exit(0);
+			return null;
 		}
 
 		//-----------------------------------------------------------------------

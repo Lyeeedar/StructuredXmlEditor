@@ -48,10 +48,12 @@ namespace StructuredXmlEditor.Data
 				if (WrappedItem != null)
 				{
 					Name = WrappedItem.Name;
+					ToolTip = WrappedItem.ToolTip;
 				}
 				else
 				{
 					Name = Definition.Name;
+					ToolTip = Definition.ToolTip;
 				}
 
 				RaisePropertyChangedEvent();

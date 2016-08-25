@@ -242,6 +242,7 @@
 									<Border
 										x:Name="border1"
 										BorderThickness="0.5"
+										ToolTip="{Binding ToolTip}"
 										Background="{StaticResource BackgroundNormalBrush}">
 										<TextBlock
 											x:Name="name"
@@ -449,6 +450,7 @@
 									<Border
 										x:Name="border1"
 										BorderThickness="0.5"
+										ToolTip="{Binding ToolTip}"
 										Background="{StaticResource BackgroundNormalBrush}">
 										<TextBlock
 											x:Name="name"
