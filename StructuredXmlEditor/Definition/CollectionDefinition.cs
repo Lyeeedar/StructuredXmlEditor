@@ -16,6 +16,11 @@ namespace StructuredXmlEditor.Definition
 		public int MinCount { get; set; } = 0;
 		public int MaxCount { get; set; } = int.MaxValue;
 
+		public CollectionDefinition()
+		{
+			TextColour = Colours["Collection"];
+		}
+
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
 			var item = new CollectionItem(this, undoRedo);

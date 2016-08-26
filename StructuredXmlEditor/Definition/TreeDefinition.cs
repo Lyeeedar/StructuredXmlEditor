@@ -10,6 +10,11 @@ namespace StructuredXmlEditor.Definition
 {
 	public class TreeDefinition : ComplexDataDefinition
 	{
+		public TreeDefinition()
+		{
+			TextColour = Colours["Collection"];
+		}
+
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
 			return new TreeItem(this, undoRedo);

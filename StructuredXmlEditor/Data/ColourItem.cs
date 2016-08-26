@@ -17,6 +17,16 @@ namespace StructuredXmlEditor.Data
 		{
 		}
 
+		//-----------------------------------------------------------------------
+		public override string Description
+		{
+			get
+			{
+				var asString = ValueToString(Value);
+				return "<" + asString + ">" + asString + "</>";
+			}
+		}
+
 		public override string ValueToString(Color val)
 		{
 			var cdef = Definition as ColourDefinition;

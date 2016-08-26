@@ -55,7 +55,7 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public PrimitiveDataItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
-
+			
 		}
 
 		//-----------------------------------------------------------------------

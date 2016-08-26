@@ -17,6 +17,11 @@ namespace StructuredXmlEditor.Definition
 		public List<DataDefinition> Children { get; set; } = new List<DataDefinition>();
 		public string DescriptionChild { get; set; }
 
+		public StructDefinition()
+		{
+			TextColour = Colours["Struct"];
+		}
+
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
 			var item = new StructItem(this, undoRedo);

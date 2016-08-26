@@ -13,6 +13,11 @@ namespace StructuredXmlEditor.Definition
 		public PrimitiveDataDefinition Key { get; set; }
 		public PrimitiveDataDefinition Value { get; set; }
 
+		public PairDefinition()
+		{
+			TextColour = Colours["Struct"];
+		}
+
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
 			var item = new PairItem(this, undoRedo);

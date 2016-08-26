@@ -10,6 +10,13 @@ namespace StructuredXmlEditor.Definition
 {
 	public abstract class DataDefinition
 	{
+		public static Dictionary<string, string> Colours = new Dictionary<string, string>()
+		{
+			{ "Primitive", "181,178,156" },
+			{ "Collection", "156,171,181" },
+			{ "Struct", "180,156,181" }
+		};
+
 		public virtual string CopyKey { get { return GetType().ToString() + "Copy"; } }
 
 		public string Name { get; set; }
@@ -61,8 +68,14 @@ namespace StructuredXmlEditor.Definition
 
 			definition.Name = element.Attribute("Name")?.Value?.ToString();
 			definition.ToolTip = element.Attribute("ToolTip")?.Value?.ToString();
-			definition.TextColour = element.Attribute("TextColour")?.Value?.ToString();
-			if (definition.TextColour == null) definition.TextColour = "200,200,200";
+
+			var col = element.Attribute("TextColour")?.Value?.ToString();
+			if (col != null)
+			{
+				if (Colours.ContainsKey(col)) col = Colours[col];
+				definition.TextColour = col;
+			}
+
 			definition.VisibleIf = element.Attribute("VisibleIf")?.Value?.ToString();
 			definition.IsDef = definition.TryParseBool(element, "IsDef");
 

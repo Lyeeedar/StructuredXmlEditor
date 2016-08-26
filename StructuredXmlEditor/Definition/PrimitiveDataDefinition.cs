@@ -12,5 +12,10 @@ namespace StructuredXmlEditor.Definition
 		public abstract string DefaultValueString();
 		public abstract string WriteToString(DataItem item);
 		public abstract DataItem LoadFromString(string data, UndoRedoManager undoRedo);
+
+		public PrimitiveDataDefinition()
+		{
+			TextColour = Colours["Primitive"];
+		}
 	}
 }
