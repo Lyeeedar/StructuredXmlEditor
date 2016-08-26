@@ -49,11 +49,13 @@ namespace StructuredXmlEditor.Data
 				{
 					Name = WrappedItem.Name;
 					ToolTip = WrappedItem.ToolTip;
+					TextColour = WrappedItem.TextColour;
 				}
 				else
 				{
 					Name = Definition.Name;
 					ToolTip = Definition.ToolTip;
+					TextColour = Definition.TextColour;
 				}
 
 				RaisePropertyChangedEvent();

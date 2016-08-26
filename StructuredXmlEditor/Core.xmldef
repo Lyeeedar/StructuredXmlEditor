@@ -1,6 +1,6 @@
 ﻿<Definitions>
 
-	<StructDef Name="Number" ToolTip="A number.">
+	<StructDef Name="Number" ToolTip="A number." TextColour="200,200,180">
 		<Attributes>
 			<String Name="Name" Default="Number" ToolTip="The name to be written for this element." />
 			<Enum Name="Type" EnumValues="Float,Int" ToolTip="The value type." />
@@ -11,7 +11,7 @@
 		</Attributes>
 	</StructDef>
 
-	<StructDef Name="String" ToolTip="A string." >
+	<StructDef Name="String" ToolTip="A string." TextColour="200,200,180" >
 		<Attributes>
 			<String Name="Name" Default="String" ToolTip="The name to be written for this element." />
 			<String Name="Default" ToolTip="The default value for this element." />
@@ -20,7 +20,7 @@
 		</Attributes>
 	</StructDef>
 
-	<StructDef Name="File" ToolTip="A file path (relative to the project root)." >
+	<StructDef Name="File" ToolTip="A file path (relative to the project root)." TextColour="200,200,180" >
 		<Attributes>
 			<String Name="Name" Default="File" ToolTip="The name to be written for this element." />
 			<String Name="BasePath" ToolTip="The base path (relative to the project root) to convert any selected paths to." />
@@ -30,7 +30,7 @@
 		</Attributes>
 	</StructDef>
 
-	<StructDef Name="Boolean" ToolTip="A boolean (true/false).">
+	<StructDef Name="Boolean" ToolTip="A boolean (true/false)." TextColour="200,200,180">
 		<Attributes>
 			<String Name="Name" Default="Boolean" ToolTip="The name to be written for this element." />
 			<Boolean Name="Default" ToolTip="The default value for this element." />
@@ -38,7 +38,7 @@
 		</Attributes>
 	</StructDef>
 
-	<StructDef Name="Colour" ToolTip="A colour (stored as RGB or RGBA in 0-255 range).">
+	<StructDef Name="Colour" ToolTip="A colour (stored as RGB or RGBA in 0-255 range)." TextColour="200,200,180">
 		<Attributes>
 			<String Name="Name" Default="Colour" ToolTip="The name to be written for this element." />
 			<Boolean Name="HasAlpha" ToolTip="Whether this colour has an alpha value that isnt 255. If set to false then the colour will only write RGB, instead of RGBA." />
@@ -46,7 +46,7 @@
 		</Attributes>
 	</StructDef>
 
-	<StructDef Name="MultilineString" ToolTip="A string that spans multiple lines.">
+	<StructDef Name="MultilineString" ToolTip="A string that spans multiple lines." TextColour="200,200,180">
 		<Attributes>
 			<String Name="Name" Default="MultilineString" ToolTip="The name to be written for this element." />
 			<String Name="Default" ToolTip="The default value for this element." />
@@ -55,7 +55,7 @@
 		</Attributes>
 	</StructDef>
 
-	<StructDef Name="Enum" ToolTip="A value chosen from a series of valid values.">
+	<StructDef Name="Enum" ToolTip="A value chosen from a series of valid values." TextColour="200,200,180">
 		<Attributes>
 			<String Name="Name" Default="Enum" ToolTip="The name to be written for this element." />
 			<String Name="Key" ToolTip="The key of the EnumDef to load the EnumValues from." />
@@ -66,7 +66,7 @@
 		</Attributes>
 	</StructDef>
 
-	<StructDef Name="EnumDef" ToolTip="The definition for a collection of enumvalues that can be referenced by enums.">
+	<StructDef Name="EnumDef" ToolTip="The definition for a collection of enumvalues that can be referenced by enums." TextColour="200,200,180">
 		<Attributes>
 			<String Name="Name" Default="EnumDef" ToolTip="The name to be written for this element. This will be used as the key when referencing it." />
 			<String Name="EnumValues" ToolTip="A comma seperated list of enum values that can be picked." />
@@ -76,14 +76,14 @@
 		</Attributes>
 	</StructDef>
 
-	<StructDef Name="Tree" ToolTip="A tree of string values.">
+	<StructDef Name="Tree" ToolTip="A tree of string values." TextColour="160,200,180">
 		<Attributes>
 			<String Name="Name" Default="Tree" ToolTip="The name to be written for this element." />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 		</Attributes>
 	</StructDef>
 
-	<StructDef Name="Collection" ToolTip="A collection containing multiple elements of the specified child.">
+	<StructDef Name="Collection" ToolTip="A collection containing multiple elements of the specified child." TextColour="180,200,180">
 		<Attributes>
 			<String Name="Name" Default="Collection" ToolTip="The name to be written for this element." />
 			<Boolean Name="Collapse" ToolTip="If set to true the collection will be collapsed to a single line seperated by the Seperator string. Only works if the child is a primitive item." />
@@ -95,7 +95,7 @@
 		<Reference Name="Child" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,Reference,String,Struct,Tree" ToolTip="The child that this collection contains." />
 	</StructDef>
 
-	<StructDef Name="CollectionDef" ToolTip="A definition for a collection that can be referenced.">
+	<StructDef Name="CollectionDef" ToolTip="A definition for a collection that can be referenced." TextColour="180,200,180">
 		<Attributes>
 			<String Name="Name" Default="CollectionDef" ToolTip="The name to be written for this element. This will be used as the key when referencing it." />
 			<Boolean Name="Collapse" ToolTip="If set to true the collection will be collapsed to a single line seperated by the Seperator string. Only works if the child is a primitive item." />
@@ -107,7 +107,7 @@
 		<Reference Name="Child" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,Reference,String,Struct,Tree" ToolTip="The child that this collection contains." />
 	</StructDef>
 
-	<StructDef Name="Pair" ToolTip="A pair of values. Written as &gt;Key&lt;Value&gt;/Key&lt;.">
+	<StructDef Name="Pair" ToolTip="A pair of values. Written as &gt;Key&lt;Value&gt;/Key&lt;." TextColour="170,190,185">
 		<Attributes>
 			<String Name="Name" Default="Pair" ToolTip="The name to be written for this element." />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
@@ -116,7 +116,7 @@
 		<Reference Name="Value" Keys="Boolean,Colour,Enum,File,Number,String" ToolTip="The value to be used for the element contents." />
 	</StructDef>
 
-	<StructDef Name="PairDef" ToolTip="A definition for a pair that can be referenced.">
+	<StructDef Name="PairDef" ToolTip="A definition for a pair that can be referenced." TextColour="170,190,185">
 		<Attributes>
 			<String Name="Name" Default="Pair" ToolTip="The name to be written for this element. This will be used as the key when referencing it." />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
@@ -125,7 +125,7 @@
 		<Reference Name="Value" Keys="Boolean,Colour,Enum,File,Number,String" ToolTip="The value to be used for the element contents." />
 	</StructDef>
 
-	<CollectionDef Name="Struct" ToolTip="A collection of elements to be placed within a single element.">
+	<CollectionDef Name="Struct" ToolTip="A collection of elements to be placed within a single element." TextColour="180,180,200">
 		<Attributes>
 			<String Name="Name" Default="Struct" ToolTip="The name to be written for this element." />
 			<Boolean Name="Collapse" ToolTip="If set to true the struct will be collapsed to a single line seperated by the Seperator string. Only works all the child are a primitive items." />
@@ -137,7 +137,7 @@
 		<Reference Name="Child" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,String,Struct,Reference,Tree" ToolTip="The defined children of the struct" />
 	</CollectionDef>
 
-	<CollectionDef Name="StructDef" ToolTip="A definition for a struct that can be referenced.">
+	<CollectionDef Name="StructDef" ToolTip="A definition for a struct that can be referenced." TextColour="180,180,200">
 		<Attributes>
 			<String Name="Name" Default="StructDef" ToolTip="The name to be written for this element. This will be used as the key when referencing it." />
 			<Boolean Name="Collapse" ToolTip="If set to true the struct will be collapsed to a single line seperated by the Seperator string. Only works all the child are a primitive items." />
@@ -149,7 +149,7 @@
 		<Reference Name="Child" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,String,Struct,Reference,Tree" ToolTip="The defined children of the struct" />
 	</CollectionDef>
 
-	<StructDef Name="Reference" ToolTip="An element used to allow the user to pick from a collection of valid elements.">
+	<StructDef Name="Reference" ToolTip="An element used to allow the user to pick from a collection of valid elements." TextColour="200,200,200">
 		<Attributes>
 			<String Name="Name" Default="Reference" ToolTip="The name to be written for this element." />
 			<String Name="Keys" ToolTip="The names of the definitions that this reference can contain." />

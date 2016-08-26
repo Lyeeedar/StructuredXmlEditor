@@ -61,7 +61,7 @@
 			Value="1" />
 		<Setter
 			Property="HeaderForeground"
-			Value="{StaticResource FontDarkBrush}" />
+			Value="{Binding TextColour, Converter={l:ValueTypeConverter}}" />
 		<Setter
 			Property="Background"
 			Value="{StaticResource BackgroundNormalBrush}" />

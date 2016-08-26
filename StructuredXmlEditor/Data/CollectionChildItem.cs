@@ -51,6 +51,7 @@ namespace StructuredXmlEditor.Data
 				{
 					Name += WrappedItem.Name;
 					ToolTip = WrappedItem.ToolTip;
+					TextColour = WrappedItem.TextColour;
 				}
 			}
 		}
@@ -186,6 +187,10 @@ namespace StructuredXmlEditor.Data
 			else if (args.PropertyName == "ToolTip")
 			{
 				ToolTip = WrappedItem.ToolTip;
+			}
+			else if (args.PropertyName == "TextColour")
+			{
+				TextColour = WrappedItem.TextColour;
 			}
 		}
 

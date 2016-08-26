@@ -38,15 +38,21 @@ namespace StructuredXmlEditor.Data
 				var sdef = Definition as StructDefinition;
 				if (sdef != null && sdef.DescriptionChild != null)
 				{
-					return Children.FirstOrDefault(e => e.Definition.Name == sdef.DescriptionChild)?.Description;
+					var child = Children.FirstOrDefault(e => e.Definition.Name == sdef.DescriptionChild);
+
+					if (child != null)
+					{
+						return "<" + child.TextColour + ">" + child.Description + "</>";
+					}
+					return "null";
 				}
 				else if (Attributes.Count > 0)
 				{
-					return string.Join(", ", Attributes.Where(e => e.Name == "Name" || e.Description != (e.Definition as PrimitiveDataDefinition).DefaultValueString()).Select(e => e.Name + "=" + e.Description));
+					return string.Join(", ", Attributes.Where(e => e.Name == "Name" || e.Description != (e.Definition as PrimitiveDataDefinition).DefaultValueString()).Select(e => "<200,180,200>" + e.Name + "=</>" + e.Description));
 				}
 				else
 				{
-					return String.Join(", ", Children.Where(e => e.IsVisibleFromBindings).Select(e => e.Description));
+					return String.Join(", ", Children.Where(e => e.IsVisibleFromBindings).Select(e => "<" + e.TextColour + ">" + e.Description + "</>"));
 				}
 			}
 		}

@@ -109,6 +109,7 @@
       <DependentUpon>Message.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\CustomControls\NumericTextBox.cs" />
+    <Compile Include="View\ValueConverters\ColourMarkupConverter.cs" />
     <Compile Include="View\ValueConverters\ConverterBase.cs" />
     <Compile Include="Util\DeferableObservableCollection.cs" />
     <Compile Include="View\CustomControls\DataGridView\DataGridView.cs" />

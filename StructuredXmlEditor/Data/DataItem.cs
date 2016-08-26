@@ -187,6 +187,21 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public virtual string TextColour
+		{
+			get { return m_textColour; }
+			set
+			{
+				if (m_textColour != value)
+				{
+					m_textColour = value;
+
+					RaisePropertyChangedEvent();
+				}
+			}
+		}
+
+		//-----------------------------------------------------------------------
 		public string FocusName
 		{
 			get
@@ -302,6 +317,7 @@ namespace StructuredXmlEditor.Data
 			Name = definition.Name;
 			ToolTip = definition.ToolTip;
 			UndoRedo = undoRedo;
+			TextColour = definition.TextColour;
 
 			Children = new ObservableCollection<DataItem>();
 
@@ -592,6 +608,7 @@ namespace StructuredXmlEditor.Data
 		DispatcherOperation m_deferredUpdateChildren = null;
 		private ObservableCollection<DataItem> m_children;
 		string m_toolTip = null;
+		string m_textColour;
 	}
 
 	//-----------------------------------------------------------------------

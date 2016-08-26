@@ -14,6 +14,8 @@ namespace StructuredXmlEditor.Definition
 
 		public string Name { get; set; }
 
+		public string TextColour { get; set; } = "200,200,200";
+
 		public string ToolTip { get; set; }
 
 		public string VisibleIf { get; set; }
@@ -59,6 +61,8 @@ namespace StructuredXmlEditor.Definition
 
 			definition.Name = element.Attribute("Name")?.Value?.ToString();
 			definition.ToolTip = element.Attribute("ToolTip")?.Value?.ToString();
+			definition.TextColour = element.Attribute("TextColour")?.Value?.ToString();
+			if (definition.TextColour == null) definition.TextColour = "200,200,200";
 			definition.VisibleIf = element.Attribute("VisibleIf")?.Value?.ToString();
 			definition.IsDef = definition.TryParseBool(element, "IsDef");
 

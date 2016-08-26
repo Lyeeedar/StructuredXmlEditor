@@ -65,6 +65,23 @@ namespace StructuredXmlEditor.View
 				return new SolidColorBrush((Color)i_value);
 			}
 
+			if (i_targetType == typeof(Brush) && i_value is string)
+			{
+				var split = (i_value as string).Split(new char[] { ',' });
+
+				byte r = 0;
+				byte g = 0;
+				byte b = 0;
+
+				byte.TryParse(split[0], out r);
+				byte.TryParse(split[1], out g);
+				byte.TryParse(split[2], out b);
+
+				var col = Color.FromArgb(255, r, g, b);
+
+				return new SolidColorBrush(col);
+			}
+
 			//Special case handling for Nullable value types.
 			if (i_targetType.IsGenericType &&
 				i_targetType.GetGenericTypeDefinition() == typeof(Nullable<>))

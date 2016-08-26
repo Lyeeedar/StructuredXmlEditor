@@ -77,9 +77,9 @@
 
 	<DataTemplate
 		DataType="{x:Type d:PairItem}">
-		<TextBlock
+		<ContentControl
 			VerticalAlignment="Center"
-			Text="{Binding Description}" />
+			Content="{Binding Description, Converter={v:ColourMarkupConverter}}" />
 	</DataTemplate>
 
 	<DataTemplate
@@ -156,9 +156,9 @@
 			VerticalAlignment="Center">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition
-					Width="Auto" />
+					Width="20" />
 				<ColumnDefinition
-					Width="Auto" />
+					Width="20" />
 				<ColumnDefinition
 					Width="*" />
 			</Grid.ColumnDefinitions>
@@ -316,12 +316,10 @@
 				</Border>
 			</Popup>
 
-			<TextBlock
+			<ContentControl
 				Grid.Column="2"
-				TextTrimming="WordEllipsis"
 				VerticalAlignment="Center"
-				Text="{Binding Description}" />
-
+				Content="{Binding Description, Converter={v:ColourMarkupConverter}}" />
 		</Grid>
 	</DataTemplate>
 
@@ -331,41 +329,45 @@
 			VerticalAlignment="Center">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition
-					Width="Auto" />
+					Width="20" />
 				<ColumnDefinition
-					Width="*" />
+					Width="20" />
+				<ColumnDefinition
+					Width="Auto" />
 			</Grid.ColumnDefinitions>
 
-			<StackPanel
-				Orientation="Horizontal"
-				Visibility="{Binding HasContent, Converter={v:ValueTypeConverter}, ConverterParameter=Not}">
-				<ComboBox
-					VerticalAlignment="Center"
-					ItemsSource="{Binding Definition.Definitions.Values}"
-					SelectedItem="{Binding SelectedDefinition}">
-					<ComboBox.ItemTemplate>
-						<DataTemplate>
-							<TextBlock
-								Text="{Binding Name}" />
-						</DataTemplate>
-					</ComboBox.ItemTemplate>
-				</ComboBox>
-				<Button
-					VerticalAlignment="Center"
-					Background="Transparent"
-					BorderBrush="Transparent"
-					ToolTip="Create"
-					Command="{Binding CreateCMD}">
-					<Image
-						Source="/Resources/Add.png"
-						RenderOptions.BitmapScalingMode="NearestNeighbor"
-						Height="16"
-						Width="16" />
-				</Button>
-			</StackPanel>
+			<Button
+				Grid.Column="1"
+				Visibility="{Binding HasContent, Converter={v:ValueTypeConverter}, ConverterParameter=Not}"
+				VerticalAlignment="Center"
+				Background="Transparent"
+				BorderBrush="Transparent"
+				ToolTip="Create"
+				Command="{Binding CreateCMD}">
+				<Image
+					Source="/Resources/Add.png"
+					RenderOptions.BitmapScalingMode="NearestNeighbor"
+					Height="16"
+					Width="16" />
+			</Button>
+
+			<ComboBox
+				Grid.Column="2"
+				Visibility="{Binding HasContent, Converter={v:ValueTypeConverter}, ConverterParameter=Not}"
+				VerticalAlignment="Center"
+				ItemsSource="{Binding Definition.Definitions.Values}"
+				SelectedItem="{Binding SelectedDefinition}">
+				<ComboBox.ItemTemplate>
+					<DataTemplate>
+						<TextBlock
+							Text="{Binding Name}" />
+					</DataTemplate>
+				</ComboBox.ItemTemplate>
+			</ComboBox>
 
 			<ContentPresenter
-				Grid.Column="1"
+				Grid.Column="0"
+				Grid.ColumnSpan="3"
 				VerticalAlignment="Center"
 				Content="{Binding WrappedItem}" />
 
@@ -378,9 +380,9 @@
 			VerticalAlignment="Center">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition
-					Width="Auto" />
+					Width="20" />
 				<ColumnDefinition
-					Width="Auto" />
+					Width="20" />
 				<ColumnDefinition
 					Width="*" />
 			</Grid.ColumnDefinitions>
@@ -524,11 +526,10 @@
 				</Border>
 			</Popup>
 
-			<TextBlock
-				VerticalAlignment="Center"
+			<ContentControl
 				Grid.Column="2"
-				TextTrimming="WordEllipsis"
-				Text="{Binding Description}" />
+				VerticalAlignment="Center"
+				Content="{Binding Description, Converter={v:ColourMarkupConverter}}" />
 
 		</Grid>
 	</DataTemplate>
