@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using StructuredXmlEditor.Data;
+using StructuredXmlEditor.View;
 
 namespace StructuredXmlEditor.Definition
 {
@@ -82,8 +83,15 @@ namespace StructuredXmlEditor.Definition
 		{
 			if (Key != null)
 			{
-				var def = defs[Key.ToLower()] as EnumDefinition;
-				EnumValues = def.EnumValues;
+				if (defs.ContainsKey(Key.ToLower()))
+				{
+					var def = defs[Key.ToLower()] as EnumDefinition;
+					EnumValues = def.EnumValues;
+				}
+				else
+				{
+					Message.Show("Failed to find key " + Key + "!", "Reference Resolve Failed", "Ok");
+				}
 			}
 		}
 

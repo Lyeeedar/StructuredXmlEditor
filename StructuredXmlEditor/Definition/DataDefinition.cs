@@ -27,7 +27,7 @@ namespace StructuredXmlEditor.Definition
 
 		public string VisibleIf { get; set; }
 
-		public bool SkipIfDefault { get; set; }
+		public virtual bool SkipIfDefault { get; set; }
 
 		public abstract void Parse(XElement definition);
 		public abstract void DoSaveData(XElement parent, DataItem item);

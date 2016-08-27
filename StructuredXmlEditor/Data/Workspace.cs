@@ -69,7 +69,7 @@ namespace StructuredXmlEditor.Data
 		public Command<object> OpenCMD { get { return new Command<object>((e) => OpenNew()); } }
 
 		//-----------------------------------------------------------------------
-		public Command<object> SaveCMD { get { return new Command<object>((e) => Save(), (e) => Current != null && Current.UndoRedo.IsModified); } }
+		public Command<object> SaveCMD { get { return new Command<object>((e) => Save(), (e) => Current != null); } }
 
 		//-----------------------------------------------------------------------
 		public Command<object> SaveAsCMD { get { return new Command<object>((e) => SaveAs(), (e) => Current != null); } }
@@ -135,6 +135,8 @@ namespace StructuredXmlEditor.Data
 			}
 
 			LoadDefinitions();
+
+			LoadBackups();
 		}
 
 		//-----------------------------------------------------------------------
@@ -311,7 +313,40 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public void Open(string path)
+		public void LoadBackups()
+		{
+			var loadedFiles = "";
+
+			if (Directory.Exists(Document.BackupFolder))
+			{
+				foreach (var file in Directory.EnumerateFiles(Document.BackupFolder, "*.*", SearchOption.AllDirectories))
+				{
+					var doc = Open(file, true);
+
+					if (doc != null)
+					{
+						// make relative to backup folder
+						Uri path1 = new Uri(file);
+						Uri path2 = new Uri(Path.Combine(Document.BackupFolder, "fakefile.fake"));
+						Uri diff = path2.MakeRelativeUri(path1);
+						string relPath = diff.OriginalString;
+
+						doc.IsBackup = true;
+						doc.Path = Path.Combine(Path.GetDirectoryName(ProjectRoot), relPath);
+
+						loadedFiles += "\t" + Path.GetFileName(file) + "\n";
+					}
+				}
+			}
+
+			if (loadedFiles != "")
+			{
+				Message.Show("Backups were loaded for the following files:\n\n" + loadedFiles, "Backups Loaded", "Ok");
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public Document Open(string path, bool isBackup = false)
 		{
 			foreach (var openDoc in Documents)
 			{
@@ -319,7 +354,7 @@ namespace StructuredXmlEditor.Data
 				{
 					MainWindow.Instance.TabControl.SelectedItem = openDoc;
 
-					return;
+					return null;
 				}
 			}
 
@@ -338,7 +373,7 @@ namespace StructuredXmlEditor.Data
 				if (!SupportedResourceTypes.ContainsKey(rootname))
 				{
 					Message.Show("No definition found for xml '" + rootname + "'! Cannot open document.", "Load Failed!");
-					return;
+					return null;
 				}
 				data = SupportedResourceTypes[rootname];
 			}
@@ -355,10 +390,15 @@ namespace StructuredXmlEditor.Data
 
 			Current = document;
 
-			RecentFiles.Remove(path);
-			RecentFiles.Insert(0, path);
+			if (!isBackup)
+			{
+				RecentFiles.Remove(path);
+				RecentFiles.Insert(0, path);
 
-			StoreSetting("RecentFiles", RecentFiles.ToArray());
+				StoreSetting("RecentFiles", RecentFiles.ToArray());
+			}
+
+			return document;
 		}
 
 		//-----------------------------------------------------------------------

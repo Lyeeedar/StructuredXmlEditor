@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using StructuredXmlEditor.Data;
+using StructuredXmlEditor.View;
 
 namespace StructuredXmlEditor.Definition
 {
@@ -121,7 +122,7 @@ namespace StructuredXmlEditor.Definition
 					}
 				}
 
-				if (refDefs.Count != unassignedEls.Count) throw new Exception("Out of sync data when using reference items! This is bad!");
+				if (refDefs.Count != unassignedEls.Count) Message.Show("Not enough data for the references defined! This can cause some weirdness when loading!", "Data Load Error", "Ok");
 
 				for (int i = 0; i < unassignedEls.Count; i++)
 				{

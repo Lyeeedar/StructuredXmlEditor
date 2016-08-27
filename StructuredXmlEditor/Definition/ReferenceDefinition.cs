@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using StructuredXmlEditor.Data;
+using StructuredXmlEditor.View;
 
 namespace StructuredXmlEditor.Definition
 {
@@ -13,6 +14,18 @@ namespace StructuredXmlEditor.Definition
 		public List<string> Keys { get; set; } = new List<string>();
 		public Dictionary<string, DataDefinition> Definitions { get; set; } = new Dictionary<string, DataDefinition>();
 		public bool IsNullable { get; set; }
+
+		public override bool SkipIfDefault
+		{
+			get
+			{
+				return false;
+			}
+
+			set
+			{
+			}
+		}
 
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
@@ -37,18 +50,33 @@ namespace StructuredXmlEditor.Definition
 				var el = parent.Elements().Last();
 				el.SetAttributeValue("RefKey", si.ChosenDefinition.Name);
 			}
+			else
+			{
+				var el = new XElement("Reference" + parent.Elements().Count());
+				parent.Add(el);
+			}
 		}
 
 		public override DataItem LoadData(XElement element, UndoRedoManager undoRedo)
 		{
-			var key = element.Attribute("RefKey").Value.ToString();
-			var def = Definitions[key];
+			var key = element.Attribute("RefKey")?.Value?.ToString();
 
-			var item = new ReferenceItem(this, undoRedo);
-			item.ChosenDefinition = def;
+			ReferenceItem item = null;
 
-			var loaded = def.LoadData(element, undoRedo);
-			item.WrappedItem = loaded;
+			if (key != null && Definitions.ContainsKey(key))
+			{
+				var def = Definitions[key];
+
+				item = new ReferenceItem(this, undoRedo);
+				item.ChosenDefinition = def;
+
+				var loaded = def.LoadData(element, undoRedo);
+				item.WrappedItem = loaded;
+			}
+			else
+			{
+				item = CreateData(undoRedo) as ReferenceItem;
+			}
 
 			return item;
 		}
@@ -63,8 +91,14 @@ namespace StructuredXmlEditor.Definition
 		{
 			foreach (var key in Keys)
 			{
-				if (!defs.ContainsKey(key.ToLower())) throw new Exception("Failed to find key " + key + "!");
-				Definitions[key] = defs[key.ToLower()];
+				if (defs.ContainsKey(key.ToLower()))
+				{
+					Definitions[key] = defs[key.ToLower()];
+				}
+				else
+				{
+					Message.Show("Failed to find key " + key + "!", "Reference Resolve Failed", "Ok");
+				}				
 			}
 		}
 

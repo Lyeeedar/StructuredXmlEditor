@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -231,8 +232,11 @@ namespace StructuredXmlEditor.Data
 			}
 		}
 
+		//-----------------------------------------------------------------------
 		public void Save(string path)
 		{
+			Directory.CreateDirectory(Path.GetDirectoryName(path));
+
 			XDocument doc = new XDocument();
 			XElement fakeRoot = new XElement("FAKE_ROOT");
 			foreach (var item in m_storedRootItems)
