@@ -218,83 +218,81 @@ namespace StructuredXmlEditor.Definition
 		public override void DoSaveData(XElement parent, DataItem item)
 		{
 			StructItem si = item as StructItem;
-			if (si.HasContent)
-			{
-				if (Collapse)
-				{
-					var name = Name;
-					var data = "";
 
+			if (Collapse)
+			{
+				var name = Name;
+				var data = "";
+
+				foreach (var child in si.Children)
+				{
+					var primDef = child.Definition as PrimitiveDataDefinition;
+
+					if (primDef.Name == ChildAsName)
+					{
+						name = primDef.WriteToString(child);
+					}
+					else
+					{
+						data += primDef.WriteToString(child) + Seperator;
+					}
+				}
+
+				data = data.Remove(data.Length - Seperator.Length, Seperator.Length);
+
+				var el = new XElement(name, data);
+				parent.Add(el);
+
+				foreach (var att in si.Attributes)
+				{
+					var primDef = att.Definition as PrimitiveDataDefinition;
+					var asString = primDef.WriteToString(att);
+					var defaultAsString = primDef.DefaultValueString();
+
+					if (att.Name == "Name" || asString != defaultAsString)
+					{
+						el.SetAttributeValue(att.Name, asString);
+					}
+				}
+			}
+			else
+			{
+				var name = Name;
+				if (ChildAsName != null)
+				{
 					foreach (var child in si.Children)
 					{
 						var primDef = child.Definition as PrimitiveDataDefinition;
-
-						if (primDef.Name == ChildAsName)
+						if (primDef != null && primDef.Name == ChildAsName)
 						{
 							name = primDef.WriteToString(child);
 						}
-						else
-						{
-							data += primDef.WriteToString(child) + Seperator;
-						}
-					}
-
-					data = data.Remove(data.Length - Seperator.Length, Seperator.Length);
-
-					var el = new XElement(name, data);
-					parent.Add(el);
-
-					foreach (var att in si.Attributes)
-					{
-						var primDef = att.Definition as PrimitiveDataDefinition;
-						var asString = primDef.WriteToString(att);
-						var defaultAsString = primDef.DefaultValueString();
-
-						if (att.Name == "Name" || asString != defaultAsString)
-						{
-							el.SetAttributeValue(att.Name, asString);
-						}
 					}
 				}
-				else
+
+				var el = new XElement(name);
+				parent.Add(el);
+
+				foreach (var att in si.Attributes)
 				{
-					var name = Name;
-					if (ChildAsName != null)
+					var primDef = att.Definition as PrimitiveDataDefinition;
+					var asString = primDef.WriteToString(att);
+					var defaultAsString = primDef.DefaultValueString();
+
+					if (att.Name == "Name" || asString != defaultAsString)
 					{
-						foreach (var child in si.Children)
-						{
-							var primDef = child.Definition as PrimitiveDataDefinition;
-							if (primDef != null && primDef.Name == ChildAsName)
-							{
-								name = primDef.WriteToString(child);
-							}
-						}
+						el.SetAttributeValue(att.Name, asString);
 					}
+				}
 
-					var el = new XElement(name);
-					parent.Add(el);
+				foreach (var child in si.Children)
+				{
+					if (ChildAsName != null && child.Name == ChildAsName) continue;
 
-					foreach (var att in si.Attributes)
-					{
-						var primDef = att.Definition as PrimitiveDataDefinition;
-						var asString = primDef.WriteToString(att);
-						var defaultAsString = primDef.DefaultValueString();
+					var childDef = child.Definition;
+					if (!Children.Contains(childDef)) throw new Exception("A child has a definition that we dont have! Something broke!");
 
-						if (att.Name == "Name" || asString != defaultAsString)
-						{
-							el.SetAttributeValue(att.Name, asString);
-						}
-					}
-
-					foreach (var child in si.Children)
-					{
-						if (ChildAsName != null && child.Name == ChildAsName) continue;
-
-						var childDef = child.Definition;
-						if (!Children.Contains(childDef)) throw new Exception("A child has a definition that we dont have! Something broke!");
-
-						child.Definition.SaveData(el, child);
-					}
+					child.Definition.SaveData(el, child);
 				}
 			}
 		}

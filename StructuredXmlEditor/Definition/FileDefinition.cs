@@ -10,14 +10,14 @@ namespace StructuredXmlEditor.Definition
 {
 	class FileDefinition : PrimitiveDataDefinition
 	{
-		public string DefaultValue { get; set; }
+		public string Default { get; set; }
 		public string BasePath { get; set; }
 		public List<string> AllowedFileTypes { get; set; }
 
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
 			var item = new FileItem(this, undoRedo);
-			item.Value = DefaultValue;
+			item.Value = Default;
 			return item;
 		}
 
@@ -32,8 +32,8 @@ namespace StructuredXmlEditor.Definition
 
 		public override void Parse(XElement definition)
 		{
-			DefaultValue = definition.Attribute("Default")?.Value?.ToString();
-			if (DefaultValue == null) DefaultValue = "";
+			Default = definition.Attribute("Default")?.Value?.ToString();
+			if (Default == null) Default = "";
 
 			BasePath = definition.Attribute("BasePath")?.Value?.ToString();
 			if (BasePath == null) BasePath = "";
@@ -64,7 +64,12 @@ namespace StructuredXmlEditor.Definition
 
 		public override string DefaultValueString()
 		{
-			return DefaultValue;
+			return Default;
+		}
+
+		public override object DefaultValue()
+		{
+			return Default;
 		}
 	}
 }

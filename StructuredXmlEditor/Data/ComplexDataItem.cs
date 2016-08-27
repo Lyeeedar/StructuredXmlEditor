@@ -48,7 +48,10 @@ namespace StructuredXmlEditor.Data
 				}
 				else if (Attributes.Count > 0)
 				{
-					return string.Join(", ", Attributes.Where(e => e.Name == "Name" || e.Description != (e.Definition as PrimitiveDataDefinition).DefaultValueString()).Select(e => "<200,180,200>" + e.Name + "=</>" + e.Description));
+					return string.Join(", ", Attributes.Where(
+						e => e.Name == "Name" || 
+						(e.Definition as PrimitiveDataDefinition)?.WriteToString(e) != (e.Definition as PrimitiveDataDefinition)?.DefaultValueString()
+						).Select(e => "<200,180,200>" + e.Name + "=</>" + e.Description));
 				}
 				else
 				{
@@ -61,6 +64,12 @@ namespace StructuredXmlEditor.Data
 		public ComplexDataItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
 			Attributes.CollectionChanged += OnAttributesCollectionChanged;
+		}
+
+		//-----------------------------------------------------------------------
+		public override void ResetToDefault()
+		{
+			foreach (var child in Children) child.ResetToDefault();
 		}
 
 		//-----------------------------------------------------------------------

@@ -19,7 +19,7 @@ namespace StructuredXmlEditor.Definition
 
 		public virtual string CopyKey { get { return GetType().ToString() + "Copy"; } }
 
-		public string Name { get; set; }
+		public string Name { get; set; } = "";
 
 		public string TextColour { get; set; } = "200,200,200";
 
@@ -27,16 +27,18 @@ namespace StructuredXmlEditor.Definition
 
 		public string VisibleIf { get; set; }
 
-		public bool IsDef { get; set; }
+		public bool SkipIfDefault { get; set; }
 
 		public abstract void Parse(XElement definition);
 		public abstract void DoSaveData(XElement parent, DataItem item);
 		public abstract DataItem LoadData(XElement element, UndoRedoManager undoRedo);
 		public abstract DataItem CreateData(UndoRedoManager undoRedo);
+		public abstract bool IsDefault(DataItem item);
 
 		public void SaveData(XElement parent, DataItem item)
 		{
 			if (!item.IsVisibleFromBindings) return;
+			if (SkipIfDefault && IsDefault(item)) return;
 
 			DoSaveData(parent, item);
 		}
@@ -67,6 +69,8 @@ namespace StructuredXmlEditor.Definition
 			else throw new Exception("Unknown definition type " + name + "!");
 
 			definition.Name = element.Attribute("Name")?.Value?.ToString();
+			if (definition.Name == null) definition.Name = "";
+
 			definition.ToolTip = element.Attribute("ToolTip")?.Value?.ToString();
 
 			var col = element.Attribute("TextColour")?.Value?.ToString();
@@ -77,7 +81,7 @@ namespace StructuredXmlEditor.Definition
 			}
 
 			definition.VisibleIf = element.Attribute("VisibleIf")?.Value?.ToString();
-			definition.IsDef = definition.TryParseBool(element, "IsDef");
+			definition.SkipIfDefault = definition.TryParseBool(element, "SkipIfDefault", true);
 
 			definition.Parse(element);
 

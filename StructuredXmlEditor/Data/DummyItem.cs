@@ -33,5 +33,10 @@ namespace StructuredXmlEditor.Data
 		{
 			throw new NotImplementedException();
 		}
+
+		public override void ResetToDefault()
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

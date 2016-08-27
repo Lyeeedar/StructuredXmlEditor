@@ -247,7 +247,7 @@ namespace StructuredXmlEditor.Data
 					var name = el.Name.ToString().ToLower();
 					if (name.EndsWith("def"))
 					{
-						if (ReferenceableDefinitions.ContainsKey(defname)) throw new Exception("Duplicate definitions for def " + defname);
+						if (ReferenceableDefinitions.ContainsKey(defname)) Message.Show("Duplicate definitions for type " + defname, "Duplicate Definitions", "Ok");
 						ReferenceableDefinitions[defname] = def;
 					}
 					else

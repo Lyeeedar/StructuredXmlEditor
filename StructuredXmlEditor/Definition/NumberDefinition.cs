@@ -11,7 +11,7 @@ namespace StructuredXmlEditor.Definition
 {
 	public class NumberDefinition : PrimitiveDataDefinition
 	{
-		public float DefaultValue { get; set; }
+		public float Default { get; set; }
 
 		public float MinValue { get; set; }
 		public float MaxValue { get; set; }
@@ -22,7 +22,7 @@ namespace StructuredXmlEditor.Definition
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
 			var item = new NumberItem(this, undoRedo);
-			item.Value = DefaultValue;
+			item.Value = Default;
 			return item;
 		}
 
@@ -40,14 +40,14 @@ namespace StructuredXmlEditor.Definition
 		public override void Parse(XElement definition)
 		{
 			Name = definition.Attribute("Name").Value.ToString();
-			DefaultValue = TryParseFloat(definition, "Default");
+			Default = TryParseFloat(definition, "Default");
 			MinValue = TryParseFloat(definition, "Min", -float.MaxValue);
 			MaxValue = TryParseFloat(definition, "Max", float.MaxValue);
 			Step = TryParseFloat(definition, "Step", 0.1f);
 			ShowSlider = TryParseBool(definition, "ShowSlider");
 
-			if (DefaultValue < MinValue) DefaultValue = MinValue;
-			if (DefaultValue > MaxValue) DefaultValue = MaxValue;
+			if (Default < MinValue) Default = MinValue;
+			if (Default > MaxValue) Default = MaxValue;
 
 			var type = definition.Attribute("Type")?.Value?.ToString().ToUpper();
 
@@ -78,9 +78,14 @@ namespace StructuredXmlEditor.Definition
 			return item;
 		}
 
+		public override object DefaultValue()
+		{
+			return Default;
+		}
+
 		public override string DefaultValueString()
 		{
-			return DefaultValue.ToString();
+			return Default.ToString();
 		}
 	}
 }

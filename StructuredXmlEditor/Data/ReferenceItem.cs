@@ -47,7 +47,7 @@ namespace StructuredXmlEditor.Data
 
 				if (WrappedItem != null)
 				{
-					Name = WrappedItem.Name;
+					if (Name == "") Name = WrappedItem.Name;
 					ToolTip = WrappedItem.ToolTip;
 					TextColour = WrappedItem.TextColour;
 				}
@@ -79,7 +79,7 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public override bool IsCollectionChild { get { return HasContent && (Definition as ReferenceDefinition).Definitions.Count > 1; } }
+		public override bool IsCollectionChild { get { return HasContent && ((Definition as ReferenceDefinition).IsNullable || (Definition as ReferenceDefinition).Definitions.Count > 1); } }
 
 		//-----------------------------------------------------------------------
 		public override bool CanRemove
@@ -104,6 +104,20 @@ namespace StructuredXmlEditor.Data
 		{
 			PropertyChanged += OnPropertyChanged;
 			SelectedDefinition = (definition as ReferenceDefinition).Definitions.Values.First();
+		}
+
+		//-----------------------------------------------------------------------
+		public override void ResetToDefault()
+		{
+			var refDef = Definition as ReferenceDefinition;
+			if (refDef.IsNullable || refDef.Keys.Count > 0)
+			{
+				Clear();
+			}
+			else
+			{
+				WrappedItem.ResetToDefault();
+			}
 		}
 
 		//-----------------------------------------------------------------------
@@ -188,6 +202,7 @@ namespace StructuredXmlEditor.Data
 			"");
 		}
 
+		//-----------------------------------------------------------------------
 		public void Clear()
 		{
 			var item = WrappedItem;

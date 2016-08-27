@@ -126,8 +126,6 @@ namespace StructuredXmlEditor.Definition
 		{
 			var ci = item as CollectionItem;
 
-			if (ci.Children.Count == 0) return;
-
 			if (Collapse && ChildDefinition.WrappedDefinition is PrimitiveDataDefinition)
 			{
 				var primDef = ChildDefinition.WrappedDefinition as PrimitiveDataDefinition;

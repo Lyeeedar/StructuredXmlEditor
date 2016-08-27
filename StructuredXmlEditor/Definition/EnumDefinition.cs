@@ -14,6 +14,7 @@ namespace StructuredXmlEditor.Definition
 
 		public bool ValueAsName { get; set; }
 		public List<string> EnumValues { get; set; }
+		public string Default { get; set; }
 
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
@@ -45,6 +46,9 @@ namespace StructuredXmlEditor.Definition
 
 			var rawEnumValues = definition.Attribute("EnumValues")?.Value;
 			if (rawEnumValues != null) EnumValues = rawEnumValues.Split(new char[] { ',' }).ToList();
+
+			Default = definition.Attribute("Default")?.Value?.ToString();
+			if (Default == null) Default = EnumValues[0];
 		}
 
 		public override void DoSaveData(XElement parent, DataItem item)
@@ -85,7 +89,12 @@ namespace StructuredXmlEditor.Definition
 
 		public override string DefaultValueString()
 		{
-			return EnumValues[0];
+			return Default;
+		}
+
+		public override object DefaultValue()
+		{
+			return Default;
 		}
 	}
 }

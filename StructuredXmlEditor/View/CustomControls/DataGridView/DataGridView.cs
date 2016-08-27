@@ -11,6 +11,7 @@ using System.Windows.Threading;
 using System.Diagnostics;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using System.Windows.Input;
 
 namespace StructuredXmlEditor.View
 {
@@ -127,6 +128,14 @@ namespace StructuredXmlEditor.View
 		#endregion Dependecy Properties
 		//#######################################################################
 		#region Methods
+
+		//-----------------------------------------------------------------------
+		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+		{
+			base.OnMouseLeftButtonDown(e);
+
+			if (!PopupCloser.IsMouseOverPopup()) PopupCloser.CloseAllPopups();
+		}
 
 		//-----------------------------------------------------------------------
 		void Refresh()

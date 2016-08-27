@@ -88,7 +88,7 @@
 			MinValue="{Binding Definition.MinValue}"
 			MaxValue="{Binding Definition.MaxValue}"
 			UseIntegers="{Binding Definition.UseIntegers}"
-			DefaultValue="{Binding Definition.DefaultValue}"
+			DefaultValue="{Binding Definition.Default}"
 			VerticalAlignment="Center"
 			Value="{Binding Value, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
 	</DataTemplate>
@@ -208,7 +208,6 @@
 			</ToggleButton>
 			<Popup
 				x:Name="AttributesPopup"
-				StaysOpen="False"
 				AllowsTransparency="True"
 				Focusable="False"
 				HorizontalOffset="1"
@@ -217,7 +216,25 @@
 				IsOpen="{Binding ElementName=AttributesPopupToggle, Path=IsChecked, Mode=TwoWay}"
 				PlacementTarget="{Binding ElementName=AttributesPopupToggle}"
 				Placement="Mouse">
+				<Popup.Style>
+					<Style
+						TargetType="{x:Type Popup}">
+						<Setter
+							Property="StaysOpen"
+							Value="True" />
+						<Style.Triggers>
+							<DataTrigger
+								Binding="{Binding IsMouseOver, ElementName=brd}"
+								Value="True">
+								<Setter
+									Property="StaysOpen"
+									Value="True" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</Popup.Style>
 				<Border
+					x:Name="brd"
 					BorderThickness="1"
 					BorderBrush="{StaticResource SelectionBorderBrush}"
 					Background="{StaticResource WindowBackgroundBrush}">
@@ -243,6 +260,7 @@
 										x:Name="border1"
 										BorderThickness="0.5"
 										ToolTip="{Binding ToolTip}"
+										ContextMenu="{Binding ContextMenu}"
 										Background="{StaticResource BackgroundNormalBrush}">
 										<TextBlock
 											x:Name="name"
@@ -418,7 +436,6 @@
 			</ToggleButton>
 			<Popup
 				x:Name="AttributesPopup"
-				StaysOpen="False"
 				AllowsTransparency="True"
 				Focusable="False"
 				HorizontalOffset="1"
@@ -427,7 +444,25 @@
 				IsOpen="{Binding ElementName=AttributesPopupToggle, Path=IsChecked, Mode=TwoWay}"
 				PlacementTarget="{Binding ElementName=AttributesPopupToggle}"
 				Placement="Mouse">
+				<Popup.Style>
+					<Style
+						TargetType="{x:Type Popup}">
+						<Setter
+							Property="StaysOpen"
+							Value="True" />
+						<Style.Triggers>
+							<DataTrigger
+								Binding="{Binding IsMouseOver, ElementName=brd}"
+								Value="True">
+								<Setter
+									Property="StaysOpen"
+									Value="True" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</Popup.Style>
 				<Border
+					x:Name="brd"
 					BorderThickness="1"
 					BorderBrush="{StaticResource SelectionBorderBrush}"
 					Background="{StaticResource WindowBackgroundBrush}">
@@ -453,6 +488,7 @@
 										x:Name="border1"
 										BorderThickness="0.5"
 										ToolTip="{Binding ToolTip}"
+										ContextMenu="{Binding ContextMenu}"
 										Background="{StaticResource BackgroundNormalBrush}">
 										<TextBlock
 											x:Name="name"

@@ -65,6 +65,12 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public override void ResetToDefault()
+		{
+			Value = (T)(Definition as PrimitiveDataDefinition).DefaultValue();
+		}
+
+		//-----------------------------------------------------------------------
 		protected override void AddContextMenuItems(ContextMenu menu)
 		{
 			MenuItem CopyItem = new MenuItem();

@@ -99,6 +99,7 @@
     <Compile Include="Definition\ReferenceDefinition.cs" />
     <Compile Include="Definition\TreeDefinition.cs" />
     <Compile Include="Util\Extensions.cs" />
+    <Compile Include="Util\PopupCloser.cs" />
     <Compile Include="Util\SerializableDictionary.cs" />
     <Compile Include="Util\UndoRedoManager.cs" />
     <Compile Include="View\CustomControls\ColourPicker\ColorCanvas.cs" />

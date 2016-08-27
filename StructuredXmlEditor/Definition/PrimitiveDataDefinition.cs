@@ -9,6 +9,7 @@ namespace StructuredXmlEditor.Definition
 {
 	public abstract class PrimitiveDataDefinition : DataDefinition
 	{
+		public abstract object DefaultValue();
 		public abstract string DefaultValueString();
 		public abstract string WriteToString(DataItem item);
 		public abstract DataItem LoadFromString(string data, UndoRedoManager undoRedo);
@@ -16,6 +17,11 @@ namespace StructuredXmlEditor.Definition
 		public PrimitiveDataDefinition()
 		{
 			TextColour = Colours["Primitive"];
+		}
+
+		public override bool IsDefault(DataItem item)
+		{
+			return WriteToString(item) == DefaultValueString();
 		}
 	}
 }

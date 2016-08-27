@@ -218,6 +218,7 @@ namespace StructuredXmlEditor.Data
 			Filter = null;
 		}
 
+		//-----------------------------------------------------------------------
 		public void SetRootItem(DataItem item)
 		{
 			RootItems.Clear();

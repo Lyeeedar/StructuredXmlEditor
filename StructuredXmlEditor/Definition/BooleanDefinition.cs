@@ -10,12 +10,12 @@ namespace StructuredXmlEditor.Definition
 {
 	public class BooleanDefinition : PrimitiveDataDefinition
 	{
-		public bool DefaultValue { get; set; }
+		public bool Default { get; set; }
 
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
 			var item = new BooleanItem(this, undoRedo);
-			item.Value = DefaultValue;
+			item.Value = Default;
 			return item;
 		}
 
@@ -32,7 +32,7 @@ namespace StructuredXmlEditor.Definition
 
 			bool temp = false;
 			bool.TryParse(defaultValueString, out temp);
-			DefaultValue = temp;
+			Default = temp;
 		}
 
 		public override void DoSaveData(XElement parent, DataItem item)
@@ -54,9 +54,14 @@ namespace StructuredXmlEditor.Definition
 			return item;
 		}
 
+		public override object DefaultValue()
+		{
+			return Default;
+		}
+
 		public override string DefaultValueString()
 		{
-			return DefaultValue.ToString();
+			return Default.ToString();
 		}
 	}
 }

@@ -232,5 +232,10 @@ namespace StructuredXmlEditor.Data
 
 			collection.Insert(index, child);
 		}
+
+		public override void ResetToDefault()
+		{
+			WrappedItem.ResetToDefault();
+		}
 	}
 }

@@ -12,11 +12,12 @@ namespace StructuredXmlEditor.Definition
 	{
 		public List<string> Keys { get; set; } = new List<string>();
 		public Dictionary<string, DataDefinition> Definitions { get; set; } = new Dictionary<string, DataDefinition>();
+		public bool IsNullable { get; set; }
 
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
 			var item = new ReferenceItem(this, undoRedo);
-			if (Definitions.Count == 1)
+			if (Definitions.Count == 1 && !IsNullable)
 			{
 				item.ChosenDefinition = Definitions.Values.First();
 				item.Create();
@@ -55,6 +56,7 @@ namespace StructuredXmlEditor.Definition
 		public override void Parse(XElement definition)
 		{
 			Keys.AddRange(definition.Attribute("Keys").Value.ToString().Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
+			IsNullable = TryParseBool(definition, "Nullable", true);
 		}
 
 		public override void RecursivelyResolve(Dictionary<string, DataDefinition> defs)
@@ -64,6 +66,11 @@ namespace StructuredXmlEditor.Definition
 				if (!defs.ContainsKey(key.ToLower())) throw new Exception("Failed to find key " + key + "!");
 				Definitions[key] = defs[key.ToLower()];
 			}
+		}
+
+		public override bool IsDefault(DataItem item)
+		{
+			return (item as ReferenceItem).ChosenDefinition == null;
 		}
 	}
 }

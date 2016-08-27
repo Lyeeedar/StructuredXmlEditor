@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -211,6 +212,10 @@ namespace StructuredXmlEditor.Data
 
 				if (string.IsNullOrWhiteSpace(desc)) return name;
 
+				string pattern = "<.*?>";
+				var regex = new Regex(pattern);
+				desc = regex.Replace(desc, "");
+
 				if (desc.Length > 13)
 				{
 					desc = desc.Substring(0, 10) + "...";
@@ -389,6 +394,18 @@ namespace StructuredXmlEditor.Data
 
 			menu.Items.Add(new Separator());
 
+			MenuItem resetItem = new MenuItem();
+			resetItem.Header = "Reset To Default";
+
+			resetItem.Click += delegate
+			{
+				ResetToDefault();
+			};
+
+			menu.Items.Add(resetItem);
+
+			menu.Items.Add(new Separator());
+
 			MenuItem collapseItem = new MenuItem();
 			collapseItem.Header = "Collapse All";
 
@@ -417,6 +434,9 @@ namespace StructuredXmlEditor.Data
 
 			return menu;
 		}
+
+		//-----------------------------------------------------------------------
+		public abstract void ResetToDefault();
 
 		//-----------------------------------------------------------------------
 		protected virtual void AddContextMenuItems(ContextMenu menu)

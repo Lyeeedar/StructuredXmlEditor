@@ -29,5 +29,10 @@ namespace StructuredXmlEditor.Definition
 		{
 			throw new NotImplementedException();
 		}
+
+		public override bool IsDefault(DataItem item)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

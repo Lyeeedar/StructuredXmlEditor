@@ -37,5 +37,10 @@ namespace StructuredXmlEditor.Definition
 		{
 			WrappedDefinition.SaveData(parent, (item as CollectionChildItem).WrappedItem);
 		}
+
+		public override bool IsDefault(DataItem item)
+		{
+			return (item as CollectionChildItem).WrappedItem == null;
+		}
 	}
 }

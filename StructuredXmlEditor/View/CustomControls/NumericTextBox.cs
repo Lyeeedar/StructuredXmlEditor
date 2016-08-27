@@ -135,12 +135,6 @@ namespace StructuredXmlEditor.View
 		//--------------------------------------------------------------------------
 		public void ValueTextChanged()
 		{
-			if (ValueText == "")
-			{
-				Value = DefaultValue;
-				return;
-			}
-
 			float value = 0f;
 
 			if (UseIntegers)

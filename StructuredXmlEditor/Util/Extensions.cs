@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Xml.Serialization;
 
 namespace StructuredXmlEditor
@@ -72,6 +73,40 @@ namespace StructuredXmlEditor
 			}
 
 			return description;
+		}
+
+		//-----------------------------------------------------------------------
+		public static Color? ToColour(this string input)
+		{
+			var split = input.Split(new char[] { ',' });
+
+			if (split.Length <= 2) return null;
+			else if (split.Length <= 3)
+			{
+				byte r = 0;
+				byte g = 0;
+				byte b = 0;
+
+				byte.TryParse(split[0], out r);
+				byte.TryParse(split[1], out g);
+				byte.TryParse(split[2], out b);
+
+				return Color.FromArgb(255, r, g, b);
+			}
+			else
+			{
+				byte r = 0;
+				byte g = 0;
+				byte b = 0;
+				byte a = 0;
+
+				byte.TryParse(split[0], out r);
+				byte.TryParse(split[1], out g);
+				byte.TryParse(split[2], out b);
+				byte.TryParse(split[3], out a);
+
+				return Color.FromArgb(a, r, g, b);
+			}
 		}
 	}
 }

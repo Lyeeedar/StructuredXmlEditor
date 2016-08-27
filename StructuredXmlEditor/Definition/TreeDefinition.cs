@@ -64,5 +64,10 @@ namespace StructuredXmlEditor.Definition
 				}
 			}
 		}
+
+		public override bool IsDefault(DataItem item)
+		{
+			return string.IsNullOrWhiteSpace((item as TreeItem).Value);
+		}
 	}
 }
