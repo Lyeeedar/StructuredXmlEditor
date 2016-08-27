@@ -54,7 +54,9 @@ public class UndoRedoManager : NotifyPropertyChanged
 		{
 			if (isInApplyUndo)
 			{
-				throw new Exception("Nested ApplyDoUndo calls! This is bad!");
+				Message.Show("Nested ApplyDoUndo calls! This is bad!", "Undo Redo borked", "Ok");
+				_do();
+				return;
 			}
 
 			isInApplyUndo = true;

@@ -242,8 +242,6 @@ namespace StructuredXmlEditor.Data
 						RaisePropertyChangedEvent("Description");
 					},
 					Name + " pasted");
-
-				IsExpanded = true;
 			}
 		}
 	}

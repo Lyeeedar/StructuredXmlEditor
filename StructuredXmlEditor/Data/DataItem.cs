@@ -501,8 +501,6 @@ namespace StructuredXmlEditor.Data
 			{
 				Children[i].Index = i;
 			}
-
-			IsExpanded = true;
 		}
 
 		//-----------------------------------------------------------------------
