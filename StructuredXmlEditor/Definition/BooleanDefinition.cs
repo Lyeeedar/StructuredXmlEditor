@@ -22,7 +22,11 @@ namespace StructuredXmlEditor.Definition
 		public override DataItem LoadData(XElement element, UndoRedoManager undoRedo)
 		{
 			var item = new BooleanItem(this, undoRedo);
-			item.Value = bool.Parse(element.Value);
+
+			bool val = Default;
+			bool.TryParse(element.Value, out val);
+			item.Value = val;
+
 			return item;
 		}
 
@@ -50,7 +54,11 @@ namespace StructuredXmlEditor.Definition
 		public override DataItem LoadFromString(string data, UndoRedoManager undoRedo)
 		{
 			var item = new BooleanItem(this, undoRedo);
-			item.Value = bool.Parse(data);
+
+			bool val = Default;
+			bool.TryParse(data, out val);
+			item.Value = val;
+
 			return item;
 		}
 

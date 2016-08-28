@@ -48,6 +48,7 @@ namespace StructuredXmlEditor.Definition
 				if (parent.Elements().Count() == 0) return;
 
 				var el = parent.Elements().Last();
+				el.Name = Name;
 				el.SetAttributeValue("RefKey", si.ChosenDefinition.Name);
 			}
 			else

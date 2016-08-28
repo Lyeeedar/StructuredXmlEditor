@@ -539,14 +539,21 @@ namespace StructuredXmlEditor.Data
 			}
 			else if (!matchFound)
 			{
-				matchFound = Name.ToLower().Contains(filter);
-
-				if (!matchFound)
+				if (IsVisibleFromBindings)
 				{
-					matchFound = Description.ToLower().Contains(filter);
-				}
+					matchFound = Name.ToLower().Contains(filter);
 
-				m_isSearchFiltered = !matchFound;
+					if (!matchFound)
+					{
+						matchFound = Description.ToLower().Contains(filter);
+					}
+
+					m_isSearchFiltered = !matchFound;
+				}
+				else
+				{
+					m_isSearchFiltered = true;
+				}
 			}
 			else
 			{

@@ -29,7 +29,10 @@ namespace StructuredXmlEditor.Definition
 		public override DataItem LoadData(XElement element, UndoRedoManager undoRedo)
 		{
 			var item = new NumberItem(this, undoRedo);
-			item.Value = float.Parse(element.Value);
+
+			float val = Default;
+			float.TryParse(element.Value, out val);
+			item.Value = val;
 
 			if (item.Value < MinValue) item.Value = MinValue;
 			if (item.Value > MaxValue) item.Value = MaxValue;
@@ -72,9 +75,11 @@ namespace StructuredXmlEditor.Definition
 		public override DataItem LoadFromString(string data, UndoRedoManager undoRedo)
 		{
 			var item = new NumberItem(this, undoRedo);
-			float val = 0f;
+
+			float val = Default;
 			float.TryParse(data, out val);
 			item.Value = val;
+
 			return item;
 		}
 

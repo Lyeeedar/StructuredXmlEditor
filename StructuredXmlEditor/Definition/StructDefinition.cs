@@ -124,13 +124,23 @@ namespace StructuredXmlEditor.Definition
 
 				if (refDefs.Count != unassignedEls.Count) Message.Show("Not enough data for the references defined! This can cause some weirdness when loading!", "Data Load Error", "Ok");
 
-				for (int i = 0; i < unassignedEls.Count && i < refDefs.Count; i++)
+				for (int i = 0; i < refDefs.Count; i++)
 				{
-					var rdef = refDefs[i];
-					var el = unassignedEls[i];
+					if (i < unassignedEls.Count)
+					{
+						var rdef = refDefs[i];
+						var el = unassignedEls[i];
 
-					DataItem childItem = rdef.LoadData(el, undoRedo);
-					createdChildren.Add(childItem);
+						DataItem childItem = rdef.LoadData(el, undoRedo);
+						createdChildren.Add(childItem);
+					}
+					else
+					{
+						var rdef = refDefs[i];
+
+						DataItem childItem = rdef.CreateData(undoRedo);
+						createdChildren.Add(childItem);
+					}
 
 					hadData = true;
 				}
