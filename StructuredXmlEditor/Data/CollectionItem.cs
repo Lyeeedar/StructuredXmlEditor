@@ -101,7 +101,7 @@ namespace StructuredXmlEditor.Data
 
 				if (cdef.ChildDefinition.WrappedDefinition is StructDefinition)
 				{
-					(cdef.ChildDefinition.WrappedDefinition as StructDefinition).CreateChildren((item as CollectionChildItem).WrappedItem as StructItem, UndoRedo);
+					//(cdef.ChildDefinition.WrappedDefinition as StructDefinition).CreateChildren((item as CollectionChildItem).WrappedItem as StructItem, UndoRedo);
 				}
 			}
 

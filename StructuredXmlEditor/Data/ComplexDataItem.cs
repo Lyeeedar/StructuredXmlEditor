@@ -136,7 +136,10 @@ namespace StructuredXmlEditor.Data
 		{
 			base.ChildPropertyChanged(sender, args);
 
-			RaisePropertyChangedEvent("Description");
+			if (args.PropertyName == "Description")
+			{
+				RaisePropertyChangedEvent("Description");
+			}
 		}
 
 		//-----------------------------------------------------------------------

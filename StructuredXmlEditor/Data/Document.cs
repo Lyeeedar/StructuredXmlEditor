@@ -33,7 +33,7 @@ namespace StructuredXmlEditor.Data
 				Uri diff = path2.MakeRelativeUri(path1);
 				string relPath = diff.OriginalString;
 
-				return System.IO.Path.Combine(BackupFolder, relPath);
+				return System.IO.Path.GetFullPath(System.IO.Path.Combine(BackupFolder, relPath));
 			}
 		}
 
@@ -82,6 +82,7 @@ namespace StructuredXmlEditor.Data
 
 			Workspace.Documents.Remove(this);
 
+			IsBackup = false;
 			backupTimer.Stop();
 			CleanupBackups();
 

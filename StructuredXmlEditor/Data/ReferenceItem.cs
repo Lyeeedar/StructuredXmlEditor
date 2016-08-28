@@ -102,7 +102,6 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public ReferenceItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
-			PropertyChanged += OnPropertyChanged;
 			SelectedDefinition = (definition as ReferenceDefinition).Definitions.Values.First();
 		}
 
@@ -118,12 +117,6 @@ namespace StructuredXmlEditor.Data
 			{
 				WrappedItem.ResetToDefault();
 			}
-		}
-
-		//-----------------------------------------------------------------------
-		public override void ParentPropertyChanged(object sender, PropertyChangedEventArgs e)
-		{
-			
 		}
 
 		//-----------------------------------------------------------------------
@@ -146,12 +139,6 @@ namespace StructuredXmlEditor.Data
 			menu.Items.Add(pasteItem);
 
 			menu.Items.Add(new Separator());
-		}
-
-		//-----------------------------------------------------------------------
-		public void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-		{
-
 		}
 
 		//-----------------------------------------------------------------------
