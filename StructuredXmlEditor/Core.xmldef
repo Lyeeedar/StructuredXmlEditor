@@ -168,6 +168,7 @@
 	<CollectionDef Name="Struct" ToolTip="A collection of elements to be placed within a single element." TextColour="Struct">
 		<Attributes>
 			<String Name="Name" Default="Struct" ToolTip="The name to be written for this element." />
+			<Boolean Name="Nullable" Default="true" ToolTip="Whether this element can be empty." />
 			<Boolean Name="Collapse" ToolTip="If set to true the struct will be collapsed to a single line seperated by the Seperator string. Only works all the child are a primitive items." />
 			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." />
 			<String Name="ChildAsName" ToolTip="The child to be used as the element name." />
@@ -183,6 +184,7 @@
 	<CollectionDef Name="StructDef" ToolTip="A definition for a struct that can be referenced." TextColour="Struct">
 		<Attributes>
 			<String Name="Name" Default="StructDef" ToolTip="The name to be written for this element. This will be used as the key when referencing it." />
+			<Boolean Name="Nullable" Default="true" ToolTip="Whether this element can be empty." />
 			<Boolean Name="Collapse" ToolTip="If set to true the struct will be collapsed to a single line seperated by the Seperator string. Only works all the child are a primitive items." />
 			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." />
 			<String Name="ChildAsName" ToolTip="The child to be used as the element name." />

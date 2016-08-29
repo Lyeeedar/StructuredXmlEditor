@@ -17,6 +17,7 @@ namespace StructuredXmlEditor.Definition
 		public string Seperator { get; set; }
 		public List<DataDefinition> Children { get; set; } = new List<DataDefinition>();
 		public string DescriptionChild { get; set; }
+		public bool Nullable { get; set; }
 
 		public StructDefinition()
 		{
@@ -31,6 +32,11 @@ namespace StructuredXmlEditor.Definition
 			{
 				var attItem = att.CreateData(undoRedo);
 				item.Attributes.Add(attItem);
+			}
+
+			if (!Nullable)
+			{
+				CreateChildren(item, undoRedo);
 			}
 
 			return item;
@@ -165,8 +171,8 @@ namespace StructuredXmlEditor.Definition
 				item.Attributes.Add(attItem);
 			}
 
-			// only create the missing data if there was some data
-			if (!hadData)
+			// if empty and nullable, then clear all the auto created stuff
+			if (!hadData && Nullable)
 			{
 				item.Children.Clear();
 			}
@@ -178,6 +184,8 @@ namespace StructuredXmlEditor.Definition
 
 		public override void Parse(XElement definition)
 		{
+			Nullable = TryParseBool(definition, "Nullable");
+
 			ChildAsName = definition.Attribute("ChildAsName")?.Value.ToString();
 
 			DescriptionChild = definition.Attribute("DescriptionChild")?.Value?.ToString();
