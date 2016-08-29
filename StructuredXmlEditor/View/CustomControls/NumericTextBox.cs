@@ -71,9 +71,19 @@ namespace StructuredXmlEditor.View
 		//--------------------------------------------------------------------------
 		public void OnValueChanged(float oldVal, float newVal)
 		{
-			m_valueText = newVal.ToString();
-			RaisePropertyChangedEvent("ValueText");
+			if (cameFromUs)
+			{
+				cameFromUs = false;
+			}
+			else
+			{
+				m_valueText = newVal.ToString();
+				RaisePropertyChangedEvent("ValueText");
+			}
 		}
+
+		//--------------------------------------------------------------------------
+		bool cameFromUs = false;
 		#endregion Value
 
 		#region MaxValue
@@ -165,6 +175,7 @@ namespace StructuredXmlEditor.View
 				return;
 			}
 
+			cameFromUs = true;
 			HasError = false;
 			Value = value;
 		}

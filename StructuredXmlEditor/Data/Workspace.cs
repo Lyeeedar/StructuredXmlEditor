@@ -395,6 +395,11 @@ namespace StructuredXmlEditor.Data
 				RecentFiles.Remove(path);
 				RecentFiles.Insert(0, path);
 
+				while (RecentFiles.Count > 10)
+				{
+					RecentFiles.RemoveAt(RecentFiles.Count - 1);
+				}
+
 				StoreSetting("RecentFiles", RecentFiles.ToArray());
 			}
 
