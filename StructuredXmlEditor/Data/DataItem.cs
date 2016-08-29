@@ -699,7 +699,11 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public bool Evaluate()
 		{
-			if (Target is NumberItem)
+			if (Target == null)
+			{
+				return false;
+			}
+			else if (Target is NumberItem)
 			{
 				var val = (Target as NumberItem).Value;
 				var target = float.Parse(TargetValue);

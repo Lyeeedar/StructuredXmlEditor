@@ -12,13 +12,13 @@ namespace StructuredXmlEditor.Definition
 	{
 		private const string Seperator = "\n";
 
-		public string DefaultValue { get; set; }
+		public string Default { get; set; }
 		public bool ElementPerLine { get; set; }
 
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
 			var item = new MultilineStringItem(this, undoRedo);
-			item.Value = DefaultValue;
+			item.Value = Default;
 			return item;
 		}
 
@@ -38,10 +38,17 @@ namespace StructuredXmlEditor.Definition
 			return item;
 		}
 
+		public override bool IsDefault(DataItem item)
+		{
+			var mls = item as MultilineStringItem;
+
+			return mls.Value == Default;
+		}
+
 		public override void Parse(XElement definition)
 		{
-			DefaultValue = definition.Attribute("Default")?.Value?.ToString();
-			if (DefaultValue == null) DefaultValue = "";
+			Default = definition.Attribute("Default")?.Value?.ToString();
+			if (Default == null) Default = "";
 
 			ElementPerLine = TryParseBool(definition, "ElementPerLine");
 		}
