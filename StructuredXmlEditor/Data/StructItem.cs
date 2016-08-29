@@ -39,7 +39,10 @@ namespace StructuredXmlEditor.Data
 				{
 					if (!HasContent && (Parent is CollectionChildItem || Parent is ReferenceItem))
 					{
-						Create();
+						using (UndoRedo.DisableUndoScope())
+						{
+							Create();
+						}
 					}
 				}
 			};

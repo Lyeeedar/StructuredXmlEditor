@@ -153,7 +153,7 @@ namespace StructuredXmlEditor.Definition
 			{
 				var el = element.Attribute(att.Name);
 				DataItem attItem = null;
-
+				
 				if (el != null)
 				{
 					attItem = att.LoadData(new XElement(el.Name, el.Value.ToString()), undoRedo);
@@ -216,12 +216,16 @@ namespace StructuredXmlEditor.Definition
 			Seperator = definition.Attribute("Seperator")?.Value;
 			if (Collapse && Seperator == null) Seperator = ",";
 
-			foreach (var type in Children)
+			if (Collapse)
 			{
-				if (!(type is PrimitiveDataDefinition))
+				foreach (var type in Children)
 				{
-					Collapse = false;
-					break;
+					if (!(type is PrimitiveDataDefinition))
+					{
+						Message.Show("Tried to collapse a struct that has a non-primitive child. This does not work!", "Parse Error", "Ok");
+						Collapse = false;
+						break;
+					}
 				}
 			}
 		}
