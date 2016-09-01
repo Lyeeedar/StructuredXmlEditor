@@ -241,22 +241,29 @@ namespace StructuredXmlEditor.Data
 
 			foreach (var file in Directory.EnumerateFiles(Path.Combine(Path.GetDirectoryName(ProjectRoot), DefsFolder), "*.xmldef", SearchOption.AllDirectories))
 			{
-				var filedoc = XDocument.Load(file);
-				foreach (var el in filedoc.Elements().First().Elements())
+				try
 				{
-					var def = DataDefinition.LoadDefinition(el);
-					var defname = def.Name.ToLower();
-					var name = el.Name.ToString().ToLower();
-					if (name.EndsWith("def"))
+					var filedoc = XDocument.Load(file);
+					foreach (var el in filedoc.Elements().First().Elements())
 					{
-						if (ReferenceableDefinitions.ContainsKey(defname)) Message.Show("Duplicate definitions for type " + defname, "Duplicate Definitions", "Ok");
-						ReferenceableDefinitions[defname] = def;
+						var def = DataDefinition.LoadDefinition(el);
+						var defname = def.Name.ToLower();
+						var name = el.Name.ToString().ToLower();
+						if (name.EndsWith("def"))
+						{
+							if (ReferenceableDefinitions.ContainsKey(defname)) Message.Show("Duplicate definitions for type " + defname, "Duplicate Definitions", "Ok");
+							ReferenceableDefinitions[defname] = def;
+						}
+						else
+						{
+							if (SupportedResourceTypes.ContainsKey(defname)) throw new Exception("Duplicate definitions for type " + defname);
+							SupportedResourceTypes[defname] = def;
+						}
 					}
-					else
-					{
-						if (SupportedResourceTypes.ContainsKey(defname)) throw new Exception("Duplicate definitions for type " + defname);
-						SupportedResourceTypes[defname] = def;
-					}
+				}
+				catch (Exception ex)
+				{
+					Message.Show("Failed to load definition '" + file + "'!\n\n" + ex.Message, "Load Definition Failed", "Ok");
 				}
 			}
 
