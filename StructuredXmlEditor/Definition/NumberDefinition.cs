@@ -42,7 +42,6 @@ namespace StructuredXmlEditor.Definition
 
 		public override void Parse(XElement definition)
 		{
-			Name = definition.Attribute("Name").Value.ToString();
 			Default = TryParseFloat(definition, "Default");
 			MinValue = TryParseFloat(definition, "Min", -float.MaxValue);
 			MaxValue = TryParseFloat(definition, "Max", float.MaxValue);

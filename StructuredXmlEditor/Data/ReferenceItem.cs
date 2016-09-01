@@ -170,7 +170,7 @@ namespace StructuredXmlEditor.Data
 			using (UndoRedo.DisableUndoScope())
 			{
 				item = chosen.CreateData(UndoRedo);
-				if (item is StructItem)
+				if (item is StructItem && item.Children.Count == 0)
 				{
 					(item.Definition as StructDefinition).CreateChildren(item as StructItem, UndoRedo);
 				}

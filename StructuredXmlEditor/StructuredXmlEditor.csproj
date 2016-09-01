@@ -77,6 +77,8 @@
     <Compile Include="Data\MultilineStringItem.cs" />
     <Compile Include="Data\ReferenceItem.cs" />
     <Compile Include="Data\TreeItem.cs" />
+    <Compile Include="Data\VectorItem.cs" />
+    <Compile Include="Definition\VectorDefinition.cs" />
     <Compile Include="Data\Workspace.cs" />
     <Compile Include="Definition\BooleanDefinition.cs" />
     <Compile Include="Definition\CollectionChildDefinition.cs" />

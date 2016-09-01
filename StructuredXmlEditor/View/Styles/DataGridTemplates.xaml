@@ -94,6 +94,31 @@
 	</DataTemplate>
 
 	<DataTemplate
+		DataType="{x:Type d:VectorItem}">
+		<StackPanel Margin="5,0,0,0">
+			<DockPanel>
+				<TextBlock
+					DockPanel.Dock="Left"
+					VerticalAlignment="Center"
+					Text="X: " />
+				<v:NumericTextBox
+					VerticalAlignment="Center"
+					Value="{Binding X, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
+			</DockPanel>
+
+			<DockPanel>
+				<TextBlock
+					DockPanel.Dock="Left"
+					VerticalAlignment="Center"
+					Text="Y: " />
+				<v:NumericTextBox
+					VerticalAlignment="Center"
+					Value="{Binding Y, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
+			</DockPanel>
+		</StackPanel>
+	</DataTemplate>
+
+	<DataTemplate
 		DataType="{x:Type d:BooleanItem}">
 		<CheckBox
 			VerticalAlignment="Center"

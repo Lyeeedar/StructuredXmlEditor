@@ -66,6 +66,7 @@ namespace StructuredXmlEditor.Definition
 			else if (name == "PAIR") definition = new PairDefinition();
 			else if (name == "FILE") definition = new FileDefinition();
 			else if (name == "TREE") definition = new TreeDefinition();
+			else if (name == "VECTOR") definition = new VectorDefinition();
 			else throw new Exception("Unknown definition type " + name + "!");
 
 			definition.Name = element.Attribute("Name")?.Value?.ToString();

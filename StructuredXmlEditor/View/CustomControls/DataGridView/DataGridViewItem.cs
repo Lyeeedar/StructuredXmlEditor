@@ -256,51 +256,11 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
-			if (e.ClickCount == 1 && IsSelected)
+			if (HasItems)
 			{
-				// the user may start a drag by clicking into selected items
-				// delay destroying the selection to the Up event
-				m_deferSelection = true;
+				SetCurrentValue(IsExpandedProperty, !IsExpanded);
+				e.Handled = true;
 			}
-			else
-			{
-				base.OnMouseLeftButtonDown(e);
-			}
-
-			if (e.ClickCount == 2)
-			{
-				if (HasItems)
-				{
-					SetCurrentValue(IsExpandedProperty, !IsExpanded);
-					e.Handled = true;
-				}
-			}
-		}
-
-		//-----------------------------------------------------------------------
-		protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
-		{
-			if (m_deferSelection)
-			{
-				try
-				{
-					base.OnMouseLeftButtonDown(e);
-				}
-				finally
-				{
-					m_deferSelection = false;
-				}
-			}
-
-			base.OnMouseLeftButtonUp(e);
-		}
-
-		//-----------------------------------------------------------------------
-		protected override void OnMouseLeave(MouseEventArgs e)
-		{
-			// abort deferred Down
-			m_deferSelection = false;
-			base.OnMouseLeave(e);
 		}
 
 		//-----------------------------------------------------------------------
@@ -649,7 +609,6 @@ namespace StructuredXmlEditor.View
 		//##############################################################################################################
 		#region Data
 
-		bool m_deferSelection = false;
 		private static InsertionAdorner adorner;
 		private static ImageSource draggedImage;
 
