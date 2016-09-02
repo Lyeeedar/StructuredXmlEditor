@@ -217,6 +217,8 @@ namespace StructuredXmlEditor.View
 				m_headerColumnWidthThumb.RenderTransform = new TranslateTransform(HeaderColumnWidth - 21, 0.0);
 			}
 
+			scrollViewer = GetTemplateChild("scrollViewer") as ScrollViewer;
+
 			RefreshLines();
 		}
 
@@ -440,6 +442,7 @@ namespace StructuredXmlEditor.View
 		#region Data
 
 		//-----------------------------------------------------------------------
+		ScrollViewer scrollViewer;
 		DataGridViewLines m_PART_lines;
 		List<IDataGridItem> m_subscribed = new List<IDataGridItem>();
 		List<ItemData> m_dataItems = new List<ItemData>();

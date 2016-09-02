@@ -36,6 +36,10 @@
 					Source="View/Styles/TabControl.xaml" />
 				<ResourceDictionary
 					Source="View/Styles/TextBox.xaml" />
+
+				<ResourceDictionary
+					Source="View/Styles/AvalonDock.xaml" />
+
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Application.Resources>

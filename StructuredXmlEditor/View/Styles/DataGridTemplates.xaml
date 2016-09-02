@@ -4,6 +4,13 @@
 	xmlns:d="clr-namespace:StructuredXmlEditor.Data"
 	xmlns:v="clr-namespace:StructuredXmlEditor.View">
 
+	<ResourceDictionary.MergedDictionaries>
+		<ResourceDictionary
+			Source="Brushes.xaml" />
+		<ResourceDictionary
+			Source="GeneralStyles.xaml" />
+	</ResourceDictionary.MergedDictionaries>
+	
 	<DataTemplate
 		DataType="{x:Type d:StringItem}">
 		<TextBox
@@ -95,14 +102,16 @@
 
 	<DataTemplate
 		DataType="{x:Type d:VectorItem}">
-		<StackPanel Margin="5,0,0,0">
+		<StackPanel Margin="5,0,0,0" Orientation="Horizontal">
 			<DockPanel>
 				<TextBlock
 					DockPanel.Dock="Left"
 					VerticalAlignment="Center"
+					Foreground="White"
 					Text="X: " />
 				<v:NumericTextBox
 					VerticalAlignment="Center"
+					Width="100"
 					Value="{Binding X, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
 			</DockPanel>
 
@@ -110,9 +119,11 @@
 				<TextBlock
 					DockPanel.Dock="Left"
 					VerticalAlignment="Center"
+					Foreground="White"
 					Text="Y: " />
 				<v:NumericTextBox
 					VerticalAlignment="Center"
+					Width="100"
 					Value="{Binding Y, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
 			</DockPanel>
 		</StackPanel>

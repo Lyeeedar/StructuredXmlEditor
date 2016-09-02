@@ -35,7 +35,13 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		public DataGridViewItem()
 		{
+			GotFocus += (e, args) => 
+			{
+				this.IsSelected = true;
+				args.Handled = true;
+			};
 
+			AllowDrop = true;
 		}
 
 		#endregion Constructor

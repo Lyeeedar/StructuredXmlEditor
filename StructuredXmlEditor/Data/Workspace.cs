@@ -359,7 +359,7 @@ namespace StructuredXmlEditor.Data
 			{
 				if (openDoc.Path == path)
 				{
-					MainWindow.Instance.TabControl.SelectedItem = openDoc;
+					//MainWindow.Instance.TabControl.SelectedItem = openDoc;
 
 					return null;
 				}

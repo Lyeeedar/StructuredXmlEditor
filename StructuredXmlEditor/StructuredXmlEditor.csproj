@@ -58,6 +58,10 @@
     <Reference Include="WPFFolderBrowser">
       <HintPath>lib\WPFFolderBrowser.dll</HintPath>
     </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock, Version=2.9.15603.14400, Culture=neutral, PublicKeyToken=ba83ff368b7563c6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\Xceed.Wpf.AvalonDock.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -108,10 +112,14 @@
     <Compile Include="View\CustomControls\ColourPicker\ColorSpectrumSlider.cs" />
     <Compile Include="View\CustomControls\ColourPicker\ColourUtilities.cs" />
     <Compile Include="View\CustomControls\ColourPicker\HsvColor.cs" />
+    <Compile Include="View\CustomControls\DocumentView.xaml.cs">
+      <DependentUpon>DocumentView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\CustomControls\Message.xaml.cs">
       <DependentUpon>Message.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\CustomControls\NumericTextBox.cs" />
+    <Compile Include="View\ValueConverters\ActiveDocumentConverter.cs" />
     <Compile Include="View\ValueConverters\ColourMarkupConverter.cs" />
     <Compile Include="View\ValueConverters\ConverterBase.cs" />
     <Compile Include="Util\DeferableObservableCollection.cs" />
@@ -140,7 +148,15 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View\CustomControls\DocumentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\CustomControls\Message.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Styles\AvalonDock.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -223,7 +239,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Core.xmldef" />
+    <EmbeddedResource Include="Core.xmldef">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -251,6 +269,28 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="FodyWeavers.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\AvalonDock\DockBottom.PNG" />
+    <Resource Include="Resources\AvalonDock\DockLeft.PNG" />
+    <Resource Include="Resources\AvalonDock\DockPaneEmpty.png" />
+    <Resource Include="Resources\AvalonDock\DockRight.PNG" />
+    <Resource Include="Resources\AvalonDock\DockTop.PNG" />
+    <Resource Include="Resources\AvalonDock\InnerDockDocPaneBottom.png" />
+    <Resource Include="Resources\AvalonDock\InnerDockDocPaneLeft.png" />
+    <Resource Include="Resources\AvalonDock\InnerDockDocPaneRight.png" />
+    <Resource Include="Resources\AvalonDock\InnerDockDocPaneTop.png" />
+    <Resource Include="Resources\AvalonDock\InnerDockPaneBottom.png" />
+    <Resource Include="Resources\AvalonDock\InnerDockPaneInside.png" />
+    <Resource Include="Resources\AvalonDock\InnerDockPaneLeft.png" />
+    <Resource Include="Resources\AvalonDock\InnerDockPaneRight.png" />
+    <Resource Include="Resources\AvalonDock\InnerDockPaneTop.png" />
+    <Resource Include="Resources\AvalonDock\PinAutoHide.png" />
+    <Resource Include="Resources\AvalonDock\PinClose.png" />
+    <Resource Include="Resources\AvalonDock\PinDocMenu.png" />
+    <Resource Include="Resources\AvalonDock\PinMaximize.png" />
+    <Resource Include="Resources\AvalonDock\PinMenu.png" />
+    <Resource Include="Resources\AvalonDock\PinRestore.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.1.28.3\build\Fody.targets" Condition="Exists('..\packages\Fody.1.28.3\build\Fody.targets')" />

@@ -60,7 +60,7 @@
 							Value="true">
 							<Setter
 								Property="Background"
-								Value="{StaticResource BackgroundDarkBrush}" />
+								Value="{StaticResource MouseOverBorderBrush}" />
 						</Trigger>
 						<Trigger
 							Property="IsEnabled"
@@ -184,7 +184,7 @@
 							Value="true">
 							<Setter
 								Property="Background"
-								Value="{StaticResource BackgroundDarkBrush}" />
+								Value="{StaticResource MouseOverBorderBrush}" />
 						</Trigger>
 						<Trigger
 							Property="IsEnabled"

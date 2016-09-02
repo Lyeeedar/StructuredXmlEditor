@@ -348,6 +348,7 @@
 							BorderThickness="{TemplateBinding BorderThickness}"
 							SnapsToDevicePixels="true">
 							<ScrollViewer
+								x:Name="scrollViewer"
 								Padding="0"
 								Margin="0"
 								Focusable="false">
