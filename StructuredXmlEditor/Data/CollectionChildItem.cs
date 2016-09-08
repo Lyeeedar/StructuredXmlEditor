@@ -227,7 +227,7 @@ namespace StructuredXmlEditor.Data
 				child.WrappedItem = item;
 			}
 
-			var collection = Parent as CollectionItem;
+			var collection = ParentCollection;
 			var index = collection.Children.IndexOf(this) + 1;
 
 			collection.Insert(index, child);

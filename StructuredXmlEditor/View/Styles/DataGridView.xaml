@@ -335,11 +335,7 @@
 					TargetType="{x:Type l:DataGridView}">
 					<Grid
 						Background="{TemplateBinding Background}">
-						<l:DataGridViewLines
-							x:Name="PART_Lines"
-							Visibility="Collapsed"
-							Pen="{StaticResource linePen}"
-							ClipToBounds="True" />
+					
 						<Border
 							Name="Bd"
 							Padding="0"

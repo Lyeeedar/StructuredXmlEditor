@@ -133,7 +133,7 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Collection" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,Reference,String,Struct,Tree,Vector" ToolTip="The child that this collection contains." />
+		<Reference Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,Reference,String,Struct,Timeline,Tree,Vector" ToolTip="The child that this collection contains." />
 	</StructDef>
 
 	<StructDef Name="CollectionDef" ToolTip="A definition for a collection that can be referenced." TextColour="Collection">
@@ -148,7 +148,7 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Collection" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,Reference,String,Struct,Tree,Vector" ToolTip="The child that this collection contains." />
+		<Reference Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,Reference,String,Struct,Timeline,Tree,Vector" ToolTip="The child that this collection contains." />
 	</StructDef>
 
 	<StructDef Name="Pair" ToolTip="A pair of values. Written as &gt;Key&lt;Value&gt;/Key&lt;." TextColour="Struct">
@@ -188,7 +188,7 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Struct" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,String,Struct,Reference,Tree,Vector" ToolTip="The defined children of the struct" />
+		<Reference Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,String,Struct,Reference,Timeline,Tree,Vector" ToolTip="The defined children of the struct" />
 	</CollectionDef>
 
 	<CollectionDef Name="StructDef" ToolTip="A definition for a struct that can be referenced." TextColour="Struct">
@@ -204,8 +204,22 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Struct" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,String,Struct,Reference,Tree,Vector" ToolTip="The defined children of the struct" />
+		<Reference Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,String,Struct,Reference,Timeline,Tree,Vector" ToolTip="The defined children of the struct" />
 	</CollectionDef>
+
+	<StructDef Name="Timeline" ToolTip="A collection of keyframes." TextColour="Struct">
+		<Attributes>
+			<String Name="Name" Default="Struct" ToolTip="The name to be written for this element." />
+			<Number Name="MinCount" Min="0" ToolTip="The minimum number of keyframesthis can have." />
+			<Number Name="MaxCount" Min="1" Default="99999999" ToolTip="The maximum number of keyframes this can have." />
+			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
+			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Struct" HasAlpha="false" />
+			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
+		</Attributes>
+		<Reference Keys="Number" Nullable="false" ToolTip="The keyframe time." />
+		<Reference Keys="Struct" Nullable="false" ToolTip="The data in the keyframe." />
+	</StructDef>
 
 	<StructDef Name="Reference" ToolTip="An element used to allow the user to pick from a collection of valid elements.">
 		<Attributes>

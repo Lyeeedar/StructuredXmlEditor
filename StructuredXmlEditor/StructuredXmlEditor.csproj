@@ -44,6 +44,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -57,10 +58,12 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="WPFFolderBrowser">
       <HintPath>lib\WPFFolderBrowser.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Xceed.Wpf.AvalonDock, Version=2.9.15603.14400, Culture=neutral, PublicKeyToken=ba83ff368b7563c6, processorArchitecture=MSIL">
+    <Reference Include="Xceed.Wpf.AvalonDock, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\Xceed.Wpf.AvalonDock.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -80,8 +83,11 @@
     <Compile Include="Data\PrimitiveDataItem.cs" />
     <Compile Include="Data\MultilineStringItem.cs" />
     <Compile Include="Data\ReferenceItem.cs" />
+    <Compile Include="Data\TimelineItem.cs" />
+    <Compile Include="Data\TimelineKeyframeItem.cs" />
     <Compile Include="Data\TreeItem.cs" />
     <Compile Include="Data\VectorItem.cs" />
+    <Compile Include="Definition\TimelineDefinition.cs" />
     <Compile Include="Definition\VectorDefinition.cs" />
     <Compile Include="Data\Workspace.cs" />
     <Compile Include="Definition\BooleanDefinition.cs" />
@@ -108,6 +114,7 @@
     <Compile Include="Util\PopupCloser.cs" />
     <Compile Include="Util\SerializableDictionary.cs" />
     <Compile Include="Util\UndoRedoManager.cs" />
+    <Compile Include="View\CustomControls\CanvasAutoSize.cs" />
     <Compile Include="View\CustomControls\ColourPicker\ColorCanvas.cs" />
     <Compile Include="View\CustomControls\ColourPicker\ColorSpectrumSlider.cs" />
     <Compile Include="View\CustomControls\ColourPicker\ColourUtilities.cs" />
@@ -119,6 +126,7 @@
       <DependentUpon>Message.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\CustomControls\NumericTextBox.cs" />
+    <Compile Include="View\CustomControls\Timeline.cs" />
     <Compile Include="View\ValueConverters\ActiveDocumentConverter.cs" />
     <Compile Include="View\ValueConverters\ColourMarkupConverter.cs" />
     <Compile Include="View\ValueConverters\ConverterBase.cs" />

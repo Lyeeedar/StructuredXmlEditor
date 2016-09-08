@@ -5,6 +5,113 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:v="clr-namespace:StructuredXmlEditor.View">
+
+	<UserControl.Resources>
+		
+		<Style
+			x:Key="breadcrumbButtonStyle"
+			TargetType="{x:Type ButtonBase}">
+			<Setter
+				Property="SnapsToDevicePixels"
+				Value="true" />
+			<Setter
+				Property="OverridesDefaultStyle"
+				Value="true" />
+			<Setter
+				Property="Template">
+				<Setter.Value>
+					<ControlTemplate
+						TargetType="{x:Type ButtonBase}">
+						<StackPanel
+							x:Name="Panel"
+							Margin="0"
+							SnapsToDevicePixels="True"
+							Orientation="Horizontal">
+							<Border
+								x:Name="padBorder"
+								Width="30"
+								Background="{StaticResource BackgroundNormalBrush}"
+								Visibility="{Binding FirstItem}" />
+							<Border
+								x:Name="buttonTextBorder"
+								Background="{StaticResource BackgroundNormalBrush}"
+								Padding="0,0,1,0">
+								<TextBlock
+									x:Name="buttonText"
+									FontWeight="Bold"
+									VerticalAlignment="Center"
+									Foreground="{StaticResource FontDarkBrush}"
+									Text="{Binding FocusName}" />
+							</Border>
+							<Border
+								x:Name="seperator"
+								Margin="-1,0,0,0"
+								Width="30"
+								Height="30">
+								<Path
+									x:Name="PART_Arrow"
+									HorizontalAlignment="Center"
+									VerticalAlignment="Center"
+									StrokeThickness="3"
+									Stroke="{StaticResource BackgroundDarkBrush}"
+									Fill="{StaticResource BackgroundNormalBrush}">
+									<Path.Data>
+										<PathGeometry>
+											<PathGeometry.Figures>
+												<PathFigureCollection>
+													<PathFigure
+														StartPoint="-10, 0">
+														<PathFigure.Segments>
+															<PathSegmentCollection>
+																<LineSegment
+																	Point="0,0" />
+																<LineSegment
+																	Point="15,19" />
+																<LineSegment
+																	Point="0,35" />
+																<LineSegment
+																	Point="-10,35" />
+															</PathSegmentCollection>
+														</PathFigure.Segments>
+													</PathFigure>
+												</PathFigureCollection>
+											</PathGeometry.Figures>
+										</PathGeometry>
+									</Path.Data>
+								</Path>
+							</Border>
+						</StackPanel>
+
+						<ControlTemplate.Triggers>
+							<Trigger
+								Property="IsMouseOver"
+								Value="true">
+								<Setter
+									TargetName="padBorder"
+									Property="Background"
+									Value="{StaticResource MouseOverBackgroundBrush}" />
+								<Setter
+									TargetName="buttonTextBorder"
+									Property="Background"
+									Value="{StaticResource MouseOverBackgroundBrush}" />
+								<Setter
+									TargetName="PART_Arrow"
+									Property="Fill"
+									Value="{StaticResource MouseOverBackgroundBrush}" />
+								<Setter
+									TargetName="buttonText"
+									Property="Foreground"
+									Value="Black" />
+							</Trigger>
+						</ControlTemplate.Triggers>
+
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+		
+	</UserControl.Resources>
+	
 	<DockPanel
 		DataContext="{Binding Data}">
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -106,6 +107,29 @@ namespace StructuredXmlEditor
 				byte.TryParse(split[3], out a);
 
 				return Color.FromArgb(a, r, g, b);
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public static void Sort<TSource, TKey>(this ObservableCollection<TSource> source, Func<TSource, TKey> keySelector, bool ascending = true)
+		{
+			if (ascending)
+			{
+				List<TSource> sortedList = source.OrderBy(keySelector).ToList();
+				source.Clear();
+				foreach (var sortedItem in sortedList)
+				{
+					source.Add(sortedItem);
+				}
+			}
+			else
+			{
+				List<TSource> sortedList = source.OrderByDescending(keySelector).ToList();
+				source.Clear();
+				foreach (var sortedItem in sortedList)
+				{
+					source.Add(sortedItem);
+				}
 			}
 		}
 	}

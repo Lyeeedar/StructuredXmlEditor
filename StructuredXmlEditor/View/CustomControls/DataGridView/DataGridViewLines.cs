@@ -131,8 +131,6 @@ namespace StructuredXmlEditor.View
 			double verticalOffset = (int)-sv.VerticalOffset * lineHeight;
 			double horizontalOffset = -sv.HorizontalOffset;
 
-			//var mappingTimer = Stopwatch.StartNew();
-
 			m_itemParentIndexMapping.Clear();
 			for (int i = 0; i < ListBox.DataItems.Count; ++i)
 			{
@@ -143,8 +141,6 @@ namespace StructuredXmlEditor.View
 					m_itemParentIndexMapping[c] = i;
 				}
 			}
-
-			//mappingTimer.Stop();
 
 			var guidelines = new GuidelineSet();
 			for (int i = 0; i < 10; ++i)

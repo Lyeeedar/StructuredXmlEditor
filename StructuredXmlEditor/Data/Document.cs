@@ -137,7 +137,10 @@ namespace StructuredXmlEditor.Data
 			{
 				if (undoPoint != lastUndoPoint)
 				{
-					Save(true);
+					Application.Current.Dispatcher.Invoke(new Action(() => 
+					{
+						Save(true);
+					}));
 				}
 			}
 			else
