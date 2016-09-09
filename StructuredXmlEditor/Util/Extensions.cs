@@ -111,6 +111,17 @@ namespace StructuredXmlEditor
 		}
 
 		//-----------------------------------------------------------------------
+		public static Color Lerp(this Color start, Color end, float alpha)
+		{
+			var r = start.ScR + (end.ScR - start.ScR) * alpha;
+			var g = start.ScG + (end.ScG - start.ScG) * alpha;
+			var b = start.ScB + (end.ScB - start.ScB) * alpha;
+			var a = start.ScA + (end.ScA - start.ScA) * alpha;
+
+			return Color.FromScRgb(a, r, g, b);
+		}
+
+		//-----------------------------------------------------------------------
 		public static void Sort<TSource, TKey>(this ObservableCollection<TSource> source, Func<TSource, TKey> keySelector, bool ascending = true)
 		{
 			if (ascending)

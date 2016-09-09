@@ -136,6 +136,13 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public void SetColourData(DataItem keyframe, int index, Color value)
+		{
+			var def = (Definition as TimelineDefinition).KeyframeDefinition.Children.Where((e) => e is ColourDefinition).ElementAt(index);
+			(keyframe.Children.First((e) => e.Definition == def) as ColourItem).Value = value;
+		}
+
+		//-----------------------------------------------------------------------
 		public int NumNumberData()
 		{
 			return (Definition as TimelineDefinition).KeyframeDefinition.Children.Where((e) => e is NumberDefinition && e != (Definition as TimelineDefinition).TimeDefinition).Count();
@@ -146,6 +153,13 @@ namespace StructuredXmlEditor.Data
 		{
 			var def = (Definition as TimelineDefinition).KeyframeDefinition.Children.Where((e) => e is NumberDefinition && e != (Definition as TimelineDefinition).TimeDefinition).ElementAt(index);
 			return (keyframe.Children.First((e) => e.Definition == def) as NumberItem).Value;
+		}
+
+		//-----------------------------------------------------------------------
+		public void SetNumberData(DataItem keyframe, int index, float value)
+		{
+			var def = (Definition as TimelineDefinition).KeyframeDefinition.Children.Where((e) => e is NumberDefinition && e != (Definition as TimelineDefinition).TimeDefinition).ElementAt(index);
+			(keyframe.Children.First((e) => e.Definition == def) as NumberItem).Value = value;
 		}
 
 		//-----------------------------------------------------------------------

@@ -67,6 +67,7 @@ namespace StructuredXmlEditor.View
 			};
 		}
 
+		//-----------------------------------------------------------------------
 		private void OnPropertyChange(object sender, EventArgs args)
 		{
 			InvalidateVisual();
@@ -184,14 +185,7 @@ namespace StructuredXmlEditor.View
 
 			while (tpos < ActualWidth)
 			{
-				for (int i = 0; i < 5; i++)
-				{
-					var minorStep = indicatorStep / 6;
-					var mpos = (tpos - indicatorStep) + i * minorStep + minorStep;
-					drawingContext.DrawLine(indicatorPen, new Point(mpos, 20), new Point(mpos, ActualHeight - 20));
-				}
-
-				var time = ((tpos - TimelineItem.LeftPad) / pixelsASecond);
+				var time = Math.Round(((tpos - TimelineItem.LeftPad) / pixelsASecond) / bestStep) * bestStep;
 
 				string timeText = time.ToString();
 				FormattedText text = new FormattedText(timeText, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, typeface, 10, FontBrush);
@@ -202,8 +196,15 @@ namespace StructuredXmlEditor.View
 
 				tpos += indicatorStep;
 
-				time = ((tpos - TimelineItem.LeftPad) / pixelsASecond);
+				time = Math.Round(((tpos - TimelineItem.LeftPad) / pixelsASecond) / bestStep) * bestStep;
 				if (time > TimelineItem.Max) break;
+
+				for (int i = 0; i < 5; i++)
+				{
+					var minorStep = indicatorStep / 6;
+					var mpos = (tpos - indicatorStep) + i * minorStep + minorStep;
+					drawingContext.DrawLine(indicatorPen, new Point(mpos, 20), new Point(mpos, ActualHeight - 20));
+				}
 			}
 
 			// Draw the keyframe boxes
@@ -416,6 +417,68 @@ namespace StructuredXmlEditor.View
 								var roundedTime = Math.Floor(newTime / bestStep) * bestStep;
 
 								TimelineItem.SetKeyframeTime(item, (float)roundedTime);
+
+								TimelineItem.Children.Sort((e) => TimelineItem.GetKeyframeTime(e));
+
+								var index = TimelineItem.Children.IndexOf(item);
+								var prev = TimelineItem.Children.ElementAtOrDefault(index - 1);
+								var next = TimelineItem.Children.ElementAtOrDefault(index + 1);
+
+								if (prev == null && next == null)
+								{
+
+								}
+								else if (prev == null)
+								{
+									for (int i = 0; i < TimelineItem.NumColourData(); i++)
+									{
+										TimelineItem.SetColourData(item, i, TimelineItem.GetColourData(next, i));
+									}
+									for (int i = 0; i < TimelineItem.NumNumberData(); i++)
+									{
+										TimelineItem.SetNumberData(item, i, TimelineItem.GetNumberData(next, i));
+									}
+								}
+								else if (next == null)
+								{
+									for (int i = 0; i < TimelineItem.NumColourData(); i++)
+									{
+										TimelineItem.SetColourData(item, i, TimelineItem.GetColourData(prev, i));
+									}
+									for (int i = 0; i < TimelineItem.NumNumberData(); i++)
+									{
+										TimelineItem.SetNumberData(item, i, TimelineItem.GetNumberData(prev, i));
+									}
+								}
+								else
+								{
+									for (int i = 0; i < TimelineItem.NumColourData(); i++)
+									{
+										var prevVal = TimelineItem.GetColourData(prev, i);
+										var nextVal = TimelineItem.GetColourData(next, i);
+
+										var prevTime = TimelineItem.GetKeyframeTime(prev);
+										var nextTime = TimelineItem.GetKeyframeTime(next);
+										var alpha = (TimelineItem.GetKeyframeTime(item) - prevTime) / (nextTime - prevTime);
+
+										var col = prevVal.Lerp(nextVal, alpha);
+
+										TimelineItem.SetColourData(item, i, col);
+									}
+									for (int i = 0; i < TimelineItem.NumNumberData(); i++)
+									{
+										var prevVal = TimelineItem.GetNumberData(prev, i);
+										var nextVal = TimelineItem.GetNumberData(next, i);
+
+										var prevTime = TimelineItem.GetKeyframeTime(prev);
+										var nextTime = TimelineItem.GetKeyframeTime(next);
+										var alpha = (TimelineItem.GetKeyframeTime(item) - prevTime) / (nextTime - prevTime);
+
+										var val = prevVal + (nextVal - prevVal) * alpha;
+
+										TimelineItem.SetNumberData(item, i, val);
+									}
+								}
 							}
 
 							InvalidateVisual();
