@@ -14,6 +14,7 @@ namespace StructuredXmlEditor.Definition
 		public StructDefinition KeyframeDefinition { get; set; }
 		public int MinCount { get; set; }
 		public int MaxCount { get; set; }
+		public bool Interpolate { get; set; }
 
 		public NumberDefinition TimeDefinition { get; set; }
 
@@ -74,6 +75,7 @@ namespace StructuredXmlEditor.Definition
 			TimeChild = definition.Attribute("TimeChild").Value;
 			MinCount = TryParseInt(definition, "MinCount", 0);
 			MaxCount = TryParseInt(definition, "MaxCount", int.MaxValue);
+			Interpolate = TryParseBool(definition, "Interpolate", true);
 
 			var elements = definition.Elements();
 			KeyframeDefinition = LoadDefinition(elements.First()) as StructDefinition;

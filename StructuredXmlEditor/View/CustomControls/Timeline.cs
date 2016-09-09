@@ -11,6 +11,8 @@ using System.Windows.Input;
 using System.Globalization;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls.Primitives;
+using StructuredXmlEditor.Definition;
+using System.Timers;
 
 namespace StructuredXmlEditor.View
 {
@@ -65,12 +67,30 @@ namespace StructuredXmlEditor.View
 
 				InvalidateVisual();
 			};
+
+			redrawTimer = new Timer();
+			redrawTimer.Interval = 1.0 / 15.0;
+			redrawTimer.Elapsed += (e, args) =>
+			{
+				if (dirty)
+				{
+					Application.Current.Dispatcher.BeginInvoke(new Action(() => { InvalidateVisual(); }));
+					dirty = false;
+				}
+			};
+			redrawTimer.Start();
+		}
+
+		//-----------------------------------------------------------------------
+		~Timeline()
+		{
+			redrawTimer.Stop();
 		}
 
 		//-----------------------------------------------------------------------
 		private void OnPropertyChange(object sender, EventArgs args)
 		{
-			InvalidateVisual();
+			dirty = true;
 		}
 
 		//-----------------------------------------------------------------------
@@ -107,68 +127,71 @@ namespace StructuredXmlEditor.View
 
 			var sortedKeyframes = TimelineItem.Children.OrderBy((e) => TimelineItem.GetKeyframeTime(e)).ToList();
 
-			// Draw the colour keyframes interpolated
-			var numColours = TimelineItem.NumColourData();
-			var linePad = 2;
-			var lineHeight = 5;
-			var bottomPad = (ActualHeight - (lineHeight * numColours + (numColours - 1) * linePad)) / 2;
-			for (int i = 0; i < numColours; i++)
+			if ((TimelineItem.Definition as TimelineDefinition).Interpolate)
 			{
-				var drawPos = bottomPad + (lineHeight + linePad) * i;
-
-				for (int ii = 0; ii < sortedKeyframes.Count - 1; ii++)
+				// Draw the colour keyframes interpolated
+				var numColours = TimelineItem.NumColourData();
+				var linePad = 2;
+				var lineHeight = 5;
+				var bottomPad = (ActualHeight - (lineHeight * numColours + (numColours - 1) * linePad)) / 2;
+				for (int i = 0; i < numColours; i++)
 				{
-					var thisKeyframe = sortedKeyframes[ii];
-					var nextKeyframe = sortedKeyframes[ii + 1];
+					var drawPos = bottomPad + (lineHeight + linePad) * i;
 
-					var thisCol = TimelineItem.GetColourData(thisKeyframe, i);
-					var nextCol = TimelineItem.GetColourData(nextKeyframe, i);
+					for (int ii = 0; ii < sortedKeyframes.Count - 1; ii++)
+					{
+						var thisKeyframe = sortedKeyframes[ii];
+						var nextKeyframe = sortedKeyframes[ii + 1];
 
-					var brush = new LinearGradientBrush(thisCol, nextCol, new Point(0, 0), new Point(1, 0));
+						var thisCol = TimelineItem.GetColourData(thisKeyframe, i);
+						var nextCol = TimelineItem.GetColourData(nextKeyframe, i);
 
-					var thisDrawPos = TimelineItem.GetKeyframeTime(thisKeyframe) * pixelsASecond + TimelineItem.LeftPad;
-					var nextDrawPos = TimelineItem.GetKeyframeTime(nextKeyframe) * pixelsASecond + TimelineItem.LeftPad;
+						var brush = new LinearGradientBrush(thisCol, nextCol, new Point(0, 0), new Point(1, 0));
 
-					drawingContext.DrawRectangle(brush, null, new Rect(thisDrawPos, drawPos, nextDrawPos - thisDrawPos, lineHeight));
+						var thisDrawPos = TimelineItem.GetKeyframeTime(thisKeyframe) * pixelsASecond + TimelineItem.LeftPad;
+						var nextDrawPos = TimelineItem.GetKeyframeTime(nextKeyframe) * pixelsASecond + TimelineItem.LeftPad;
+
+						drawingContext.DrawRectangle(brush, null, new Rect(thisDrawPos, drawPos, nextDrawPos - thisDrawPos, lineHeight));
+					}
 				}
-			}
 
-			// Draw the number keyframes interpolated
-			var numNumbers = TimelineItem.NumNumberData();
-			var min = float.MaxValue;
-			var max = -float.MaxValue;
-			for (int i = 0; i < numNumbers; i++)
-			{
-				foreach (var keyframe in sortedKeyframes)
+				// Draw the number keyframes interpolated
+				var numNumbers = TimelineItem.NumNumberData();
+				var min = float.MaxValue;
+				var max = -float.MaxValue;
+				for (int i = 0; i < numNumbers; i++)
 				{
-					var val = TimelineItem.GetNumberData(keyframe, i);
-					if (val < min) min = val;
-					if (val > max) max = val;
+					foreach (var keyframe in sortedKeyframes)
+					{
+						var val = TimelineItem.GetNumberData(keyframe, i);
+						if (val < min) min = val;
+						if (val > max) max = val;
+					}
 				}
-			}
 
-			for (int i = 0; i < numNumbers; i++)
-			{
-				var pen = NumberTrackColours[i];
-
-				for (int ii = 0; ii < sortedKeyframes.Count - 1; ii++)
+				for (int i = 0; i < numNumbers; i++)
 				{
-					var thisKeyframe = sortedKeyframes[ii];
-					var nextKeyframe = sortedKeyframes[ii + 1];
+					var pen = NumberTrackColours[i];
 
-					var thisNum = TimelineItem.GetNumberData(thisKeyframe, i);
-					var nextNum = TimelineItem.GetNumberData(nextKeyframe, i);
+					for (int ii = 0; ii < sortedKeyframes.Count - 1; ii++)
+					{
+						var thisKeyframe = sortedKeyframes[ii];
+						var nextKeyframe = sortedKeyframes[ii + 1];
 
-					var thisAlpha = (thisNum - min) / (max - min);
-					var nextAlpha = (nextNum - min) / (max - min);
+						var thisNum = TimelineItem.GetNumberData(thisKeyframe, i);
+						var nextNum = TimelineItem.GetNumberData(nextKeyframe, i);
 
-					var thisH = (ActualHeight - 20) - (ActualHeight - 25) * thisAlpha;
-					var nextH = (ActualHeight - 20) - (ActualHeight - 25) * nextAlpha;
+						var thisAlpha = (thisNum - min) / (max - min);
+						var nextAlpha = (nextNum - min) / (max - min);
 
-					var thisDrawPos = TimelineItem.GetKeyframeTime(thisKeyframe) * pixelsASecond + TimelineItem.LeftPad;
-					var nextDrawPos = TimelineItem.GetKeyframeTime(nextKeyframe) * pixelsASecond + TimelineItem.LeftPad;
+						var thisH = (ActualHeight - 20) - (ActualHeight - 25) * thisAlpha;
+						var nextH = (ActualHeight - 20) - (ActualHeight - 25) * nextAlpha;
 
-					drawingContext.DrawLine(pen, new Point(thisDrawPos, thisH), new Point(nextDrawPos, nextH));
+						var thisDrawPos = TimelineItem.GetKeyframeTime(thisKeyframe) * pixelsASecond + TimelineItem.LeftPad;
+						var nextDrawPos = TimelineItem.GetKeyframeTime(nextKeyframe) * pixelsASecond + TimelineItem.LeftPad;
+
+						drawingContext.DrawLine(pen, new Point(thisDrawPos, thisH), new Point(nextDrawPos, nextH));
+					}
 				}
 			}
 
@@ -308,6 +331,7 @@ namespace StructuredXmlEditor.View
 			}
 
 			InvalidateVisual();
+			e.Handled = true;
 		}
 
 		//-----------------------------------------------------------------------
@@ -396,7 +420,6 @@ namespace StructuredXmlEditor.View
 						MenuItem delete = new MenuItem();
 						delete.Header = "Delete";
 						delete.Click += delegate { TimelineItem.Remove(selected); InvalidateVisual(); };
-						delete.InputGestureText = "Delete";
 						delete.IsEnabled = !TimelineItem.IsAtMin;
 						menu.Items.Add(delete);
 					}
@@ -420,63 +443,66 @@ namespace StructuredXmlEditor.View
 
 								TimelineItem.Children.Sort((e) => TimelineItem.GetKeyframeTime(e));
 
-								var index = TimelineItem.Children.IndexOf(item);
-								var prev = TimelineItem.Children.ElementAtOrDefault(index - 1);
-								var next = TimelineItem.Children.ElementAtOrDefault(index + 1);
-
-								if (prev == null && next == null)
+								if ((TimelineItem.Definition as TimelineDefinition).Interpolate)
 								{
+									var index = TimelineItem.Children.IndexOf(item);
+									var prev = TimelineItem.Children.ElementAtOrDefault(index - 1);
+									var next = TimelineItem.Children.ElementAtOrDefault(index + 1);
 
-								}
-								else if (prev == null)
-								{
-									for (int i = 0; i < TimelineItem.NumColourData(); i++)
+									if (prev == null && next == null)
 									{
-										TimelineItem.SetColourData(item, i, TimelineItem.GetColourData(next, i));
+
 									}
-									for (int i = 0; i < TimelineItem.NumNumberData(); i++)
+									else if (prev == null)
 									{
-										TimelineItem.SetNumberData(item, i, TimelineItem.GetNumberData(next, i));
+										for (int i = 0; i < TimelineItem.NumColourData(); i++)
+										{
+											TimelineItem.SetColourData(item, i, TimelineItem.GetColourData(next, i));
+										}
+										for (int i = 0; i < TimelineItem.NumNumberData(); i++)
+										{
+											TimelineItem.SetNumberData(item, i, TimelineItem.GetNumberData(next, i));
+										}
 									}
-								}
-								else if (next == null)
-								{
-									for (int i = 0; i < TimelineItem.NumColourData(); i++)
+									else if (next == null)
 									{
-										TimelineItem.SetColourData(item, i, TimelineItem.GetColourData(prev, i));
+										for (int i = 0; i < TimelineItem.NumColourData(); i++)
+										{
+											TimelineItem.SetColourData(item, i, TimelineItem.GetColourData(prev, i));
+										}
+										for (int i = 0; i < TimelineItem.NumNumberData(); i++)
+										{
+											TimelineItem.SetNumberData(item, i, TimelineItem.GetNumberData(prev, i));
+										}
 									}
-									for (int i = 0; i < TimelineItem.NumNumberData(); i++)
+									else
 									{
-										TimelineItem.SetNumberData(item, i, TimelineItem.GetNumberData(prev, i));
-									}
-								}
-								else
-								{
-									for (int i = 0; i < TimelineItem.NumColourData(); i++)
-									{
-										var prevVal = TimelineItem.GetColourData(prev, i);
-										var nextVal = TimelineItem.GetColourData(next, i);
+										for (int i = 0; i < TimelineItem.NumColourData(); i++)
+										{
+											var prevVal = TimelineItem.GetColourData(prev, i);
+											var nextVal = TimelineItem.GetColourData(next, i);
 
-										var prevTime = TimelineItem.GetKeyframeTime(prev);
-										var nextTime = TimelineItem.GetKeyframeTime(next);
-										var alpha = (TimelineItem.GetKeyframeTime(item) - prevTime) / (nextTime - prevTime);
+											var prevTime = TimelineItem.GetKeyframeTime(prev);
+											var nextTime = TimelineItem.GetKeyframeTime(next);
+											var alpha = (TimelineItem.GetKeyframeTime(item) - prevTime) / (nextTime - prevTime);
 
-										var col = prevVal.Lerp(nextVal, alpha);
+											var col = prevVal.Lerp(nextVal, alpha);
 
-										TimelineItem.SetColourData(item, i, col);
-									}
-									for (int i = 0; i < TimelineItem.NumNumberData(); i++)
-									{
-										var prevVal = TimelineItem.GetNumberData(prev, i);
-										var nextVal = TimelineItem.GetNumberData(next, i);
+											TimelineItem.SetColourData(item, i, col);
+										}
+										for (int i = 0; i < TimelineItem.NumNumberData(); i++)
+										{
+											var prevVal = TimelineItem.GetNumberData(prev, i);
+											var nextVal = TimelineItem.GetNumberData(next, i);
 
-										var prevTime = TimelineItem.GetKeyframeTime(prev);
-										var nextTime = TimelineItem.GetKeyframeTime(next);
-										var alpha = (TimelineItem.GetKeyframeTime(item) - prevTime) / (nextTime - prevTime);
+											var prevTime = TimelineItem.GetKeyframeTime(prev);
+											var nextTime = TimelineItem.GetKeyframeTime(next);
+											var alpha = (TimelineItem.GetKeyframeTime(item) - prevTime) / (nextTime - prevTime);
 
-										var val = prevVal + (nextVal - prevVal) * alpha;
+											var val = prevVal + (nextVal - prevVal) * alpha;
 
-										TimelineItem.SetNumberData(item, i, val);
+											TimelineItem.SetNumberData(item, i, val);
+										}
 									}
 								}
 							}
@@ -492,7 +518,6 @@ namespace StructuredXmlEditor.View
 					MenuItem zoom = new MenuItem();
 					zoom.Header = "Zoom To Best Fit";
 					zoom.Click += delegate { ZoomToBestFit(); };
-					zoom.InputGestureText = "=";
 					menu.Items.Add(zoom);
 
 					this.ContextMenu = menu;
@@ -530,8 +555,6 @@ namespace StructuredXmlEditor.View
 			}
 
 			EndDrag();
-
-			base.OnPreviewMouseUp(args);
 		}
 
 		//-----------------------------------------------------------------------
@@ -573,34 +596,13 @@ namespace StructuredXmlEditor.View
 		}
 
 		//-----------------------------------------------------------------------
-		protected override void OnPreviewKeyDown(KeyEventArgs e)
-		{
-			base.OnKeyDown(e);
-
-			if (e.Key == Key.Delete)
-			{
-				foreach (var item in TimelineItem.Children.ToList())
-				{
-					if (item.IsSelected)
-					{
-						TimelineItem.Remove(item);
-					}
-				}
-			}
-			else if (e.Key == Key.OemPlus)
-			{
-				ZoomToBestFit();
-			}
-
-			e.Handled = true;
-		}
-
-		//-----------------------------------------------------------------------
 		double startPos = 0;
 		double panPos = 0;
 		bool isDragging = false;
 		bool isPanning = false;
 		DataItem draggedItem;
 		DataItem mouseOverItem;
+		Timer redrawTimer;
+		bool dirty = false;
 	}
 }
