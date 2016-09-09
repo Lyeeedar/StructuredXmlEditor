@@ -209,7 +209,7 @@
 
 	<StructDef Name="Timeline" ToolTip="A collection of keyframes." TextColour="Struct">
 		<Attributes>
-			<String Name="Name" Default="Struct" ToolTip="The name to be written for this element." />
+			<String Name="Name" Default="Timeline" ToolTip="The name to be written for this element." />
 			<String Name="TimeChild" Default="Time" SkipIfDefault="false" ToolTip="The name of the child containing the keyframe time." />
 			<Boolean Name="Interpolate" Default="true" ToolTip="Whether the timeline should show interpolated values" />
 			<Number Name="MinCount" Min="0" ToolTip="The minimum number of keyframesthis can have." />

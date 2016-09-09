@@ -151,7 +151,20 @@ namespace StructuredXmlEditor.View
 						var thisDrawPos = TimelineItem.GetKeyframeTime(thisKeyframe) * pixelsASecond + TimelineItem.LeftPad;
 						var nextDrawPos = TimelineItem.GetKeyframeTime(nextKeyframe) * pixelsASecond + TimelineItem.LeftPad;
 
-						drawingContext.DrawRectangle(brush, null, new Rect(thisDrawPos, drawPos, nextDrawPos - thisDrawPos, lineHeight));
+						drawingContext.DrawRectangle(brush, indicatorPen, new Rect(thisDrawPos, drawPos, nextDrawPos - thisDrawPos, lineHeight));
+					}
+
+					for (int ii = 0; ii < sortedKeyframes.Count; ii++)
+					{
+						var thisKeyframe = sortedKeyframes[ii];
+
+						var thisCol = TimelineItem.GetColourData(thisKeyframe, i);
+
+						var brush = new SolidColorBrush(thisCol);
+
+						var thisDrawPos = TimelineItem.GetKeyframeTime(thisKeyframe) * pixelsASecond + TimelineItem.LeftPad;
+
+						drawingContext.DrawRoundedRectangle(brush, indicatorPen, new Rect(thisDrawPos-5, (drawPos+lineHeight/2)-5, 10, 10), 5, 5);
 					}
 				}
 
@@ -190,7 +203,24 @@ namespace StructuredXmlEditor.View
 						var thisDrawPos = TimelineItem.GetKeyframeTime(thisKeyframe) * pixelsASecond + TimelineItem.LeftPad;
 						var nextDrawPos = TimelineItem.GetKeyframeTime(nextKeyframe) * pixelsASecond + TimelineItem.LeftPad;
 
+						var borderPen = new Pen(IndicatorBrush, 4);
+						drawingContext.DrawLine(borderPen, new Point(thisDrawPos, thisH), new Point(nextDrawPos, nextH));
 						drawingContext.DrawLine(pen, new Point(thisDrawPos, thisH), new Point(nextDrawPos, nextH));
+					}
+
+					for (int ii = 0; ii < sortedKeyframes.Count; ii++)
+					{
+						var thisKeyframe = sortedKeyframes[ii];
+
+						var thisNum = TimelineItem.GetNumberData(thisKeyframe, i);
+
+						var thisAlpha = (thisNum - min) / (max - min);
+
+						var thisH = (ActualHeight - 20) - (ActualHeight - 25) * thisAlpha;
+
+						var thisDrawPos = TimelineItem.GetKeyframeTime(thisKeyframe) * pixelsASecond + TimelineItem.LeftPad;
+
+						drawingContext.DrawRoundedRectangle(pen.Brush, indicatorPen, new Rect(thisDrawPos - 5, thisH - 5, 10, 10), 5, 5);
 					}
 				}
 			}
