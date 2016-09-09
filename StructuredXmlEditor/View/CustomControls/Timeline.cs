@@ -17,6 +17,12 @@ namespace StructuredXmlEditor.View
 	public class Timeline : Control
 	{
 		//-----------------------------------------------------------------------
+		private static double[] PossibleValueSteps = { 10000, 5000, 1000, 500, 100, 50, 10, 5, 1, 0.5, 0.1, 0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001 };
+
+		//-----------------------------------------------------------------------
+		private static Pen[] NumberTrackColours = { new Pen(Brushes.ForestGreen, 2), new Pen(Brushes.DarkCyan, 2), new Pen(Brushes.DarkViolet, 2), new Pen(Brushes.DarkOrange, 2) };
+
+		//-----------------------------------------------------------------------
 		public TimelineItem TimelineItem { get { return DataContext as TimelineItem; } }
 
 		//-----------------------------------------------------------------------
@@ -45,11 +51,26 @@ namespace StructuredXmlEditor.View
 		{
 			DataContextChanged += (e, args) =>
 			{
+				if (args.OldValue != null)
+				{
+					var oldItem = args.OldValue as TimelineItem;
+					oldItem.PropertyChanged -= OnPropertyChange;
+				}
+
+				if (args.NewValue != null)
+				{
+					var newItem = args.NewValue as TimelineItem;
+					newItem.PropertyChanged += OnPropertyChange;
+				}
+
 				InvalidateVisual();
 			};
 		}
 
-		private static double[] PossibleValueSteps = { 10000, 5000, 1000, 500, 100, 50, 10, 5, 1, 0.5, 0.1, 0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001 };
+		private void OnPropertyChange(object sender, EventArgs args)
+		{
+			InvalidateVisual();
+		}
 
 		//-----------------------------------------------------------------------
 		private double FindBestIndicatorStep()
@@ -83,9 +104,78 @@ namespace StructuredXmlEditor.View
 
 			double pixelsASecond = ActualWidth / TimelineItem.TimelineRange;
 
+			var sortedKeyframes = TimelineItem.Children.OrderBy((e) => TimelineItem.GetKeyframeTime(e)).ToList();
+
+			// Draw the colour keyframes interpolated
+			var numColours = TimelineItem.NumColourData();
+			var linePad = 2;
+			var lineHeight = 5;
+			var bottomPad = (ActualHeight - (lineHeight * numColours + (numColours - 1) * linePad)) / 2;
+			for (int i = 0; i < numColours; i++)
+			{
+				var drawPos = bottomPad + (lineHeight + linePad) * i;
+
+				for (int ii = 0; ii < sortedKeyframes.Count - 1; ii++)
+				{
+					var thisKeyframe = sortedKeyframes[ii];
+					var nextKeyframe = sortedKeyframes[ii + 1];
+
+					var thisCol = TimelineItem.GetColourData(thisKeyframe, i);
+					var nextCol = TimelineItem.GetColourData(nextKeyframe, i);
+
+					var brush = new LinearGradientBrush(thisCol, nextCol, new Point(0, 0), new Point(1, 0));
+
+					var thisDrawPos = TimelineItem.GetKeyframeTime(thisKeyframe) * pixelsASecond + TimelineItem.LeftPad;
+					var nextDrawPos = TimelineItem.GetKeyframeTime(nextKeyframe) * pixelsASecond + TimelineItem.LeftPad;
+
+					drawingContext.DrawRectangle(brush, null, new Rect(thisDrawPos, drawPos, nextDrawPos - thisDrawPos, lineHeight));
+				}
+			}
+
+			// Draw the number keyframes interpolated
+			var numNumbers = TimelineItem.NumNumberData();
+			var min = float.MaxValue;
+			var max = -float.MaxValue;
+			for (int i = 0; i < numNumbers; i++)
+			{
+				foreach (var keyframe in sortedKeyframes)
+				{
+					var val = TimelineItem.GetNumberData(keyframe, i);
+					if (val < min) min = val;
+					if (val > max) max = val;
+				}
+			}
+
+			for (int i = 0; i < numNumbers; i++)
+			{
+				var pen = NumberTrackColours[i];
+
+				for (int ii = 0; ii < sortedKeyframes.Count - 1; ii++)
+				{
+					var thisKeyframe = sortedKeyframes[ii];
+					var nextKeyframe = sortedKeyframes[ii + 1];
+
+					var thisNum = TimelineItem.GetNumberData(thisKeyframe, i);
+					var nextNum = TimelineItem.GetNumberData(nextKeyframe, i);
+
+					var thisAlpha = (thisNum - min) / (max - min);
+					var nextAlpha = (nextNum - min) / (max - min);
+
+					var thisH = (ActualHeight - 20) - (ActualHeight - 25) * thisAlpha;
+					var nextH = (ActualHeight - 20) - (ActualHeight - 25) * nextAlpha;
+
+					var thisDrawPos = TimelineItem.GetKeyframeTime(thisKeyframe) * pixelsASecond + TimelineItem.LeftPad;
+					var nextDrawPos = TimelineItem.GetKeyframeTime(nextKeyframe) * pixelsASecond + TimelineItem.LeftPad;
+
+					drawingContext.DrawLine(pen, new Point(thisDrawPos, thisH), new Point(nextDrawPos, nextH));
+				}
+			}
+
+			// Draw the indicators
 			double bestStep = FindBestIndicatorStep();
 			double indicatorStep = bestStep * pixelsASecond;
 			double tpos = TimelineItem.LeftPad;
+
 			if (TimelineItem.LeftPad < 0)
 			{
 				var remainder = Math.Abs(TimelineItem.LeftPad) - Math.Floor(Math.Abs(TimelineItem.LeftPad) / indicatorStep) * indicatorStep;
@@ -116,13 +206,14 @@ namespace StructuredXmlEditor.View
 				if (time > TimelineItem.Max) break;
 			}
 
-			foreach (TimelineKeyframeItem keyframe in TimelineItem.Children)
+			// Draw the keyframe boxes
+			foreach (var keyframe in TimelineItem.Children)
 			{
 				var background = Brushes.HotPink;
 				var thickness = keyframe == mouseOverItem ? 2 : 1;
 				var pen = keyframe.IsSelected ? new Pen(SelectedBrush, thickness) : new Pen(UnselectedBrush, thickness);
 
-				drawingContext.DrawRectangle(null, pen, new Rect(keyframe.Time * pixelsASecond - 5 + TimelineItem.LeftPad, 5, 10, ActualHeight-20));
+				drawingContext.DrawRectangle(null, pen, new Rect(TimelineItem.GetKeyframeTime(keyframe) * pixelsASecond - 5 + TimelineItem.LeftPad, 5, 10, ActualHeight-20));
 			}
 		}
 
@@ -167,14 +258,14 @@ namespace StructuredXmlEditor.View
 
 			double pixelsASecond = ActualWidth / TimelineItem.TimelineRange;
 
-			foreach (TimelineKeyframeItem keyframe in TimelineItem.Children)
+			foreach (var keyframe in TimelineItem.Children)
 			{
 				keyframe.IsSelected = false;
 			}
 
-			foreach (TimelineKeyframeItem keyframe in TimelineItem.Children)
+			foreach (var keyframe in TimelineItem.Children)
 			{
-				var time = keyframe.Time * pixelsASecond;
+				var time = TimelineItem.GetKeyframeTime(keyframe) * pixelsASecond;
 
 				if (Math.Abs(time - clickPos) < 10)
 				{
@@ -198,14 +289,14 @@ namespace StructuredXmlEditor.View
 
 			double pixelsASecond = ActualWidth / TimelineItem.TimelineRange;
 
-			foreach (TimelineKeyframeItem keyframe in TimelineItem.Children)
+			foreach (var keyframe in TimelineItem.Children)
 			{
 				keyframe.IsSelected = false;
 			}
 
-			foreach (TimelineKeyframeItem keyframe in TimelineItem.Children)
+			foreach (var keyframe in TimelineItem.Children)
 			{
-				var time = keyframe.Time * pixelsASecond;
+				var time = TimelineItem.GetKeyframeTime(keyframe) * pixelsASecond;
 
 				if (Math.Abs(time - clickPos) < 10)
 				{
@@ -235,9 +326,9 @@ namespace StructuredXmlEditor.View
 			{
 				mouseOverItem = null;
 
-				foreach (TimelineKeyframeItem keyframe in TimelineItem.Children)
+				foreach (var keyframe in TimelineItem.Children)
 				{
-					var time = keyframe.Time * pixelsASecond;
+					var time = TimelineItem.GetKeyframeTime(keyframe) * pixelsASecond;
 
 					if (Math.Abs(time - clickPos) < 10)
 					{
@@ -277,11 +368,9 @@ namespace StructuredXmlEditor.View
 
 				double bestStep = FindBestIndicatorStep() / 6;
 
-				var roundedTime = Math.Floor(newTime / bestStep) * bestStep;
+				var roundedTime = Keyboard.IsKeyDown(Key.LeftCtrl) ? Math.Floor(newTime / bestStep) * bestStep : newTime;
 
-				draggedItem.Time = (float)roundedTime;
-				if (draggedItem.Time < 0) draggedItem.Time = 0;
-				if (draggedItem.Time > TimelineItem.Max) draggedItem.Time = TimelineItem.Max;
+				TimelineItem.SetKeyframeTime(draggedItem, (float)roundedTime);
 			}
 
 			InvalidateVisual();
@@ -305,7 +394,7 @@ namespace StructuredXmlEditor.View
 					{
 						MenuItem delete = new MenuItem();
 						delete.Header = "Delete";
-						delete.Click += delegate { TimelineItem.Remove(selected as TimelineKeyframeItem); InvalidateVisual(); };
+						delete.Click += delegate { TimelineItem.Remove(selected); InvalidateVisual(); };
 						delete.InputGestureText = "Delete";
 						delete.IsEnabled = !TimelineItem.IsAtMin;
 						menu.Items.Add(delete);
@@ -326,9 +415,7 @@ namespace StructuredXmlEditor.View
 
 								var roundedTime = Math.Floor(newTime / bestStep) * bestStep;
 
-								item.Time = (float)roundedTime;
-								if (item.Time < 0) item.Time = 0;
-								if (item.Time > TimelineItem.Max) item.Time = TimelineItem.Max;
+								TimelineItem.SetKeyframeTime(item, (float)roundedTime);
 							}
 
 							InvalidateVisual();
@@ -396,16 +483,16 @@ namespace StructuredXmlEditor.View
 
 			if (wasDragging)
 			{
-				TimelineItem.Children.Sort((e) => (e as TimelineKeyframeItem).Time);
+				TimelineItem.Children.Sort((e) => TimelineItem.GetKeyframeTime(e));
 			}
 		}
 
 		//-----------------------------------------------------------------------
 		public void ZoomToBestFit()
 		{
-			TimelineItem.Children.Sort((e) => (e as TimelineKeyframeItem).Time);
-			var min = (TimelineItem.Children.First() as TimelineKeyframeItem).Time;
-			var max = (TimelineItem.Children.Last() as TimelineKeyframeItem).Time;
+			TimelineItem.Children.Sort((e) => TimelineItem.GetKeyframeTime(e));
+			var min = TimelineItem.GetKeyframeTime(TimelineItem.Children.First());
+			var max = TimelineItem.GetKeyframeTime(TimelineItem.Children.Last());
 
 			var diff = max - min;
 			if (diff < 1) diff = 1;
@@ -429,7 +516,7 @@ namespace StructuredXmlEditor.View
 
 			if (e.Key == Key.Delete)
 			{
-				foreach (TimelineKeyframeItem item in TimelineItem.Children.ToList())
+				foreach (var item in TimelineItem.Children.ToList())
 				{
 					if (item.IsSelected)
 					{
@@ -450,7 +537,7 @@ namespace StructuredXmlEditor.View
 		double panPos = 0;
 		bool isDragging = false;
 		bool isPanning = false;
-		TimelineKeyframeItem draggedItem;
-		TimelineKeyframeItem mouseOverItem;
+		DataItem draggedItem;
+		DataItem mouseOverItem;
 	}
 }

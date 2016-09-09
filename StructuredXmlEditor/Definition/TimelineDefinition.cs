@@ -10,32 +10,16 @@ namespace StructuredXmlEditor.Definition
 {
 	public class TimelineDefinition : ComplexDataDefinition
 	{
-		public NumberDefinition TimeChild { get; set; }
-		public StructDefinition DataChild { get; set; }
+		public string TimeChild { get; set; }
+		public StructDefinition KeyframeDefinition { get; set; }
 		public int MinCount { get; set; }
 		public int MaxCount { get; set; }
+
+		public NumberDefinition TimeDefinition { get; set; }
 
 		public TimelineDefinition()
 		{
 			TextColour = Colours["Struct"];
-		}
-
-		public TimelineKeyframeItem CreateKeyframe(UndoRedoManager undoRedo)
-		{
-			var keyframe = new TimelineKeyframeItem(this, undoRedo);
-			keyframe.Children.Add(TimeChild.CreateData(undoRedo));
-
-			using (undoRedo.DisableUndoScope())
-			{
-				var temp = new StructItem(DataChild, undoRedo);
-				if (temp.Children.Count == 0) DataChild.CreateChildren(temp, undoRedo);
-				foreach (var child in temp.Children)
-				{
-					keyframe.Children.Add(child);
-				}
-			}
-
-			return keyframe;
 		}
 
 		public override DataItem CreateData(UndoRedoManager undoRedo)
@@ -44,8 +28,8 @@ namespace StructuredXmlEditor.Definition
 
 			for (int i = 0; i < MinCount; i++)
 			{
-				var keyframe = CreateKeyframe(undoRedo);
-				item.Children.Add(keyframe);
+				var child = KeyframeDefinition.CreateData(undoRedo);
+				item.Children.Add(child);
 			}
 
 			return item;
@@ -53,20 +37,14 @@ namespace StructuredXmlEditor.Definition
 
 		public override void DoSaveData(XElement parent, DataItem item)
 		{
-			var timelineEl = new XElement(Name);
-			parent.Add(timelineEl);
+			var ti = item as TimelineItem;
 
-			foreach (TimelineKeyframeItem child in item.Children)
+			var root = new XElement(Name);
+			parent.Add(root);
+
+			foreach (var child in ti.Children)
 			{
-				var keyframeEl = new XElement("Keyframe");
-				timelineEl.Add(keyframeEl);
-
-				foreach (var dchild in child.Children)
-				{
-					var childDef = dchild.Definition;
-
-					child.Definition.SaveData(keyframeEl, dchild);
-				}
+				child.Definition.SaveData(root, child);
 			}
 		}
 
@@ -74,18 +52,35 @@ namespace StructuredXmlEditor.Definition
 		{
 			var item = new TimelineItem(this, undoRedo);
 
+			foreach (var el in element.Elements())
+			{
+				var child = KeyframeDefinition.LoadData(el, undoRedo);
+				item.Children.Add(child);
+
+				if (item.Children.Count == MaxCount) break;
+			}
+
+			for (int i = item.Children.Count; i < MinCount; i++)
+			{
+				var child = KeyframeDefinition.CreateData(undoRedo);
+				item.Children.Add(child);
+			}
+
 			return item;
 		}
 
 		public override void Parse(XElement definition)
 		{
+			TimeChild = definition.Attribute("TimeChild").Value;
 			MinCount = TryParseInt(definition, "MinCount", 0);
 			MaxCount = TryParseInt(definition, "MaxCount", int.MaxValue);
 
 			var elements = definition.Elements();
-			TimeChild = LoadDefinition(elements.First()) as NumberDefinition;
-			DataChild = LoadDefinition(elements.Last()) as StructDefinition;
-			DataChild.Nullable = false;
+			KeyframeDefinition = LoadDefinition(elements.First()) as StructDefinition;
+			KeyframeDefinition.Nullable = false;
+
+			TimeDefinition = KeyframeDefinition.Children.FirstOrDefault((e) => e.Name == TimeChild) as NumberDefinition;
+			if (TimeDefinition == null) throw new Exception("Could not find number item '" + TimeChild + "' on the timeline keyframe!");
 		}
 	}
 }

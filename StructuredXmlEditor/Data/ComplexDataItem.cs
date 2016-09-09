@@ -49,7 +49,8 @@ namespace StructuredXmlEditor.Data
 				else if (Attributes.Count > 0)
 				{
 					return string.Join(", ", Attributes.Where(
-						e => e.Name == "Name" || 
+						e => e.Name == "Name" ||
+						!(e.Definition as PrimitiveDataDefinition).SkipIfDefault ||
 						(e.Definition as PrimitiveDataDefinition)?.WriteToString(e) != (e.Definition as PrimitiveDataDefinition)?.DefaultValueString()
 						).Select(e => "<200,180,200>" + e.Name + "=</>" + e.Description));
 				}

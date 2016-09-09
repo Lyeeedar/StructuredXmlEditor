@@ -172,7 +172,7 @@ namespace StructuredXmlEditor.Definition
 					var asString = attDef.WriteToString(att);
 					var defaultAsString = attDef.DefaultValueString();
 
-					if (att.Name == "Name" || asString != defaultAsString)
+					if (att.Name == "Name" || !attDef.SkipIfDefault || asString != defaultAsString)
 					{
 						root.SetAttributeValue(att.Name, asString);
 					}

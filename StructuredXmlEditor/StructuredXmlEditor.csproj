@@ -84,7 +84,6 @@
     <Compile Include="Data\MultilineStringItem.cs" />
     <Compile Include="Data\ReferenceItem.cs" />
     <Compile Include="Data\TimelineItem.cs" />
-    <Compile Include="Data\TimelineKeyframeItem.cs" />
     <Compile Include="Data\TreeItem.cs" />
     <Compile Include="Data\VectorItem.cs" />
     <Compile Include="Definition\TimelineDefinition.cs" />
@@ -114,7 +113,6 @@
     <Compile Include="Util\PopupCloser.cs" />
     <Compile Include="Util\SerializableDictionary.cs" />
     <Compile Include="Util\UndoRedoManager.cs" />
-    <Compile Include="View\CustomControls\CanvasAutoSize.cs" />
     <Compile Include="View\CustomControls\ColourPicker\ColorCanvas.cs" />
     <Compile Include="View\CustomControls\ColourPicker\ColorSpectrumSlider.cs" />
     <Compile Include="View\CustomControls\ColourPicker\ColourUtilities.cs" />

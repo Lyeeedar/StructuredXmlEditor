@@ -234,6 +234,14 @@ namespace StructuredXmlEditor.Definition
 						Collapse = false;
 						break;
 					}
+					else if (Seperator == "," && type is ColourDefinition)
+					{
+						Message.Show("If collapsing a colour the seperator should not be a comma (as colours use that to seperate their components). Please use something else.", "Parse Error", "Ok");
+					}
+					else if (Seperator == "," && type is VectorDefinition)
+					{
+						Message.Show("If collapsing a vector the seperator should not be a comma (as vectors use that to seperate their components). Please use something else.", "Parse Error", "Ok");
+					}
 				}
 			}
 		}
@@ -272,7 +280,7 @@ namespace StructuredXmlEditor.Definition
 					var asString = primDef.WriteToString(att);
 					var defaultAsString = primDef.DefaultValueString();
 
-					if (att.Name == "Name" || asString != defaultAsString)
+					if (att.Name == "Name" || !primDef.SkipIfDefault || asString != defaultAsString)
 					{
 						el.SetAttributeValue(att.Name, asString);
 					}
@@ -302,7 +310,7 @@ namespace StructuredXmlEditor.Definition
 					var asString = primDef.WriteToString(att);
 					var defaultAsString = primDef.DefaultValueString();
 
-					if (att.Name == "Name" || asString != defaultAsString)
+					if (att.Name == "Name" || !primDef.SkipIfDefault || asString != defaultAsString)
 					{
 						el.SetAttributeValue(att.Name, asString);
 					}

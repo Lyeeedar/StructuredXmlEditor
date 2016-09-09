@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 using StructuredXmlEditor.Definition;
 using System.Collections.ObjectModel;
 using StructuredXmlEditor.View;
+using System.Windows.Media;
+using System.ComponentModel;
 
 namespace StructuredXmlEditor.Data
 {
 	public class TimelineItem : ComplexDataItem
 	{
+		//-----------------------------------------------------------------------
 		protected override string EmptyString
 		{
 			get
@@ -19,16 +22,29 @@ namespace StructuredXmlEditor.Data
 			}
 		}
 
+		//-----------------------------------------------------------------------
 		public float Max
 		{
 			get
 			{
 				var tdef = Definition as TimelineDefinition;
-				var timeDef = tdef.TimeChild;
+				var timeDef = tdef.TimeDefinition;
 				return timeDef.MaxValue;
 			}
 		}
 
+		//-----------------------------------------------------------------------
+		public float Min
+		{
+			get
+			{
+				var tdef = Definition as TimelineDefinition;
+				var timeDef = tdef.TimeDefinition;
+				return timeDef.MinValue;
+			}
+		}
+
+		//-----------------------------------------------------------------------
 		public double TimelineRange
 		{
 			get
@@ -38,7 +54,7 @@ namespace StructuredXmlEditor.Data
 					var max = Max;
 					if (Children.Count > 0)
 					{
-						max = (Children.Last() as TimelineKeyframeItem).Time;
+						max = GetKeyframeTime(Children.Last());
 					}
 
 					if (max == 0)
@@ -51,7 +67,7 @@ namespace StructuredXmlEditor.Data
 						max = 1;
 					}
 
-					range = max;
+					range = max * 1.1;
 				}
 
 				return range;
@@ -63,6 +79,7 @@ namespace StructuredXmlEditor.Data
 		}
 		private double range = -1;
 
+		//-----------------------------------------------------------------------
 		public double LeftPad
 		{
 			get { return leftPad; }
@@ -76,13 +93,63 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public bool IsAtMin { get { return Children.Count <= (Definition as TimelineDefinition).MinCount; } }
 
+		//-----------------------------------------------------------------------
 		public TimelineItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
 			
 		}
 
 		//-----------------------------------------------------------------------
-		public void Remove(TimelineKeyframeItem item)
+		public override void ChildPropertyChanged(object sender, PropertyChangedEventArgs args)
+		{
+			base.ChildPropertyChanged(sender, args);
+
+			RaisePropertyChangedEvent("Child Property");
+		}
+
+		//-----------------------------------------------------------------------
+		public float GetKeyframeTime(DataItem keyframe)
+		{
+			return (keyframe.Children.First((e) => e.Definition == (Definition as TimelineDefinition).TimeDefinition) as NumberItem).Value;
+		}
+
+		//-----------------------------------------------------------------------
+		public void SetKeyframeTime(DataItem keyframe, float value)
+		{
+			var timeItem = keyframe.Children.First((e) => e.Definition == (Definition as TimelineDefinition).TimeDefinition) as NumberItem;
+			if (value < Min) value = Min;
+			if (value > Max) value = Max;
+			timeItem.Value = value;
+		}
+
+		//-----------------------------------------------------------------------
+		public int NumColourData()
+		{
+			return (Definition as TimelineDefinition).KeyframeDefinition.Children.Where((e) => e is ColourDefinition).Count();
+		}
+
+		//-----------------------------------------------------------------------
+		public Color GetColourData(DataItem keyframe, int index)
+		{
+			var def = (Definition as TimelineDefinition).KeyframeDefinition.Children.Where((e) => e is ColourDefinition).ElementAt(index);
+			return (keyframe.Children.First((e) => e.Definition == def) as ColourItem).Value;
+		}
+
+		//-----------------------------------------------------------------------
+		public int NumNumberData()
+		{
+			return (Definition as TimelineDefinition).KeyframeDefinition.Children.Where((e) => e is NumberDefinition && e != (Definition as TimelineDefinition).TimeDefinition).Count();
+		}
+
+		//-----------------------------------------------------------------------
+		public float GetNumberData(DataItem keyframe, int index)
+		{
+			var def = (Definition as TimelineDefinition).KeyframeDefinition.Children.Where((e) => e is NumberDefinition && e != (Definition as TimelineDefinition).TimeDefinition).ElementAt(index);
+			return (keyframe.Children.First((e) => e.Definition == def) as NumberItem).Value;
+		}
+
+		//-----------------------------------------------------------------------
+		public void Remove(DataItem item)
 		{
 			var def = Definition as TimelineDefinition;
 			if (IsAtMin) return;
@@ -106,13 +173,12 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public TimelineKeyframeItem Add()
+		public DataItem Add()
 		{
 			var def = Definition as TimelineDefinition;
 			if (IsAtMax) return null;
 
-			var cdef = Definition as TimelineDefinition;
-			TimelineKeyframeItem item = cdef.CreateKeyframe(UndoRedo);
+			DataItem item = def.KeyframeDefinition.CreateData(UndoRedo);
 
 			UndoRedo.ApplyDoUndo(
 				delegate

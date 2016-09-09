@@ -210,6 +210,7 @@
 	<StructDef Name="Timeline" ToolTip="A collection of keyframes." TextColour="Struct">
 		<Attributes>
 			<String Name="Name" Default="Struct" ToolTip="The name to be written for this element." />
+			<String Name="TimeChild" Default="Time" SkipIfDefault="false" ToolTip="The name of the child containing the keyframe time." />
 			<Number Name="MinCount" Min="0" ToolTip="The minimum number of keyframesthis can have." />
 			<Number Name="MaxCount" Min="1" Default="99999999" ToolTip="The maximum number of keyframes this can have." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
@@ -217,8 +218,7 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Struct" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Keys="Number" Nullable="false" ToolTip="The keyframe time." />
-		<Reference Keys="Struct" Nullable="false" ToolTip="The data in the keyframe." />
+		<Reference Keys="Struct" Nullable="false" ToolTip="The keyframe. Must contain a number child with the name of the value in TimeChild." />
 	</StructDef>
 
 	<StructDef Name="Reference" ToolTip="An element used to allow the user to pick from a collection of valid elements.">
