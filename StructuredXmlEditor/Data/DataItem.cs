@@ -128,11 +128,24 @@ namespace StructuredXmlEditor.Data
 		{
 			get
 			{
-				foreach (var binding in VisibleIfStatements)
+				if (VisibleIfStatements.Count == 0) return true;
+
+				foreach (var group in VisibleIfStatements)
 				{
-					if (!binding.Evaluate()) return false;
+					var isValid = true;
+					foreach (var statement in group)
+					{
+						if (!statement.Evaluate())
+						{
+							isValid = false;
+							break;
+						}
+					}
+
+					if (isValid) return true;
 				}
-				return true;
+
+				return false;
 			}
 		}
 
@@ -313,7 +326,7 @@ namespace StructuredXmlEditor.Data
 		public virtual bool IsPrimitive { get { return false; } }
 
 		//-----------------------------------------------------------------------
-		public List<Statement> VisibleIfStatements = new List<Statement>();
+		public List<List<Statement>> VisibleIfStatements = new List<List<Statement>>();
 
 		//-----------------------------------------------------------------------
 		public DataItem(DataDefinition definition, UndoRedoManager undoRedo)
@@ -342,27 +355,35 @@ namespace StructuredXmlEditor.Data
 
 			if (Definition.VisibleIf != null)
 			{
-				// decompose into boolean statements
-				var statements = Definition.VisibleIf.Split(new string[] { "&&" }, StringSplitOptions.RemoveEmptyEntries);
-
-				// extract the linked element and value from the boolean and setup the binding
-				foreach (var statement in statements)
+				// decompose into or groups
+				var orgroups = Definition.VisibleIf.Split(new string[] { "||" }, StringSplitOptions.RemoveEmptyEntries);
+				foreach (var orgroup in orgroups)
 				{
-					var stmnt = new Statement(statement);
-					VisibleIfStatements.Add(stmnt);
+					var group = new List<Statement>();
+					VisibleIfStatements.Add(group);
 
-					// find the referenced element and bind to it
-					foreach (var child in Parent.Children)
+					// decompose into and statements
+					var statements = orgroup.Split(new string[] { "&&" }, StringSplitOptions.RemoveEmptyEntries);
+
+					// extract the linked element and value from the boolean and setup the binding
+					foreach (var statement in statements)
 					{
-						if (child != this && child.Name == stmnt.TargetName)
-						{
-							stmnt.SetTarget(child);
-							child.PropertyChanged += (e, a) =>
-							{
-								RaisePropertyChangedEvent("IsVisible");
-							};
+						var stmnt = new Statement(statement);
+						group.Add(stmnt);
 
-							break;
+						// find the referenced element and bind to it
+						foreach (var child in Parent.Children)
+						{
+							if (child != this && child.Name == stmnt.TargetName)
+							{
+								stmnt.SetTarget(child);
+								child.PropertyChanged += (e, a) =>
+								{
+									RaisePropertyChangedEvent("IsVisible");
+								};
+
+								break;
+							}
 						}
 					}
 				}
@@ -727,11 +748,13 @@ namespace StructuredXmlEditor.Data
 			}
 			else
 			{
-				var val = Target.GetType().GetProperty("Value").GetValue(Target) as string; // reflection cause cant cast to PrimitiveDataType<>
+				var val = Target.GetType().GetProperty("Value").GetValue(Target) as string; // reflection cause cant cast to PrimitiveDataItem<>
 				var target = TargetValue;
+				var split = target.Split(new char[] { ',' });
+				var equal = val == target || (split.Length > 1 && split.Contains(val));
 
-				if (Operator == ComparisonOperation.Equal) { return val == target; }
-				else if (Operator == ComparisonOperation.NotEqual) { return val != target; }
+				if (Operator == ComparisonOperation.Equal) { return equal; }
+				else if (Operator == ComparisonOperation.NotEqual) { return !equal; }
 				else { throw new Exception("Invalid operation type " + Operator + " for string!"); }
 			}
 		}

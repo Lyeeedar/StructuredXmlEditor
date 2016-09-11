@@ -42,14 +42,17 @@ namespace StructuredXmlEditor
 			if (e.Key == Key.S && Keyboard.IsKeyDown(Key.LeftCtrl))
 			{
 				Workspace.Save();
+				e.Handled = true;
 			}
 			else if (e.Key == Key.Z && Keyboard.IsKeyDown(Key.LeftCtrl))
 			{
 				Workspace.Undo();
+				e.Handled = true;
 			}
 			else if (e.Key == Key.Y && Keyboard.IsKeyDown(Key.LeftCtrl))
 			{
 				Workspace.Redo();
+				e.Handled = true;
 			}
 		}
 

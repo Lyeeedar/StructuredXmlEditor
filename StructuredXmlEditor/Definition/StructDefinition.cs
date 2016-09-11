@@ -184,7 +184,7 @@ namespace StructuredXmlEditor.Definition
 
 		public override void Parse(XElement definition)
 		{
-			Nullable = TryParseBool(definition, "Nullable");
+			Nullable = TryParseBool(definition, "Nullable", true);
 
 			ChildAsName = definition.Attribute("ChildAsName")?.Value.ToString();
 

@@ -20,7 +20,7 @@ namespace StructuredXmlEditor.Definition
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
 			var item = new EnumItem(this, undoRedo);
-			item.Value = EnumValues[0];
+			item.Value = Default;
 			return item;
 		}
 

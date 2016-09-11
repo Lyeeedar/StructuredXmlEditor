@@ -135,7 +135,14 @@ namespace StructuredXmlEditor.Definition
 				{
 					foreach (var child in ci.Children)
 					{
-						data += primDef.WriteToString(child) + Seperator;
+						if (child is CollectionChildItem)
+						{
+							data += primDef.WriteToString(((CollectionChildItem)child).WrappedItem) + Seperator;
+						}
+						else
+						{
+							data += primDef.WriteToString(child) + Seperator;
+						}
 					}
 
 					data = data.Remove(data.Length - Seperator.Length, Seperator.Length);
