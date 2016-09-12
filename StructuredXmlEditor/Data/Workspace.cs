@@ -81,6 +81,9 @@ namespace StructuredXmlEditor.Data
 		public Command<object> RedoCMD { get { return new Command<object>((e) => Redo(), (e) => Current != null && Current.UndoRedo.CanRedo); } }
 
 		//-----------------------------------------------------------------------
+		public Command<object> SwitchProjectCMD { get { return new Command<object>((e) => SwitchProject()); } }
+
+		//-----------------------------------------------------------------------
 		public Workspace()
 		{
 			Instance = this;
@@ -140,9 +143,32 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public string LoadProjectRoot()
+		public void SwitchProject()
 		{
-			var choice = Message.Show("Could not find a project root file. What do you want to do?", "No Project Root", "Browse", "Create New", "Quit");
+			var newProjectRoot = LoadProjectRoot(false);
+			if (newProjectRoot == null) return;
+
+			foreach (var document in Documents.ToList())
+			{
+				document.Close();
+			}
+			Documents.Clear();
+
+			ProjectRoot = newProjectRoot;
+			StoreSetting("ProjectRoot", ProjectRoot);
+
+			RecentFiles.Clear();
+			StoreSetting("RecentFiles", RecentFiles.ToArray());
+
+			LoadDefinitions();
+		}
+
+		//-----------------------------------------------------------------------
+		public string LoadProjectRoot(bool isFailure = true)
+		{
+			var choice = isFailure ? 
+				Message.Show("Could not find a project root file. What do you want to do?", "No Project Root", "Browse", "Create New", "Quit") :
+				Message.Show("Please select a project root file.", "Select Project Root", "Browse", "Create New", "Cancel");
 
 			if (choice == "Browse")
 			{
@@ -157,10 +183,14 @@ namespace StructuredXmlEditor.Data
 				{
 					return dlg.FileName;
 				}
-				else
+				else if (isFailure)
 				{
 					Message.Show("Cannot run without a project root file. Shutting down.", "Startup Failed");
 					Environment.Exit(0);
+				}
+				else
+				{
+					return null;
 				}
 			}
 			else if (choice == "Create New")
@@ -172,10 +202,14 @@ namespace StructuredXmlEditor.Data
 				dlgRoot.Title = "Project Root Folder";
 				bool? resultRoot = dlgRoot.ShowDialog();
 
-				if (resultRoot != true)
+				if (resultRoot != true && isFailure)
 				{
 					Message.Show("Cannot run without a project root file. Shutting down.", "Startup Failed");
 					Environment.Exit(0);
+				}
+				else
+				{
+					return null;
 				}
 
 				Message.Show("Now pick the folder to store your resource definitions in.", "Pick Definitions Folder", "Ok");
@@ -185,10 +219,14 @@ namespace StructuredXmlEditor.Data
 				dlgDefs.Title = "Definitions Folder";
 				bool? resultDefs = dlgDefs.ShowDialog();
 
-				if (resultDefs != true)
+				if (resultDefs != true && isFailure)
 				{
 					Message.Show("Cannot run without a project root file. Shutting down.", "Startup Failed");
 					Environment.Exit(0);
+				}
+				else
+				{
+					return null;
 				}
 
 				// make relative
@@ -226,8 +264,12 @@ namespace StructuredXmlEditor.Data
 				return projRoot;
 			}
 
-			Message.Show("Cannot run without a project root file. Shutting down.", "Startup Failed");
-			Environment.Exit(0);
+			if (isFailure)
+			{
+				Message.Show("Cannot run without a project root file. Shutting down.", "Startup Failed");
+				Environment.Exit(0);
+			}
+
 			return null;
 		}
 

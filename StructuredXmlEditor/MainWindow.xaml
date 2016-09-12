@@ -93,6 +93,13 @@
 					<Separator />
 
 					<MenuItem
+						Header="Switch _Project"
+						Command="{Binding SwitchProjectCMD}">
+					</MenuItem>
+					
+					<Separator />
+
+					<MenuItem
 						Header="_Exit"
 						Click="ExitClick">
 						<MenuItem.Icon>
