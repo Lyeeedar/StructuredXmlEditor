@@ -187,6 +187,8 @@ namespace StructuredXmlEditor.Data
 				ChosenDefinition = null;
 			},
 			"");
+
+			IsExpanded = true;
 		}
 
 		//-----------------------------------------------------------------------

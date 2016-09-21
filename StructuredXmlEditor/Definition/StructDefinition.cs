@@ -128,7 +128,31 @@ namespace StructuredXmlEditor.Definition
 					}
 				}
 
-				if (refDefs.Count != unassignedEls.Count) Message.Show("Not enough data for the references defined! This can cause some weirdness when loading!", "Data Load Error", "Ok");
+				var sorted = createdChildren.OrderBy((e) => Children.IndexOf(e.Definition));
+				foreach (var c in sorted) item.Children.Add(c);
+
+				using (undoRedo.DisableUndoScope())
+				{
+					foreach (var def in refDefs.ToList())
+					{
+						var temp = def.CreateData(undoRedo);
+						temp.Parent = item;
+
+						if (!temp.IsVisibleFromBindings)
+						{
+							refDefs.Remove(def);
+						}
+					}
+				}
+
+				if (refDefs.Count > unassignedEls.Count)
+				{
+					Message.Show("Not enough data for the references defined! Expected " + refDefs.Count + " but got " + unassignedEls.Count, "Data Load Error", "Ok");
+				}
+				else if (refDefs.Count < unassignedEls.Count)
+				{
+					Message.Show("Too much data for the references defined! Expected " + refDefs.Count + " but got " + unassignedEls.Count, "Data Load Error", "Ok");
+				}
 
 				for (int i = 0; i < refDefs.Count; i++)
 				{
@@ -151,7 +175,8 @@ namespace StructuredXmlEditor.Definition
 					hadData = true;
 				}
 
-				var sorted = createdChildren.OrderBy((e) => Children.IndexOf(e.Definition));
+				item.Children.Clear();
+				sorted = createdChildren.OrderBy((e) => Children.IndexOf(e.Definition));
 				foreach (var c in sorted) item.Children.Add(c);
 			}
 
@@ -262,6 +287,10 @@ namespace StructuredXmlEditor.Definition
 					if (primDef.Name == ChildAsName)
 					{
 						name = primDef.WriteToString(child);
+						if (string.IsNullOrWhiteSpace(name))
+						{
+							throw new Exception("Element '" + primDef.Name + "' in struct '" + Name + "' is blank but is being used as the ChildAsName! This is invalid!");
+						}
 					}
 					else
 					{

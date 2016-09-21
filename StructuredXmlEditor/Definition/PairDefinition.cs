@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using StructuredXmlEditor.Data;
+using StructuredXmlEditor.View;
 
 namespace StructuredXmlEditor.Definition
 {
@@ -46,7 +47,14 @@ namespace StructuredXmlEditor.Definition
 
 		public override void DoSaveData(XElement parent, DataItem item)
 		{
-			parent.Add(new XElement(Key.WriteToString(item.Children[0]), Value.WriteToString(item.Children[1])));
+			var key = Key.WriteToString(item.Children[0]);
+			if (string.IsNullOrWhiteSpace(key))
+			{
+				throw new Exception("Pair key in element '" + Name + "' is blank! This is invalid!");
+			}
+
+			var value = Value.WriteToString(item.Children[1]);
+			parent.Add(new XElement(key, value));
 		}
 	}
 }

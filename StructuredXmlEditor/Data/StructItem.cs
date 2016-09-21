@@ -75,6 +75,8 @@ namespace StructuredXmlEditor.Data
 					RaisePropertyChangedEvent("Description");
 				},
 				Name + " created");
+
+			IsExpanded = true;
 		}
 	}
 }

@@ -170,6 +170,12 @@ namespace StructuredXmlEditor.Definition
 
 				foreach (var child in ci.Children)
 				{
+					if (child is ReferenceItem)
+					{
+						var refitem = child as ReferenceItem;
+						if (refitem.ChosenDefinition == null) continue;
+					}
+
 					child.Definition.SaveData(root, child);
 				}
 

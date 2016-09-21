@@ -22,7 +22,7 @@ namespace StructuredXmlEditor
 
 		void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
 		{
-			string errorMessage = string.Format("An unhandled exception occurred: {0}", e.Exception.Message);
+			string errorMessage = string.Format("An unhandled exception occurred! The app has attempted to recover and carry on, but you may experience some weirdness. Please create a new issue on github and attach the error.log file so that I can fix this in the future.", e.Exception.Message);
 			File.WriteAllText("error.log", e.Exception.ToString());
 			Message.Show(errorMessage, "Error", "Ok");
 			e.Handled = true;
