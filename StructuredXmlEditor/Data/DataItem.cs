@@ -109,6 +109,13 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public bool IsSearchFiltered
+		{
+			get { return m_isSearchFiltered; }
+			set { m_isSearchFiltered = value; }
+		}
+
+		//-----------------------------------------------------------------------
 		public bool IsVisible
 		{
 			get { return m_isVisible && !m_isSearchFiltered && !m_isMultiselectFiltered && IsVisibleFromBindings; }
@@ -594,7 +601,7 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public virtual bool Filter(string filter)
+		public bool Filter(string filter)
 		{
 			RefreshChildren();
 
@@ -609,6 +616,18 @@ namespace StructuredXmlEditor.Data
 						matchFound = true;
 					}
 				}
+
+				if (matchFound)
+				{
+					if ((this is StructItem && Parent is CollectionChildItem) || (this is CollectionChildItem && ((CollectionChildItem)this).WrappedItem is StructItem))
+					{
+						foreach (var item in Descendants)
+						{
+							item.IsSearchFiltered = false;
+							item.RaisePropertyChangedEvent("IsVisible");
+						}
+					}
+				}
 			}
 
 			if (filter == null)
@@ -621,9 +640,9 @@ namespace StructuredXmlEditor.Data
 				{
 					matchFound = Name.ToLower().Contains(filter);
 
-					if (!matchFound)
+					if (!matchFound && IsPrimitive)
 					{
-						matchFound = Description.ToLower().Contains(filter);
+						matchFound = GetValue().ToLower().Contains(filter);
 					}
 
 					m_isSearchFiltered = !matchFound;
@@ -696,6 +715,15 @@ namespace StructuredXmlEditor.Data
 					yield return j;
 				}
 			}
+		}
+
+		//-----------------------------------------------------------------------
+		public string GetValue()
+		{
+			if (this is NumberItem) return ((NumberItem)this).Value.ToString();
+			if (this is BooleanItem) return ((BooleanItem)this).Value.ToString();
+
+			return GetType().GetProperty("Value")?.GetValue(this) as string;
 		}
 
 		//-----------------------------------------------------------------------
@@ -805,7 +833,7 @@ namespace StructuredXmlEditor.Data
 			}
 			else
 			{
-				var val = Target.GetType().GetProperty("Value").GetValue(Target) as string; // reflection cause cant cast to PrimitiveDataItem<>
+				var val = Target.GetValue(); // reflection cause cant cast to PrimitiveDataItem<>
 				var target = TargetValue;
 				var split = target.Split(new char[] { ',' });
 				var equal = val == target || (split.Length > 1 && split.Contains(val));
