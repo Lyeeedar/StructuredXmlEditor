@@ -82,14 +82,6 @@
 						</Trigger>
 
 						<Trigger
-							Property="IsReadOnly"
-							Value="True">
-							<Setter
-								Property="Opacity"
-								Value="0.8" />
-						</Trigger>
-
-						<Trigger
 							Property="Validation.HasError"
 							Value="true">
 							<Setter
