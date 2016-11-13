@@ -601,7 +601,7 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public bool Filter(string filter)
+		public bool Filter(string filter, Regex regex, bool caseSensitive, bool showMatchesOnly)
 		{
 			RefreshChildren();
 
@@ -611,13 +611,13 @@ namespace StructuredXmlEditor.Data
 			{
 				foreach (var item in Children)
 				{
-					if (item.Filter(filter))
+					if (item.Filter(filter, regex, caseSensitive, showMatchesOnly))
 					{
 						matchFound = true;
 					}
 				}
 
-				if (matchFound)
+				if (matchFound && !showMatchesOnly)
 				{
 					if ((this is StructItem && Parent is CollectionChildItem) || (this is CollectionChildItem && ((CollectionChildItem)this).WrappedItem is StructItem))
 					{
@@ -638,11 +638,39 @@ namespace StructuredXmlEditor.Data
 			{
 				if (IsVisibleFromBindings)
 				{
-					matchFound = Name.ToLower().Contains(filter);
+					List<string> stringsToCheck = new List<string>();
 
-					if (!matchFound && IsPrimitive)
+					if (caseSensitive)
 					{
-						matchFound = GetValue().ToLower().Contains(filter);
+						stringsToCheck.Add(Name);
+
+						if (!matchFound && IsPrimitive)
+						{
+							stringsToCheck.Add(GetValue());
+						}
+					}
+					else
+					{
+						stringsToCheck.Add(Name.ToLower());
+
+						if (!matchFound && IsPrimitive)
+						{
+							stringsToCheck.Add(GetValue().ToLower());
+						}
+					}
+
+					foreach (var s in stringsToCheck)
+					{
+						if (regex != null)
+						{
+							matchFound = regex.IsMatch(s);
+						}
+						else
+						{
+							matchFound = s.Contains(filter);
+						}
+
+						if (matchFound) break;
 					}
 
 					m_isSearchFiltered = !matchFound;

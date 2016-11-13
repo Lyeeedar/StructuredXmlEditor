@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -82,14 +83,54 @@ namespace StructuredXmlEditor.Data
 
 		//##############################################################################################################
 		#region Filter
+
+		//-----------------------------------------------------------------------
+		public bool CaseSensitiveFilter
+		{
+			get { return m_caseSensitive; }
+			set
+			{
+				m_caseSensitive = value;
+				ApplyFilter();
+
+				RaisePropertyChangedEvent();
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public bool ShowMatchElementsOnly
+		{
+			get { return m_showMatchesOnly; }
+			set
+			{
+				m_showMatchesOnly = value;
+				ApplyFilter();
+
+				RaisePropertyChangedEvent();
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public bool UseRegex
+		{
+			get { return m_useRegex; }
+			set
+			{
+				m_useRegex = value;
+				ApplyFilter();
+
+				RaisePropertyChangedEvent();
+			}
+		}
+
 		//-----------------------------------------------------------------------
 		public string Filter
 		{
 			get { return m_filter; }
 			set
 			{
-				m_filter = value;
-				ApplyFilter();
+				OnFilterChanged(m_filter, value);
+
 				RaisePropertyChangedEvent();
 			}
 		}
@@ -97,6 +138,8 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		void OnFilterChanged(string oldValue, string newValue)
 		{
+			m_filter = newValue;
+
 			if (string.IsNullOrEmpty(oldValue))
 			{
 				m_lastNullFilterState.Clear();
@@ -116,29 +159,35 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		private void ApplyFilter()
 		{
-			if (!string.IsNullOrEmpty(Filter))
+			try
 			{
-				string filter = Filter.ToLower();
-				foreach (DataItem item in RootItems)
+				if (!string.IsNullOrEmpty(Filter))
 				{
-					item.Filter(filter);
-				}
-			}
-			else
-			{
-				foreach (DataItem item in RootItems)
-				{
-					item.Filter(null);
-				}
-			}
+					string filter = CaseSensitiveFilter ? Filter : Filter.ToLower();
+					Regex regex = UseRegex ? new Regex(filter) : null;
 
-			if (string.IsNullOrEmpty(Filter))
-			{
-				foreach (var i in m_lastNullFilterState)
+					foreach (DataItem item in RootItems)
+					{
+						item.Filter(filter, regex, CaseSensitiveFilter, ShowMatchElementsOnly);
+					}
+				}
+				else
 				{
-					i.Key.IsExpanded = i.Value;
+					foreach (DataItem item in RootItems)
+					{
+						item.Filter(null, null, false, false);
+					}
+				}
+
+				if (string.IsNullOrEmpty(Filter))
+				{
+					foreach (var i in m_lastNullFilterState)
+					{
+						i.Key.IsExpanded = i.Value;
+					}
 				}
 			}
+			catch (Exception) { }
 		}
 
 		#endregion Filter
@@ -279,6 +328,9 @@ namespace StructuredXmlEditor.Data
 			}
 		}
 
+		bool m_caseSensitive = false;
+		bool m_useRegex = false;
+		bool m_showMatchesOnly = false;
 		string m_filter;
 		bool m_isFocusing = true;
 		DataItem m_lastFocusedItem;
