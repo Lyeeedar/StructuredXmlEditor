@@ -11,7 +11,6 @@ namespace StructuredXmlEditor.Definition
 	public class StringDefinition : PrimitiveDataDefinition
 	{
 		public string Default { get; set; }
-		public bool ValueAsName { get; set; }
 
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
@@ -24,15 +23,8 @@ namespace StructuredXmlEditor.Definition
 		{
 			var item = new StringItem(this, undoRedo);
 
-			if (ValueAsName)
-			{
-				item.Value = element.Name.ToString();
-			}
-			else
-			{
-				item.Value = element.Value;
-			}
-			
+			item.Value = element.Value;
+
 			return item;
 		}
 
@@ -40,21 +32,13 @@ namespace StructuredXmlEditor.Definition
 		{
 			Default = definition.Attribute("Default")?.Value?.ToString();
 			if (Default == null) Default = "";
-			ValueAsName = TryParseBool(definition, "ValueAsName");
 		}
 
 		public override void DoSaveData(XElement parent, DataItem item)
 		{
 			var si = item as StringItem;
 
-			if (ValueAsName)
-			{
-				parent.Add(new XElement(si.Value));
-			}
-			else
-			{
-				parent.Add(new XElement(Name, si.Value));
-			}
+			parent.Add(new XElement(Name, si.Value));
 		}
 
 		public override string WriteToString(DataItem item)

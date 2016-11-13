@@ -11,7 +11,6 @@ namespace StructuredXmlEditor.Definition
 {
 	public class StructDefinition : ComplexDataDefinition
 	{
-		public string ChildAsName { get; set; }
 		public bool Collapse { get; set; }
 		public bool HadCollapse { get; set; }
 		public string Seperator { get; set; }
@@ -85,99 +84,38 @@ namespace StructuredXmlEditor.Definition
 			}
 			else
 			{
-				var refDefs = new List<ReferenceDefinition>();
-				var unassignedEls = new List<XElement>();
-				unassignedEls.AddRange(element.Elements());
-
 				var createdChildren = new List<DataItem>();
 
 				foreach (var def in Children)
 				{
 					var name = def.Name;
 
-					if (ChildAsName == name)
-					{
-						var primDef = def as PrimitiveDataDefinition;
-						DataItem childItem = primDef.LoadFromString(element.Name.ToString(), undoRedo);
-						createdChildren.Add(childItem);
+					var els = element.Elements(name);
 
-						hadData = true;
-					}
-					else if (def is ReferenceDefinition)
+					if (els.Count() > 0)
 					{
-						refDefs.Add(def as ReferenceDefinition);
-					}
-					else
-					{
-						var el = element.Element(name);
-
-						if (el != null)
+						if (els.Count() > 1 && def is CollectionDefinition)
 						{
-							DataItem childItem = def.LoadData(el, undoRedo);
-							createdChildren.Add(childItem);
+							var dummyEl = new XElement(els.First().Name);
+							foreach (var el in els) dummyEl.Add(el);
 
-							hadData = true;
-
-							unassignedEls.Remove(el);
+							DataItem childItem = def.LoadData(dummyEl, undoRedo);
+							item.Children.Add(childItem);
 						}
 						else
 						{
-							DataItem childItem = def.CreateData(undoRedo);
-							createdChildren.Add(childItem);
+							DataItem childItem = def.LoadData(els.First(), undoRedo);
+							item.Children.Add(childItem);
 						}
-					}
-				}
 
-				var sorted = createdChildren.OrderBy((e) => Children.IndexOf(e.Definition));
-				foreach (var c in sorted) item.Children.Add(c);
-
-				using (undoRedo.DisableUndoScope())
-				{
-					foreach (var def in refDefs.ToList())
-					{
-						var temp = def.CreateData(undoRedo);
-						temp.Parent = item;
-
-						if (!temp.IsVisibleFromBindings)
-						{
-							refDefs.Remove(def);
-						}
-					}
-				}
-
-				if (refDefs.Count > unassignedEls.Count)
-				{
-					Message.Show("Not enough data for the references defined! Expected " + refDefs.Count + " but got " + unassignedEls.Count, "Data Load Error", "Ok");
-				}
-				else if (refDefs.Count < unassignedEls.Count)
-				{
-					Message.Show("Too much data for the references defined! Expected " + refDefs.Count + " but got " + unassignedEls.Count, "Data Load Error", "Ok");
-				}
-
-				for (int i = 0; i < refDefs.Count; i++)
-				{
-					if (i < unassignedEls.Count)
-					{
-						var rdef = refDefs[i];
-						var el = unassignedEls[i];
-
-						DataItem childItem = rdef.LoadData(el, undoRedo);
-						createdChildren.Add(childItem);
+						hadData = true;
 					}
 					else
 					{
-						var rdef = refDefs[i];
-
-						DataItem childItem = rdef.CreateData(undoRedo);
-						createdChildren.Add(childItem);
+						DataItem childItem = def.CreateData(undoRedo);
+						item.Children.Add(childItem);
 					}
-
-					hadData = true;
 				}
-
-				item.Children.Clear();
-				sorted = createdChildren.OrderBy((e) => Children.IndexOf(e.Definition));
-				foreach (var c in sorted) item.Children.Add(c);
 			}
 
 			foreach (var att in Attributes)
@@ -210,8 +148,6 @@ namespace StructuredXmlEditor.Definition
 		public override void Parse(XElement definition)
 		{
 			Nullable = TryParseBool(definition, "Nullable", true);
-
-			ChildAsName = definition.Attribute("ChildAsName")?.Value.ToString();
 
 			DescriptionChild = definition.Attribute("DescriptionChild")?.Value?.ToString();
 
@@ -284,18 +220,7 @@ namespace StructuredXmlEditor.Definition
 				{
 					var primDef = child.Definition as PrimitiveDataDefinition;
 
-					if (primDef.Name == ChildAsName)
-					{
-						name = primDef.WriteToString(child);
-						if (string.IsNullOrWhiteSpace(name))
-						{
-							throw new Exception("Element '" + primDef.Name + "' in struct '" + Name + "' is blank but is being used as the ChildAsName! This is invalid!");
-						}
-					}
-					else
-					{
-						data += primDef.WriteToString(child) + Seperator;
-					}
+					data += primDef.WriteToString(child) + Seperator;
 				}
 
 				data = data.Remove(data.Length - Seperator.Length, Seperator.Length);
@@ -318,17 +243,6 @@ namespace StructuredXmlEditor.Definition
 			else
 			{
 				var name = Name;
-				if (ChildAsName != null)
-				{
-					foreach (var child in si.Children)
-					{
-						var primDef = child.Definition as PrimitiveDataDefinition;
-						if (primDef != null && primDef.Name == ChildAsName)
-						{
-							name = primDef.WriteToString(child);
-						}
-					}
-				}
 
 				var el = new XElement(name);
 				parent.Add(el);
@@ -347,8 +261,6 @@ namespace StructuredXmlEditor.Definition
 
 				foreach (var child in si.Children)
 				{
-					if (ChildAsName != null && child.Name == ChildAsName) continue;
-
 					var childDef = child.Definition;
 					if (!Children.Contains(childDef)) throw new Exception("A child has a definition that we dont have! Something broke!");
 

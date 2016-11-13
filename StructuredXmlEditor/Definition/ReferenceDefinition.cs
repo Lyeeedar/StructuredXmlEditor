@@ -15,18 +15,6 @@ namespace StructuredXmlEditor.Definition
 		public Dictionary<string, DataDefinition> Definitions { get; set; } = new Dictionary<string, DataDefinition>();
 		public bool IsNullable { get; set; }
 
-		public override bool SkipIfDefault
-		{
-			get
-			{
-				return false;
-			}
-
-			set
-			{
-			}
-		}
-
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
 			var item = new ReferenceItem(this, undoRedo);
@@ -50,11 +38,6 @@ namespace StructuredXmlEditor.Definition
 				var el = parent.Elements().Last();
 				if (Name != "") el.Name = Name;
 				el.SetAttributeValue("RefKey", si.ChosenDefinition.Name);
-			}
-			else
-			{
-				var el = new XElement("Reference" + parent.Elements().Count());
-				parent.Add(el);
 			}
 		}
 

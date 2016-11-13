@@ -29,7 +29,6 @@
 			<String Name="Name" Default="String" ToolTip="The name to be written for this element." />
 			<String Name="Default" ToolTip="The default value for this element." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
-			<Boolean Name="ValueAsName" ToolTip="If true then write this value as the element name. &gt;Tag&lt;value&gt;/&lt; becomes &gt;value/&lt;." />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
@@ -91,25 +90,23 @@
 			<String Name="EnumValues" ToolTip="A comma seperated list of enum values that can be picked." />
 			<String Name="Default" ToolTip="The default value for this element. If not set it defaults to the first EnumValue." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
-			<Boolean Name="ValueAsName" ToolTip="If true then write this value as the element name. &gt;Tag&lt;value&gt;/Tag&lt; becomes &gt;value/&lt;." />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
 	</StructDef>
 
-	<StructDef Name="EnumDef" ToolTip="The definition for a collection of enumvalues that can be referenced by enums." TextColour="Primitive">
+	<CollectionDef Name="EnumDef" ToolTip="The definition for a collection of enumvalues that can be referenced by enums." TextColour="Primitive" Collapse="True" MinCount="1">
 		<Attributes>
 			<String Name="Name" Default="EnumDef" ToolTip="The name to be written for this element. This will be used as the key when referencing it." />
-			<String Name="EnumValues" ToolTip="A comma seperated list of enum values that can be picked." />
 			<String Name="Default" ToolTip="The default value for this element." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
-			<Boolean Name="ValueAsName" ToolTip="If true then write this value as the element name. &gt;Tag&lt;value&gt;/Tag&lt; becomes &gt;value/&lt;." />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-	</StructDef>
+		<String Name="EnumValue" />
+	</CollectionDef>
 
 	<StructDef Name="Tree" ToolTip="A tree of string values." TextColour="Collection">
 		<Attributes>
@@ -133,7 +130,7 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Collection" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,Reference,String,Struct,Timeline,Tree,Vector" ToolTip="The child that this collection contains." />
+		<Reference Name="Item" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Reference,String,Struct,Timeline,Tree,Vector" ToolTip="The child that this collection contains." />
 	</StructDef>
 
 	<StructDef Name="CollectionDef" ToolTip="A definition for a collection that can be referenced." TextColour="Collection">
@@ -148,31 +145,7 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Collection" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,Reference,String,Struct,Timeline,Tree,Vector" ToolTip="The child that this collection contains." />
-	</StructDef>
-
-	<StructDef Name="Pair" ToolTip="A pair of values. Written as &gt;Key&lt;Value&gt;/Key&lt;." TextColour="Struct">
-		<Attributes>
-			<String Name="Name" Default="Pair" ToolTip="The name to be written for this element." />
-			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
-			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
-			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Struct" HasAlpha="false" />
-			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
-		</Attributes>
-		<Reference Keys="Boolean,Colour,Enum,File,Number,String,Vector" ToolTip="The value to be used for the element name." />
-		<Reference Keys="Boolean,Colour,Enum,File,Number,String,Vector" ToolTip="The value to be used for the element contents." />
-	</StructDef>
-
-	<StructDef Name="PairDef" ToolTip="A definition for a pair that can be referenced." TextColour="Struct">
-		<Attributes>
-			<String Name="Name" Default="Pair" ToolTip="The name to be written for this element. This will be used as the key when referencing it." />
-			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
-			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
-			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Struct" HasAlpha="false" />
-			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
-		</Attributes>
-		<Reference Keys="Boolean,Colour,Enum,File,Number,String,Vector" ToolTip="The value to be used for the element name." />
-		<Reference Keys="Boolean,Colour,Enum,File,Number,String,Vector" ToolTip="The value to be used for the element contents." />
+		<Reference Name="Item" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Reference,String,Struct,Timeline,Tree,Vector" ToolTip="The child that this collection contains." />
 	</StructDef>
 
 	<CollectionDef Name="Struct" ToolTip="A collection of elements to be placed within a single element." TextColour="Struct">
@@ -181,14 +154,13 @@
 			<Boolean Name="Nullable" Default="true" ToolTip="Whether this element can be empty." />
 			<Boolean Name="Collapse" ToolTip="If set to true the struct will be collapsed to a single line seperated by the Seperator string. Only works all the child are a primitive items." />
 			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." />
-			<String Name="ChildAsName" ToolTip="The child to be used as the element name." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="DescriptionChild" ToolTip="The child to be used to build the ui side description." />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Struct" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,String,Struct,Reference,Timeline,Tree,Vector" ToolTip="The defined children of the struct" />
+		<Reference Name="Data" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,String,Struct,Reference,Timeline,Tree,Vector" ToolTip="The defined children of the struct" />
 	</CollectionDef>
 
 	<CollectionDef Name="StructDef" ToolTip="A definition for a struct that can be referenced." TextColour="Struct">
@@ -197,14 +169,13 @@
 			<Boolean Name="Nullable" Default="true" ToolTip="Whether this element can be empty." />
 			<Boolean Name="Collapse" ToolTip="If set to true the struct will be collapsed to a single line seperated by the Seperator string. Only works all the child are a primitive items." />
 			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." />
-			<String Name="ChildAsName" ToolTip="The child to be used as the element name." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="DescriptionChild" ToolTip="The child to be used to build the ui side description." />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Struct" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,Pair,String,Struct,Reference,Timeline,Tree,Vector" ToolTip="The defined children of the struct" />
+		<Reference Name="Data" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,String,Struct,Reference,Timeline,Tree,Vector" ToolTip="The defined children of the struct" />
 	</CollectionDef>
 
 	<StructDef Name="Timeline" ToolTip="A collection of keyframes." TextColour="Struct">
@@ -219,7 +190,7 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Struct" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Keys="Struct" Nullable="false" ToolTip="The keyframe. Must contain a number child with the name of the value in TimeChild." />
+		<Reference Name="Keyframe" Keys="Struct" Nullable="false" ToolTip="The keyframe. Must contain a number child with the name of the value in TimeChild." />
 	</StructDef>
 
 	<StructDef Name="Reference" ToolTip="An element used to allow the user to pick from a collection of valid elements.">
@@ -234,7 +205,7 @@
 	</StructDef>
 
 	<Collection Name="Definitions" ToolTip="The definitions stored in this file. Can contain only a single non-def element.">
-		<Reference Keys="Struct,StructDef,EnumDef,CollectionDef,PairDef" ToolTip="A single definition." />
+		<Reference Name="Definition" Keys="Struct,Collection,StructDef,EnumDef,CollectionDef" ToolTip="A single definition." />
 	</Collection>
 	
 </Definitions>

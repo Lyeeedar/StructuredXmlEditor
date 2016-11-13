@@ -119,6 +119,16 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		protected override void AddContextMenuItems(ContextMenu menu)
 		{
+			MenuItem addNewItem = new MenuItem();
+			addNewItem.Header = "Add New";
+
+			addNewItem.Click += delegate
+			{
+				AddNew();
+			};
+
+			menu.Items.Add(addNewItem);
+
 			MenuItem DuplicateItem = new MenuItem();
 			DuplicateItem.Header = "Duplicate";
 
@@ -144,8 +154,6 @@ namespace StructuredXmlEditor.Data
 			pasteItem.Command = PasteCMD;
 
 			menu.Items.Add(pasteItem);
-
-			menu.Items.Add(new Separator());
 		}
 
 		//-----------------------------------------------------------------------
@@ -233,6 +241,25 @@ namespace StructuredXmlEditor.Data
 			collection.Insert(index, child);
 		}
 
+		//-----------------------------------------------------------------------
+		public void AddNew()
+		{
+			CollectionChildItem child = null;
+
+			using (UndoRedo.DisableUndoScope())
+			{
+				var item = WrappedItem.Definition.CreateData(UndoRedo);
+				child = Definition.CreateData(UndoRedo) as CollectionChildItem;
+				child.WrappedItem = item;
+			}
+
+			var collection = ParentCollection;
+			var index = collection.Children.IndexOf(this) + 1;
+
+			collection.Insert(index, child);
+		}
+
+		//-----------------------------------------------------------------------
 		public override void ResetToDefault()
 		{
 			WrappedItem.ResetToDefault();

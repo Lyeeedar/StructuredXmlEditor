@@ -45,7 +45,8 @@ namespace StructuredXmlEditor.Definition
 
 		public static DataDefinition LoadDefinition(XElement element)
 		{
-			var name = element.Name.ToString().ToUpper();
+			var name = element.Attribute("RefKey")?.Value.ToString().ToUpper();
+			if (name == null) name = element.Name.ToString().ToUpper();
 
 			if (name.EndsWith("DEF"))
 			{
@@ -63,7 +64,6 @@ namespace StructuredXmlEditor.Definition
 			else if (name == "BOOLEAN") definition = new BooleanDefinition();
 			else if (name == "COLOUR") definition = new ColourDefinition();
 			else if (name == "ENUM") definition = new EnumDefinition();
-			else if (name == "PAIR") definition = new PairDefinition();
 			else if (name == "FILE") definition = new FileDefinition();
 			else if (name == "TREE") definition = new TreeDefinition();
 			else if (name == "VECTOR") definition = new VectorDefinition();

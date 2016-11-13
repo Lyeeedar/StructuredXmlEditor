@@ -403,6 +403,11 @@ namespace StructuredXmlEditor.Data
 
 			AddContextMenuItems(menu);
 
+			if (menu.Items.Count > 0)
+			{
+				menu.Items.Add(new Separator());
+			}
+
 			MenuItem focusItem = new MenuItem();
 			focusItem.Header = "Focus";
 
@@ -427,31 +432,83 @@ namespace StructuredXmlEditor.Data
 
 			menu.Items.Add(new Separator());
 
-			MenuItem collapseItem = new MenuItem();
-			collapseItem.Header = "Collapse All";
+			MenuItem collapseAllItem = new MenuItem();
+			collapseAllItem.Header = "Collapse All";
 
-			collapseItem.Click += delegate
+			collapseAllItem.Click += delegate
 			{
-				foreach (var item in this.GetAllBreadthFirst())
+				foreach (var item in this.GetRootItem().GetAllBreadthFirst())
 				{
 					item.IsExpanded = false;
 				}
 			};
 
-			menu.Items.Add(collapseItem);
+			menu.Items.Add(collapseAllItem);
 
-			MenuItem expandItem = new MenuItem();
-			expandItem.Header = "Expand All";
+			MenuItem expandAllItem = new MenuItem();
+			expandAllItem.Header = "Expand All";
 
-			expandItem.Click += delegate
+			expandAllItem.Click += delegate
 			{
-				foreach (var item in this.GetAllBreadthFirst())
+				foreach (var item in this.GetRootItem().GetAllBreadthFirst())
 				{
 					item.IsExpanded = true;
 				}
 			};
 
-			menu.Items.Add(expandItem);
+			menu.Items.Add(expandAllItem);
+
+			MenuItem collapseLevelItem = new MenuItem();
+			collapseLevelItem.Header = "Collapse Level";
+
+			collapseLevelItem.Click += delegate
+			{
+				foreach (var item in this.GetAllSiblings())
+				{
+					item.IsExpanded = false;
+				}
+			};
+
+			menu.Items.Add(collapseLevelItem);
+
+			MenuItem expandLevelItem = new MenuItem();
+			expandLevelItem.Header = "Expand Level";
+
+			expandLevelItem.Click += delegate
+			{
+				foreach (var item in this.GetAllSiblings())
+				{
+					item.IsExpanded = true;
+				}
+			};
+
+			menu.Items.Add(expandLevelItem);
+
+			MenuItem collapseChildrenItem = new MenuItem();
+			collapseChildrenItem.Header = "Collapse Children";
+
+			collapseChildrenItem.Click += delegate
+			{
+				foreach (var item in this.GetChildrenBreadthFirst())
+				{
+					item.IsExpanded = false;
+				}
+			};
+
+			menu.Items.Add(collapseChildrenItem);
+
+			MenuItem expandChildrenItem = new MenuItem();
+			expandChildrenItem.Header = "Expand Children";
+
+			expandChildrenItem.Click += delegate
+			{
+				foreach (var item in this.GetChildrenBreadthFirst())
+				{
+					item.IsExpanded = true;
+				}
+			};
+
+			menu.Items.Add(expandChildrenItem);
 
 			return menu;
 		}

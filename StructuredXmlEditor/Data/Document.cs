@@ -101,7 +101,7 @@ namespace StructuredXmlEditor.Data
 		{
 			var path = isBackup ? BackupPath : Path;
 
-			Data.Save(path);
+			Data.Save(path, path.EndsWith(".json"));
 
 			if (isBackup)
 			{

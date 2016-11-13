@@ -165,8 +165,7 @@ namespace StructuredXmlEditor.Definition
 			}
 			else
 			{
-				var root = new XElement(Name);
-				parent.Add(root);
+				XElement root = new XElement(Name);
 
 				foreach (var child in ci.Children)
 				{
@@ -177,6 +176,19 @@ namespace StructuredXmlEditor.Definition
 					}
 
 					child.Definition.SaveData(root, child);
+				}
+
+				if (item.Grid.IsJson)
+				{
+					foreach (var el in root.Elements())
+					{
+						el.Name = Name;
+						parent.Add(el);
+					}
+				}
+				else
+				{
+					parent.Add(root);
 				}
 
 				foreach (var att in ci.Attributes)

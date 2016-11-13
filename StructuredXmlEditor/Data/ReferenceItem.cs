@@ -47,7 +47,7 @@ namespace StructuredXmlEditor.Data
 
 				if (WrappedItem != null)
 				{
-					if (Name == "") Name = WrappedItem.Name;
+					Name = WrappedItem.Name;
 					ToolTip = WrappedItem.ToolTip;
 					TextColour = WrappedItem.TextColour;
 				}

@@ -20,11 +20,14 @@
 				Height="Auto" />
 		</Grid.RowDefinitions>
 
-		<TextBlock
+		<TextBox
 			Foreground="{StaticResource FontBrush}"
+			Background="Transparent"
+			BorderThickness="0"
+			Text="{Binding MessageString, Mode=OneWay}"
+			IsReadOnly="True"
 			Margin="10"
-			TextWrapping="Wrap"
-			Text="{Binding MessageString}" />
+			TextWrapping="Wrap" />
 
 		<Border
 			Grid.Row="1"

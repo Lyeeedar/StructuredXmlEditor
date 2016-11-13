@@ -1,4 +1,5 @@
-﻿using StructuredXmlEditor.View;
+﻿using Newtonsoft.Json;
+using StructuredXmlEditor.View;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,6 +20,9 @@ namespace StructuredXmlEditor.Data
 		{
 			m_proxyRootItem = new DummyItem("   ⌂ ", this);
 		}
+
+		//-----------------------------------------------------------------------
+		public bool IsJson { get; set; }
 
 		//-----------------------------------------------------------------------
 		public Command<object> FocusCMD { get { return new Command<object>((e) => FocusItem((DataItem)e)); } }
@@ -233,8 +237,10 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public void Save(string path)
+		public void Save(string path, bool isJson)
 		{
+			IsJson = isJson;
+
 			Directory.CreateDirectory(Path.GetDirectoryName(path));
 
 			XDocument doc = new XDocument();
@@ -249,21 +255,28 @@ namespace StructuredXmlEditor.Data
 				doc.Add(el);
 			}
 
-			XmlWriterSettings settings = new XmlWriterSettings
+			if (isJson)
 			{
-				Indent = true,
-				IndentChars = "\t",
-				NewLineChars = "\r\n",
-				NewLineHandling = NewLineHandling.Replace,
-				OmitXmlDeclaration = true,
-				Encoding = new UTF8Encoding(false)
-			};
-
-			using (XmlWriter writer = XmlTextWriter.Create(path, settings))
-			{
-				doc.Save(writer);
+				string json = JsonConvert.SerializeXNode(doc, Newtonsoft.Json.Formatting.Indented);
+				File.WriteAllText(path, json);
 			}
-			
+			else
+			{
+				XmlWriterSettings settings = new XmlWriterSettings
+				{
+					Indent = true,
+					IndentChars = "\t",
+					NewLineChars = "\r\n",
+					NewLineHandling = NewLineHandling.Replace,
+					OmitXmlDeclaration = true,
+					Encoding = new UTF8Encoding(false)
+				};
+
+				using (XmlWriter writer = XmlTextWriter.Create(path, settings))
+				{
+					doc.Save(writer);
+				}
+			}
 		}
 
 		string m_filter;

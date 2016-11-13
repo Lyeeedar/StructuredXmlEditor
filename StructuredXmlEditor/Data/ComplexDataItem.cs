@@ -56,7 +56,7 @@ namespace StructuredXmlEditor.Data
 				}
 				else
 				{
-					return String.Join(", ", Children.Where(e => e.IsVisibleFromBindings).Select(e => "<" + e.TextColour + ">" + e.Description + "</>"));
+					return String.Join(", ", Children.Where(e => e.IsVisibleFromBindings).Take(10).Select(e => "<" + e.TextColour + ">" + e.Description + "</>"));
 				}
 			}
 		}
@@ -162,10 +162,10 @@ namespace StructuredXmlEditor.Data
 
 			menu.Items.Add(pasteItem);
 
-			menu.Items.Add(new Separator());
-
 			if (CanClear)
 			{
+				menu.Items.Add(new Separator());
+
 				MenuItem clearItem = new MenuItem();
 				clearItem.Header = "Clear";
 
@@ -175,8 +175,6 @@ namespace StructuredXmlEditor.Data
 				};
 
 				menu.Items.Add(clearItem);
-
-				menu.Items.Add(new Separator());
 			}
 		}
 

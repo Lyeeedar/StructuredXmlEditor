@@ -13,7 +13,6 @@ namespace StructuredXmlEditor.Definition
 	{
 		public string Key { get; set; }
 
-		public bool ValueAsName { get; set; }
 		public List<string> EnumValues { get; set; }
 		public string Default { get; set; }
 
@@ -28,14 +27,7 @@ namespace StructuredXmlEditor.Definition
 		{
 			var item = new EnumItem(this, undoRedo);
 
-			if (ValueAsName)
-			{
-				item.Value = element.Name.ToString();
-			}
-			else
-			{
-				item.Value = element.Value;
-			}
+			item.Value = element.Value;
 
 			return item;
 		}
@@ -43,27 +35,20 @@ namespace StructuredXmlEditor.Definition
 		public override void Parse(XElement definition)
 		{
 			Key = definition.Attribute("Key")?.Value?.ToString();
-			ValueAsName = TryParseBool(definition, "ValueAsName");
 
 			var rawEnumValues = definition.Attribute("EnumValues")?.Value;
+			if (rawEnumValues == null && definition.Value != null) rawEnumValues = definition.Value;
 			if (rawEnumValues != null) EnumValues = rawEnumValues.Split(new char[] { ',' }).ToList();
 
 			Default = definition.Attribute("Default")?.Value?.ToString();
-			if (Default == null) Default = EnumValues[0];
+			if (Default == null && EnumValues != null) Default = EnumValues[0];
 		}
 
 		public override void DoSaveData(XElement parent, DataItem item)
 		{
 			var si = item as EnumItem;
 
-			if (ValueAsName)
-			{
-				parent.Add(new XElement(si.Value));
-			}
-			else
-			{
-				parent.Add(new XElement(Name, si.Value));
-			}
+			parent.Add(new XElement(Name, si.Value));
 		}
 
 		public override string WriteToString(DataItem item)
@@ -87,6 +72,7 @@ namespace StructuredXmlEditor.Definition
 				{
 					var def = defs[Key.ToLower()] as EnumDefinition;
 					EnumValues = def.EnumValues;
+					if (Default == null) Default = EnumValues[0];
 				}
 				else
 				{

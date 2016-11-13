@@ -202,8 +202,6 @@ namespace StructuredXmlEditor.View
 		{
 			base.OnApplyTemplate();
 
-			m_PART_lines = GetTemplateChild("PART_Lines") as DataGridViewLines;
-
 			if (m_headerColumnWidthThumb != null)
 			{
 				m_headerColumnWidthThumb.DragDelta -= OnHeaderColumnWidthThumbDragDelta;
@@ -218,8 +216,6 @@ namespace StructuredXmlEditor.View
 			}
 
 			scrollViewer = GetTemplateChild("scrollViewer") as ScrollViewer;
-
-			RefreshLines();
 		}
 
 		//-----------------------------------------------------------------------
@@ -358,16 +354,6 @@ namespace StructuredXmlEditor.View
 		}
 
 		//-----------------------------------------------------------------------
-		void RefreshLines()
-		{
-			if (m_PART_lines != null)
-			{
-				m_PART_lines.Visibility = Visibility.Visible;
-				m_PART_lines.SetTarget(this);
-			}
-		}
-
-		//-----------------------------------------------------------------------
 		public void FocusItem(IDataGridItem item)
 		{
 			if (item != null)
@@ -443,7 +429,6 @@ namespace StructuredXmlEditor.View
 
 		//-----------------------------------------------------------------------
 		ScrollViewer scrollViewer;
-		DataGridViewLines m_PART_lines;
 		List<IDataGridItem> m_subscribed = new List<IDataGridItem>();
 		List<ItemData> m_dataItems = new List<ItemData>();
 		DeferableObservableCollection<IDataGridItem> m_visibleItems = new DeferableObservableCollection<IDataGridItem>();

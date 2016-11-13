@@ -55,7 +55,8 @@ namespace StructuredXmlEditor.View
 
 			this.Closing -= OnClosing;
 
-			this.DialogResult = true;
+			if (this.DialogResult != null) this.DialogResult = true;
+			else Close();
 		}
 
 		public static string Show(string message, string title, params string[] buttons)
@@ -67,7 +68,7 @@ namespace StructuredXmlEditor.View
 			{
 				return dialog.Choice;
 			}
-			else throw new Exception("How did we even get here.");
+			else return null;
 		}
 	}
 }

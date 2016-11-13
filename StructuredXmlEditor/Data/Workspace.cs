@@ -1,4 +1,5 @@
-﻿using StructuredXmlEditor.Definition;
+﻿using Newtonsoft.Json;
+using StructuredXmlEditor.Definition;
 using StructuredXmlEditor.View;
 using System;
 using System.Collections.Generic;
@@ -207,7 +208,7 @@ namespace StructuredXmlEditor.Data
 					Message.Show("Cannot run without a project root file. Shutting down.", "Startup Failed");
 					Environment.Exit(0);
 				}
-				else
+				else if (resultRoot != true)
 				{
 					return null;
 				}
@@ -224,7 +225,7 @@ namespace StructuredXmlEditor.Data
 					Message.Show("Cannot run without a project root file. Shutting down.", "Startup Failed");
 					Environment.Exit(0);
 				}
-				else
+				else if (resultRoot != true)
 				{
 					return null;
 				}
@@ -290,7 +291,10 @@ namespace StructuredXmlEditor.Data
 					{
 						var def = DataDefinition.LoadDefinition(el);
 						var defname = def.Name.ToLower();
-						var name = el.Name.ToString().ToLower();
+
+						var name = el.Attribute("RefKey")?.Value.ToString().ToLower();
+						if (name == null) name = el.Name.ToString().ToLower();
+
 						if (name.EndsWith("def"))
 						{
 							if (ReferenceableDefinitions.ContainsKey(defname)) Message.Show("Duplicate definitions for type " + defname, "Duplicate Definitions", "Ok");
@@ -407,7 +411,27 @@ namespace StructuredXmlEditor.Data
 				}
 			}
 
-			var doc = XDocument.Load(path);
+			XDocument doc = null;
+
+			if (path.EndsWith(".json"))
+			{
+				string json = File.ReadAllText(path);
+
+				var temp = JsonConvert.DeserializeXNode(json, "Root");
+				if (temp.Elements().First().Elements().Count() > 1)
+				{
+					temp.Elements().First().Name = temp.Elements().First().Elements().First().Name;
+					doc = temp;
+				}
+				else
+				{
+					doc = new XDocument(temp.Elements().First());
+				}
+			}
+			else
+			{
+				doc = XDocument.Load(path);
+			}
 
 			var rootname = doc.Elements().First().Name.ToString().ToLower();
 
@@ -461,7 +485,7 @@ namespace StructuredXmlEditor.Data
 			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
 
 			dlg.DefaultExt = ".xml";
-			dlg.Filter = "Xml File (*.xml, *.xmldef)|*.xml; *.xmldef";
+			dlg.Filter = "Xml File (*.xml, *.xmldef)|*.xml; *.xmldef|Json File (*.json)|*.json";
 			bool? result = dlg.ShowDialog();
 
 			if (result == true)
@@ -509,7 +533,7 @@ namespace StructuredXmlEditor.Data
 			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
 
 			dlg.DefaultExt = ".xml";
-			dlg.Filter = "XML File (*.xml)|*.xml";
+			dlg.Filter = "XML File (*.xml)|*.xml|Json File (*.json)|*.json";
 			bool? result = dlg.ShowDialog();
 
 			if (result == true)
@@ -542,7 +566,7 @@ namespace StructuredXmlEditor.Data
 			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
 
 			dlg.DefaultExt = ".xml";
-			dlg.Filter = "XML File (*.xml)|*.xml";
+			dlg.Filter = "XML File (*.xml)|*.xml|Json File (*.json)|*.json";
 			bool? result = dlg.ShowDialog();
 
 			if (result == true)

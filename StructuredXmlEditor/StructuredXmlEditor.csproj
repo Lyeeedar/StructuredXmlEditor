@@ -41,6 +41,10 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -102,7 +106,6 @@
     <Compile Include="Definition\EnumDefinition.cs" />
     <Compile Include="Definition\FileDefinition.cs" />
     <Compile Include="Definition\NumberDefinition.cs" />
-    <Compile Include="Definition\PairDefinition.cs" />
     <Compile Include="Definition\PrimitiveDataDefinition.cs" />
     <Compile Include="Definition\MultilineStringDefinition.cs" />
     <Compile Include="Definition\StringDefinition.cs" />
@@ -120,6 +123,9 @@
     <Compile Include="View\CustomControls\DocumentView.xaml.cs">
       <DependentUpon>DocumentView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\CustomControls\Graph\Graph.cs" />
+    <Compile Include="View\CustomControls\Graph\GraphNode.cs" />
+    <Compile Include="View\CustomControls\Graph\GraphNodeData.cs" />
     <Compile Include="View\CustomControls\Message.xaml.cs">
       <DependentUpon>Message.xaml</DependentUpon>
     </Compile>
@@ -131,7 +137,6 @@
     <Compile Include="Util\DeferableObservableCollection.cs" />
     <Compile Include="View\CustomControls\DataGridView\DataGridView.cs" />
     <Compile Include="View\CustomControls\DataGridView\DataGridViewItem.cs" />
-    <Compile Include="View\CustomControls\DataGridView\DataGridViewLines.cs" />
     <Compile Include="View\CustomControls\DataGridView\IDataGridItem.cs" />
     <Compile Include="View\CustomControls\MultilineTextEditor.cs" />
     <Compile Include="Util\NotifyPropertyChanged.cs" />

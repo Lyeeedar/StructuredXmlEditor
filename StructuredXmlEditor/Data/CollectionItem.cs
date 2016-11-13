@@ -58,8 +58,6 @@ namespace StructuredXmlEditor.Data
 			pasteItem.Command = PasteNewCMD;
 
 			menu.Items.Add(pasteItem);
-
-			menu.Items.Add(new Separator());
 		}
 
 		//-----------------------------------------------------------------------

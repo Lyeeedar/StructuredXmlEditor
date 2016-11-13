@@ -12,6 +12,22 @@ namespace StructuredXmlEditor.View
 	public static class DataGridHelper
 	{
 		//-----------------------------------------------------------------------
+		public static IDataGridItem GetRootItem(this IDataGridItem _this)
+		{
+			if (_this.Parent == null) return _this;
+			else return _this.Parent.GetRootItem();
+		}
+
+		//-----------------------------------------------------------------------
+		public static IEnumerable<IDataGridItem> GetAllSiblings(this IDataGridItem _this)
+		{
+			foreach (var item in _this.Parent.Items)
+			{
+				yield return item;
+			}
+		}
+
+		//-----------------------------------------------------------------------
 		public static void RecursiveCollapse(this IDataGridItem _this)
 		{
 			_this.IsExpanded = false;
