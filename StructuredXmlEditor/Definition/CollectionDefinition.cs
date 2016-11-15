@@ -58,20 +58,23 @@ namespace StructuredXmlEditor.Definition
 			}
 			else
 			{
-				foreach (var el in element.Elements())
+				if (!element.Elements().Any(e => e.Name != element.Elements().First().Name))
 				{
-					var child = ChildDefinition.LoadData(el, undoRedo);
-					item.Children.Add(child);
+					foreach (var el in element.Elements())
+					{
+						var child = ChildDefinition.LoadData(el, undoRedo);
+						item.Children.Add(child);
 
-					if (item.Children.Count == MaxCount) break;
+						if (item.Children.Count == MaxCount) break;
+					}
 				}
 			}
 
-			for (int i = item.Children.Count; i < MinCount; i++)
-			{
-				var child = ChildDefinition.CreateData(undoRedo);
-				item.Children.Add(child);
-			}
+			//for (int i = item.Children.Count; i < MinCount; i++)
+			//{
+			//	var child = ChildDefinition.CreateData(undoRedo);
+			//	item.Children.Add(child);
+			//}
 
 			foreach (var att in Attributes)
 			{
