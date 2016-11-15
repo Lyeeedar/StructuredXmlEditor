@@ -304,9 +304,11 @@ namespace StructuredXmlEditor.Data
 		{
 			get
 			{
-				return CreateContextMenu();
+				if (m_menu == null) m_menu = CreateContextMenu();
+				return m_menu;
 			}
 		}
+		private ContextMenu m_menu;
 
 		//-----------------------------------------------------------------------
 		public DataDefinition Definition { get; set; }

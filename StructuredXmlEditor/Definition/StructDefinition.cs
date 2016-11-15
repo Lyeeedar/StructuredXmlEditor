@@ -94,12 +94,17 @@ namespace StructuredXmlEditor.Definition
 
 					if (els.Count() > 0)
 					{
-						if (els.Count() > 1 && def is CollectionDefinition)
+						if (def is CollectionDefinition)
 						{
-							var dummyEl = new XElement(els.First().Name);
-							foreach (var el in els) dummyEl.Add(el);
+							CollectionItem childItem = (CollectionItem)def.LoadData(els.First(), undoRedo);
+							if (childItem.Children.Count == 0)
+							{
+								var dummyEl = new XElement(els.First().Name);
+								foreach (var el in els) dummyEl.Add(el);
 
-							DataItem childItem = def.LoadData(dummyEl, undoRedo);
+								childItem = (CollectionItem)def.LoadData(dummyEl, undoRedo);
+							}
+
 							item.Children.Add(childItem);
 						}
 						else

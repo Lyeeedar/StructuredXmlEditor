@@ -56,7 +56,28 @@ namespace StructuredXmlEditor.Data
 				}
 				else
 				{
-					return String.Join(", ", Children.Where(e => e.IsVisibleFromBindings).Take(10).Select(e => "<" + e.TextColour + ">" + e.Description + "</>"));
+					var builder = new StringBuilder();
+					foreach (var child in Children.Where(e => e.IsVisibleFromBindings))
+					{
+						if (builder.Length > 0) builder.Append(", ");
+
+						builder.Append("<");
+						builder.Append(child.TextColour);
+						builder.Append(">");
+						builder.Append(child.Description);
+						builder.Append("</>");
+
+						if (builder.Length > 500)
+						{
+							if (!builder.ToString().EndsWith("..."))
+							{
+								builder.Append("...");
+							}
+							break;
+						}
+					}
+
+					return builder.ToString();
 				}
 			}
 		}

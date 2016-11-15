@@ -64,11 +64,7 @@ namespace StructuredXmlEditor.View
 			var dialog = new Message(message, title, buttons);
 			var result = dialog.ShowDialog();
 
-			if (result == true)
-			{
-				return dialog.Choice;
-			}
-			else return null;
+			return dialog.Choice;
 		}
 	}
 }
