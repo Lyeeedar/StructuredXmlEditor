@@ -15,8 +15,6 @@ namespace StructuredXmlEditor.Definition
 
 		public float MinValue { get; set; }
 		public float MaxValue { get; set; }
-		public float Step { get; set; }
-		public bool ShowSlider { get; set; }
 		public bool UseIntegers { get; set; }
 
 		public override DataItem CreateData(UndoRedoManager undoRedo)
@@ -45,8 +43,6 @@ namespace StructuredXmlEditor.Definition
 			Default = TryParseFloat(definition, "Default");
 			MinValue = TryParseFloat(definition, "Min", -float.MaxValue);
 			MaxValue = TryParseFloat(definition, "Max", float.MaxValue);
-			Step = TryParseFloat(definition, "Step", 0.1f);
-			ShowSlider = TryParseBool(definition, "ShowSlider");
 
 			if (Default < MinValue) Default = MinValue;
 			if (Default > MaxValue) Default = MaxValue;

@@ -358,7 +358,7 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		private void UpdateVisibleIfBinding()
+		public void UpdateVisibleIfBinding()
 		{
 			VisibleIfStatements.Clear();
 
@@ -380,15 +380,21 @@ namespace StructuredXmlEditor.Data
 						var stmnt = new Statement(statement);
 						group.Add(stmnt);
 
+						IEnumerable<DataItem> collection = Children;
+						if (Parent is ComplexDataItem && ((ComplexDataItem)Parent).Attributes.Contains(this))
+						{
+							collection = ((ComplexDataItem)Parent).Attributes;
+						}
+
 						// find the referenced element and bind to it
-						foreach (var child in Parent.Children)
+						foreach (var child in collection)
 						{
 							if (child != this && child.Name == stmnt.TargetName)
 							{
 								stmnt.SetTarget(child);
 								child.PropertyChanged += (e, a) =>
 								{
-									RaisePropertyChangedEvent("IsVisible");
+									if (a.PropertyName == "Value") RaisePropertyChangedEvent("IsVisible");
 								};
 
 								break;
@@ -752,6 +758,8 @@ namespace StructuredXmlEditor.Data
 		{
 			if (this is NumberItem) return ((NumberItem)this).Value.ToString();
 			if (this is BooleanItem) return ((BooleanItem)this).Value.ToString();
+			if (this is StringItem) return ((StringItem)this).Value;
+			if (this is EnumItem) return ((EnumItem)this).Value;
 
 			return GetType().GetProperty("Value")?.GetValue(this) as string;
 		}
@@ -866,7 +874,7 @@ namespace StructuredXmlEditor.Data
 				var val = Target.GetValue(); // reflection cause cant cast to PrimitiveDataItem<>
 				var target = TargetValue;
 				var split = target.Split(new char[] { ',' });
-				var equal = val == target || (split.Length > 1 && split.Contains(val));
+				var equal = target.ToLower() == "null" ? string.IsNullOrEmpty(val) : (val == target || (split.Length > 1 && split.Contains(val)));
 
 				if (Operator == ComparisonOperation.Equal) { return equal; }
 				else if (Operator == ComparisonOperation.NotEqual) { return !equal; }

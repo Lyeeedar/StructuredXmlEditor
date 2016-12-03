@@ -38,6 +38,15 @@ namespace StructuredXmlEditor.Definition
 				CreateChildren(item, undoRedo);
 			}
 
+			foreach (var child in item.Attributes)
+			{
+				child.UpdateVisibleIfBinding();
+			}
+			foreach (var child in item.Children)
+			{
+				child.UpdateVisibleIfBinding();
+			}
+
 			return item;
 		}
 
@@ -146,6 +155,15 @@ namespace StructuredXmlEditor.Definition
 			}
 
 			item.Children.OrderBy(e => Children.IndexOf(e.Definition));
+
+			foreach (var child in item.Attributes)
+			{
+				child.UpdateVisibleIfBinding();
+			}
+			foreach (var child in item.Children)
+			{
+				child.UpdateVisibleIfBinding();
+			}
 
 			return item;
 		}

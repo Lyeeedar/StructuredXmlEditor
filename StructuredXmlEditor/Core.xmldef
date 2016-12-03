@@ -17,6 +17,14 @@
 	<StructDef Name="Vector" ToolTip="A vector." TextColour="Primitive">
 		<Attributes>
 			<String Name="Name" Default="Vector" ToolTip="The name to be written for this element." />
+			<Enum Name="NumComponents" Default="2" EnumValues="2,3,4" ToolTip="The number of components this vector contains." />
+			<String Name="Name1" Default="X" ToolTip="The name to display for component 1." />
+			<String Name="Name2" Default="Y" ToolTip="The name to display for component 2." />
+			<String Name="Name3" Default="Z" ToolTip="The name to display for component 3." VisibleIf="NumComponents==3 || NumComponents==4" />
+			<String Name="Name4" Default="W" ToolTip="The name to display for component 4." VisibleIf="NumComponents==4" />
+			<Number Name="Min" Default="-9999999" ToolTip="The minimum value this element can contain." />
+			<Number Name="Max" Default="9999999" ToolTip="The maximum value this element can contain." />
+			<Enum Name="Type" Default="Float" EnumValues="Float,Int" ToolTip="The value type." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
@@ -86,8 +94,8 @@
 	<StructDef Name="Enum" ToolTip="A value chosen from a series of valid values." TextColour="Primitive">
 		<Attributes>
 			<String Name="Name" Default="Enum" ToolTip="The name to be written for this element." />
-			<String Name="Key" ToolTip="The key of the EnumDef to load the EnumValues from." />
-			<String Name="EnumValues" ToolTip="A comma seperated list of enum values that can be picked." />
+			<String Name="EnumValues" ToolTip="A comma seperated list of enum values that can be picked." VisibleIf="Key==null" />
+			<String Name="Key" ToolTip="The key of the EnumDef to load the EnumValues from." VisibleIf="EnumValues==null" />
 			<String Name="Default" ToolTip="The default value for this element. If not set it defaults to the first EnumValue." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
@@ -122,7 +130,7 @@
 		<Attributes>
 			<String Name="Name" Default="Collection" ToolTip="The name to be written for this element." />
 			<Boolean Name="Collapse" ToolTip="If set to true the collection will be collapsed to a single line seperated by the Seperator string. Only works if the child is a primitive item." />
-			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." />
+			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." VisibleIf="Collapse==true" />
 			<Number Name="MinCount" Min="0" ToolTip="The minimum number of child elements this can have." />
 			<Number Name="MaxCount" Min="1" Default="99999999" ToolTip="The maximum number of child elements this can have." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
@@ -137,7 +145,7 @@
 		<Attributes>
 			<String Name="Name" Default="CollectionDef" ToolTip="The name to be written for this element. This will be used as the key when referencing it." />
 			<Boolean Name="Collapse" ToolTip="If set to true the collection will be collapsed to a single line seperated by the Seperator string. Only works if the child is a primitive item." />
-			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." />
+			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." VisibleIf="Collapse==true" />
 			<Number Name="MinCount" Min="0" ToolTip="The minimum number of child elements this can have." />
 			<Number Name="MaxCount" Min="1" Default="99999999" ToolTip="The maximum number of child elements this can have." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
@@ -153,7 +161,7 @@
 			<String Name="Name" Default="Struct" ToolTip="The name to be written for this element." />
 			<Boolean Name="Nullable" Default="true" ToolTip="Whether this element can be empty." />
 			<Boolean Name="Collapse" ToolTip="If set to true the struct will be collapsed to a single line seperated by the Seperator string. Only works all the child are a primitive items." />
-			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." />
+			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." VisibleIf="Collapse==true" />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="DescriptionChild" ToolTip="The child to be used to build the ui side description." />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
@@ -168,7 +176,7 @@
 			<String Name="Name" Default="StructDef" ToolTip="The name to be written for this element. This will be used as the key when referencing it." />
 			<Boolean Name="Nullable" Default="true" ToolTip="Whether this element can be empty." />
 			<Boolean Name="Collapse" ToolTip="If set to true the struct will be collapsed to a single line seperated by the Seperator string. Only works all the child are a primitive items." />
-			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." />
+			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." VisibleIf="Collapse==true" />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="DescriptionChild" ToolTip="The child to be used to build the ui side description." />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />

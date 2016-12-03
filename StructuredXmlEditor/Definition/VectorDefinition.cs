@@ -10,6 +10,18 @@ namespace StructuredXmlEditor.Definition
 {
 	public class VectorDefinition : PrimitiveDataDefinition
 	{
+		public string Default { get; set; }
+		public int NumComponents { get; set; } = 2;
+
+		public string XName { get; set; } = "X";
+		public string YName { get; set; } = "Y";
+		public string ZName { get; set; } = "Z";
+		public string WName { get; set; } = "W";
+
+		public float MinValue { get; set; }
+		public float MaxValue { get; set; }
+		public bool UseIntegers { get; set; }
+
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
 			var item = new VectorItem(this, undoRedo);
@@ -18,12 +30,12 @@ namespace StructuredXmlEditor.Definition
 
 		public override object DefaultValue()
 		{
-			return new Vector2();
+			return VectorN.FromString(Default);
 		}
 
 		public override string DefaultValueString()
 		{
-			return DefaultValue().ToString();
+			return Default;
 		}
 
 		public override void DoSaveData(XElement parent, DataItem item)
@@ -35,20 +47,36 @@ namespace StructuredXmlEditor.Definition
 		public override DataItem LoadData(XElement element, UndoRedoManager undoRedo)
 		{
 			var item = new VectorItem(this, undoRedo);
-			item.Value = Vector2.FromString(element.Value);
+			item.Value = VectorN.FromString(element.Value);
 			return item;
 		}
 
 		public override DataItem LoadFromString(string data, UndoRedoManager undoRedo)
 		{
 			var item = new VectorItem(this, undoRedo);
-			item.Value = Vector2.FromString(data);
+			item.Value = VectorN.FromString(data);
 			return item;
 		}
 
 		public override void Parse(XElement definition)
 		{
-			
+			NumComponents = TryParseInt(definition, "NumComponents", 2);
+			XName = definition.Attribute("Name1")?.Value?.ToString() ?? XName;
+			YName = definition.Attribute("Name2")?.Value?.ToString() ?? YName;
+			ZName = definition.Attribute("Name3")?.Value?.ToString() ?? ZName;
+			WName = definition.Attribute("Name4")?.Value?.ToString() ?? WName;
+
+			MinValue = TryParseFloat(definition, "Min", -float.MaxValue);
+			MaxValue = TryParseFloat(definition, "Max", float.MaxValue);
+
+			var type = definition.Attribute("Type")?.Value?.ToString().ToUpper();
+
+			if (type == "INT")
+			{
+				UseIntegers = true;
+			}
+
+			Default = definition.Attribute("Default")?.Value?.ToString() ?? "0,0,0,0";
 		}
 
 		public override string WriteToString(DataItem item)

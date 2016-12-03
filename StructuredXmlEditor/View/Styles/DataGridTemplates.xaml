@@ -21,7 +21,8 @@
 				<DataTemplate>
 					<Grid
 						x:Name="grid"
-						Margin="1">
+						Margin="1"
+						Visibility="{Binding IsVisible, Converter={v:ValueTypeConverter}}">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition
 								SharedSizeGroup="FlatDataGridHeader"
@@ -215,10 +216,15 @@
 					DockPanel.Dock="Left"
 					VerticalAlignment="Center"
 					Foreground="White"
-					Text="X: " />
+					Margin="10,0,5,0"
+					Text="{Binding Definition.XName}" />
 				<v:NumericTextBox
 					VerticalAlignment="Center"
-					Width="100"
+					Width="75"
+					MinValue="{Binding Definition.MinValue}"
+					MaxValue="{Binding Definition.MaxValue}"
+					UseIntegers="{Binding Definition.UseIntegers}"
+					DefaultValue="{Binding Definition.Default.X}"
 					Value="{Binding X, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
 			</DockPanel>
 
@@ -227,11 +233,52 @@
 					DockPanel.Dock="Left"
 					VerticalAlignment="Center"
 					Foreground="White"
-					Text="Y: " />
+					Margin="10,0,5,0"
+					Text="{Binding Definition.YName}" />
 				<v:NumericTextBox
 					VerticalAlignment="Center"
-					Width="100"
+					Width="75"
+					MinValue="{Binding Definition.MinValue}"
+					MaxValue="{Binding Definition.MaxValue}"
+					UseIntegers="{Binding Definition.UseIntegers}"
+					DefaultValue="{Binding Definition.Default.Y}"
 					Value="{Binding Y, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
+			</DockPanel>
+
+			<DockPanel
+				Visibility="{Binding ShowZ, Converter={v:ValueTypeConverter}}">
+				<TextBlock
+					DockPanel.Dock="Left"
+					VerticalAlignment="Center"
+					Foreground="White"
+					Margin="10,0,5,0"
+					Text="{Binding Definition.ZName}" />
+				<v:NumericTextBox
+					VerticalAlignment="Center"
+					Width="75"
+					MinValue="{Binding Definition.MinValue}"
+					MaxValue="{Binding Definition.MaxValue}"
+					UseIntegers="{Binding Definition.UseIntegers}"
+					DefaultValue="{Binding Definition.Default.Z}"
+					Value="{Binding Z, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
+			</DockPanel>
+
+			<DockPanel
+				Visibility="{Binding ShowW, Converter={v:ValueTypeConverter}}">
+				<TextBlock
+					DockPanel.Dock="Left"
+					VerticalAlignment="Center"
+					Foreground="White"
+					Margin="10,0,5,0"
+					Text="{Binding Definition.WName}" />
+				<v:NumericTextBox
+					VerticalAlignment="Center"
+					Width="75"
+					MinValue="{Binding Definition.MinValue}"
+					MaxValue="{Binding Definition.MaxValue}"
+					UseIntegers="{Binding Definition.UseIntegers}"
+					DefaultValue="{Binding Definition.Default.W}"
+					Value="{Binding W, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
 			</DockPanel>
 		</StackPanel>
 	</DataTemplate>
