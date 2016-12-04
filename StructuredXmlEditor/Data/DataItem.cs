@@ -380,6 +380,7 @@ namespace StructuredXmlEditor.Data
 						var stmnt = new Statement(statement);
 						group.Add(stmnt);
 
+						// We are an attribute, so use the attribute collection instead
 						IEnumerable<DataItem> collection = Children;
 						if (Parent is ComplexDataItem && ((ComplexDataItem)Parent).Attributes.Contains(this))
 						{
