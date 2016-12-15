@@ -68,6 +68,7 @@ namespace StructuredXmlEditor.Definition
 			else if (name == "TREE") definition = new TreeDefinition();
 			else if (name == "VECTOR") definition = new VectorDefinition();
 			else if (name == "TIMELINE") definition = new TimelineDefinition();
+			else if (name == "GRAPHNODE") definition = new GraphNodeDefinition();
 			else throw new Exception("Unknown definition type " + name + "!");
 
 			definition.Name = element.Attribute("Name")?.Value?.ToString();

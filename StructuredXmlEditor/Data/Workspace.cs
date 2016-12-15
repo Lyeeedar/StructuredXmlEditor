@@ -407,82 +407,91 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public Document Open(string path, bool isBackup = false)
 		{
-			foreach (var openDoc in Documents)
+			try
 			{
-				if (openDoc.Path == path)
+				foreach (var openDoc in Documents)
 				{
-					Current = openDoc;
+					if (openDoc.Path == path)
+					{
+						Current = openDoc;
 
-					return null;
+						return null;
+					}
 				}
-			}
 
-			XDocument doc = null;
+				XDocument doc = null;
 
-			if (path.EndsWith(".json"))
-			{
-				string json = File.ReadAllText(path);
-
-				var temp = JsonConvert.DeserializeXNode(json, "Root");
-				if (temp.Elements().First().Elements().Count() > 1)
+				if (path.EndsWith(".json"))
 				{
-					temp.Elements().First().Name = temp.Elements().First().Elements().First().Name;
-					doc = temp;
+					string json = File.ReadAllText(path);
+
+					var temp = JsonConvert.DeserializeXNode(json, "Root");
+					if (temp.Elements().First().Elements().Count() > 1)
+					{
+						temp.Elements().First().Name = temp.Elements().First().Elements().First().Name;
+						doc = temp;
+					}
+					else
+					{
+						doc = new XDocument(temp.Elements().First());
+					}
 				}
 				else
 				{
-					doc = new XDocument(temp.Elements().First());
+					doc = XDocument.Load(path);
 				}
-			}
-			else
-			{
-				doc = XDocument.Load(path);
-			}
 
-			var rootname = doc.Elements().First().Name.ToString().ToLower();
+				var rootname = doc.Elements().First().Name.ToString().ToLower();
 
-			DataDefinition data = null;
+				DataDefinition data = null;
 
-			if (path.EndsWith(".xmldef"))
-			{
-				data = RootDefinition;
-			}
-			else
-			{
-				if (!SupportedResourceTypes.ContainsKey(rootname))
+				if (path.EndsWith(".xmldef"))
 				{
-					Message.Show("No definition found for xml '" + rootname + "'! Cannot open document.", "Load Failed!");
-					return null;
+					data = RootDefinition;
 				}
-				data = SupportedResourceTypes[rootname];
-			}
-
-			var document = new Document(path, this);
-
-			using (document.UndoRedo.DisableUndoScope())
-			{
-				var item = data.LoadData(doc.Elements().First(), document.UndoRedo);
-				document.SetData(item);
-			}
-
-			Documents.Add(document);
-
-			Current = document;
-
-			if (!isBackup)
-			{
-				RecentFiles.Remove(path);
-				RecentFiles.Insert(0, path);
-
-				while (RecentFiles.Count > 10)
+				else
 				{
-					RecentFiles.RemoveAt(RecentFiles.Count - 1);
+					if (!SupportedResourceTypes.ContainsKey(rootname))
+					{
+						Message.Show("No definition found for xml '" + rootname + "'! Cannot open document.", "Load Failed!");
+						return null;
+					}
+					data = SupportedResourceTypes[rootname];
 				}
 
-				StoreSetting("RecentFiles", RecentFiles.ToArray());
+				var document = new Document(path, this);
+
+				using (document.UndoRedo.DisableUndoScope())
+				{
+					var item = data.LoadData(doc.Elements().First(), document.UndoRedo);
+					document.SetData(item);
+				}
+
+				Documents.Add(document);
+
+				Current = document;
+
+				if (!isBackup)
+				{
+					RecentFiles.Remove(path);
+					RecentFiles.Insert(0, path);
+
+					while (RecentFiles.Count > 10)
+					{
+						RecentFiles.RemoveAt(RecentFiles.Count - 1);
+					}
+
+					StoreSetting("RecentFiles", RecentFiles.ToArray());
+				}
+
+				return document;
+			}
+			catch (Exception ex)
+			{
+				Message.Show(ex.Message, "Failed to open document!");
 			}
 
-			return document;
+			return null;
 		}
 
 		//-----------------------------------------------------------------------

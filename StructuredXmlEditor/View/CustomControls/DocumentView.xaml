@@ -228,22 +228,32 @@
 			</ItemsControl.ItemTemplate>
 		</ItemsControl>
 
-		<v:DataGridView
-			HierarchicalItemsSource="{Binding RootItems}">
-			<v:DataGridView.ItemContainerStyle>
-				<Style
-					TargetType="{x:Type v:DataGridViewItem}"
-					BasedOn="{StaticResource {x:Type v:DataGridViewItem}}">
-					<Setter
-						Property="HorizontalContentAlignment"
-						Value="Stretch" />
-					<Setter
-						Property="IsExpanded"
-						Value="{Binding IsExpanded, Mode=TwoWay}" />
-				</Style>
-			</v:DataGridView.ItemContainerStyle>
+		<Grid>
 
-		</v:DataGridView>
+			<v:Graph
+				Visibility="{Binding ShowAsGraph, Converter={v:ValueTypeConverter}}"
+				Nodes="{Binding GraphNodes}">
+				
+			</v:Graph>
+			
+			<v:DataGridView
+				Visibility="{Binding ShowAsDataGrid, Converter={v:ValueTypeConverter}}"
+				HierarchicalItemsSource="{Binding RootItems}">
+				<v:DataGridView.ItemContainerStyle>
+					<Style
+						TargetType="{x:Type v:DataGridViewItem}"
+						BasedOn="{StaticResource {x:Type v:DataGridViewItem}}">
+						<Setter
+							Property="HorizontalContentAlignment"
+							Value="Stretch" />
+						<Setter
+							Property="IsExpanded"
+							Value="{Binding IsExpanded, Mode=TwoWay}" />
+					</Style>
+				</v:DataGridView.ItemContainerStyle>
+			</v:DataGridView>
 
+		</Grid>
+		
 	</DockPanel>
 </UserControl>

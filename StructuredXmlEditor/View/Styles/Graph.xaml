@@ -1,0 +1,197 @@
+﻿<ResourceDictionary
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="clr-namespace:StructuredXmlEditor.View">
+
+	<ResourceDictionary.MergedDictionaries>
+		<ResourceDictionary
+			Source="Brushes.xaml" />
+		<ResourceDictionary
+			Source="GeneralStyles.xaml" />
+	</ResourceDictionary.MergedDictionaries>
+
+	<Style
+		TargetType="{x:Type local:Connection}">
+		<Setter
+			Property="Graph"
+			Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:Graph}}, Path=.}" />
+		<Setter
+			Property="Template">
+			<Setter.Value>
+				<ControlTemplate
+					TargetType="{x:Type local:Connection}">
+					<Border
+						Background="LawnGreen"
+						BorderThickness="2"
+						Width="18"
+						Height="18"
+						CornerRadius="9">
+						<Border.Style>
+							<Style>
+								<Setter
+									Property="Border.BorderBrush"
+									Value="{StaticResource BorderLightBrush}" />
+								<Style.Triggers>
+									<DataTrigger
+										Binding="{Binding Connection.MouseOver}"
+										Value="True">
+										<Setter
+											Property="Border.BorderBrush"
+											Value="{StaticResource BorderDarkBrush}" />
+									</DataTrigger>
+								</Style.Triggers>
+							</Style>
+						</Border.Style>
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<DataTemplate
+		DataType="{x:Type local:GraphNodeDataPreview}">
+		<Grid
+			Margin="5">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition
+					Width="*" />
+				<ColumnDefinition
+					Width="*" />
+			</Grid.ColumnDefinitions>
+
+			<TextBlock
+				Margin="5"
+				Text="{Binding Title}" />
+
+			<TextBlock
+				Margin="5"
+				Grid.Column="1"
+				Text="{Binding Preview}" />
+
+		</Grid>
+	</DataTemplate>
+
+	<DataTemplate
+		DataType="{x:Type local:GraphNodeDataLink}">
+		<Grid
+			Margin="5">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition
+					Width="*" />
+				<ColumnDefinition
+					Width="*" />
+			</Grid.ColumnDefinitions>
+
+			<TextBlock
+				Margin="5"
+				Text="{Binding Title}" />
+
+			<TextBlock
+				Margin="5"
+				Grid.Column="1"
+				Text="{Binding Link.Title}" />
+
+			<local:Connection
+				Grid.Column="1"
+				Margin="0,0,-15,0"
+				HorizontalAlignment="Right"
+				Position="{Binding Position, Mode=OneWayToSource}" />
+
+		</Grid>
+	</DataTemplate>
+
+	<Style
+		TargetType="{x:Type local:GraphNode}">
+		<Setter
+			Property="Canvas.Left"
+			Value="{Binding Path=X}" />
+		<Setter
+			Property="Canvas.Top"
+			Value="{Binding Path=Y}" />
+		<Setter
+			Property="Template">
+			<Setter.Value>
+				<ControlTemplate
+					TargetType="{x:Type local:GraphNode}">
+					<Border
+						Background="{StaticResource WindowBackgroundBrush}">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition
+									Height="Auto" />
+								<RowDefinition
+									Height="5" />
+								<RowDefinition
+									Height="*" />
+							</Grid.RowDefinitions>
+
+							<TextBlock
+								FontSize="12"
+								Margin="5"
+								Text="{Binding Title}" />
+
+							<Border
+								Grid.Row="1"
+								Height="1"
+								Margin="2"
+								Background="{StaticResource BorderLightBrush}" />
+
+
+							<ItemsControl
+								Grid.Row="2"
+								ItemsSource="{Binding Datas}" />
+
+						</Grid>
+						<Border.Style>
+							<Style>
+								<Setter
+									Property="Border.BorderThickness"
+									Value="2" />
+								<Setter
+									Property="Border.BorderBrush"
+									Value="{StaticResource BorderLightBrush}" />
+								<Style.Triggers>
+									<DataTrigger
+										Binding="{Binding MouseOver}"
+										Value="True">
+										<Setter
+											Property="Border.BorderThickness"
+											Value="3" />
+									</DataTrigger>
+									<DataTrigger
+										Binding="{Binding IsSelected}"
+										Value="true">
+										<Setter
+											Property="Border.BorderBrush"
+											Value="{StaticResource SelectionBorderBrush}" />
+									</DataTrigger>
+								</Style.Triggers>
+							</Style>
+						</Border.Style>
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<Style
+		TargetType="{x:Type local:Graph}">
+		<Setter
+			Property="Template">
+			<Setter.Value>
+				<ControlTemplate
+					TargetType="{x:Type local:Graph}">
+					<Grid>
+
+						<local:ZoomPanItemsControl
+							x:Name="PanCanvas"
+							ItemsSource="{Binding Controls, RelativeSource={RelativeSource TemplatedParent}}" />
+
+					</Grid>
+				</ControlTemplate>
+
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+</ResourceDictionary>

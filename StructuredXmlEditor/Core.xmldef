@@ -186,6 +186,30 @@
 		<Reference Name="Data" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,String,Struct,Reference,Timeline,Tree,Vector" ToolTip="The defined children of the struct" />
 	</CollectionDef>
 
+	<CollectionDef Name="GraphNode" ToolTip="A node on a graph." TextColour="Struct">
+		<Attributes>
+			<String Name="Name" Default="GraphNode" ToolTip="The name to be written for this element." />
+			<Boolean Name="Nullable" Default="true" ToolTip="Whether this element can be empty." />
+			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
+			<String Name="DescriptionChild" ToolTip="The child to be used to build the ui side description." />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
+			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Struct" HasAlpha="false" />
+			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
+		</Attributes>
+		<Reference Name="Data" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,String,Struct,Reference,Timeline,Tree,Vector,GraphNode,GraphReference" ToolTip="The defined children of the struct" />
+	</CollectionDef>
+
+	<StructDef Name="GraphReference" ToolTip="An element that links to another graphnode.">
+		<Attributes>
+			<String Name="Name" Default="Reference" ToolTip="The name to be written for this element." />
+			<String Name="Keys" ToolTip="The names of the graph nodes that this reference can contain." />
+			<Boolean Name="Nullable" Default="true" ToolTip="Whether this element can be empty." />
+			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
+			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
+		</Attributes>
+	</StructDef>
+
 	<StructDef Name="Timeline" ToolTip="A collection of keyframes." TextColour="Struct">
 		<Attributes>
 			<String Name="Name" Default="Timeline" ToolTip="The name to be written for this element." />
@@ -213,7 +237,7 @@
 	</StructDef>
 
 	<Collection Name="Definitions" ToolTip="The definitions stored in this file. Can contain only a single non-def element.">
-		<Reference Name="Definition" Keys="Struct,Collection,StructDef,EnumDef,CollectionDef" ToolTip="A single definition." />
+		<Reference Name="Definition" Keys="Struct,Collection,StructDef,EnumDef,CollectionDef,GraphNode" ToolTip="A single definition." />
 	</Collection>
 	
 </Definitions>

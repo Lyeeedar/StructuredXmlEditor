@@ -82,6 +82,8 @@
     <Compile Include="Data\Document.cs" />
     <Compile Include="Data\EnumItem.cs" />
     <Compile Include="Data\FileItem.cs" />
+    <Compile Include="Data\GraphNodeItem.cs" />
+    <Compile Include="Data\GraphReferenceItem.cs" />
     <Compile Include="Data\NumberItem.cs" />
     <Compile Include="Data\PairItem.cs" />
     <Compile Include="Data\PrimitiveDataItem.cs" />
@@ -90,6 +92,7 @@
     <Compile Include="Data\TimelineItem.cs" />
     <Compile Include="Data\TreeItem.cs" />
     <Compile Include="Data\VectorItem.cs" />
+    <Compile Include="Definition\GraphNodeDefinition.cs" />
     <Compile Include="Definition\TimelineDefinition.cs" />
     <Compile Include="Definition\VectorDefinition.cs" />
     <Compile Include="Data\Workspace.cs" />
@@ -123,11 +126,17 @@
     <Compile Include="View\CustomControls\DocumentView.xaml.cs">
       <DependentUpon>DocumentView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\CustomControls\Graph\Connection.cs" />
+    <Compile Include="View\CustomControls\Graph\Graph.cs" />
+    <Compile Include="View\CustomControls\Graph\GraphNode.cs" />
+    <Compile Include="View\CustomControls\Graph\GraphNodeData.cs" />
     <Compile Include="View\CustomControls\Message.xaml.cs">
       <DependentUpon>Message.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\CustomControls\NumericTextBox.cs" />
     <Compile Include="View\CustomControls\Timeline.cs" />
+    <Compile Include="View\CustomControls\ZoomPan\ZoomPanCanvas.cs" />
+    <Compile Include="View\CustomControls\ZoomPan\ZoomPanItemsControl.cs" />
     <Compile Include="View\ValueConverters\ActiveDocumentConverter.cs" />
     <Compile Include="View\ValueConverters\ColourMarkupConverter.cs" />
     <Compile Include="View\ValueConverters\ConverterBase.cs" />
@@ -200,6 +209,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\Styles\Graph.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="View\Styles\Menu.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -225,6 +238,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="View\Styles\TextBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Styles\ZoomPanItemsControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

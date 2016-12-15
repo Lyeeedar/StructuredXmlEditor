@@ -61,6 +61,36 @@ namespace StructuredXmlEditor.Data
 			{
 				m_rootItems = value;
 				RaisePropertyChangedEvent("RootItems");
+
+				if (RootItems.Any(e => !(e is GraphNodeItem)))
+				{
+					ShowAsGraph = false;
+					ShowAsDataGrid = true;
+				}
+				else
+				{
+					ShowAsGraph = true;
+					ShowAsDataGrid = false;
+				}
+
+				RaisePropertyChangedEvent("ShowAsGraph");
+				RaisePropertyChangedEvent("ShowAsDataGrid");
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public IEnumerable<GraphNode> GraphNodes
+		{
+			get
+			{
+				foreach (var item in Descendants)
+				{
+					if (item is GraphNodeItem)
+					{
+						var gni = item as GraphNodeItem;
+						yield return gni.GraphNode;
+					}
+				}
 			}
 		}
 
@@ -80,6 +110,10 @@ namespace StructuredXmlEditor.Data
 				}
 			}
 		}
+
+		//-----------------------------------------------------------------------
+		public bool ShowAsDataGrid { get; set; } = true;
+		public bool ShowAsGraph { get; set; }
 
 		//##############################################################################################################
 		#region Filter
@@ -193,7 +227,6 @@ namespace StructuredXmlEditor.Data
 		#endregion Filter
 		//##############################################################################################################
 
-
 		//-----------------------------------------------------------------------
 		public void FocusItem(DataItem item)
 		{
@@ -283,6 +316,20 @@ namespace StructuredXmlEditor.Data
 			{
 				i.Grid = this;
 			}
+
+			if (RootItems.Any(e => !(e is GraphNodeItem)))
+			{
+				ShowAsGraph = false;
+				ShowAsDataGrid = true;
+			}
+			else
+			{
+				ShowAsGraph = true;
+				ShowAsDataGrid = false;
+			}
+
+			RaisePropertyChangedEvent("ShowAsGraph");
+			RaisePropertyChangedEvent("ShowAsDataGrid");
 		}
 
 		//-----------------------------------------------------------------------
