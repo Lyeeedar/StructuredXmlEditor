@@ -61,6 +61,9 @@ namespace StructuredXmlEditor.Definition
 		{
 			var item = new GraphNodeItem(this, undoRedo);
 
+			item.X = TryParseFloat(element, "X");
+			item.Y = TryParseFloat(element, "Y");
+
 			bool hadData = false;
 
 			var createdChildren = new List<DataItem>();
@@ -176,6 +179,9 @@ namespace StructuredXmlEditor.Definition
 
 			var el = new XElement(name);
 			parent.Add(el);
+
+			el.Add(new XAttribute("X", si.X));
+			el.Add(new XAttribute("Y", si.Y));
 
 			foreach (var att in si.Attributes)
 			{

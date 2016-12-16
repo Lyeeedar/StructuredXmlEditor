@@ -15,22 +15,29 @@ namespace StructuredXmlEditor.View
 {
 	public class GraphNode : Control, INotifyPropertyChanged
 	{
+		//--------------------------------------------------------------------------
 		static GraphNode()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(GraphNode), new FrameworkPropertyMetadata(typeof(GraphNode)));
 		}
 
+		//--------------------------------------------------------------------------
 		public GraphNodeItem GraphNodeItem { get { return m_nodeItem; } }
 		private GraphNodeItem m_nodeItem;
 
+		//--------------------------------------------------------------------------
 		public ObservableCollection<GraphNodeData> Datas { get; set; } = new ObservableCollection<GraphNodeData>();
 
-		public string Title { get; set; } = "Empty Node";
+		//--------------------------------------------------------------------------
+		public string Title { get { return GraphNodeItem.Name; } }
 
+		//--------------------------------------------------------------------------
 		public Graph Graph { get; set; }
 
+		//--------------------------------------------------------------------------
 		public List<GraphNode> ParentNodes { get; } = new List<GraphNode>();
 
+		//--------------------------------------------------------------------------
 		public double X
 		{
 			get { return GraphNodeItem.X; }
@@ -44,6 +51,7 @@ namespace StructuredXmlEditor.View
 			}
 		}
 
+		//--------------------------------------------------------------------------
 		public double Y
 		{
 			get { return GraphNodeItem.Y; }
@@ -57,6 +65,7 @@ namespace StructuredXmlEditor.View
 			}
 		}
 
+		//--------------------------------------------------------------------------
 		public bool IsSelected
 		{
 			get { return m_isSelected; }
@@ -71,6 +80,7 @@ namespace StructuredXmlEditor.View
 		}
 		private bool m_isSelected;
 
+		//--------------------------------------------------------------------------
 		public bool MouseOver
 		{
 			get { return m_MouseOver; }
@@ -85,9 +95,24 @@ namespace StructuredXmlEditor.View
 		}
 		private bool m_MouseOver;
 
+		//--------------------------------------------------------------------------
 		public GraphNode(GraphNodeItem nodeItem)
 		{
 			m_nodeItem = nodeItem;
+
+			nodeItem.PropertyChanged += (e, args) =>
+			{
+				if (args.PropertyName == "IsFilterMatched")
+				{
+					Opacity = nodeItem.IsFilterMatched ? 1.0 : 0.2;
+					RaisePropertyChangedEvent("Opacity");
+				}
+				else if (args.PropertyName == "X" || args.PropertyName == "Y")
+				{
+					RaisePropertyChangedEvent("X");
+					RaisePropertyChangedEvent("Y");
+				}
+			};
 
 			AllowDrop = true;
 			DataContext = this;
@@ -111,6 +136,11 @@ namespace StructuredXmlEditor.View
 					item.PropertyChanged += func;
 				}
 			};
+
+			foreach (var link in nodeItem.Links)
+			{
+				Datas.Add(link.Link);
+			}
 		}
 
 		private Point m_mouseDragLast;
@@ -139,6 +169,7 @@ namespace StructuredXmlEditor.View
 			base.OnMouseDown(e);
 		}
 
+		//--------------------------------------------------------------------------
 		private bool HasParent(GraphNode node)
 		{
 			var parent = this;
@@ -158,7 +189,7 @@ namespace StructuredXmlEditor.View
 		{
 			if (Graph.CreatingLink != null)
 			{
-				if (Graph.CanHaveCircularReferences || Graph.CreatingLink.Link == this || !Graph.CreatingLink.Node.HasParent(this))
+				if (Graph.CreatingLink.AllowedTypes.Contains(GraphNodeItem.Definition.Name) && Graph.CanHaveCircularReferences || Graph.CreatingLink.Link == this || !Graph.CreatingLink.Node.HasParent(this))
 				{
 					Graph.ConnectedLinkTo = this;
 					if (!(Graph.MouseOverItem is Connection)) Graph.MouseOverItem = this;

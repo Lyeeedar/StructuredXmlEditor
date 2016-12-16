@@ -116,6 +116,13 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public bool IsFilterMatched
+		{
+			get { return m_filterMatched; }
+			set { m_filterMatched = value; RaisePropertyChangedEvent(); }
+		}
+
+		//-----------------------------------------------------------------------
 		public bool IsVisible
 		{
 			get { return m_isVisible && !m_isSearchFiltered && !m_isMultiselectFiltered && IsVisibleFromBindings; }
@@ -354,6 +361,8 @@ namespace StructuredXmlEditor.Data
 				{
 					RaisePropertyChangedEvent("FocusName");
 				}
+
+				Parent?.DescendantPropertyChanged(e, a);
 			};
 		}
 
@@ -598,9 +607,14 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public virtual void DescendantPropertyChanged(object sender, PropertyChangedEventArgs args)
+		{
+			Parent?.DescendantPropertyChanged(sender, args);
+		}
+
+		//-----------------------------------------------------------------------
 		public virtual void ChildPropertyChanged(object sender, PropertyChangedEventArgs args)
 		{
-
 		}
 
 		//-----------------------------------------------------------------------
@@ -614,7 +628,8 @@ namespace StructuredXmlEditor.Data
 		{
 			RefreshChildren();
 
-			bool matchFound = false;
+			
+			bool foundInChild = false;
 
 			if (Children.Count > 0)
 			{
@@ -622,11 +637,11 @@ namespace StructuredXmlEditor.Data
 				{
 					if (item.Filter(filter, regex, caseSensitive, showMatchesOnly))
 					{
-						matchFound = true;
+						foundInChild = true;
 					}
 				}
 
-				if (matchFound && !showMatchesOnly)
+				if (foundInChild && !showMatchesOnly)
 				{
 					if ((this is StructItem && Parent is CollectionChildItem) || (this is CollectionChildItem && ((CollectionChildItem)this).WrappedItem is StructItem))
 					{
@@ -639,11 +654,14 @@ namespace StructuredXmlEditor.Data
 				}
 			}
 
+			bool matchFound = false;
+
 			if (filter == null)
 			{
 				m_isSearchFiltered = false;
+				IsFilterMatched = true;
 			}
-			else if (!matchFound)
+			else
 			{
 				if (IsVisibleFromBindings)
 				{
@@ -670,6 +688,8 @@ namespace StructuredXmlEditor.Data
 
 					foreach (var s in stringsToCheck)
 					{
+						if (string.IsNullOrWhiteSpace(s)) continue;
+
 						if (regex != null)
 						{
 							matchFound = regex.IsMatch(s);
@@ -682,22 +702,31 @@ namespace StructuredXmlEditor.Data
 						if (matchFound) break;
 					}
 
-					m_isSearchFiltered = !matchFound;
+					m_isSearchFiltered = !(matchFound || foundInChild);
 				}
 				else
 				{
 					m_isSearchFiltered = true;
+					foundInChild = false;
 				}
+
+				IsFilterMatched = matchFound;
 			}
-			else
+
+			if (foundInChild)
 			{
 				IsExpanded = true;
-				m_isSearchFiltered = false;
+			}
+
+			if (this is GraphReferenceItem)
+			{
+				var gri = this as GraphReferenceItem;
+				gri.WrappedItem.IsFilterMatched = IsFilterMatched;
 			}
 
 			RaisePropertyChangedEvent("IsVisible");
 
-			return matchFound;
+			return matchFound || foundInChild;
 		}
 
 		//-----------------------------------------------------------------------
@@ -769,6 +798,7 @@ namespace StructuredXmlEditor.Data
 		Visibility m_firstItem = Visibility.Hidden;
 		int m_zindex = 0;
 		bool m_isSearchFiltered = false;
+		bool m_filterMatched = false;
 		protected bool m_isMultiselectFiltered = false;
 		string m_name;
 		bool m_isExpanded = false;
@@ -831,11 +861,7 @@ namespace StructuredXmlEditor.Data
 		{
 			Target = target;
 
-			if (!Target.IsPrimitive)
-			{
-				throw new Exception("Cannot do comparison operations on non-primitives!");
-			}
-			else if (!(target is NumberItem) && Operator != ComparisonOperation.Equal && Operator != ComparisonOperation.NotEqual)
+			if (!(target is NumberItem) && Operator != ComparisonOperation.Equal && Operator != ComparisonOperation.NotEqual)
 			{
 				throw new Exception("Invalid operation '" + Operator + "' on non-number item '" + target.Name + "'!");
 			}
@@ -869,6 +895,14 @@ namespace StructuredXmlEditor.Data
 				if (Operator == ComparisonOperation.Equal) { return val == target; }
 				else if (Operator == ComparisonOperation.NotEqual) { return val != target; }
 				else { throw new Exception("Invalid operation type " + Operator + " for bool!"); }
+			}
+			else if (Target is ComplexDataItem)
+			{
+				var equal = (Target as ComplexDataItem).HasContent;
+
+				if (Operator == ComparisonOperation.Equal) { return equal; }
+				else if (Operator == ComparisonOperation.NotEqual) { return !equal; }
+				else { throw new Exception("Invalid operation type " + Operator + " for " + Target.GetType() + "!"); }
 			}
 			else
 			{

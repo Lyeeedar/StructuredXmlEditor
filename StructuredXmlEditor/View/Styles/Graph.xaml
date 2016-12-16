@@ -80,19 +80,61 @@
 					Width="*" />
 				<ColumnDefinition
 					Width="*" />
+				<ColumnDefinition
+					Width="*" />
 			</Grid.ColumnDefinitions>
 
 			<TextBlock
 				Margin="5"
 				Text="{Binding Title}" />
 
-			<TextBlock
-				Margin="5"
+			<Button
 				Grid.Column="1"
-				Text="{Binding Link.Title}" />
+				Margin="5"
+				VerticalAlignment="Center"
+				Background="Transparent"
+				BorderBrush="Transparent"
+				ToolTip="Clear"
+				Visibility="{Binding Link, Converter={local:NullOrZeroConverter}, ConverterParameter=Not}"
+				Command="{Binding ClearCMD}">
+				<Image
+					Source="/Resources/Remove.png"
+					RenderOptions.BitmapScalingMode="NearestNeighbor"
+					Height="16"
+					Width="16" />
+			</Button>
+
+			<local:PopupButton
+				Grid.Column="1"
+				Margin="5"
+				ShowArrow="False"
+				Background="Transparent"
+				BorderBrush="Transparent"
+				ToolTip="Create"
+				Visibility="{Binding Link, Converter={local:NullOrZeroConverter}}"
+				x:Name="button">
+				<Image
+					Source="/Resources/Add.png"
+					RenderOptions.BitmapScalingMode="NearestNeighbor"
+					Height="16"
+					Width="16" />
+				<local:PopupButton.PopupContent>
+					<ItemsControl
+						ItemsSource="{Binding AllowedTypes}">
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<Button
+									Content="{Binding}"
+									Command="{Binding DataContext.CreateCMD, ElementName=button}"
+									CommandParameter="{Binding}" />
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</local:PopupButton.PopupContent>
+			</local:PopupButton>
 
 			<local:Connection
-				Grid.Column="1"
+				Grid.Column="2"
 				Margin="0,0,-15,0"
 				HorizontalAlignment="Right"
 				Position="{Binding Position, Mode=OneWayToSource}" />
@@ -182,11 +224,9 @@
 				<ControlTemplate
 					TargetType="{x:Type local:Graph}">
 					<Grid>
-
 						<local:ZoomPanItemsControl
 							x:Name="PanCanvas"
 							ItemsSource="{Binding Controls, RelativeSource={RelativeSource TemplatedParent}}" />
-
 					</Grid>
 				</ControlTemplate>
 

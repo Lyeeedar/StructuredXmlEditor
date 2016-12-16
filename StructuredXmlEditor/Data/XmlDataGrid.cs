@@ -90,6 +90,15 @@ namespace StructuredXmlEditor.Data
 						var gni = item as GraphNodeItem;
 						yield return gni.GraphNode;
 					}
+					else if (item is GraphReferenceItem)
+					{
+						var gri = item as GraphReferenceItem;
+
+						if (gri.WrappedItem != null)
+						{
+							yield return gri.WrappedItem.GraphNode;
+						}
+					}
 				}
 			}
 		}

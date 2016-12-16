@@ -13,6 +13,8 @@
 				<ResourceDictionary
 					Source="View/Styles/Button.xaml" />
 				<ResourceDictionary
+					Source="View/Styles/PopupButton.xaml" />
+				<ResourceDictionary
 					Source="View/Styles/CheckBox.xaml" />
 				<ResourceDictionary
 					Source="View/Styles/ColorCanvas.xaml" />

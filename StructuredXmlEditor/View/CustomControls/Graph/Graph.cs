@@ -16,9 +16,10 @@ namespace StructuredXmlEditor.View
 {
 	public class Graph : Control, INotifyPropertyChanged
 	{
+		//-----------------------------------------------------------------------
 		private void ChildPropertyChangedHandler(object e, PropertyChangedEventArgs args)
 		{
-			if (args.PropertyName == "X" || args.PropertyName == "Y" || args.PropertyName == "Child Link" || args.PropertyName == "Child Position")
+			if (args.PropertyName == "X" || args.PropertyName == "Y" || args.PropertyName == "Child Link" || args.PropertyName == "Child Position" || args.PropertyName == "Opacity")
 			{
 				RaisePropertyChangedEvent("Controls");
 			}
@@ -37,20 +38,24 @@ namespace StructuredXmlEditor.View
 			}
 		}
 
+		//-----------------------------------------------------------------------
 		static Graph()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(Graph), new FrameworkPropertyMetadata(typeof(Graph)));
 		}
 
+		//-----------------------------------------------------------------------
 		public Graph()
 		{
 		}
 
+		//-----------------------------------------------------------------------
 		public bool CanHaveCircularReferences
 		{
 			get; set;
 		}
 
+		//-----------------------------------------------------------------------
 		public IEnumerable<object> Controls
 		{
 			get
@@ -94,6 +99,7 @@ namespace StructuredXmlEditor.View
 				g.RaisePropertyChangedEvent("Controls");
 			}));
 
+		//-----------------------------------------------------------------------
 		public IEnumerable<object> Lines
 		{
 			get
@@ -111,7 +117,7 @@ namespace StructuredXmlEditor.View
 								var src = link.Position;
 								var dst = new Point(link.Link.X + 10, link.Link.Y + 10);
 
-								yield return MakePath(src, dst);
+								yield return MakePath(src, dst, node.Opacity);
 							}
 						}
 					}
@@ -123,20 +129,20 @@ namespace StructuredXmlEditor.View
 					{
 						var dst = new Point(ConnectedLinkTo.X + 10, ConnectedLinkTo.Y + 10);
 
-						yield return MakePath(CreatingLink.Position, dst);
+						yield return MakePath(CreatingLink.Position, dst, CreatingLink.Node.Opacity);
 					}
 					else
 					{
 						var point = new Point(m_mousePoint.X / Scale - Offset.X, m_mousePoint.Y / Scale - Offset.Y);
 
-						yield return MakePath(CreatingLink.Position, point);
+						yield return MakePath(CreatingLink.Position, point, CreatingLink.Node.Opacity);
 					}
 				}
 			}
 		}
 		
 		//--------------------------------------------------------------------------
-		private object MakePath(Point src, Point dst)
+		private object MakePath(Point src, Point dst, double opacity)
 		{
 			src = new Point(src.X / Scale - Offset.X, src.Y / Scale - Offset.Y);
 
@@ -169,6 +175,8 @@ namespace StructuredXmlEditor.View
 
 			path.Stroke = System.Windows.Media.Brushes.Wheat;
 			path.StrokeThickness = 2;
+
+			path.Opacity = opacity;
 
 			return path;
 		}
@@ -216,7 +224,10 @@ namespace StructuredXmlEditor.View
 		{
 			if (CreatingLink != null)
 			{
-				if (ConnectedLinkTo != null) CreatingLink.Link = ConnectedLinkTo;
+				if (ConnectedLinkTo != null)
+				{
+					CreatingLink.GraphReferenceItem.WrappedItem = ConnectedLinkTo.GraphNodeItem;
+				}
 
 				CreatingLink = null;
 				ConnectedLinkTo = null;
@@ -270,6 +281,8 @@ namespace StructuredXmlEditor.View
 			}
 		}
 		private GraphNodeDataLink m_creatingLink;
+
+		//-----------------------------------------------------------------------
 		public GraphNode ConnectedLinkTo
 		{
 			get { return m_graphNode; }
@@ -283,12 +296,18 @@ namespace StructuredXmlEditor.View
 			}
 		}
 		private GraphNode m_graphNode;
+
+		//-----------------------------------------------------------------------
 		private Point m_mousePoint;
 		private ZoomPanItemsControl m_panCanvas;
+
+		//-----------------------------------------------------------------------
 		public Point Offset
 		{
 			get { return m_panCanvas?.Offset ?? new Point(); }
 		}
+
+		//-----------------------------------------------------------------------
 		public double Scale
 		{
 			get { return m_panCanvas?.Scale ?? 1; }

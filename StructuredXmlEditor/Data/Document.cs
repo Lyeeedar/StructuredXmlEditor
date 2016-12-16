@@ -92,6 +92,29 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void SetData(DataItem item)
 		{
+			if (item is StructItem)
+			{
+				var si = item as StructItem;
+				if (!si.HasContent)
+				{
+					using (si.UndoRedo.DisableUndoScope())
+					{
+						si.Create();
+					}
+				}
+			}
+			else if (item is GraphNodeItem)
+			{
+				var gni = item as GraphNodeItem;
+				if (!gni.HasContent)
+				{
+					using (gni.UndoRedo.DisableUndoScope())
+					{
+						gni.Create();
+					}
+				}
+			}
+
 			Data = new XmlDataGrid();
 			Data.SetRootItem(item);
 		}

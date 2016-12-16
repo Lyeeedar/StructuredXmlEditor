@@ -103,14 +103,6 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
-		{
-			GraphNodeDataLink.Link = null;
-
-			base.OnMouseRightButtonUp(e);
-		}
-
-		//--------------------------------------------------------------------------
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
 			Graph.CreatingLink = GraphNodeDataLink;

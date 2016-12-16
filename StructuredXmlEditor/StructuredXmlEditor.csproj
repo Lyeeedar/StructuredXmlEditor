@@ -93,6 +93,7 @@
     <Compile Include="Data\TreeItem.cs" />
     <Compile Include="Data\VectorItem.cs" />
     <Compile Include="Definition\GraphNodeDefinition.cs" />
+    <Compile Include="Definition\GraphReferenceDefinition.cs" />
     <Compile Include="Definition\TimelineDefinition.cs" />
     <Compile Include="Definition\VectorDefinition.cs" />
     <Compile Include="Data\Workspace.cs" />
@@ -134,6 +135,7 @@
       <DependentUpon>Message.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\CustomControls\NumericTextBox.cs" />
+    <Compile Include="View\CustomControls\PopupButton.cs" />
     <Compile Include="View\CustomControls\Timeline.cs" />
     <Compile Include="View\CustomControls\ZoomPan\ZoomPanCanvas.cs" />
     <Compile Include="View\CustomControls\ZoomPan\ZoomPanItemsControl.cs" />
@@ -224,6 +226,10 @@
     <Page Include="View\Styles\NumericTextBox.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Styles\PopupButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Styles\Scrollbar.xaml">
       <Generator>MSBuild:Compile</Generator>

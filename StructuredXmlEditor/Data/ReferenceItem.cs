@@ -204,7 +204,7 @@ namespace StructuredXmlEditor.Data
 			},
 			delegate
 			{
-				item = WrappedItem;
+				WrappedItem = item;
 				ChosenDefinition = oldDef;
 			},
 			"");

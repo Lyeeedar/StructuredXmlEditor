@@ -146,7 +146,7 @@ namespace StructuredXmlEditor.Data
 
 			LoadDefinitions();
 
-			LoadBackups();
+			Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, new Action(() => { LoadBackups(); }));
 		}
 
 		//-----------------------------------------------------------------------
@@ -392,6 +392,7 @@ namespace StructuredXmlEditor.Data
 
 						doc.IsBackup = true;
 						doc.Path = Path.Combine(Path.GetDirectoryName(ProjectRoot), relPath);
+						doc.RaisePropertyChangedEvent("Title");
 
 						loadedFiles += "\t" + Path.GetFileName(file) + "\n";
 					}

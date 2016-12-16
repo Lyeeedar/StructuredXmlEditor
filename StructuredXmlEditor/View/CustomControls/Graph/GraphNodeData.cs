@@ -1,4 +1,6 @@
-﻿using StructuredXmlEditor.View;
+﻿using StructuredXmlEditor.Data;
+using StructuredXmlEditor.Definition;
+using StructuredXmlEditor.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +23,7 @@ namespace StructuredXmlEditor.View
 		}
 		private GraphNode m_node;
 
-		public string Title { get; set; } = "Data";
+		public virtual string Title { get; } = "Data";
 	}
 
 	public class GraphNodeDataPreview : GraphNodeData
@@ -31,8 +33,19 @@ namespace StructuredXmlEditor.View
 
 	public class GraphNodeDataLink : GraphNodeData
 	{
-		public GraphNodeDataLink()
+		public GraphNodeDataLink(GraphReferenceItem item)
 		{
+			GraphReferenceItem = item;
+			LinkNoEvent = GraphReferenceItem.WrappedItem?.GraphNode;
+
+			GraphReferenceItem.PropertyChanged += (e, args) => 
+			{
+				if (args.PropertyName == "WrappedItem")
+				{
+					Link = GraphReferenceItem.WrappedItem?.GraphNode;
+				}
+			};
+
 			PropertyChanged += (e, args) => 
 			{
 				if (args.PropertyName == "Node")
@@ -45,7 +58,51 @@ namespace StructuredXmlEditor.View
 			};
 		}
 
+		public override string Title
+		{
+			get
+			{
+				return GraphReferenceItem.GetParentPath();
+			}
+		}
+
+		public GraphReferenceItem GraphReferenceItem { get; set; }
+
 		public Connection Connection { get; set; }
+
+		public IEnumerable<string> AllowedTypes
+		{
+			get
+			{
+				var def = GraphReferenceItem.Definition as GraphReferenceDefinition;
+				foreach (var type in def.Definitions.Values)
+				{
+					yield return type.Name;
+				}
+			}
+		}
+
+		public GraphNode LinkNoEvent
+		{
+			get { return m_link; }
+			set
+			{
+				if (m_link != value)
+				{
+					if (m_link != null)
+					{
+						m_link.ParentNodes.Remove(Node);
+					}
+
+					m_link = value;
+
+					if (m_link != null)
+					{
+						if (Node != null) m_link.ParentNodes.Add(Node);
+					}
+				}
+			}
+		}
 
 		public GraphNode Link
 		{
@@ -61,11 +118,12 @@ namespace StructuredXmlEditor.View
 
 					m_link = value;
 
-					if (m_link != null && Node != null)
+					if (m_link != null)
 					{
-						m_link.ParentNodes.Add(Node); 
+						if (Node != null) m_link.ParentNodes.Add(Node); 
 					}
 
+					GraphReferenceItem.Grid.RaisePropertyChangedEvent("GraphNodes");
 					RaisePropertyChangedEvent();
 				}
 			}
@@ -85,5 +143,8 @@ namespace StructuredXmlEditor.View
 			}
 		}
 		private Point m_position;
+
+		public Command<string> ClearCMD { get { return new Command<string>((type) => { GraphReferenceItem.Clear(); }); } }
+		public Command<string> CreateCMD { get { return new Command<string>((type) => { GraphReferenceItem.Create(type); }); } }
 	}
 }
