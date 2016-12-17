@@ -1,0 +1,194 @@
+﻿<UserControl
+	x:Class="StructuredXmlEditor.View.StartPageView"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:l="clr-namespace:StructuredXmlEditor.View">
+
+	<UserControl.Resources>
+		<l:PathToFileNameConverter
+			x:Key="PathToFileNameConverter" />
+
+		<Style
+			TargetType="{x:Type Hyperlink}"
+			BasedOn="{StaticResource {x:Type Hyperlink}}"
+			x:Key="hyperlinkStyle">
+			<Setter
+				Property="Foreground"
+				Value="SteelBlue" />
+			<Style.Triggers>
+				<Trigger
+					Property="IsMouseOver"
+					Value="True">
+					<Setter
+						Property="Foreground"
+						Value="LightSteelBlue" />
+				</Trigger>
+			</Style.Triggers>
+		</Style>
+
+		<Style
+			TargetType="{x:Type TextBlock}"
+			BasedOn="{StaticResource {x:Type TextBlock}}"
+			x:Key="textBlockStyle">
+			<Setter
+				Property="Foreground"
+				Value="SteelBlue" />
+			<Style.Triggers>
+				<Trigger
+					Property="IsMouseOver"
+					Value="True">
+					<Setter
+						Property="Foreground"
+						Value="LightSteelBlue" />
+				</Trigger>
+			</Style.Triggers>
+		</Style>
+
+	</UserControl.Resources>
+
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition
+				Width="*" />
+			<ColumnDefinition
+				Width="2*" />
+		</Grid.ColumnDefinitions>
+
+		<Grid
+			Background="{StaticResource WindowBackgroundLightBrush}">
+			<Grid.RowDefinitions>
+				<RowDefinition
+					Height="Auto" />
+				<RowDefinition
+					Height="*" />
+				<RowDefinition
+					Height="Auto" />
+				<RowDefinition
+					Height="*" />
+				<RowDefinition
+					Height="Auto" />
+				<RowDefinition
+					Height="*" />
+			</Grid.RowDefinitions>
+
+			<!-- Top part - Create new -->
+			<TextBlock
+				Text="Create New"
+				FontSize="16"
+				Margin="10" />
+
+			<Grid
+				Grid.Row="1">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition
+						Width="Auto" />
+					<ColumnDefinition
+						Width="*" />
+				</Grid.ColumnDefinitions>
+
+				<TextBlock
+					Margin="10">
+				<Hyperlink
+						Command="{Binding Workspace.NewDefCMD}"
+						Style="{StaticResource hyperlinkStyle}">
+					New Definition...
+				</Hyperlink>
+				</TextBlock>
+
+				<ScrollViewer
+					Grid.Column="1"
+					Margin="10"
+					HorizontalScrollBarVisibility="Hidden">
+					<ItemsControl
+						x:Name="newDocs"
+						ItemsSource="{Binding Workspace.AllResourceTypes}">
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<TextBlock
+									Margin="5,0,0,0">
+								<Hyperlink
+										Command="{Binding DataContext.Workspace.NewCMD, ElementName=newDocs}"
+										Style="{StaticResource hyperlinkStyle}"
+										CommandParameter="{Binding}">
+									<TextBlock
+											Style="{StaticResource textBlockStyle}"
+											Text="{Binding StringFormat=New {0} File...}" />
+								</Hyperlink>
+							</TextBlock>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</ScrollViewer>
+			</Grid>
+
+			<TextBlock
+				Grid.Row="2"
+				Text="Open Recent"
+				FontSize="16"
+				Margin="10" />
+
+			<ScrollViewer
+				Grid.Row="3"
+				Margin="10">
+				<ItemsControl
+					x:Name="recentDocs"
+					ItemsSource="{Binding Workspace.RecentFiles}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<TextBlock
+								Margin="5,0,0,0">
+									<Hyperlink
+									Command="{Binding DataContext.Workspace.OpenRecentCMD, ElementName=recentDocs}"
+									Style="{StaticResource hyperlinkStyle}"
+									CommandParameter="{Binding}">
+										<TextBlock
+										Style="{StaticResource textBlockStyle}"
+										Text="{Binding Converter={StaticResource PathToFileNameConverter}}" />
+									</Hyperlink>
+								</TextBlock>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</ScrollViewer>
+
+			<TextBlock
+				Text="Recovered Files"
+				Grid.Row="4"
+				Visibility="{Binding Workspace.BackupDocuments.Count, Converter={l:NullOrZeroConverter}, ConverterParameter=Not}"
+				FontSize="16"
+				Margin="10"  />
+
+			<ScrollViewer
+				Grid.Row="5"
+				Margin="10"
+				Visibility="{Binding Workspace.BackupDocuments.Count, Converter={l:NullOrZeroConverter}, ConverterParameter=Not}">
+				<ItemsControl
+					x:Name="backupDocs"
+					ItemsSource="{Binding Workspace.BackupDocuments}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<TextBlock
+								Margin="5,0,0,0">
+									<Hyperlink
+									Command="{Binding DataContext.Workspace.OpenBackupCMD, ElementName=backupDocs}"
+									Style="{StaticResource hyperlinkStyle}"
+									CommandParameter="{Binding}">
+										<TextBlock
+										Style="{StaticResource textBlockStyle}"
+										Text="{Binding Converter={StaticResource PathToFileNameConverter}}" />
+									</Hyperlink>
+								</TextBlock>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</ScrollViewer>
+
+		</Grid>
+
+
+	</Grid>
+
+
+</UserControl>

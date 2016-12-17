@@ -58,6 +58,9 @@ namespace StructuredXmlEditor.Data
 		public ObservableCollection<string> RecentFiles { get; set; } = new ObservableCollection<string>();
 
 		//-----------------------------------------------------------------------
+		public ObservableCollection<string> BackupDocuments { get; set; } = new ObservableCollection<string>();
+
+		//-----------------------------------------------------------------------
 		public IEnumerable<string> AllResourceTypes
 		{
 			get
@@ -71,7 +74,13 @@ namespace StructuredXmlEditor.Data
 		public Command<object> NewDefCMD { get { return new Command<object>((e) => NewDef()); } }
 
 		//-----------------------------------------------------------------------
+		public Command<string> NewCMD { get { return new Command<string>((e) => New(e)); } }
+
+		//-----------------------------------------------------------------------
 		public Command<object> OpenCMD { get { return new Command<object>((e) => OpenNew()); } }
+
+		//-----------------------------------------------------------------------
+		public Command<string> OpenRecentCMD { get { return new Command<string>((e) => Open(e)); } }
 
 		//-----------------------------------------------------------------------
 		public Command<object> SaveCMD { get { return new Command<object>((e) => Save(), (e) => Current != null); } }
@@ -93,6 +102,9 @@ namespace StructuredXmlEditor.Data
 
 		//-----------------------------------------------------------------------
 		public Command<object> DefinitionFromDataCMD { get { return new Command<object>((e) => CreateDefinitionFromDocument()); } }
+
+		//-----------------------------------------------------------------------
+		public Command<string> OpenBackupCMD { get { return new Command<string>((e) => OpenBackup(e)); } }
 
 		//-----------------------------------------------------------------------
 		public Workspace()
@@ -153,6 +165,7 @@ namespace StructuredXmlEditor.Data
 			Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, new Action(() => { LoadBackups(); }));
 
 			Tools.Add(new UndoHistoryTool(this));
+			Tools.Add(new StartPage(this));
 		}
 
 		//-----------------------------------------------------------------------
@@ -380,34 +393,31 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void LoadBackups()
 		{
-			var loadedFiles = "";
-
 			if (Directory.Exists(Document.BackupFolder))
 			{
 				foreach (var file in Directory.EnumerateFiles(Document.BackupFolder, "*.*", SearchOption.AllDirectories))
 				{
-					var doc = Open(file, true);
-
-					if (doc != null)
-					{
-						// make relative to backup folder
-						Uri path1 = new Uri(file);
-						Uri path2 = new Uri(Path.Combine(Document.BackupFolder, "fakefile.fake"));
-						Uri diff = path2.MakeRelativeUri(path1);
-						string relPath = diff.OriginalString;
-
-						doc.IsBackup = true;
-						doc.Path = Path.Combine(Path.GetDirectoryName(ProjectRoot), relPath);
-						doc.RaisePropertyChangedEvent("Title");
-
-						loadedFiles += "\t" + Path.GetFileName(file) + "\n";
-					}
+					BackupDocuments.Add(file);
 				}
 			}
+		}
 
-			if (loadedFiles != "")
+		//-----------------------------------------------------------------------
+		public void OpenBackup(string path)
+		{
+			var doc = Open(path, true);
+
+			if (doc != null)
 			{
-				Message.Show("Backups were loaded for the following files:\n\n" + loadedFiles, "Backups Loaded", "Ok");
+				// make relative to backup folder
+				Uri path1 = new Uri(path);
+				Uri path2 = new Uri(Path.Combine(Document.BackupFolder, "fakefile.fake"));
+				Uri diff = path2.MakeRelativeUri(path1);
+				string relPath = diff.OriginalString;
+
+				doc.IsBackup = true;
+				doc.Path = Path.Combine(Path.GetDirectoryName(ProjectRoot), relPath);
+				doc.RaisePropertyChangedEvent("Title");
 			}
 		}
 

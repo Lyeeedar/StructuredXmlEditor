@@ -116,6 +116,7 @@
     <Compile Include="Definition\StructDefinition.cs" />
     <Compile Include="Definition\ReferenceDefinition.cs" />
     <Compile Include="Definition\TreeDefinition.cs" />
+    <Compile Include="Tools\StartPage.cs" />
     <Compile Include="Tools\ToolBase.cs" />
     <Compile Include="Tools\UndoHistoryTool.cs" />
     <Compile Include="Util\Extensions.cs" />
@@ -138,6 +139,9 @@
     </Compile>
     <Compile Include="View\CustomControls\NumericTextBox.cs" />
     <Compile Include="View\CustomControls\PopupButton.cs" />
+    <Compile Include="View\CustomControls\StartPageView.xaml.cs">
+      <DependentUpon>StartPageView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\CustomControls\Timeline.cs" />
     <Compile Include="View\CustomControls\UndoHistoryView.xaml.cs">
       <DependentUpon>UndoHistoryView.xaml</DependentUpon>
@@ -177,6 +181,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\CustomControls\Message.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\CustomControls\StartPageView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

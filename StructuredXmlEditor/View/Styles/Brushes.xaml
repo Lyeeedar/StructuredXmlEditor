@@ -47,6 +47,17 @@
 		po:Freeze="True"
 		Color="{StaticResource WindowBackgroundColor}" />
 
+	<Color
+		x:Key="WindowBackgroundLightColor"
+		A="255"
+		R="25"
+		G="25"
+		B="25" />
+	<SolidColorBrush
+		x:Key="WindowBackgroundLightBrush"
+		po:Freeze="True"
+		Color="{StaticResource WindowBackgroundLightColor}" />
+
 	<SolidColorBrush
 		x:Key="{x:Static SystemColors.WindowBrushKey}"
 		po:Freeze="True"

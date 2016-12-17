@@ -228,6 +228,10 @@
 						DataType="{x:Type t:UndoHistoryTool}">
 						<v:UndoHistoryView />
 					</DataTemplate>
+					<DataTemplate
+						DataType="{x:Type t:StartPage}">
+						<v:StartPageView />
+					</DataTemplate>
 				</dock:DockingManager.Resources>
 
 				<dock:DockingManager.LayoutItemContainerStyleSelector>
