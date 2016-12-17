@@ -42,6 +42,8 @@
 					Source="View/Styles/ZoomPanItemsControl.xaml" />
 				<ResourceDictionary
 					Source="View/Styles/Graph.xaml" />
+				<ResourceDictionary
+					Source="View/Styles/ListView.xaml" />
 
 				<ResourceDictionary
 					Source="View/Styles/AvalonDock.xaml" />

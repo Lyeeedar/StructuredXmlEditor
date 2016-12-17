@@ -186,7 +186,7 @@ namespace StructuredXmlEditor.Data
 				WrappedItem = null;
 				ChosenDefinition = null;
 			},
-			"");
+			"Create Item " + item.Name);
 
 			IsExpanded = true;
 		}
@@ -207,7 +207,7 @@ namespace StructuredXmlEditor.Data
 				WrappedItem = item;
 				ChosenDefinition = oldDef;
 			},
-			"");
+			"Clear Item " + Definition.Name);
 		}
 	}
 }

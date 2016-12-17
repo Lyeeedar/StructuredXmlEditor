@@ -116,6 +116,8 @@
     <Compile Include="Definition\StructDefinition.cs" />
     <Compile Include="Definition\ReferenceDefinition.cs" />
     <Compile Include="Definition\TreeDefinition.cs" />
+    <Compile Include="Tools\ToolBase.cs" />
+    <Compile Include="Tools\UndoHistoryTool.cs" />
     <Compile Include="Util\Extensions.cs" />
     <Compile Include="Util\PopupCloser.cs" />
     <Compile Include="Util\SerializableDictionary.cs" />
@@ -137,6 +139,9 @@
     <Compile Include="View\CustomControls\NumericTextBox.cs" />
     <Compile Include="View\CustomControls\PopupButton.cs" />
     <Compile Include="View\CustomControls\Timeline.cs" />
+    <Compile Include="View\CustomControls\UndoHistoryView.xaml.cs">
+      <DependentUpon>UndoHistoryView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\CustomControls\ZoomPan\ZoomPanCanvas.cs" />
     <Compile Include="View\CustomControls\ZoomPan\ZoomPanItemsControl.cs" />
     <Compile Include="View\ValueConverters\ActiveDocumentConverter.cs" />
@@ -172,6 +177,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\CustomControls\Message.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\CustomControls\UndoHistoryView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -212,6 +221,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Styles\Graph.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Styles\ListView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

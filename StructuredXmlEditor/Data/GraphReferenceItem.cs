@@ -250,7 +250,7 @@ namespace StructuredXmlEditor.Data
 			{
 				WrappedItem = null;
 			},
-			"");
+			"Create Item " + item.Name);
 
 			IsExpanded = true;
 		}
@@ -269,7 +269,7 @@ namespace StructuredXmlEditor.Data
 			{
 				WrappedItem = item;
 			},
-			"");
+			"Clear Item " + Definition.Name);
 		}
 	}
 }

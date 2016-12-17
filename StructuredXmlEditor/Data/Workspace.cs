@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using StructuredXmlEditor.Definition;
+using StructuredXmlEditor.Tools;
 using StructuredXmlEditor.View;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,9 @@ namespace StructuredXmlEditor.Data
 			}
 		}
 		private Document m_current;
+
+		//-----------------------------------------------------------------------
+		public ObservableCollection<ToolBase> Tools { get; set; } = new ObservableCollection<ToolBase>();
 
 		//-----------------------------------------------------------------------
 		public string ProjectRoot { get; set; }
@@ -147,6 +151,8 @@ namespace StructuredXmlEditor.Data
 			LoadDefinitions();
 
 			Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, new Action(() => { LoadBackups(); }));
+
+			Tools.Add(new UndoHistoryTool(this));
 		}
 
 		//-----------------------------------------------------------------------

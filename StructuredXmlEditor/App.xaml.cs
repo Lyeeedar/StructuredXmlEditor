@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace StructuredXmlEditor
     {
 		public App()
 		{
-			this.Dispatcher.UnhandledException += OnDispatcherUnhandledException;
+			if (!Debugger.IsAttached) this.Dispatcher.UnhandledException += OnDispatcherUnhandledException;
 		}
 
 		void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)

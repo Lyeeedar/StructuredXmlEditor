@@ -1,0 +1,122 @@
+﻿<UserControl
+	x:Class="StructuredXmlEditor.View.UndoHistoryView"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:l="clr-namespace:StructuredXmlEditor.View"
+	xmlns:t="clr-namespace:StructuredXmlEditor.Tools"
+	xmlns:v="clr-namespace:StructuredXmlEditor.View">
+
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition
+				Height="Auto" />
+			<RowDefinition
+				Height="*" />
+		</Grid.RowDefinitions>
+		<StackPanel>
+			<MenuItem
+				Command="{Binding Workspace.UndoCMD}">
+				<MenuItem.Header>
+					<TextBlock
+						Text="Undo" />
+				</MenuItem.Header>
+				<MenuItem.Icon>
+					<Image
+						Source="/Resources/Undo.png"
+						Width="16"
+						Height="16" />
+				</MenuItem.Icon>
+			</MenuItem>
+
+			<MenuItem
+				Command="{Binding Workspace.RedoCMD}">
+				<MenuItem.Header>
+					<TextBlock
+						Text="Redo" />
+				</MenuItem.Header>
+				<MenuItem.Icon>
+					<Image
+						Source="/Resources/Redo.png"
+						Width="16"
+						Height="16" />
+				</MenuItem.Icon>
+			</MenuItem>
+		</StackPanel>
+
+		<ListView
+			x:Name="ListView"
+			Grid.Row="1"
+			ItemsSource="{Binding Workspace.Current.UndoRedo.DescriptionStack}">
+			<ListView.ItemContainerStyle>
+				<Style
+					TargetType="{x:Type ListViewItem}"
+					BasedOn="{StaticResource {x:Type ListViewItem}}">
+					<Setter
+						Property="HorizontalContentAlignment"
+						Value="Stretch" />
+				</Style>
+			</ListView.ItemContainerStyle>
+			<ListView.ItemTemplate>
+				<DataTemplate>
+					<Grid>
+						<Grid.ContextMenu>
+							<ContextMenu>
+								<MenuItem
+									Header="Undo To This Point"
+									Visibility="{Binding IsUndo, Converter={v:ValueTypeConverter}}"
+									Click="UndoToThisPointClick" />
+								<MenuItem
+									Header="Redo To This Point"
+									Visibility="{Binding IsRedo, Converter={v:ValueTypeConverter}}"
+									Click="RedoToThisPointClick" />
+							</ContextMenu>
+						</Grid.ContextMenu>
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition
+								Width="20" />
+							<ColumnDefinition
+								Width="*" />
+						</Grid.ColumnDefinitions>
+
+						<Label
+							Content=">"
+							Visibility="{Binding IsCurrentPoint, Converter={v:ValueTypeConverter}}" />
+
+						<Label
+							Grid.Column="1"
+							Content="{Binding Description}">
+							<Label.Style>
+								<Style
+									TargetType="Label"
+									BasedOn="{StaticResource {x:Type Label}}">
+									<Style.Triggers>
+										<DataTrigger
+											Binding="{Binding IsSavePoint}"
+											Value="true">
+											<Setter
+												Property="Label.FontWeight"
+												Value="Bold" />
+										</DataTrigger>
+										<DataTrigger
+											Binding="{Binding IsRedo}"
+											Value="true">
+											<Setter
+												Property="Label.Foreground"
+												Value="LightGray" />
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</Label.Style>
+						</Label>
+
+					</Grid>
+
+				</DataTemplate>
+			</ListView.ItemTemplate>
+		</ListView>
+	</Grid>
+
+</UserControl>

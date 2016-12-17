@@ -2,14 +2,22 @@
 	x:Class="StructuredXmlEditor.MainWindow"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:l="clr-namespace:StructuredXmlEditor.Data"
+	xmlns:l="clr-namespace:StructuredXmlEditor"
+	xmlns:d="clr-namespace:StructuredXmlEditor.Data"
 	xmlns:v="clr-namespace:StructuredXmlEditor.View"
+	xmlns:t="clr-namespace:StructuredXmlEditor.Tools"
 	xmlns:dock="http://schemas.xceed.com/wpf/xaml/avalondock"
 	xmlns:dockctrl="clr-namespace:Xceed.Wpf.AvalonDock.Controls;assembly=Xceed.Wpf.AvalonDock"
 	Title="Structured Xml Editor"
 	WindowStartupLocation="CenterScreen"
 	Icon="pack://application:,,,/StructuredXmlEditor;component/Resources/Icon.png"
 	WindowState="Maximized">
+
+	<Window.Resources>
+		<dock:BoolToVisibilityConverter
+			x:Key="BoolToVisibilityConverter" />
+	</Window.Resources>
+	
 	<Grid>
 		<DockPanel>
 
@@ -96,7 +104,7 @@
 						Header="Switch _Project"
 						Command="{Binding SwitchProjectCMD}">
 					</MenuItem>
-					
+
 					<Separator />
 
 					<MenuItem
@@ -122,6 +130,18 @@
 						</MenuItem.Icon>
 					</MenuItem>
 
+				</MenuItem>
+				<MenuItem
+					Header="_Tools"
+					ItemsSource="{Binding Tools}">
+					<MenuItem.ItemTemplate>
+						<DataTemplate>
+							<MenuItem
+								Header="{Binding Title}"
+								IsCheckable="True"
+								IsChecked="{Binding IsVisible}" />
+						</DataTemplate>
+					</MenuItem.ItemTemplate>
 				</MenuItem>
 			</Menu>
 
@@ -193,31 +213,73 @@
 			</Border>
 
 			<dock:DockingManager
+				x:Name="DockingManager"
 				AllowMixedOrientation="True"
 				DocumentsSource="{Binding Documents}"
+				AnchorablesSource="{Binding Tools}"
 				ActiveContent="{Binding Current, Mode=TwoWay, Converter={v:ActiveDocumentConverter}}">
 
-				<dock:DockingManager.LayoutItemTemplate>
-					<DataTemplate>
+				<dock:DockingManager.Resources>
+					<DataTemplate
+						DataType="{x:Type d:Document}">
 						<v:DocumentView />
 					</DataTemplate>
-				</dock:DockingManager.LayoutItemTemplate>
-	
-				<dock:DockingManager.LayoutItemContainerStyle>
-					<!-- you can add additional bindings from the layoutitem to the DockWindowViewModel -->
-					<Style
-						TargetType="{x:Type dockctrl:LayoutItem}">
-						<Setter
-							Property="Title"
-							Value="{Binding Model.Title}" />
-						<Setter
-							Property="CloseCommand"
-							Value="{Binding Model.CloseCMD}" />
-					</Style>
-				</dock:DockingManager.LayoutItemContainerStyle>
+					<DataTemplate
+						DataType="{x:Type t:UndoHistoryTool}">
+						<v:UndoHistoryView />
+					</DataTemplate>
+				</dock:DockingManager.Resources>
+
+				<dock:DockingManager.LayoutItemContainerStyleSelector>
+					<l:ViewStyleSelector>
+						<l:ViewStyleSelector.ToolStyle>
+							<Style
+								TargetType="{x:Type dock:LayoutAnchorableItem}">
+								<Setter
+									Property="Title"
+									Value="{Binding Model.Title}" />
+								<Setter
+									Property="ContentId"
+									Value="{Binding Model.Title}" />
+								<Setter
+									Property="IsActive"
+									Value="{Binding Model.IsActive, Mode=TwoWay}" />
+								<Setter
+									Property="CloseCommand"
+									Value="{Binding Model.CloseCMD}" />
+								<Setter
+									Property="Visibility"
+									Value="{Binding Model.IsVisible, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Hidden}}" />
+								<Setter
+									Property="HideCommand"
+									Value="{Binding Model.CloseCMD}" />
+
+							</Style>
+						</l:ViewStyleSelector.ToolStyle>
+						<l:ViewStyleSelector.DocumentStyle>
+							<Style
+								TargetType="{x:Type dock:LayoutItem}">
+								<Setter
+									Property="Title"
+									Value="{Binding Model.Title}" />
+								<Setter
+									Property="CloseCommand"
+									Value="{Binding Model.CloseCMD}" />
+							</Style>
+						</l:ViewStyleSelector.DocumentStyle>
+					</l:ViewStyleSelector>
+				</dock:DockingManager.LayoutItemContainerStyleSelector>
+
+				<dock:LayoutRoot>
+					<dock:LayoutPanel
+						Orientation="Horizontal">
+						<dock:LayoutAnchorablePane
+							DockWidth="150" />
+						<dock:LayoutDocumentPane />
+					</dock:LayoutPanel>
+				</dock:LayoutRoot>
 
 			</dock:DockingManager>
 		</DockPanel>
-
 	</Grid>
 </Window>
