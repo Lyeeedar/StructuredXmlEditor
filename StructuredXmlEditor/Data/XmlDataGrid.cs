@@ -79,6 +79,9 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public ObservableCollection<DataItem> Selected { get; } = new ObservableCollection<DataItem>();
+
+		//-----------------------------------------------------------------------
 		public IEnumerable<GraphNode> GraphNodes
 		{
 			get

@@ -166,6 +166,7 @@ namespace StructuredXmlEditor.Data
 
 			Tools.Add(new UndoHistoryTool(this));
 			Tools.Add(new StartPage(this));
+			Tools.Add(new FocusTool(this));
 		}
 
 		//-----------------------------------------------------------------------

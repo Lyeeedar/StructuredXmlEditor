@@ -63,10 +63,11 @@
 				Margin="5"
 				Text="{Binding Title}" />
 
-			<TextBlock
+			<ContentControl
 				Margin="5"
 				Grid.Column="1"
-				Text="{Binding Preview}" />
+				VerticalAlignment="Center"
+				Content="{Binding Preview, Converter={local:ColourMarkupConverter}}" />
 
 		</Grid>
 	</DataTemplate>

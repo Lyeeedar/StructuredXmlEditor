@@ -163,7 +163,7 @@
 			<Boolean Name="Collapse" ToolTip="If set to true the struct will be collapsed to a single line seperated by the Seperator string. Only works all the child are a primitive items." />
 			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." VisibleIf="Collapse==true" />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
-			<String Name="DescriptionChild" ToolTip="The child to be used to build the ui side description." />
+			<String Name="Description" ToolTip="The description to be used. Add a child names inside {} to use the contents of it in the description." />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Struct" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
@@ -178,7 +178,7 @@
 			<Boolean Name="Collapse" ToolTip="If set to true the struct will be collapsed to a single line seperated by the Seperator string. Only works all the child are a primitive items." />
 			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." VisibleIf="Collapse==true" />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
-			<String Name="DescriptionChild" ToolTip="The child to be used to build the ui side description." />
+			<String Name="Description" ToolTip="The description to be used. Add a child names inside {} to use the contents of it in the description." />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Struct" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
@@ -189,7 +189,7 @@
 	<CollectionDef Name="GraphNode" ToolTip="A node on a graph." TextColour="Struct">
 		<Attributes>
 			<String Name="Name" Default="GraphNode" ToolTip="The name to be written for this element." />
-			<String Name="DescriptionChild" ToolTip="The child to be used to build the ui side description." />
+			<String Name="Description" ToolTip="The description to be used. Add a child names inside {} to use the contents of it in the description." />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Struct" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
@@ -200,7 +200,7 @@
 	<CollectionDef Name="GraphNodeDef" ToolTip="A node on a graph that can be referenced." TextColour="Struct">
 		<Attributes>
 			<String Name="Name" Default="GraphNode" ToolTip="The name to be written for this element." />
-			<String Name="DescriptionChild" ToolTip="The child to be used to build the ui side description." />
+			<String Name="Description" ToolTip="The description to be used. Add a child names inside {} to use the contents of it in the description." />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Struct" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />

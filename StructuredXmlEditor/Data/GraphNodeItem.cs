@@ -66,11 +66,20 @@ namespace StructuredXmlEditor.Data
 		private double m_y;
 
 		//-----------------------------------------------------------------------
-		public IEnumerable<GraphReferenceItem> Links
+		public IEnumerable<DataItem> GraphData
 		{
 			get
 			{
-				return GetAllGraphLinks(this);
+				return GetAllUIGraphData(this);
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public IEnumerable<DataItem> Datas
+		{
+			get
+			{
+				return GetAllGraphData(this);
 			}
 		}
 
@@ -124,18 +133,24 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public override void DescendantPropertyChanged(object sender, PropertyChangedEventArgs args)
+		public override void DescendantPropertyChanged(object sender, DescendantPropertyChangedEventArgs args)
 		{
-			base.DescendantPropertyChanged(sender, args);
-
-			if (args.PropertyName == "Children" || args.PropertyName == "WrappedItem")
+			if (!args.Data.ContainsKey("ProcessedByGraph"))
 			{
-				RaisePropertyChangedEvent("Links");
+				if (args.PropertyName == "HasContent")
+				{
+					Grid.RaisePropertyChangedEvent("GraphNodes");
+					RaisePropertyChangedEvent("GraphData");
+				}
+
+				args.Data["ProcessedByGraph"] = "YES";
 			}
+
+			//base.DescendantPropertyChanged(sender, args);
 		}
 
 		//-----------------------------------------------------------------------
-		private IEnumerable<GraphReferenceItem> GetAllGraphLinks(ComplexDataItem item)
+		private IEnumerable<DataItem> GetAllUIGraphData(DataItem item)
 		{
 			foreach (var child in item.Children)
 			{
@@ -143,9 +158,35 @@ namespace StructuredXmlEditor.Data
 				{
 					yield return child as GraphReferenceItem;
 				}
-				else if (child is ComplexDataItem)
+				else
 				{
-					foreach (var childchild in GetAllGraphLinks(child as ComplexDataItem))
+					yield return child;
+
+					foreach (var childchild in GetAllUIGraphData(child))
+					{
+						if (childchild is GraphReferenceItem)
+						{
+							yield return childchild;
+						}
+					}
+				}
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		private IEnumerable<DataItem> GetAllGraphData(DataItem item)
+		{
+			foreach (var child in item.Children)
+			{
+				if (child is GraphReferenceItem)
+				{
+					yield return child as GraphReferenceItem;
+				}
+				else
+				{
+					yield return child;
+
+					foreach (var childchild in GetAllGraphData(child))
 					{
 						yield return childchild;
 					}

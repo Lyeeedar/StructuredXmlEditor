@@ -35,16 +35,56 @@ namespace StructuredXmlEditor.Data
 			{
 				if (!HasContent) return EmptyString;
 
-				var sdef = Definition as StructDefinition;
-				if (sdef != null && sdef.DescriptionChild != null)
-				{
-					var child = Children.FirstOrDefault(e => e.Definition.Name == sdef.DescriptionChild);
+				string descriptionFormat = null;
 
-					if (child != null)
+				var sdef = Definition as StructDefinition;
+				var gdef = Definition as GraphNodeDefinition;
+
+				if (sdef != null) descriptionFormat = sdef.Description;
+				if (gdef != null) descriptionFormat = gdef.Description;
+
+				if (descriptionFormat != null)
+				{
+					if (!descriptionFormat.Contains("{")) return descriptionFormat;
+
+					var builder = new StringBuilder();
+
+					var split = descriptionFormat.Split('{');
+
+					foreach (var block in split)
 					{
-						return "<" + child.TextColour + ">" + child.Description + "</>";
+						if (block == "")
+						{
+							continue;
+						}
+						else if (!block.Contains("}"))
+						{
+							builder.Append(block);
+						}
+						else
+						{
+							var split2 = block.Split('}');
+
+							var child = Children.FirstOrDefault(e => e.Definition.Name == split2[0]);
+
+							if (child != null)
+							{
+								builder.Append("<");
+								builder.Append(child.TextColour);
+								builder.Append(">");
+								builder.Append(child.Description);
+								builder.Append("</>");
+							}
+							else
+							{
+								builder.Append("null");
+							}
+
+							builder.Append(split2[1]);
+						}
 					}
-					return "null";
+
+					return builder.ToString();
 				}
 				else if (Attributes.Count > 0)
 				{

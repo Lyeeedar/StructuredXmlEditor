@@ -116,9 +116,11 @@
     <Compile Include="Definition\StructDefinition.cs" />
     <Compile Include="Definition\ReferenceDefinition.cs" />
     <Compile Include="Definition\TreeDefinition.cs" />
+    <Compile Include="Tools\FocusTool.cs" />
     <Compile Include="Tools\StartPage.cs" />
     <Compile Include="Tools\ToolBase.cs" />
     <Compile Include="Tools\UndoHistoryTool.cs" />
+    <Compile Include="Util\DescendantPropertyChangedEventArgs.cs" />
     <Compile Include="Util\Extensions.cs" />
     <Compile Include="Util\PopupCloser.cs" />
     <Compile Include="Util\SerializableDictionary.cs" />
@@ -129,6 +131,9 @@
     <Compile Include="View\CustomControls\ColourPicker\HsvColor.cs" />
     <Compile Include="View\CustomControls\DocumentView.xaml.cs">
       <DependentUpon>DocumentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\CustomControls\FocusToolView.xaml.cs">
+      <DependentUpon>FocusToolView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\CustomControls\Graph\Connection.cs" />
     <Compile Include="View\CustomControls\Graph\Graph.cs" />
@@ -177,6 +182,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="View\CustomControls\DocumentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\CustomControls\FocusToolView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

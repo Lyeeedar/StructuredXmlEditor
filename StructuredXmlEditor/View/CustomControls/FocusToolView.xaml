@@ -1,0 +1,27 @@
+﻿<UserControl
+	x:Class="StructuredXmlEditor.View.FocusToolView"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:v="clr-namespace:StructuredXmlEditor.View">
+	<Grid>
+
+		<v:DataGridView
+			HierarchicalItemsSource="{Binding Workspace.Current.Data.Selected}">
+			<v:DataGridView.ItemContainerStyle>
+				<Style
+					TargetType="{x:Type v:DataGridViewItem}"
+					BasedOn="{StaticResource {x:Type v:DataGridViewItem}}">
+					<Setter
+						Property="HorizontalContentAlignment"
+						Value="Stretch" />
+					<Setter
+						Property="IsExpanded"
+						Value="{Binding IsExpanded, Mode=TwoWay}" />
+				</Style>
+			</v:DataGridView.ItemContainerStyle>
+		</v:DataGridView>
+
+	</Grid>
+</UserControl>

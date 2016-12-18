@@ -232,6 +232,10 @@
 						DataType="{x:Type t:StartPage}">
 						<v:StartPageView />
 					</DataTemplate>
+					<DataTemplate
+						DataType="{x:Type t:FocusTool}">
+						<v:FocusToolView />
+					</DataTemplate>
 				</dock:DockingManager.Resources>
 
 				<dock:DockingManager.LayoutItemContainerStyleSelector>

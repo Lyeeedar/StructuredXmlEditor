@@ -37,7 +37,7 @@ namespace StructuredXmlEditor.Data
 							RaisePropertyChangedEvent();
 							RaisePropertyChangedEvent("Description");
 						},
-						Name + " set from " + ValueToString(m_value) + " to " + ValueToString(value));
+						Name + " set from " + ValueToString(oldVal) + " to " + ValueToString(value));
 				}
 			}
 		}

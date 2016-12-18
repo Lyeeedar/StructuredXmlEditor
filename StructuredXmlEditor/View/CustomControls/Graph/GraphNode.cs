@@ -27,6 +27,7 @@ namespace StructuredXmlEditor.View
 
 		//--------------------------------------------------------------------------
 		public ObservableCollection<GraphNodeData> Datas { get; set; } = new ObservableCollection<GraphNodeData>();
+		private List<GraphNodeData> m_dataCache = new List<GraphNodeData>();
 
 		//--------------------------------------------------------------------------
 		public string Title { get { return GraphNodeItem.Name; } }
@@ -75,6 +76,15 @@ namespace StructuredXmlEditor.View
 				{
 					m_isSelected = value;
 					RaisePropertyChangedEvent();
+
+					if (value)
+					{
+						GraphNodeItem.Grid.Selected.Add(GraphNodeItem);
+					}
+					else
+					{
+						GraphNodeItem.Grid.Selected.Remove(GraphNodeItem);
+					}
 				}
 			}
 		}
@@ -95,6 +105,9 @@ namespace StructuredXmlEditor.View
 		}
 		private bool m_MouseOver;
 
+		//-----------------------------------------------------------------------
+		private Dictionary<DataItem, GraphNodeData> CachedNodeData = new Dictionary<DataItem, GraphNodeData>();
+
 		//--------------------------------------------------------------------------
 		public GraphNode(GraphNodeItem nodeItem)
 		{
@@ -105,12 +118,20 @@ namespace StructuredXmlEditor.View
 				if (args.PropertyName == "IsFilterMatched")
 				{
 					Opacity = nodeItem.IsFilterMatched ? 1.0 : 0.2;
+					IsEnabled = nodeItem.IsFilterMatched ? true : false;
 					RaisePropertyChangedEvent("Opacity");
 				}
 				else if (args.PropertyName == "X" || args.PropertyName == "Y")
 				{
 					RaisePropertyChangedEvent("X");
 					RaisePropertyChangedEvent("Y");
+				}
+				else if (args.PropertyName == "GraphData")
+				{
+					Datas.Clear();
+					UpdateGraphData();
+
+					RaisePropertyChangedEvent("Datas");
 				}
 			};
 
@@ -121,25 +142,43 @@ namespace StructuredXmlEditor.View
 
 			Datas.CollectionChanged += (e, args) => 
 			{
-				if (args.OldItems != null)
+				foreach (GraphNodeData item in m_dataCache)
 				{
-					foreach (GraphNodeData item in args.OldItems)
-					{
-						item.Node = null;
-						item.PropertyChanged -= func;
-					}
+					item.Node = null;
+					item.PropertyChanged -= func;
 				}
 
-				foreach (GraphNodeData item in args.NewItems)
+				foreach (GraphNodeData item in Datas)
 				{
 					item.Node = this;
 					item.PropertyChanged += func;
 				}
+
+				m_dataCache.Clear();
+				m_dataCache.AddRange(Datas);
 			};
 
-			foreach (var link in nodeItem.Links)
+			UpdateGraphData();
+		}
+
+		private void UpdateGraphData()
+		{
+			foreach (var data in m_nodeItem.GraphData)
 			{
-				Datas.Add(link.Link);
+				if (data is GraphReferenceItem)
+				{
+					var link = data as GraphReferenceItem;
+					Datas.Add(link.Link);
+				}
+				else
+				{
+					if (!CachedNodeData.ContainsKey(data))
+					{
+						CachedNodeData[data] = new GraphNodeDataPreview(data);
+					}
+
+					Datas.Add(CachedNodeData[data]);
+				}
 			}
 		}
 

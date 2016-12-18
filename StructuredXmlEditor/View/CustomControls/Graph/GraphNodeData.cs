@@ -28,7 +28,24 @@ namespace StructuredXmlEditor.View
 
 	public class GraphNodeDataPreview : GraphNodeData
 	{
-		public string Preview { get; set; }
+		public override string Title { get { return data.Name; } }
+
+		public string Preview { get { return data.Description; } }
+
+		private DataItem data;
+
+		public GraphNodeDataPreview(DataItem data)
+		{
+			this.data = data;
+
+			data.PropertyChanged += (e, args) =>
+			{
+				if (args.PropertyName == "Description")
+				{
+					RaisePropertyChangedEvent("Preview");
+				}
+			};
+		}
 	}
 
 	public class GraphNodeDataLink : GraphNodeData

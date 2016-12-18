@@ -11,7 +11,7 @@ namespace StructuredXmlEditor.Definition
 	public class GraphNodeDefinition : ComplexDataDefinition
 	{
 		public List<DataDefinition> Children { get; set; } = new List<DataDefinition>();
-		public string DescriptionChild { get; set; }
+		public string Description { get; set; }
 		public bool Nullable { get; set; }
 
 		public GraphNodeDefinition()
@@ -144,7 +144,7 @@ namespace StructuredXmlEditor.Definition
 		{
 			Nullable = TryParseBool(definition, "Nullable", true);
 
-			DescriptionChild = definition.Attribute("DescriptionChild")?.Value?.ToString();
+			Description = definition.Attribute("Description")?.Value?.ToString();
 
 			foreach (var child in definition.Elements())
 			{

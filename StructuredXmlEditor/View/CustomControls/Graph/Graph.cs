@@ -21,7 +21,7 @@ namespace StructuredXmlEditor.View
 		{
 			if (args.PropertyName == "X" || args.PropertyName == "Y" || args.PropertyName == "Child Link" || args.PropertyName == "Child Position" || args.PropertyName == "Opacity")
 			{
-				RaisePropertyChangedEvent("Controls");
+				Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action(() => { RaisePropertyChangedEvent("Controls"); }));
 			}
 			else if (args.PropertyName == "IsSelected")
 			{

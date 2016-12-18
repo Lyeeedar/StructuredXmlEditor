@@ -120,6 +120,17 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public override void DescendantPropertyChanged(object sender, DescendantPropertyChangedEventArgs args)
+		{
+			if (m_wrappedItem != null)
+			{
+				m_wrappedItem.DescendantPropertyChanged(sender, args);
+			}
+
+			base.DescendantPropertyChanged(sender, args);
+		}
+
+		//-----------------------------------------------------------------------
 		public override void ResetToDefault()
 		{
 			var refDef = Definition as GraphReferenceDefinition;
@@ -196,9 +207,13 @@ namespace StructuredXmlEditor.Data
 			nodes.Add(Definition.Name);
 
 			var current = Parent;
-			while (current != null && !(current is GraphNodeItem))
+			while (current != null && !(current is GraphNodeItem) && !(current is GraphReferenceItem))
 			{
-				nodes.Add(current.Definition.Name);
+				if (!(current is CollectionChildItem) && !(current is ReferenceItem))
+				{
+					nodes.Add(current.Definition.Name);
+				}
+
 				current = current.Parent;
 			}
 

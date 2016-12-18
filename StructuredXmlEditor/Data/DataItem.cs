@@ -362,7 +362,7 @@ namespace StructuredXmlEditor.Data
 					RaisePropertyChangedEvent("FocusName");
 				}
 
-				Parent?.DescendantPropertyChanged(e, a);
+				Parent?.DescendantPropertyChanged(e, new DescendantPropertyChangedEventArgs() { PropertyName = a.PropertyName } );
 			};
 		}
 
@@ -607,7 +607,7 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public virtual void DescendantPropertyChanged(object sender, PropertyChangedEventArgs args)
+		public virtual void DescendantPropertyChanged(object sender, DescendantPropertyChangedEventArgs args)
 		{
 			Parent?.DescendantPropertyChanged(sender, args);
 		}
@@ -624,24 +624,25 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public bool Filter(string filter, Regex regex, bool caseSensitive, bool showMatchesOnly)
+		public DataItem Filter(string filter, Regex regex, bool caseSensitive, bool showMatchesOnly)
 		{
 			RefreshChildren();
 
-			
-			bool foundInChild = false;
+			DataItem foundInChild = null;
 
 			if (Children.Count > 0)
 			{
 				foreach (var item in Children)
 				{
-					if (item.Filter(filter, regex, caseSensitive, showMatchesOnly))
+					var match = item.Filter(filter, regex, caseSensitive, showMatchesOnly);
+
+					if (match != null)
 					{
-						foundInChild = true;
+						foundInChild = match;
 					}
 				}
 
-				if (foundInChild && !showMatchesOnly)
+				if (foundInChild != null && !showMatchesOnly)
 				{
 					if ((this is StructItem && Parent is CollectionChildItem) || (this is CollectionChildItem && ((CollectionChildItem)this).WrappedItem is StructItem))
 					{
@@ -702,31 +703,50 @@ namespace StructuredXmlEditor.Data
 						if (matchFound) break;
 					}
 
-					m_isSearchFiltered = !(matchFound || foundInChild);
+					m_isSearchFiltered = !(matchFound || foundInChild != null);
 				}
 				else
 				{
 					m_isSearchFiltered = true;
-					foundInChild = false;
+					foundInChild = null;
 				}
 
 				IsFilterMatched = matchFound;
 			}
 
-			if (foundInChild)
+			if (foundInChild != null)
 			{
 				IsExpanded = true;
+			}
+
+			if (this is GraphNodeItem)
+			{
+				var gni = this as GraphNodeItem;
+
+				if (foundInChild != null && gni.Datas.Contains(foundInChild))
+				{
+					IsFilterMatched = true;
+				}
 			}
 
 			if (this is GraphReferenceItem)
 			{
 				var gri = this as GraphReferenceItem;
-				gri.WrappedItem.IsFilterMatched = IsFilterMatched;
+				if (gri.WrappedItem != null)
+				{
+					if (foundInChild != null && gri.WrappedItem.Datas.Contains(foundInChild))
+					{
+						IsFilterMatched = true;
+					}
+
+					gri.WrappedItem.IsFilterMatched = IsFilterMatched;
+				}
 			}
 
 			RaisePropertyChangedEvent("IsVisible");
 
-			return matchFound || foundInChild;
+			if (matchFound) return this;
+			else return foundInChild;
 		}
 
 		//-----------------------------------------------------------------------
