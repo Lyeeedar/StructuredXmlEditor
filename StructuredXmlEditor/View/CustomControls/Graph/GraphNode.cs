@@ -161,6 +161,7 @@ namespace StructuredXmlEditor.View
 			UpdateGraphData();
 		}
 
+		//--------------------------------------------------------------------------
 		private void UpdateGraphData()
 		{
 			foreach (var data in m_nodeItem.GraphData)
@@ -199,11 +200,20 @@ namespace StructuredXmlEditor.View
 		{
 			if (Graph.MouseOverItem is Connection) return;
 
-			IsSelected = true;
+			if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+			{
+				IsSelected = !IsSelected;
+			}
+			else
+			{
+				IsSelected = true;
+			}
 
 			m_inDrag = true;
 			m_mouseDragLast = e.GetPosition(Parent as IInputElement);
 			this.CaptureMouse();
+
+			e.Handled = true;
 
 			base.OnMouseDown(e);
 		}
@@ -239,10 +249,13 @@ namespace StructuredXmlEditor.View
 			if (m_inDrag)
 			{
 				var current = e.GetPosition(Parent as IInputElement);
-
 				var diff = current - m_mouseDragLast;
-				X += diff.X / Graph.Scale;
-				Y += diff.Y / Graph.Scale;
+
+				foreach (var node in Graph.Selected)
+				{
+					node.X += diff.X / Graph.Scale;
+					node.Y += diff.Y / Graph.Scale;
+				}
 
 				m_mouseDragLast = current;
 			}
@@ -255,6 +268,11 @@ namespace StructuredXmlEditor.View
 		{
 			m_inDrag = false;
 			this.ReleaseMouseCapture();
+
+			if (Graph.CreatingLink == null)
+			{
+				e.Handled = true;
+			}
 
 			base.OnMouseUp(e);
 		}

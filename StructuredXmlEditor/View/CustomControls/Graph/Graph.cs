@@ -26,7 +26,7 @@ namespace StructuredXmlEditor.View
 			}
 			else if (args.PropertyName == "IsSelected")
 			{
-				if ((e as GraphNode).IsSelected)
+				if ((e as GraphNode).IsSelected && !Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl) && !m_isMarqueeSelecting)
 				{
 					foreach (var node in AllNodes)
 					{
@@ -262,20 +262,71 @@ namespace StructuredXmlEditor.View
 		private object m_MouseOverItem;
 
 		//--------------------------------------------------------------------------
-		protected override void OnMouseUp(MouseButtonEventArgs e)
+		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+		{
+			if (!Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl))
+			{
+				m_mightBeMarqueeSelecting = true;
+				m_marqueeStart = e.GetPosition(this);
+				m_marquee = new Rect(m_marqueeStart, m_marqueeStart);
+
+				e.Handled = true;
+			}
+
+			base.OnMouseLeftButtonDown(e);
+		}
+
+		//--------------------------------------------------------------------------
+		protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
 		{
 			if (CreatingLink != null)
 			{
 				if (ConnectedLinkTo != null)
 				{
-					CreatingLink.GraphReferenceItem.WrappedItem = ConnectedLinkTo.GraphNodeItem;
+					CreatingLink.GraphReferenceItem.SetWrappedItem(ConnectedLinkTo.GraphNodeItem);
 				}
 
 				CreatingLink = null;
 				ConnectedLinkTo = null;
 			}
+			else if (!Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl) && !m_isMarqueeSelecting)
+			{
+				foreach (var node in AllNodes)
+				{
+					node.IsSelected = false;
+				}
+			}
 
-			base.OnMouseUp(e);
+			if (m_isMarqueeSelecting)
+			{
+				m_marquee.Offset(-Offset.X, -Offset.Y);
+
+				foreach (var node in AllNodes)
+				{
+					if (m_marquee.IntersectsWith(GetRectOfObject(node)))
+					{
+						node.IsSelected = true;
+					}
+				}
+
+				m_selectionBox.Visibility = Visibility.Collapsed;
+				m_isMarqueeSelecting = false;
+
+				e.Handled = true;
+			}
+			m_mightBeMarqueeSelecting = false;
+			ReleaseMouseCapture();
+
+			base.OnMouseLeftButtonUp(e);
+		}
+
+		//--------------------------------------------------------------------------
+		private Rect GetRectOfObject(GraphNode node)
+		{
+			Rect rectangleBounds = new Rect();
+			rectangleBounds = node.RenderTransform.TransformBounds(new Rect(node.RenderSize));
+			rectangleBounds.Offset(node.X, node.Y);
+			return rectangleBounds;
 		}
 
 		//--------------------------------------------------------------------------
@@ -319,6 +370,14 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
+		public void RemoveOrphanedNode(GraphNode node)
+		{
+			OrphanedNodes.Remove(node);
+			nodeCache.Remove(node);
+			node.GraphNodeItem.Grid.RaisePropertyChangedEvent("GraphNodes");
+		}
+
+		//--------------------------------------------------------------------------
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			m_mousePoint = e.GetPosition(this);
@@ -337,6 +396,26 @@ namespace StructuredXmlEditor.View
 
 				RaisePropertyChangedEvent("Controls");
 			}
+
+			if (m_mightBeMarqueeSelecting || m_isMarqueeSelecting)
+			{
+				m_marquee = new Rect(m_marqueeStart, m_mousePoint);
+
+				if (m_marquee.Width > 10 && m_marquee.Height > 10 && m_mightBeMarqueeSelecting && !m_isMarqueeSelecting)
+				{
+					m_isMarqueeSelecting = true;
+					CaptureMouse();
+				}
+
+				Canvas.SetLeft(m_selectionBox, m_marquee.X);
+				Canvas.SetTop(m_selectionBox, m_marquee.Y);
+				m_selectionBox.Width = m_marquee.Width;
+				m_selectionBox.Height = m_marquee.Height;
+
+				m_selectionBox.Visibility = Visibility.Visible;
+
+				e.Handled = true;
+			}
 			
 			base.OnMouseMove(e);
 		}
@@ -345,6 +424,7 @@ namespace StructuredXmlEditor.View
 		public override void OnApplyTemplate()
 		{
 			m_panCanvas = GetTemplateChild("PanCanvas") as ZoomPanItemsControl;
+			m_selectionBox = GetTemplateChild("SelectionBox") as Rectangle;
 
 			base.OnApplyTemplate();
 		}
@@ -380,8 +460,15 @@ namespace StructuredXmlEditor.View
 		private GraphNode m_graphNode;
 
 		//-----------------------------------------------------------------------
+		private bool m_mightBeMarqueeSelecting;
+		private bool m_isMarqueeSelecting;
+		private Point m_marqueeStart;
+		private Rect m_marquee;
+
+		//-----------------------------------------------------------------------
 		private Point m_mousePoint;
 		private ZoomPanItemsControl m_panCanvas;
+		private Rectangle m_selectionBox;
 
 		//-----------------------------------------------------------------------
 		public Point Offset

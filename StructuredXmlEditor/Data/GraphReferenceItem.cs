@@ -223,6 +223,22 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public void SetWrappedItem(GraphNodeItem item)
+		{
+			var oldItem = WrappedItem;
+
+			UndoRedo.ApplyDoUndo(delegate
+			{
+				WrappedItem = item;
+			},
+			delegate
+			{
+				WrappedItem = oldItem;
+			},
+			"Set Item " + item.Name);
+		}
+
+		//-----------------------------------------------------------------------
 		public void Create(string chosenName = null)
 		{
 			if (chosenName != null)
@@ -264,6 +280,7 @@ namespace StructuredXmlEditor.Data
 			delegate
 			{
 				WrappedItem = null;
+				item.GraphNode.Graph.RemoveOrphanedNode(item.GraphNode);
 			},
 			"Create Item " + item.Name);
 

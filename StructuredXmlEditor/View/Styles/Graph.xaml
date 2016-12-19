@@ -228,6 +228,16 @@
 						<local:ZoomPanItemsControl
 							x:Name="PanCanvas"
 							ItemsSource="{Binding Controls, RelativeSource={RelativeSource TemplatedParent}}" />
+
+						<Canvas>
+							<Rectangle
+								x:Name="SelectionBox"
+								Visibility="Collapsed"
+								Fill="DarkGray"
+								Opacity="0.2"
+								Stroke="Black"
+								StrokeThickness="1" />
+						</Canvas>
 					</Grid>
 				</ControlTemplate>
 

@@ -187,11 +187,11 @@ namespace StructuredXmlEditor.Data
 					{
 						DeleteEmptyDirs(BackupFolder);
 					}
+
+					Application.Current.Dispatcher.BeginInvoke(new Action(() => { Workspace.LoadBackups(); }));
 				}
 			}
 			catch (Exception) { }
-
-			Application.Current.Dispatcher.BeginInvoke(new Action(() => { Workspace.LoadBackups(); }));
 		}
 
 		//-----------------------------------------------------------------------
