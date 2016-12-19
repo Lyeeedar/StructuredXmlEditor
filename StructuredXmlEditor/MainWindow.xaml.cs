@@ -107,6 +107,13 @@ namespace StructuredXmlEditor
 			Workspace.Open(file);
 		}
 
+		private void BackupFilesClick(object sender, RoutedEventArgs e)
+		{
+			var file = (sender as FrameworkElement).DataContext as string;
+
+			Workspace.OpenBackup(file);
+		}
+
 		private void NewFileClick(object sender, RoutedEventArgs e)
 		{
 			var dataType = (sender as FrameworkElement).DataContext as string;

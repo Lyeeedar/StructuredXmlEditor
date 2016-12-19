@@ -190,6 +190,8 @@ namespace StructuredXmlEditor.Data
 				}
 			}
 			catch (Exception) { }
+
+			Application.Current.Dispatcher.BeginInvoke(new Action(() => { Workspace.LoadBackups(); }));
 		}
 
 		//-----------------------------------------------------------------------

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StructuredXmlEditor.Data;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -27,7 +28,7 @@ namespace StructuredXmlEditor.View
 			{
 				if ((e as GraphNode).IsSelected)
 				{
-					foreach (var node in Nodes)
+					foreach (var node in AllNodes)
 					{
 						if (node != e)
 						{
@@ -50,6 +51,18 @@ namespace StructuredXmlEditor.View
 		}
 
 		//-----------------------------------------------------------------------
+		public IEnumerable<GraphNode> Selected
+		{
+			get
+			{
+				foreach (var node in AllNodes)
+				{
+					if (node.IsSelected) yield return node;
+				}
+			}
+		}
+
+		//-----------------------------------------------------------------------
 		public bool CanHaveCircularReferences
 		{
 			get; set;
@@ -65,10 +78,20 @@ namespace StructuredXmlEditor.View
 					yield return path;
 				}
 
-				foreach (var node in Nodes)
+				foreach (var node in AllNodes)
 				{
 					yield return node;
 				}
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public IEnumerable<GraphNode> AllNodes
+		{
+			get
+			{
+				foreach (var node in Nodes) yield return node;
+				foreach (var node in OrphanedNodes) yield return node;
 			}
 		}
 
@@ -78,6 +101,8 @@ namespace StructuredXmlEditor.View
 			get { return (IEnumerable<GraphNode>)GetValue(NodesProperty); }
 			set { SetValue(NodesProperty, value); }
 		}
+		private HashSet<GraphNode> OrphanedNodes = new HashSet<GraphNode>();
+		private List<GraphNode> nodeCache = new List<GraphNode>();
 
 		//-----------------------------------------------------------------------
 		public static readonly DependencyProperty NodesProperty =
@@ -85,12 +110,29 @@ namespace StructuredXmlEditor.View
 			{
 				var g = (Graph)s;
 
-				if (a.OldValue != null) foreach (GraphNode item in (IEnumerable<GraphNode>)a.OldValue)
+				foreach (GraphNode item in g.nodeCache)
+				{
+					item.PropertyChanged -= g.ChildPropertyChangedHandler;
+				}
+				foreach (GraphNode item in g.OrphanedNodes)
 				{
 					item.PropertyChanged -= g.ChildPropertyChangedHandler;
 				}
 
-				foreach (GraphNode item in (IEnumerable<GraphNode>)a.NewValue)
+				foreach (var node in g.nodeCache)
+				{
+					g.OrphanedNodes.Add(node);
+				}
+
+				g.nodeCache.Clear();
+				g.nodeCache.AddRange(g.Nodes);
+
+				foreach (var node in g.Nodes)
+				{
+					g.OrphanedNodes.Remove(node);
+				}
+
+				foreach (GraphNode item in g.AllNodes)
 				{
 					item.Graph = g;
 					item.PropertyChanged += g.ChildPropertyChangedHandler;
@@ -104,7 +146,7 @@ namespace StructuredXmlEditor.View
 		{
 			get
 			{
-				foreach (var node in Nodes)
+				foreach (var node in AllNodes)
 				{
 					foreach (var data in node.Datas)
 					{
@@ -235,7 +277,47 @@ namespace StructuredXmlEditor.View
 
 			base.OnMouseUp(e);
 		}
-		
+
+		//--------------------------------------------------------------------------
+		protected override void OnKeyUp(KeyEventArgs e)
+		{
+			base.OnKeyUp(e);
+
+			if (e.Key == Key.Delete)
+			{
+				foreach (var node in Selected.ToList())
+				{
+					var gri = node.GraphNodeItem.Parent as GraphReferenceItem;
+
+					if (gri.Parent is CollectionChildItem)
+					{
+						(gri.Parent.Parent as CollectionItem).Remove(gri.Parent as CollectionChildItem);
+					}
+					else
+					{
+						gri.Clear();
+					}
+
+					bool wasOrphaned = OrphanedNodes.Contains(node);
+
+					gri.UndoRedo.ApplyDoUndo(
+						delegate
+						{
+							if (wasOrphaned) OrphanedNodes.Remove(node);
+							nodeCache.Remove(node);
+							gri.Grid.RaisePropertyChangedEvent("GraphNodes");
+						},
+						delegate
+						{
+							if (wasOrphaned) OrphanedNodes.Add(node);
+							nodeCache.Add(node);
+							gri.Grid.RaisePropertyChangedEvent("GraphNodes");
+						},
+						"Delete " + gri.Name);
+				}
+			}
+		}
+
 		//--------------------------------------------------------------------------
 		protected override void OnMouseMove(MouseEventArgs e)
 		{

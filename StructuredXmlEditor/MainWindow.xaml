@@ -75,6 +75,19 @@
 						</MenuItem.ItemTemplate>
 					</MenuItem>
 
+					<MenuItem
+						Header="Open Reco_vered"
+						Visibility="{Binding BackupDocuments.Count, Converter={v:NullOrZeroConverter}, ConverterParameter=Not}"
+						ItemsSource="{Binding BackupDocuments}">
+						<MenuItem.ItemTemplate>
+							<DataTemplate>
+								<MenuItem
+									Header="{Binding}"
+									Click="BackupFilesClick" />
+							</DataTemplate>
+						</MenuItem.ItemTemplate>
+					</MenuItem>
+
 					<Separator />
 
 					<MenuItem

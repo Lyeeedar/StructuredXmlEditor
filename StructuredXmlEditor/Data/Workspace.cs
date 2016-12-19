@@ -161,8 +161,7 @@ namespace StructuredXmlEditor.Data
 			}
 
 			LoadDefinitions();
-
-			Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, new Action(() => { LoadBackups(); }));
+			LoadBackups();
 
 			Tools.Add(new UndoHistoryTool(this));
 			Tools.Add(new StartPage(this));
@@ -394,11 +393,20 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void LoadBackups()
 		{
+			BackupDocuments.Clear();
+
 			if (Directory.Exists(Document.BackupFolder))
 			{
 				foreach (var file in Directory.EnumerateFiles(Document.BackupFolder, "*.*", SearchOption.AllDirectories))
 				{
-					BackupDocuments.Add(file);
+					try
+					{
+						// attempt to load to check its vaguely valid
+						var doc = OpenImpl(file);
+
+						BackupDocuments.Add(file);
+					}
+					catch (Exception) { }
 				}
 			}
 		}
@@ -437,53 +445,7 @@ namespace StructuredXmlEditor.Data
 					}
 				}
 
-				XDocument doc = null;
-
-				if (path.EndsWith(".json"))
-				{
-					string json = File.ReadAllText(path);
-
-					var temp = JsonConvert.DeserializeXNode(json, "Root");
-					if (temp.Elements().First().Elements().Count() > 1)
-					{
-						temp.Elements().First().Name = temp.Elements().First().Elements().First().Name;
-						doc = temp;
-					}
-					else
-					{
-						doc = new XDocument(temp.Elements().First());
-					}
-				}
-				else
-				{
-					doc = XDocument.Load(path);
-				}
-
-				var rootname = doc.Elements().First().Name.ToString().ToLower();
-
-				DataDefinition data = null;
-
-				if (path.EndsWith(".xmldef"))
-				{
-					data = RootDefinition;
-				}
-				else
-				{
-					if (!SupportedResourceTypes.ContainsKey(rootname))
-					{
-						Message.Show("No definition found for xml '" + rootname + "'! Cannot open document.", "Load Failed!");
-						return null;
-					}
-					data = SupportedResourceTypes[rootname];
-				}
-
-				var document = new Document(path, this);
-
-				using (document.UndoRedo.DisableUndoScope())
-				{
-					var item = data.LoadData(doc.Elements().First(), document.UndoRedo);
-					document.SetData(item);
-				}
+				var document = OpenImpl(path);
 
 				Documents.Add(document);
 
@@ -510,6 +472,60 @@ namespace StructuredXmlEditor.Data
 			}
 
 			return null;
+		}
+
+		//-----------------------------------------------------------------------
+		public Document OpenImpl(string path)
+		{
+			XDocument doc = null;
+
+			if (path.EndsWith(".json"))
+			{
+				string json = File.ReadAllText(path);
+
+				var temp = JsonConvert.DeserializeXNode(json, "Root");
+				if (temp.Elements().First().Elements().Count() > 1)
+				{
+					temp.Elements().First().Name = temp.Elements().First().Elements().First().Name;
+					doc = temp;
+				}
+				else
+				{
+					doc = new XDocument(temp.Elements().First());
+				}
+			}
+			else
+			{
+				doc = XDocument.Load(path);
+			}
+
+			var rootname = doc.Elements().First().Name.ToString().ToLower();
+
+			DataDefinition data = null;
+
+			if (path.EndsWith(".xmldef"))
+			{
+				data = RootDefinition;
+			}
+			else
+			{
+				if (!SupportedResourceTypes.ContainsKey(rootname))
+				{
+					Message.Show("No definition found for xml '" + rootname + "'! Cannot open document.", "Load Failed!");
+					return null;
+				}
+				data = SupportedResourceTypes[rootname];
+			}
+
+			var document = new Document(path, this);
+
+			using (document.UndoRedo.DisableUndoScope())
+			{
+				var item = data.LoadData(doc.Elements().First(), document.UndoRedo);
+				document.SetData(item);
+			}
+
+			return document;
 		}
 
 		//-----------------------------------------------------------------------
