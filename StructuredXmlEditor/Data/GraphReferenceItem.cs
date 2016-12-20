@@ -29,8 +29,8 @@ namespace StructuredXmlEditor.Data
 			{
 				if (m_wrappedItem != null)
 				{
+					m_wrappedItem.LinkParents.Remove(this);
 					m_wrappedItem.PropertyChanged -= WrappedItemPropertyChanged;
-					Children.Clear();
 				}
 
 				m_wrappedItem = value;
@@ -38,10 +38,14 @@ namespace StructuredXmlEditor.Data
 
 				if (m_wrappedItem != null)
 				{
-					m_wrappedItem.Parent = this;
+					m_wrappedItem.Grid = Grid;
+					foreach (var i in m_wrappedItem.Descendants)
+					{
+						i.Grid = Grid;
+					}
+
+					m_wrappedItem.LinkParents.Add(this);
 					m_wrappedItem.PropertyChanged += WrappedItemPropertyChanged;
-					foreach (var child in m_wrappedItem.Children) Children.Add(child);
-					m_wrappedItem.Children = Children;
 				}
 
 				if (WrappedItem != null)
@@ -60,7 +64,6 @@ namespace StructuredXmlEditor.Data
 				RaisePropertyChangedEvent();
 				RaisePropertyChangedEvent("Description");
 				RaisePropertyChangedEvent("HasContent");
-				RaisePropertyChangedEvent("IsCollectionChild");
 			}
 		}
 		private GraphNodeItem m_wrappedItem;
@@ -78,7 +81,7 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public override bool IsCollectionChild { get { return HasContent && ((Definition as GraphReferenceDefinition).IsNullable || (Definition as GraphReferenceDefinition).Definitions.Count > 1); } }
+		public override bool IsCollectionChild { get { return HasContent && (Definition as GraphReferenceDefinition).Definitions.Count > 1; } }
 
 		//-----------------------------------------------------------------------
 		public override bool CanRemove
@@ -117,24 +120,33 @@ namespace StructuredXmlEditor.Data
 		public GraphReferenceItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
 			SelectedDefinition = (definition as GraphReferenceDefinition).Definitions.Values.First();
-		}
 
-		//-----------------------------------------------------------------------
-		public override void DescendantPropertyChanged(object sender, DescendantPropertyChangedEventArgs args)
-		{
-			if (m_wrappedItem != null)
+			PropertyChanged += (e, args) => 
 			{
-				m_wrappedItem.DescendantPropertyChanged(sender, args);
-			}
+				if (args.PropertyName == "Grid")
+				{
+					if (m_wrappedItem != null)
+					{
+						m_wrappedItem.Grid = Grid;
+						foreach (var i in m_wrappedItem.Descendants)
+						{
+							i.Grid = Grid;
+						}
+					}
 
-			base.DescendantPropertyChanged(sender, args);
+					if (m_wrappedItem != null && Grid != null && !Grid.GraphNodeItems.Contains(m_wrappedItem))
+					{
+						Grid.GraphNodeItems.Add(m_wrappedItem);
+					}
+				}
+			};
 		}
 
 		//-----------------------------------------------------------------------
 		public override void ResetToDefault()
 		{
 			var refDef = Definition as GraphReferenceDefinition;
-			if (refDef.IsNullable || refDef.Keys.Count > 0)
+			if (refDef.Keys.Count > 0)
 			{
 				Clear();
 			}
@@ -276,11 +288,12 @@ namespace StructuredXmlEditor.Data
 			UndoRedo.ApplyDoUndo(delegate
 			{
 				WrappedItem = item;
+				Grid.GraphNodeItems.Add(item);
 			},
 			delegate
 			{
 				WrappedItem = null;
-				item.GraphNode.Graph.RemoveOrphanedNode(item.GraphNode);
+				Grid.GraphNodeItems.Remove(item);
 			},
 			"Create Item " + item.Name);
 

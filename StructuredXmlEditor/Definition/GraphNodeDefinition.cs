@@ -12,7 +12,6 @@ namespace StructuredXmlEditor.Definition
 	{
 		public List<DataDefinition> Children { get; set; } = new List<DataDefinition>();
 		public string Description { get; set; }
-		public bool Nullable { get; set; }
 
 		public GraphNodeDefinition()
 		{
@@ -29,10 +28,7 @@ namespace StructuredXmlEditor.Definition
 				item.Attributes.Add(attItem);
 			}
 
-			if (!Nullable)
-			{
-				CreateChildren(item, undoRedo);
-			}
+			CreateChildren(item, undoRedo);
 
 			foreach (var child in item.Attributes)
 			{
@@ -64,8 +60,6 @@ namespace StructuredXmlEditor.Definition
 			item.X = TryParseFloat(element, "X");
 			item.Y = TryParseFloat(element, "Y");
 
-			bool hadData = false;
-
 			var createdChildren = new List<DataItem>();
 
 			foreach (var def in Children)
@@ -94,8 +88,6 @@ namespace StructuredXmlEditor.Definition
 						DataItem childItem = def.LoadData(els.First(), undoRedo);
 						item.Children.Add(childItem);
 					}
-
-					hadData = true;
 				}
 				else
 				{
@@ -120,12 +112,6 @@ namespace StructuredXmlEditor.Definition
 				item.Attributes.Add(attItem);
 			}
 
-			// if empty and nullable, then clear all the auto created stuff
-			if (!hadData && Nullable)
-			{
-				item.Children.Clear();
-			}
-
 			item.Children.OrderBy(e => Children.IndexOf(e.Definition));
 
 			foreach (var child in item.Attributes)
@@ -142,8 +128,6 @@ namespace StructuredXmlEditor.Definition
 
 		public override void Parse(XElement definition)
 		{
-			Nullable = TryParseBool(definition, "Nullable", true);
-
 			Description = definition.Attribute("Description")?.Value?.ToString();
 
 			foreach (var child in definition.Elements())

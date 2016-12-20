@@ -28,7 +28,7 @@ namespace StructuredXmlEditor.View
 			{
 				if ((e as GraphNode).IsSelected && !Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl) && !m_isMarqueeSelecting)
 				{
-					foreach (var node in AllNodes)
+					foreach (var node in Nodes)
 					{
 						if (node != e)
 						{
@@ -55,7 +55,7 @@ namespace StructuredXmlEditor.View
 		{
 			get
 			{
-				foreach (var node in AllNodes)
+				foreach (var node in Nodes)
 				{
 					if (node.IsSelected) yield return node;
 				}
@@ -78,20 +78,10 @@ namespace StructuredXmlEditor.View
 					yield return path;
 				}
 
-				foreach (var node in AllNodes)
+				foreach (var node in Nodes)
 				{
 					yield return node;
 				}
-			}
-		}
-
-		//-----------------------------------------------------------------------
-		public IEnumerable<GraphNode> AllNodes
-		{
-			get
-			{
-				foreach (var node in Nodes) yield return node;
-				foreach (var node in OrphanedNodes) yield return node;
 			}
 		}
 
@@ -101,7 +91,6 @@ namespace StructuredXmlEditor.View
 			get { return (IEnumerable<GraphNode>)GetValue(NodesProperty); }
 			set { SetValue(NodesProperty, value); }
 		}
-		private HashSet<GraphNode> OrphanedNodes = new HashSet<GraphNode>();
 		private List<GraphNode> nodeCache = new List<GraphNode>();
 
 		//-----------------------------------------------------------------------
@@ -114,25 +103,11 @@ namespace StructuredXmlEditor.View
 				{
 					item.PropertyChanged -= g.ChildPropertyChangedHandler;
 				}
-				foreach (GraphNode item in g.OrphanedNodes)
-				{
-					item.PropertyChanged -= g.ChildPropertyChangedHandler;
-				}
-
-				foreach (var node in g.nodeCache)
-				{
-					g.OrphanedNodes.Add(node);
-				}
 
 				g.nodeCache.Clear();
 				g.nodeCache.AddRange(g.Nodes);
 
-				foreach (var node in g.Nodes)
-				{
-					g.OrphanedNodes.Remove(node);
-				}
-
-				foreach (GraphNode item in g.AllNodes)
+				foreach (GraphNode item in g.Nodes)
 				{
 					item.Graph = g;
 					item.PropertyChanged += g.ChildPropertyChangedHandler;
@@ -146,7 +121,7 @@ namespace StructuredXmlEditor.View
 		{
 			get
 			{
-				foreach (var node in AllNodes)
+				foreach (var node in Nodes)
 				{
 					foreach (var data in node.Datas)
 					{
@@ -293,7 +268,7 @@ namespace StructuredXmlEditor.View
 			}
 			else if (!Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl) && !m_isMarqueeSelecting)
 			{
-				foreach (var node in AllNodes)
+				foreach (var node in Nodes)
 				{
 					node.IsSelected = false;
 				}
@@ -301,7 +276,7 @@ namespace StructuredXmlEditor.View
 
 			if (m_isMarqueeSelecting)
 			{
-				foreach (var node in AllNodes)
+				foreach (var node in Nodes)
 				{
 					if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
 					{
@@ -356,43 +331,23 @@ namespace StructuredXmlEditor.View
 			{
 				foreach (var node in Selected.ToList())
 				{
-					var gri = node.GraphNodeItem.Parent as GraphReferenceItem;
-
-					if (gri.Parent is CollectionChildItem)
+					foreach (var parent in node.GraphNodeItem.LinkParents.ToList())
 					{
-						(gri.Parent.Parent as CollectionItem).Remove(gri.Parent as CollectionChildItem);
-					}
-					else
-					{
-						gri.Clear();
+						parent.Clear();
 					}
 
-					bool wasOrphaned = OrphanedNodes.Contains(node);
-
-					gri.UndoRedo.ApplyDoUndo(
+					node.GraphNodeItem.UndoRedo.ApplyDoUndo(
 						delegate
 						{
-							if (wasOrphaned) OrphanedNodes.Remove(node);
-							nodeCache.Remove(node);
-							gri.Grid.RaisePropertyChangedEvent("GraphNodes");
+							node.GraphNodeItem.Grid.GraphNodeItems.Remove(node.GraphNodeItem);
 						},
 						delegate
 						{
-							if (wasOrphaned) OrphanedNodes.Add(node);
-							nodeCache.Add(node);
-							gri.Grid.RaisePropertyChangedEvent("GraphNodes");
+							node.GraphNodeItem.Grid.GraphNodeItems.Add(node.GraphNodeItem);
 						},
-						"Delete " + gri.Name);
+						"Delete " + node.GraphNodeItem.Name);
 				}
 			}
-		}
-
-		//--------------------------------------------------------------------------
-		public void RemoveOrphanedNode(GraphNode node)
-		{
-			OrphanedNodes.Remove(node);
-			nodeCache.Remove(node);
-			node.GraphNodeItem.Grid.RaisePropertyChangedEvent("GraphNodes");
 		}
 
 		//--------------------------------------------------------------------------

@@ -68,6 +68,7 @@ namespace StructuredXmlEditor.Data
 				}
 			}
 		}
+		private List<DataItem> m_childrenCache = new List<DataItem>();
 
 		//-----------------------------------------------------------------------
 		public IEnumerable<DataItem> Descendants
@@ -301,7 +302,11 @@ namespace StructuredXmlEditor.Data
 
 				return m_grid;
 			}
-			set { m_grid = value; }
+			set
+			{
+				m_grid = value;
+				RaisePropertyChangedEvent();
+			}
 		}
 		private XmlDataGrid m_grid;
 
@@ -550,60 +555,26 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		void OnChildrenCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
-			switch (e.Action)
+			foreach (var child in m_childrenCache)
 			{
-				case NotifyCollectionChangedAction.Add:
-					{
-						foreach (var i in e.NewItems.OfType<DataItem>())
-						{
-							i.Parent = this;
-							i.Grid = Grid;
-							i.PropertyChanged += ChildPropertyChanged;
-						}
+				child.Parent = null;
+				child.PropertyChanged -= ChildPropertyChanged;
+			}
 
-						break;
-					}
-				case NotifyCollectionChangedAction.Replace:
-					{
-						foreach (var i in e.NewItems.OfType<DataItem>())
-						{
-							i.Parent = this;
-							i.Grid = Grid;
-							i.PropertyChanged += ChildPropertyChanged;
-						}
-
-						foreach (var i in e.OldItems.OfType<DataItem>())
-						{
-							i.PropertyChanged -= ChildPropertyChanged;
-						}
-
-						break;
-					}
-				case NotifyCollectionChangedAction.Move:
-					{
-						break;
-					}
-				case NotifyCollectionChangedAction.Remove:
-					{
-						foreach (var i in e.OldItems.OfType<DataItem>())
-						{
-							i.PropertyChanged -= ChildPropertyChanged;
-						}
-
-						break;
-					}
-				case NotifyCollectionChangedAction.Reset:
-					{
-						break;
-					}
-				default:
-					break;
+			foreach (var child in Children)
+			{
+				child.Parent = this;
+				child.Grid = Grid;
+				child.PropertyChanged += ChildPropertyChanged;
 			}
 
 			for (int i = 0; i < Children.Count; ++i)
 			{
 				Children[i].Index = i;
 			}
+
+			m_childrenCache.Clear();
+			m_childrenCache.AddRange(Children);
 		}
 
 		//-----------------------------------------------------------------------

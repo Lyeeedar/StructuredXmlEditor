@@ -84,6 +84,9 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public List<GraphReferenceItem> LinkParents { get; } = new List<GraphReferenceItem>();
+
+		//-----------------------------------------------------------------------
 		public GraphNode GraphNode
 		{
 			get
@@ -99,7 +102,7 @@ namespace StructuredXmlEditor.Data
 		private GraphNode m_graphNode;
 
 		//-----------------------------------------------------------------------
-		public bool ShowClearButton { get { return HasContent && (Definition as GraphNodeDefinition).Nullable && !(Parent is CollectionChildItem || Parent is ReferenceItem); } }
+		public bool ShowClearButton { get { return false; } }
 
 		//-----------------------------------------------------------------------
 		public Command<object> ClearCMD { get { return new Command<object>((e) => Clear()); } }

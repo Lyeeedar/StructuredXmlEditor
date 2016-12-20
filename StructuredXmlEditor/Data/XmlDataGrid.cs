@@ -20,6 +20,7 @@ namespace StructuredXmlEditor.Data
 		public XmlDataGrid()
 		{
 			m_proxyRootItem = new DummyItem("   ⌂ ", this);
+			GraphNodeItems = new ObservableCollection<GraphNodeItem>();
 		}
 
 		//-----------------------------------------------------------------------
@@ -54,6 +55,18 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public ObservableCollection<GraphNodeItem> GraphNodeItems
+		{
+			get { return m_graphNodeItems; }
+			private set
+			{
+				m_graphNodeItems = value;
+				value.CollectionChanged += (e, args) => { RaisePropertyChangedEvent("GraphNodes"); };
+			}
+		}
+		private ObservableCollection<GraphNodeItem> m_graphNodeItems;
+
+		//-----------------------------------------------------------------------
 		public ObservableCollection<DataItem> RootItems
 		{
 			get { return m_rootItems; }
@@ -86,22 +99,17 @@ namespace StructuredXmlEditor.Data
 		{
 			get
 			{
-				foreach (var item in Descendants)
+				foreach (var item in GraphNodeItems)
 				{
-					if (item is GraphNodeItem)
+					if (item.Grid != this)
 					{
-						var gni = item as GraphNodeItem;
-						yield return gni.GraphNode;
-					}
-					else if (item is GraphReferenceItem)
-					{
-						var gri = item as GraphReferenceItem;
-
-						if (gri.WrappedItem != null)
+						foreach (var i in item.Descendants)
 						{
-							yield return gri.WrappedItem.GraphNode;
+							i.Grid = this;
 						}
 					}
+
+					yield return item.GraphNode;
 				}
 			}
 		}
@@ -323,10 +331,16 @@ namespace StructuredXmlEditor.Data
 			RootItems.Clear();
 			RootItems.Add(item);
 			m_storedRootItems.Add(item);
+			GraphNodeItems.Clear();
 
 			foreach (var i in Descendants)
 			{
 				i.Grid = this;
+
+				if (item is GraphNodeItem && !GraphNodeItems.Contains(item))
+				{
+					GraphNodeItems.Add(item as GraphNodeItem);
+				}
 			}
 
 			if (RootItems.Any(e => !(e is GraphNodeItem)))

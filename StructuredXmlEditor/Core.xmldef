@@ -212,7 +212,6 @@
 		<Attributes>
 			<String Name="Name" Default="Reference" ToolTip="The name to be written for this element." />
 			<String Name="Keys" ToolTip="The names of the graph nodes that this reference can contain." />
-			<Boolean Name="Nullable" Default="true" ToolTip="Whether this element can be empty." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />

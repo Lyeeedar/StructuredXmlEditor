@@ -13,16 +13,10 @@ namespace StructuredXmlEditor.Definition
 	{
 		public List<string> Keys { get; set; } = new List<string>();
 		public Dictionary<string, GraphNodeDefinition> Definitions { get; set; } = new Dictionary<string, GraphNodeDefinition>();
-		public bool IsNullable { get; set; }
 
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
 			var item = new GraphReferenceItem(this, undoRedo);
-			if (Definitions.Count == 1 && !IsNullable)
-			{
-				item.ChosenDefinition = Definitions.Values.First();
-				item.Create();
-			}
 			return item;
 		}
 
@@ -72,8 +66,6 @@ namespace StructuredXmlEditor.Definition
 			{
 				Keys.AddRange(keyString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
 			}
-
-			IsNullable = TryParseBool(definition, "Nullable", true);
 		}
 
 		public override void RecursivelyResolve(Dictionary<string, DataDefinition> defs)
