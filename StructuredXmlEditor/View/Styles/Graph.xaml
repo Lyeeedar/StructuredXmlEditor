@@ -168,17 +168,35 @@
 									Height="*" />
 							</Grid.RowDefinitions>
 
-							<TextBlock
-								FontSize="12"
-								Margin="5"
-								Text="{Binding Title}" />
+							<DockPanel>
+
+								<Button
+									DockPanel.Dock="Right"
+									Margin="5"
+									Opacity="0.5"
+									Background="Transparent"
+									BorderBrush="Transparent"
+									ToolTip="Edit"
+									Command="{Binding EditCMD}">
+									<Image
+										Source="/Resources/Edit.png"
+										RenderOptions.BitmapScalingMode="NearestNeighbor"
+										Height="10"
+										Width="10" />
+								</Button>
+
+								<TextBlock
+									FontSize="12"
+									Margin="5"
+									Text="{Binding Title}" />
+
+							</DockPanel>
 
 							<Border
 								Grid.Row="1"
 								Height="1"
 								Margin="2"
 								Background="{StaticResource BorderLightBrush}" />
-
 
 							<ItemsControl
 								Grid.Row="2"

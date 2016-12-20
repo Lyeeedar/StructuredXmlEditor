@@ -273,6 +273,8 @@ namespace StructuredXmlEditor.View
 				e.Handled = true;
 			}
 
+			PopupCloser.CloseAllPopups();
+
 			base.OnMouseLeftButtonDown(e);
 		}
 
@@ -299,13 +301,25 @@ namespace StructuredXmlEditor.View
 
 			if (m_isMarqueeSelecting)
 			{
-				m_marquee.Offset(-Offset.X, -Offset.Y);
-
 				foreach (var node in AllNodes)
 				{
-					if (m_marquee.IntersectsWith(GetRectOfObject(node)))
+					if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
 					{
-						node.IsSelected = true;
+						if (m_marquee.IntersectsWith(GetRectOfObject(node)))
+						{
+							node.IsSelected = !node.IsSelected;
+						}
+					}
+					else
+					{
+						if (m_marquee.IntersectsWith(GetRectOfObject(node)))
+						{
+							node.IsSelected = true;
+						}
+						else
+						{
+							node.IsSelected = false;
+						}
 					}
 				}
 
@@ -324,8 +338,12 @@ namespace StructuredXmlEditor.View
 		private Rect GetRectOfObject(GraphNode node)
 		{
 			Rect rectangleBounds = new Rect();
-			rectangleBounds = node.RenderTransform.TransformBounds(new Rect(node.RenderSize));
-			rectangleBounds.Offset(node.X, node.Y);
+
+			rectangleBounds.X = (node.X + Offset.X) * Scale;
+			rectangleBounds.Y = (node.Y + Offset.Y) * Scale;
+			rectangleBounds.Width = node.ActualWidth * Scale;
+			rectangleBounds.Height = node.ActualHeight * Scale;
+
 			return rectangleBounds;
 		}
 
@@ -397,7 +415,7 @@ namespace StructuredXmlEditor.View
 				RaisePropertyChangedEvent("Controls");
 			}
 
-			if (m_mightBeMarqueeSelecting || m_isMarqueeSelecting)
+			if ((m_mightBeMarqueeSelecting || m_isMarqueeSelecting) && CreatingLink == null)
 			{
 				m_marquee = new Rect(m_marqueeStart, m_mousePoint);
 

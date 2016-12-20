@@ -9,7 +9,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace StructuredXmlEditor.View
 {
@@ -20,6 +22,9 @@ namespace StructuredXmlEditor.View
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(GraphNode), new FrameworkPropertyMetadata(typeof(GraphNode)));
 		}
+
+		//--------------------------------------------------------------------------
+		public Command<object> EditCMD { get { return new Command<object>((e) => { Edit(); }); } }
 
 		//--------------------------------------------------------------------------
 		public GraphNodeItem GraphNodeItem { get { return m_nodeItem; } }
@@ -159,6 +164,40 @@ namespace StructuredXmlEditor.View
 			};
 
 			UpdateGraphData();
+		}
+
+		//-----------------------------------------------------------------------
+		protected Brush PopupBackgroundBrush { get { return (Application.Current.TryFindResource("WindowBackgroundBrush") as SolidColorBrush); } }
+
+		//-----------------------------------------------------------------------
+		protected Brush PopupBorderBrush { get { return (Application.Current.TryFindResource("SelectionBorderBrush") as SolidColorBrush); } }
+
+		//--------------------------------------------------------------------------
+		private void Edit()
+		{
+			Popup popup = new Popup();
+			popup.DataContext = GraphNodeItem;
+			popup.StaysOpen = true;
+			popup.Focusable = false;
+			popup.PopupAnimation = PopupAnimation.Slide;
+
+			popup.PlacementTarget = this;
+			popup.Placement = PlacementMode.Mouse;
+
+			Border contentBorder = new Border();
+			contentBorder.BorderThickness = new Thickness(1);
+			contentBorder.BorderBrush = PopupBorderBrush;
+			contentBorder.Background = PopupBackgroundBrush;
+			popup.Child = contentBorder;
+
+			ItemsControl content = new ItemsControl();
+			content.ItemsSource = GraphNodeItem.Children;
+			content.Margin = new Thickness(1);
+			content.Style = Application.Current.FindResource("FlatDataGrid") as Style;
+			contentBorder.Child = content;
+			Grid.SetIsSharedSizeScope(content, true);
+
+			popup.IsOpen = true;
 		}
 
 		//--------------------------------------------------------------------------
