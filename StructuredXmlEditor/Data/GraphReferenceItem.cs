@@ -7,9 +7,16 @@ using StructuredXmlEditor.Definition;
 using StructuredXmlEditor.View;
 using System.Windows.Controls;
 using System.ComponentModel;
+using System.Collections.Specialized;
 
 namespace StructuredXmlEditor.Data
 {
+	public enum LinkType
+	{
+		Duplicate,
+		Reference
+	}
+
 	public class GraphReferenceItem : DataItem
 	{
 		//-----------------------------------------------------------------------
@@ -69,6 +76,35 @@ namespace StructuredXmlEditor.Data
 		private GraphNodeItem m_wrappedItem;
 
 		//-----------------------------------------------------------------------
+		public LinkType LinkType
+		{
+			get { return m_LinkType; }
+			set
+			{
+				if (value == LinkType.Reference)
+				{
+					bool duplicateExists = false;
+					foreach (var parent in WrappedItem.LinkParents)
+					{
+						if (parent == this) continue;
+
+						if (parent.LinkType == LinkType.Duplicate)
+						{
+							duplicateExists = true;
+							break;
+						}
+					}
+
+					if (!duplicateExists) return;
+				}
+
+				m_LinkType = value;
+				RaisePropertyChangedEvent();
+			}
+		}
+		public LinkType m_LinkType = LinkType.Duplicate;
+
+		//-----------------------------------------------------------------------
 		public bool HasContent { get { return ChosenDefinition != null; } }
 
 		//-----------------------------------------------------------------------
@@ -117,6 +153,9 @@ namespace StructuredXmlEditor.Data
 		private GraphNodeDataLink m_link;
 
 		//-----------------------------------------------------------------------
+		public string GuidToResolve { get; set; }
+
+		//-----------------------------------------------------------------------
 		public GraphReferenceItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
 			SelectedDefinition = (definition as GraphReferenceDefinition).Definitions.Values.First();
@@ -125,7 +164,33 @@ namespace StructuredXmlEditor.Data
 			{
 				if (args.PropertyName == "Grid")
 				{
-					if (m_wrappedItem != null && Grid != null && !Grid.GraphNodeItems.Contains(m_wrappedItem))
+					if (Grid != null && GuidToResolve != null)
+					{
+						var existing = Grid.GraphNodeItems.FirstOrDefault(e => e.GUID == GuidToResolve);
+						if (existing != null)
+						{
+							WrappedItem = existing;
+							GuidToResolve = null;
+						}
+						else
+						{
+							NotifyCollectionChangedEventHandler handler = null;
+							handler = (e2, args2) =>
+							{
+								var found = Grid.GraphNodeItems.FirstOrDefault(e => e.GUID == GuidToResolve);
+								if (found != null)
+								{
+									WrappedItem = found;
+									GuidToResolve = null;
+
+									Grid.GraphNodeItems.CollectionChanged -= handler;
+								}
+							};
+
+							Grid.GraphNodeItems.CollectionChanged += handler;
+						}
+					}
+					else if (m_wrappedItem != null && Grid != null && !Grid.GraphNodeItems.Contains(m_wrappedItem))
 					{
 						if (!string.IsNullOrWhiteSpace(m_wrappedItem.GUID))
 						{

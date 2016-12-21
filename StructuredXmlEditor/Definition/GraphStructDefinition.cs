@@ -189,11 +189,6 @@ namespace StructuredXmlEditor.Definition
 
 			if (string.IsNullOrWhiteSpace(ChildAsGUID) && si.LinkParents.Count > 1)
 			{
-				if (string.IsNullOrWhiteSpace(si.GUID))
-				{
-					si.GUID = Guid.NewGuid().ToString();
-				}
-
 				el.Add(new XAttribute("GUID", si.GUID));
 			}
 

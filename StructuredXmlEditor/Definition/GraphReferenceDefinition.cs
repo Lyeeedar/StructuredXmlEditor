@@ -25,13 +25,22 @@ namespace StructuredXmlEditor.Definition
 			var si = item as GraphReferenceItem;
 			if (si.ChosenDefinition != null)
 			{
-				si.ChosenDefinition.DoSaveData(parent, si.WrappedItem);
+				if (si.LinkType == LinkType.Reference)
+				{
+					var el = new XElement(Name, si.WrappedItem.GUID);
+					el.SetAttributeValue("RefKey", si.ChosenDefinition.Name);
+					parent.Add(el);
+				}
+				else
+				{
+					si.ChosenDefinition.DoSaveData(parent, si.WrappedItem);
 
-				if (parent.Elements().Count() == 0) return;
+					if (parent.Elements().Count() == 0) return;
 
-				var el = parent.Elements().Last();
-				if (Name != "") el.Name = Name;
-				el.SetAttributeValue("RefKey", si.ChosenDefinition.Name);
+					var el = parent.Elements().Last();
+					if (Name != "") el.Name = Name;
+					el.SetAttributeValue("RefKey", si.ChosenDefinition.Name);
+				}
 			}
 		}
 
@@ -41,7 +50,13 @@ namespace StructuredXmlEditor.Definition
 
 			GraphReferenceItem item = null;
 
-			if (key != null && Definitions.ContainsKey(key))
+			if (!element.HasElements)
+			{
+				item = new GraphReferenceItem(this, undoRedo);
+				item.GuidToResolve = element.Value?.ToString();
+				item.m_LinkType = LinkType.Reference;
+			}
+			else if (key != null && Definitions.ContainsKey(key))
 			{
 				var def = Definitions[key];
 

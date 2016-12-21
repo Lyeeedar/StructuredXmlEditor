@@ -61,6 +61,10 @@ namespace StructuredXmlEditor.View
 				{
 					Link = GraphReferenceItem.WrappedItem?.GraphNode;
 				}
+				else if (args.PropertyName == "LinkType")
+				{
+					Node.Graph.RaisePropertyChangedEvent("Controls");
+				}
 			};
 
 			PropertyChanged += (e, args) => 
@@ -96,6 +100,15 @@ namespace StructuredXmlEditor.View
 				{
 					yield return type.Name;
 				}
+			}
+		}
+
+		public IEnumerable<LinkType> LinkTypes
+		{
+			get
+			{
+				yield return LinkType.Duplicate;
+				yield return LinkType.Reference;
 			}
 		}
 
@@ -163,5 +176,6 @@ namespace StructuredXmlEditor.View
 
 		public Command<string> ClearCMD { get { return new Command<string>((type) => { GraphReferenceItem.Clear(); }); } }
 		public Command<string> CreateCMD { get { return new Command<string>((type) => { GraphReferenceItem.Create(type); }); } }
+		public Command<LinkType> ChangeLinkTypeCMD { get { return new Command<LinkType>((type) => { GraphReferenceItem.LinkType = type; }); } }
 	}
 }

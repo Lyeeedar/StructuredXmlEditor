@@ -134,7 +134,13 @@ namespace StructuredXmlEditor.View
 								var src = link.Position;
 								var dst = new Point(link.Link.X + 10, link.Link.Y + 10);
 
-								yield return MakePath(src, dst, node.Opacity);
+								Brush brush = Brushes.MediumSpringGreen;
+								if (link.GraphReferenceItem.LinkType == LinkType.Reference)
+								{
+									brush = Brushes.MediumPurple;
+								}
+
+								yield return MakePath(src, dst, node.Opacity, brush);
 							}
 						}
 					}
@@ -146,20 +152,20 @@ namespace StructuredXmlEditor.View
 					{
 						var dst = new Point(ConnectedLinkTo.X + 10, ConnectedLinkTo.Y + 10);
 
-						yield return MakePath(CreatingLink.Position, dst, CreatingLink.Node.Opacity);
+						yield return MakePath(CreatingLink.Position, dst, CreatingLink.Node.Opacity, Brushes.MediumSpringGreen);
 					}
 					else
 					{
 						var point = new Point(m_mousePoint.X / Scale - Offset.X, m_mousePoint.Y / Scale - Offset.Y);
 
-						yield return MakePath(CreatingLink.Position, point, CreatingLink.Node.Opacity);
+						yield return MakePath(CreatingLink.Position, point, CreatingLink.Node.Opacity, Brushes.Olive);
 					}
 				}
 			}
 		}
 		
 		//--------------------------------------------------------------------------
-		private object MakePath(Point src, Point dst, double opacity)
+		private object MakePath(Point src, Point dst, double opacity, Brush brush)
 		{
 			src = new Point(src.X / Scale - Offset.X, src.Y / Scale - Offset.Y);
 
@@ -190,7 +196,7 @@ namespace StructuredXmlEditor.View
 			path.SetValue(Canvas.LeftProperty, src.X);
 			path.SetValue(Canvas.TopProperty, src.Y);
 
-			path.Stroke = System.Windows.Media.Brushes.Wheat;
+			path.Stroke = brush;
 			path.StrokeThickness = 2;
 
 			path.Opacity = opacity;

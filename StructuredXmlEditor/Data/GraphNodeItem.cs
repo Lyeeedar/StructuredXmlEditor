@@ -22,7 +22,15 @@ namespace StructuredXmlEditor.Data
 				{
 					return (Children.FirstOrDefault(e => e.Definition.Name == childAsGUID) as StringItem).Value;
 				}
-				else return m_GUID;
+				else
+				{
+					if (m_GUID == null)
+					{
+						m_GUID = Guid.NewGuid().ToString();
+					}
+
+					return m_GUID;
+				}
 			}
 			set
 			{
