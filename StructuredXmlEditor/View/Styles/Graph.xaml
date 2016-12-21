@@ -140,6 +140,7 @@
 				Background="Transparent"
 				BorderBrush="Transparent"
 				ToolTip="Create"
+				Visibility="{Binding Graph.AllowReferenceLinks, Converter={local:ValueTypeConverter}}"
 				x:Name="button2">
 				<Image
 					Source="/Resources/Edit.png"

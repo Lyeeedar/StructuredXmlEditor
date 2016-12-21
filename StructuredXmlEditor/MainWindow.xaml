@@ -232,6 +232,15 @@
 				AnchorablesSource="{Binding Tools}"
 				ActiveContent="{Binding Current, Mode=TwoWay, Converter={v:ActiveDocumentConverter}}">
 
+				<dock:DockingManager.DocumentContextMenu>
+					<ContextMenu>
+						<MenuItem
+							Header="Open in Explorer"
+							Command="{Binding Model.OpenInExplorerCMD}"
+							CommandParameter="{Binding Model.Path}" />
+					</ContextMenu>
+				</dock:DockingManager.DocumentContextMenu>
+
 				<dock:DockingManager.Resources>
 					<DataTemplate
 						DataType="{x:Type d:Document}">

@@ -189,8 +189,11 @@
 	<CollectionDef Name="GraphStruct" ToolTip="A node on a graph." TextColour="Struct">
 		<Attributes>
 			<String Name="Name" Default="GraphStruct" ToolTip="The name to be written for this element." />
-			<String Name="Description" ToolTip="The description to be used. Add a child names inside {} to use the contents of it in the description." />
 			<String Name="ChildAsGUID" ToolTip="The child to use as this elements GUID." />
+			<Boolean Name="AllowReferenceLinks" Default="true" ToolTip="Whether to allow links to be by reference." />
+			<Boolean Name="AllowCircularLinks" Default="false" ToolTip="Whether circular links are allowed." VisibleIf="AllowReferenceLinks==true" />
+			<Boolean Name="FlattenData" Default="false" ToolTip="If true each graph node will be placed in a flat list within this element." VisibleIf="AllowReferenceLinks==true" />
+			<String Name="Description" ToolTip="The description to be used. Add a child names inside {} to use the contents of it in the description." />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Struct" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />

@@ -1,6 +1,7 @@
 ﻿using StructuredXmlEditor.View;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -41,6 +42,9 @@ namespace StructuredXmlEditor.Data
 		public Command<object> CloseCMD { get { return new Command<object>((e) => Close()); } }
 
 		//-----------------------------------------------------------------------
+		public Command<string> OpenInExplorerCMD { get { return new Command<string>((e) => OpenInExplorer(e)); } }
+
+		//-----------------------------------------------------------------------
 		public string Title
 		{
 			get
@@ -65,6 +69,14 @@ namespace StructuredXmlEditor.Data
 			backupTimer.Elapsed += (e, a) => DoBackup();
 			backupTimer.AutoReset = true;
 			backupTimer.Start();
+		}
+
+		//-----------------------------------------------------------------------
+		private void OpenInExplorer(string path)
+		{
+			path = System.IO.Path.GetFullPath(path);
+
+			Process.Start("explorer.exe", string.Format("/select,\"{0}\"", path));
 		}
 
 		//-----------------------------------------------------------------------

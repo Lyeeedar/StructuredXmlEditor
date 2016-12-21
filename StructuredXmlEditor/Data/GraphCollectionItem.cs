@@ -43,6 +43,9 @@ namespace StructuredXmlEditor.Data
 				{
 					RaisePropertyChangedEvent("IsAtMin");
 					RaisePropertyChangedEvent("IsAtMax");
+
+					Grid.RaisePropertyChangedEvent("GraphNodes");
+					RaisePropertyChangedEvent("GraphData");
 				}
 			};
 		}

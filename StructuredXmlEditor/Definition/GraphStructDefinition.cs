@@ -133,6 +133,10 @@ namespace StructuredXmlEditor.Definition
 			Description = definition.Attribute("Description")?.Value?.ToString();
 			ChildAsGUID = definition.Attribute("ChildAsGUID")?.Value?.ToString();
 
+			AllowReferenceLinks = TryParseBool(definition, "AllowReferenceLinks", true);
+			AllowCircularLinks = TryParseBool(definition, "AllowCircularLinks", false);
+			FlattenData = TryParseBool(definition, "FlattenData", false);
+
 			bool foundChildAsGUID = string.IsNullOrWhiteSpace(ChildAsGUID);
 
 			foreach (var child in definition.Elements())

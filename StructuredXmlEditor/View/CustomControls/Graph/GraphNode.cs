@@ -163,7 +163,7 @@ namespace StructuredXmlEditor.View
 				m_dataCache.AddRange(Datas);
 			};
 
-			UpdateGraphData();
+			Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, new Action(() => { UpdateGraphData(); }));
 		}
 
 		//-----------------------------------------------------------------------

@@ -81,6 +81,10 @@ namespace StructuredXmlEditor.Definition
 			MinCount = TryParseInt(definition, "MinCount", 0);
 			MaxCount = TryParseInt(definition, "MaxCount", int.MaxValue);
 
+			AllowReferenceLinks = TryParseBool(definition, "AllowReferenceLinks", true);
+			AllowCircularLinks = TryParseBool(definition, "AllowCircularLinks", false);
+			FlattenData = TryParseBool(definition, "FlattenData", false);
+
 			ChildDefinition = new CollectionChildDefinition();
 			ChildDefinition.Parse(definition.Elements().Where(e => e.Name != "Attributes").First());
 

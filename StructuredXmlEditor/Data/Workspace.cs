@@ -1084,6 +1084,11 @@ namespace StructuredXmlEditor.Data
 			if (result == true)
 			{
 				Current?.SaveAs(dlg.FileName);
+
+				RecentFiles.Remove(dlg.FileName);
+				RecentFiles.Insert(0, dlg.FileName);
+
+				StoreSetting("RecentFiles", RecentFiles.ToArray());
 			}
 		}
 

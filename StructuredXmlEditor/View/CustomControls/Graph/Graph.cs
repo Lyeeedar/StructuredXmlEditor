@@ -18,28 +18,6 @@ namespace StructuredXmlEditor.View
 	public class Graph : Control, INotifyPropertyChanged
 	{
 		//-----------------------------------------------------------------------
-		private void ChildPropertyChangedHandler(object e, PropertyChangedEventArgs args)
-		{
-			if (args.PropertyName == "X" || args.PropertyName == "Y" || args.PropertyName == "Child Link" || args.PropertyName == "Child Position" || args.PropertyName == "Opacity")
-			{
-				Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action(() => { RaisePropertyChangedEvent("Controls"); }));
-			}
-			else if (args.PropertyName == "IsSelected")
-			{
-				if ((e as GraphNode).IsSelected && !Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl) && !m_isMarqueeSelecting)
-				{
-					foreach (var node in Nodes)
-					{
-						if (node != e)
-						{
-							node.IsSelected = false;
-						}
-					}
-				}
-			}
-		}
-
-		//-----------------------------------------------------------------------
 		static Graph()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(Graph), new FrameworkPropertyMetadata(typeof(Graph)));
@@ -65,8 +43,24 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		public bool CanHaveCircularReferences
 		{
-			get; set;
+			get { return (bool)GetValue(CanHaveCircularReferencesProperty); }
+			set { SetValue(CanHaveCircularReferencesProperty, value); }
 		}
+
+		//-----------------------------------------------------------------------
+		public static readonly DependencyProperty CanHaveCircularReferencesProperty =
+			DependencyProperty.Register("CanHaveCircularReferences", typeof(bool), typeof(Graph), new PropertyMetadata(false, null));
+
+		//-----------------------------------------------------------------------
+		public bool AllowReferenceLinks
+		{
+			get { return (bool)GetValue(AllowReferenceLinksProperty); }
+			set { SetValue(AllowReferenceLinksProperty, value); }
+		}
+
+		//-----------------------------------------------------------------------
+		public static readonly DependencyProperty AllowReferenceLinksProperty =
+			DependencyProperty.Register("AllowReferenceLinks", typeof(bool), typeof(Graph), new PropertyMetadata(false, null));
 
 		//-----------------------------------------------------------------------
 		public IEnumerable<object> Controls
@@ -113,7 +107,7 @@ namespace StructuredXmlEditor.View
 					item.PropertyChanged += g.ChildPropertyChangedHandler;
 				}
 
-				g.RaisePropertyChangedEvent("Controls");
+				g.UpdateControls();
 			}));
 
 		//-----------------------------------------------------------------------
@@ -163,7 +157,44 @@ namespace StructuredXmlEditor.View
 				}
 			}
 		}
-		
+
+		//-----------------------------------------------------------------------
+		private void ChildPropertyChangedHandler(object e, PropertyChangedEventArgs args)
+		{
+			if (args.PropertyName == "X" || args.PropertyName == "Y" || args.PropertyName == "Child Link" || args.PropertyName == "Child Position" || args.PropertyName == "Opacity")
+			{
+				UpdateControls();
+			}
+			else if (args.PropertyName == "IsSelected")
+			{
+				if ((e as GraphNode).IsSelected && !Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl) && !m_isMarqueeSelecting)
+				{
+					foreach (var node in Nodes)
+					{
+						if (node != e)
+						{
+							node.IsSelected = false;
+						}
+					}
+				}
+			}
+		}
+
+		//--------------------------------------------------------------------------
+		public void UpdateControls()
+		{
+			if (!UpdatingControls)
+			{
+				UpdatingControls = true;
+				Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action(() =>
+				{
+					RaisePropertyChangedEvent("Controls");
+					UpdatingControls = false;
+				}));
+			}
+		}
+		private bool UpdatingControls = false;
+
 		//--------------------------------------------------------------------------
 		private object MakePath(Point src, Point dst, double opacity, Brush brush)
 		{
@@ -373,7 +404,7 @@ namespace StructuredXmlEditor.View
 					ConnectedLinkTo = null;
 				}
 
-				RaisePropertyChangedEvent("Controls");
+				UpdateControls();
 			}
 
 			if ((m_mightBeMarqueeSelecting || m_isMarqueeSelecting) && CreatingLink == null)
@@ -417,7 +448,7 @@ namespace StructuredXmlEditor.View
 				if (m_creatingLink != value)
 				{
 					m_creatingLink = value;
-					RaisePropertyChangedEvent("Controls");
+					UpdateControls();
 				}
 			}
 		}
@@ -432,7 +463,7 @@ namespace StructuredXmlEditor.View
 				if (m_graphNode != value)
 				{
 					m_graphNode = value;
-					RaisePropertyChangedEvent("Controls");
+					UpdateControls();
 				}
 			}
 		}

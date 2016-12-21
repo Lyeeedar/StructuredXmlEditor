@@ -109,7 +109,9 @@ namespace StructuredXmlEditor.Data
 		{
 			get
 			{
-				return WrappedItem != null ? WrappedItem.Description : "Unset";
+				if (WrappedItem == null) return "Unset";
+				else if (IsCircular()) return "Circular";
+				else return WrappedItem.Description;
 			}
 		}
 
@@ -260,7 +262,52 @@ namespace StructuredXmlEditor.Data
 		{
 			if (args.PropertyName == "Description")
 			{
-				RaisePropertyChangedEvent("Description");
+				if (!IsCircular()) RaisePropertyChangedEvent("Description");
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public bool IsCircular()
+		{
+			if (WrappedItem == null || !Grid.AllowCircularLinks) return false;
+
+			var pathsFromRoot = new List<List<DataItem>>();
+			GetPathsFromRoot(pathsFromRoot);
+
+			foreach (var path in pathsFromRoot)
+			{
+				if (path.Contains(WrappedItem)) return true;
+			}
+
+			return false;
+		}
+
+		//-----------------------------------------------------------------------
+		public void GetPathsFromRoot(List<List<DataItem>> output, List<DataItem> path = null, DataItem current = null)
+		{
+			if (path == null) path = new List<DataItem>();
+			if (current == null) current = Grid.RootItems[0];
+
+			if (path.Contains(current)) return;
+			if (current == this)
+			{
+				output.Add(path);
+
+				return;
+			}
+
+			path.Add(current);
+
+			foreach (var child in current.Children)
+			{
+				GetPathsFromRoot(output, path.ToList(), child);
+			}
+
+			if (current is GraphReferenceItem)
+			{
+				var gri = current as GraphReferenceItem;
+
+				GetPathsFromRoot(output, path.ToList(), gri.WrappedItem);
 			}
 		}
 
@@ -325,6 +372,8 @@ namespace StructuredXmlEditor.Data
 				WrappedItem = oldItem;
 			},
 			"Set Item " + item.Name);
+
+			if (IsCircular()) LinkType = LinkType.Reference;
 		}
 
 		//-----------------------------------------------------------------------

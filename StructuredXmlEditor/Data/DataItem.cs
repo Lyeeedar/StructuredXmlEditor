@@ -304,12 +304,14 @@ namespace StructuredXmlEditor.Data
 			}
 			set
 			{
-				m_grid = value;
-				RaisePropertyChangedEvent();
+				if (m_grid != value)
+				{
+					m_grid = value;
+					RaisePropertyChangedEvent();
+				}
 			}
 		}
 		private XmlDataGrid m_grid;
-
 
 		//-----------------------------------------------------------------------
 		public ContextMenu ContextMenu

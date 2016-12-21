@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using StructuredXmlEditor.Definition;
 using StructuredXmlEditor.View;
 using System;
 using System.Collections.Generic;
@@ -65,6 +66,40 @@ namespace StructuredXmlEditor.Data
 			}
 		}
 		private ObservableCollection<GraphNodeItem> m_graphNodeItems;
+
+		//-----------------------------------------------------------------------
+		public bool AllowCircularLinks
+		{
+			get
+			{
+				foreach (var item in m_storedRootItems)
+				{
+					if (item is GraphNodeItem)
+					{
+						return (item.Definition as GraphNodeDefinition).AllowCircularLinks;
+					}
+				}
+
+				return false;
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public bool AllowReferenceLinks
+		{
+			get
+			{
+				foreach (var item in m_storedRootItems)
+				{
+					if (item is GraphNodeItem)
+					{
+						return (item.Definition as GraphNodeDefinition).AllowReferenceLinks;
+					}
+				}
+
+				return false;
+			}
+		}
 
 		//-----------------------------------------------------------------------
 		public ObservableCollection<DataItem> RootItems

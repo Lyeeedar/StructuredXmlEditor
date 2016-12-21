@@ -26,7 +26,7 @@ namespace StructuredXmlEditor.Definition
 			if (si.ChosenDefinition != null)
 			{
 				if (
-					si.LinkType == LinkType.Reference && si.WrappedItem != null && 
+					(si.LinkType == LinkType.Reference || si.IsCircular()) && si.WrappedItem != null && 
 					(si.WrappedItem.LinkParents.Any(e => e.LinkType == LinkType.Duplicate) || si.WrappedItem.LinkParents.First() == si)
 					)
 				{

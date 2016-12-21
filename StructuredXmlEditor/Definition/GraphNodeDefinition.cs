@@ -8,6 +8,10 @@ namespace StructuredXmlEditor.Definition
 {
 	public abstract class GraphNodeDefinition : ComplexDataDefinition
 	{
+		public bool AllowReferenceLinks { get; set; }
+		public bool AllowCircularLinks { get; set; }
+		public bool FlattenData { get; set; }
+
 		public GraphNodeDefinition()
 		{
 			TextColour = Colours["Struct"];

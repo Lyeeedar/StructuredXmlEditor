@@ -12,6 +12,11 @@ namespace StructuredXmlEditor.View
 {
 	public abstract class GraphNodeData : NotifyPropertyChanged
 	{
+		public Graph Graph
+		{
+			get { return Node?.Graph; }
+		}
+
 		public GraphNode Node
 		{
 			get { return m_node; }
@@ -19,6 +24,7 @@ namespace StructuredXmlEditor.View
 			{
 				m_node = value;
 				RaisePropertyChangedEvent();
+				RaisePropertyChangedEvent("Graph");
 			}
 		}
 		private GraphNode m_node;
@@ -63,7 +69,7 @@ namespace StructuredXmlEditor.View
 				}
 				else if (args.PropertyName == "LinkType")
 				{
-					Node.Graph.RaisePropertyChangedEvent("Controls");
+					Node.Graph.UpdateControls();
 				}
 			};
 
