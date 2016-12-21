@@ -2,7 +2,6 @@
 using StructuredXmlEditor.View;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +11,7 @@ using System.Xml.Linq;
 
 namespace StructuredXmlEditor.Data
 {
-	public class CollectionItem : ComplexDataItem, ICollectionItem
+	public class GraphCollectionItem : GraphNodeItem, ICollectionItem
 	{
 		//-----------------------------------------------------------------------
 		protected override bool CanClear { get { return false; } }
@@ -24,19 +23,19 @@ namespace StructuredXmlEditor.Data
 		public Command<object> AddCMD { get { return new Command<object>((e) => Add()); } }
 
 		//-----------------------------------------------------------------------
-		public bool IsAtMax { get { return Children.Count >= (Definition as CollectionDefinition).MaxCount; } }
+		public bool IsAtMax { get { return Children.Count >= (Definition as GraphCollectionDefinition).MaxCount; } }
 
 		//-----------------------------------------------------------------------
-		public bool IsAtMin { get { return Children.Count <= (Definition as CollectionDefinition).MinCount; } }
+		public bool IsAtMin { get { return Children.Count <= (Definition as GraphCollectionDefinition).MinCount; } }
 
 		//-----------------------------------------------------------------------
 		public override bool CanPaste { get { return !IsAtMax; } }
 
 		//-----------------------------------------------------------------------
-		public virtual Command<object> PasteNewCMD { get { return new Command<object>((e) => PasteNew(), (e) => CanPaste && Clipboard.ContainsData((Definition as CollectionDefinition).ChildDefinition.WrappedDefinition.CopyKey)); } }
+		public virtual Command<object> PasteNewCMD { get { return new Command<object>((e) => PasteNew(), (e) => CanPaste && Clipboard.ContainsData((Definition as GraphCollectionDefinition).ChildDefinition.WrappedDefinition.CopyKey)); } }
 
 		//-----------------------------------------------------------------------
-		public CollectionItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
+		public GraphCollectionItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
 			PropertyChanged += (s, e) =>
 			{
@@ -63,7 +62,7 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void Remove(CollectionChildItem item)
 		{
-			var def = Definition as CollectionDefinition;
+			var def = Definition as GraphCollectionDefinition;
 			if (IsAtMin) return;
 
 			var index = Children.IndexOf(item);
@@ -87,10 +86,10 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void Add()
 		{
-			var def = Definition as CollectionDefinition;
+			var def = Definition as GraphCollectionDefinition;
 			if (IsAtMax) return;
 
-			var cdef = Definition as CollectionDefinition;
+			var cdef = Definition as GraphCollectionDefinition;
 			DataItem item = null;
 
 			using (UndoRedo.DisableUndoScope())
@@ -124,10 +123,10 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void Insert(int index, CollectionChildItem child)
 		{
-			var def = Definition as CollectionDefinition;
+			var def = Definition as GraphCollectionDefinition;
 			if (IsAtMax) return;
 
-			var cdef = Definition as CollectionDefinition;
+			var cdef = Definition as GraphCollectionDefinition;
 
 			UndoRedo.ApplyDoUndo(
 				delegate
@@ -167,7 +166,7 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void PasteNew()
 		{
-			var sdef = Definition as CollectionDefinition;
+			var sdef = Definition as GraphCollectionDefinition;
 
 			if (Clipboard.ContainsData(sdef.ChildDefinition.WrappedDefinition.CopyKey))
 			{

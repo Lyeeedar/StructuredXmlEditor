@@ -9,8 +9,29 @@ using StructuredXmlEditor.View;
 
 namespace StructuredXmlEditor.Data
 {
-	public class GraphNodeItem : ComplexDataItem
+	public abstract class GraphNodeItem : ComplexDataItem
 	{
+		//-----------------------------------------------------------------------
+		public string GUID
+		{
+			get
+			{
+				var childAsGUID = (Definition as GraphStructDefinition)?.ChildAsGUID;
+
+				if (childAsGUID != null)
+				{
+					return (Children.FirstOrDefault(e => e.Definition.Name == childAsGUID) as StringItem).Value;
+				}
+				else return m_GUID;
+			}
+			set
+			{
+				m_GUID = value;
+				RaisePropertyChangedEvent();
+			}
+		}
+		private string m_GUID;
+
 		//-----------------------------------------------------------------------
 		public double X
 		{
@@ -102,37 +123,12 @@ namespace StructuredXmlEditor.Data
 		private GraphNode m_graphNode;
 
 		//-----------------------------------------------------------------------
-		public bool ShowClearButton { get { return false; } }
-
-		//-----------------------------------------------------------------------
-		public Command<object> ClearCMD { get { return new Command<object>((e) => Clear()); } }
-
-		//-----------------------------------------------------------------------
-		public Command<object> CreateCMD { get { return new Command<object>((e) => Create()); } }
-
-		//-----------------------------------------------------------------------
 		protected override string EmptyString { get { return "null"; } }
 
 		//-----------------------------------------------------------------------
 		public GraphNodeItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
-			PropertyChanged += (e, a) =>
-			{
-				if (a.PropertyName == "HasContent")
-				{
-					RaisePropertyChangedEvent("ShowClearButton");
-				}
-				else if (a.PropertyName == "Parent")
-				{
-					if (!HasContent && (Parent is CollectionChildItem || Parent is ReferenceItem))
-					{
-						using (UndoRedo.DisableUndoScope())
-						{
-							Create();
-						}
-					}
-				}
-			};
+
 		}
 
 		//-----------------------------------------------------------------------
@@ -195,37 +191,6 @@ namespace StructuredXmlEditor.Data
 					}
 				}
 			}
-		}
-
-		//-----------------------------------------------------------------------
-		public void Create()
-		{
-			var sdef = Definition as GraphNodeDefinition;
-
-			using (UndoRedo.DisableUndoScope())
-			{
-				sdef.CreateChildren(this, UndoRedo);
-			}
-
-			var newChildren = Children.ToList();
-			Children.Clear();
-
-			UndoRedo.ApplyDoUndo(
-				delegate
-				{
-					foreach (var child in newChildren) Children.Add(child);
-					RaisePropertyChangedEvent("HasContent");
-					RaisePropertyChangedEvent("Description");
-				},
-				delegate
-				{
-					Children.Clear();
-					RaisePropertyChangedEvent("HasContent");
-					RaisePropertyChangedEvent("Description");
-				},
-				Name + " created");
-
-			IsExpanded = true;
 		}
 	}
 }

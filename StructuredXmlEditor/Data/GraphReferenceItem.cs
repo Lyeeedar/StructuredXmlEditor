@@ -121,10 +121,30 @@ namespace StructuredXmlEditor.Data
 		{
 			SelectedDefinition = (definition as GraphReferenceDefinition).Definitions.Values.First();
 
-			PropertyChanged += (e, args) => 
+			PropertyChanged += (s, args) => 
 			{
 				if (args.PropertyName == "Grid")
 				{
+					if (m_wrappedItem != null && Grid != null && !Grid.GraphNodeItems.Contains(m_wrappedItem))
+					{
+						if (!string.IsNullOrWhiteSpace(m_wrappedItem.GUID))
+						{
+							var existing = Grid.GraphNodeItems.FirstOrDefault(e => e.GUID == m_wrappedItem.GUID);
+							if (existing != null)
+							{
+								WrappedItem = existing;
+							}
+							else
+							{
+								Grid.GraphNodeItems.Add(m_wrappedItem);
+							}
+						}
+						else
+						{
+							Grid.GraphNodeItems.Add(m_wrappedItem);
+						}
+					}
+
 					if (m_wrappedItem != null)
 					{
 						m_wrappedItem.Grid = Grid;
@@ -132,11 +152,6 @@ namespace StructuredXmlEditor.Data
 						{
 							i.Grid = Grid;
 						}
-					}
-
-					if (m_wrappedItem != null && Grid != null && !Grid.GraphNodeItems.Contains(m_wrappedItem))
-					{
-						Grid.GraphNodeItems.Add(m_wrappedItem);
 					}
 				}
 			};

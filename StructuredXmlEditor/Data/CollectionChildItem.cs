@@ -70,18 +70,18 @@ namespace StructuredXmlEditor.Data
 		public override string CopyKey { get { return WrappedItem.CopyKey; } }
 
 		//-----------------------------------------------------------------------
-		public CollectionItem ParentCollection
+		public DataItem ParentCollection
 		{
 			get
 			{
-				if (Parent is CollectionItem) return Parent as CollectionItem;
+				if (Parent is CollectionItem || Parent is GraphCollectionItem) return Parent;
 				if (Parent is CollectionChildItem)
 				{
 					var parent = (Parent as CollectionChildItem).WrappedItem;
-					if (parent is CollectionItem) return parent as CollectionItem;
-					else if (parent is ReferenceItem) return (parent as ReferenceItem).WrappedItem as CollectionItem;
+					if (parent is CollectionItem || Parent is GraphCollectionItem) return parent;
+					else if (parent is ReferenceItem) return (parent as ReferenceItem).WrappedItem;
 				}
-				if (Parent is ReferenceItem) return (Parent as ReferenceItem).WrappedItem as CollectionItem;
+				if (Parent is ReferenceItem) return (Parent as ReferenceItem).WrappedItem;
 				return null;
 			}
 		}
@@ -91,7 +91,7 @@ namespace StructuredXmlEditor.Data
 		{
 			get
 			{
-				return !ParentCollection.IsAtMin;
+				return !(ParentCollection as ICollectionItem).IsAtMin;
 			}
 		}
 
@@ -205,7 +205,7 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void Remove()
 		{
-			ParentCollection.Remove(this);
+			(ParentCollection as ICollectionItem).Remove(this);
 		}
 
 		//-----------------------------------------------------------------------
@@ -238,7 +238,7 @@ namespace StructuredXmlEditor.Data
 			var collection = ParentCollection;
 			var index = collection.Children.IndexOf(this) + 1;
 
-			collection.Insert(index, child);
+			(ParentCollection as ICollectionItem).Insert(index, child);
 		}
 
 		//-----------------------------------------------------------------------
@@ -256,7 +256,7 @@ namespace StructuredXmlEditor.Data
 			var collection = ParentCollection;
 			var index = collection.Children.IndexOf(this) + 1;
 
-			collection.Insert(index, child);
+			(ParentCollection as ICollectionItem).Insert(index, child);
 		}
 
 		//-----------------------------------------------------------------------

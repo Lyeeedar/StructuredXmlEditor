@@ -82,8 +82,11 @@
     <Compile Include="Data\Document.cs" />
     <Compile Include="Data\EnumItem.cs" />
     <Compile Include="Data\FileItem.cs" />
+    <Compile Include="Data\GraphCollectionItem.cs" />
+    <Compile Include="Data\GraphStructItem.cs" />
     <Compile Include="Data\GraphNodeItem.cs" />
     <Compile Include="Data\GraphReferenceItem.cs" />
+    <Compile Include="Data\ICollectionItem.cs" />
     <Compile Include="Data\NumberItem.cs" />
     <Compile Include="Data\PairItem.cs" />
     <Compile Include="Data\PrimitiveDataItem.cs" />
@@ -92,7 +95,9 @@
     <Compile Include="Data\TimelineItem.cs" />
     <Compile Include="Data\TreeItem.cs" />
     <Compile Include="Data\VectorItem.cs" />
+    <Compile Include="Definition\GraphCollectionDefinition.cs" />
     <Compile Include="Definition\GraphNodeDefinition.cs" />
+    <Compile Include="Definition\GraphStructDefinition.cs" />
     <Compile Include="Definition\GraphReferenceDefinition.cs" />
     <Compile Include="Definition\TimelineDefinition.cs" />
     <Compile Include="Definition\VectorDefinition.cs" />

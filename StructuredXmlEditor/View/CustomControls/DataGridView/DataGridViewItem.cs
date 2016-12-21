@@ -379,7 +379,7 @@ namespace StructuredXmlEditor.View
 			if (DataContext is CollectionChildItem)
 			{
 				CollectionChildItem itemBase = (CollectionChildItem)DataContext;
-				CollectionItem collection = itemBase.ParentCollection;
+				DataItem collection = itemBase.ParentCollection;
 
 				if (collection != null)
 				{
@@ -422,7 +422,7 @@ namespace StructuredXmlEditor.View
 			if (DataContext is CollectionChildItem)
 			{
 				CollectionChildItem item = e.Data.GetData("CollectionChildItem") as CollectionChildItem;
-				CollectionItem collection = ((CollectionChildItem)DataContext).ParentCollection;
+				DataItem collection = ((CollectionChildItem)DataContext).ParentCollection;
 
 				if (collection.Children.Contains(item))
 				{
@@ -481,7 +481,7 @@ namespace StructuredXmlEditor.View
 			if (DataContext is CollectionChildItem)
 			{
 				CollectionChildItem item = e.Data.GetData("CollectionChildItem") as CollectionChildItem;
-				CollectionItem collection = ((CollectionChildItem)DataContext).ParentCollection;
+				DataItem collection = ((CollectionChildItem)DataContext).ParentCollection;
 
 				if (collection.Children.Contains(item))
 				{
@@ -528,7 +528,7 @@ namespace StructuredXmlEditor.View
 			if (DataContext is CollectionChildItem)
 			{
 				CollectionChildItem item = e.Data.GetData("CollectionChildItem") as CollectionChildItem;
-				CollectionItem collection = ((CollectionChildItem)DataContext).ParentCollection;
+				DataItem collection = ((CollectionChildItem)DataContext).ParentCollection;
 
 				if (collection.Children.Contains(item))
 				{
@@ -542,7 +542,7 @@ namespace StructuredXmlEditor.View
 						dstIndex = Math.Min(dstIndex + 1, collection.Children.Count - 1);
 					}
 
-					collection.MoveItem(srcIndex, dstIndex);
+					(collection as ICollectionItem).MoveItem(srcIndex, dstIndex);
 				}
 			}
 			else if (DataContext is TreeItem)

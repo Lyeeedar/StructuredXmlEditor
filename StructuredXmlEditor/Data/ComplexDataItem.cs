@@ -38,7 +38,7 @@ namespace StructuredXmlEditor.Data
 				string descriptionFormat = null;
 
 				var sdef = Definition as StructDefinition;
-				var gdef = Definition as GraphNodeDefinition;
+				var gdef = Definition as GraphStructDefinition;
 
 				if (sdef != null) descriptionFormat = sdef.Description;
 				if (gdef != null) descriptionFormat = gdef.Description;

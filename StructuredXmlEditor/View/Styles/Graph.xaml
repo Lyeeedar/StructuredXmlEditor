@@ -13,9 +13,6 @@
 	<Style
 		TargetType="{x:Type local:Connection}">
 		<Setter
-			Property="Graph"
-			Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:Graph}}, Path=.}" />
-		<Setter
 			Property="Template">
 			<Setter.Value>
 				<ControlTemplate

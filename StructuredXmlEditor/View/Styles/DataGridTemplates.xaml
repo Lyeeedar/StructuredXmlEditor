@@ -495,7 +495,7 @@
 	</DataTemplate>
 
 	<DataTemplate
-		DataType="{x:Type d:GraphNodeItem}">
+		DataType="{x:Type d:GraphStructItem}">
 		<Grid
 			VerticalAlignment="Center">
 			<Grid.ColumnDefinitions>
@@ -647,6 +647,97 @@
 
 		</Grid>
 	</DataTemplate>
+
+	<DataTemplate
+		DataType="{x:Type d:GraphCollectionItem}">
+		<Grid
+			VerticalAlignment="Center">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition
+					Width="20" />
+				<ColumnDefinition
+					Width="20" />
+				<ColumnDefinition
+					Width="*" />
+			</Grid.ColumnDefinitions>
+
+			<Button
+				Grid.Column="1"
+				VerticalAlignment="Center"
+				Background="Transparent"
+				BorderBrush="Transparent"
+				ToolTip="Add new item"
+				Command="{Binding AddCMD}"
+				IsEnabled="{Binding IsAtMax, Converter={v:ValueTypeConverter}, ConverterParameter=Not}">
+				<Image
+					Source="/Resources/Add.png"
+					RenderOptions.BitmapScalingMode="NearestNeighbor"
+					Height="16"
+					Width="16" />
+			</Button>
+
+			<ToggleButton
+				x:Name="AttributesPopupToggle"
+				VerticalAlignment="Center"
+				Background="Transparent"
+				BorderBrush="Transparent"
+				ToolTip="Attributes"
+				Visibility="{Binding Attributes.Count, Converter={v:NullOrZeroConverter}, ConverterParameter=Not}"
+				IsHitTestVisible="{Binding ElementName=AttributesPopup, Path=IsOpen, Converter={v:ValueTypeConverter}, ConverterParameter=Not}">
+				<Image
+					Source="/Resources/Settings.png"
+					RenderOptions.BitmapScalingMode="NearestNeighbor"
+					Height="16"
+					Width="16" />
+			</ToggleButton>
+			<Popup
+				x:Name="AttributesPopup"
+				AllowsTransparency="True"
+				Focusable="False"
+				HorizontalOffset="1"
+				VerticalOffset="1"
+				PopupAnimation="Slide"
+				IsOpen="{Binding ElementName=AttributesPopupToggle, Path=IsChecked, Mode=TwoWay}"
+				PlacementTarget="{Binding ElementName=AttributesPopupToggle}"
+				Placement="Mouse">
+				<Popup.Style>
+					<Style
+						TargetType="{x:Type Popup}">
+						<Setter
+							Property="StaysOpen"
+							Value="True" />
+						<Style.Triggers>
+							<DataTrigger
+								Binding="{Binding IsMouseOver, ElementName=brd}"
+								Value="True">
+								<Setter
+									Property="StaysOpen"
+									Value="True" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</Popup.Style>
+				<Border
+					x:Name="brd"
+					BorderThickness="1"
+					BorderBrush="{StaticResource SelectionBorderBrush}"
+					Background="{StaticResource WindowBackgroundBrush}">
+					<ItemsControl
+						Grid.IsSharedSizeScope="True"
+						Margin="1"
+						ItemsSource="{Binding Attributes}"
+						Style="{StaticResource FlatDataGrid}" />
+				</Border>
+			</Popup>
+
+			<ContentControl
+				Grid.Column="2"
+				VerticalAlignment="Center"
+				Content="{Binding Description, Converter={v:ColourMarkupConverter}}" />
+
+		</Grid>
+	</DataTemplate>
+
 
 	<DataTemplate
 		DataType="{x:Type d:CollectionItem}">

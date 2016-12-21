@@ -103,9 +103,9 @@ namespace StructuredXmlEditor.Data
 					}
 				}
 			}
-			else if (item is GraphNodeItem)
+			else if (item is GraphStructItem)
 			{
-				var gni = item as GraphNodeItem;
+				var gni = item as GraphStructItem;
 				if (!gni.HasContent)
 				{
 					using (gni.UndoRedo.DisableUndoScope())

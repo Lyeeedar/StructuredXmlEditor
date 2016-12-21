@@ -239,7 +239,7 @@ namespace StructuredXmlEditor.View
 		//--------------------------------------------------------------------------
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
-			if (!Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl))
+			if (!Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl) && CreatingLink == null)
 			{
 				m_mightBeMarqueeSelecting = true;
 				m_marqueeStart = e.GetPosition(this);

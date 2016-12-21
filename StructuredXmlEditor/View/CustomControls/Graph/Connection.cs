@@ -28,7 +28,6 @@ namespace StructuredXmlEditor.View
 			if (Graph == null) return;
 			if (!Graph.IsAncestorOf(this))
 			{
-				Graph = null;
 				return;
 			}
 
@@ -36,20 +35,12 @@ namespace StructuredXmlEditor.View
 			Position = TransformToAncestor(Graph).Transform(centerPoint);
 		}
 
-		internal static readonly DependencyProperty GraphProperty =
-			DependencyProperty.Register("Graph", typeof(Graph), typeof(Connection),
-				new FrameworkPropertyMetadata(GraphPropertyChanged));
-
-		internal Graph Graph
+		public Graph Graph
 		{
-			get { return (Graph)GetValue(GraphProperty); }
-			set { SetValue(GraphProperty, value); }
-		}
-
-		private static void GraphPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-		{
-			Connection c = (Connection)d;
-			c.UpdatePosition();
+			get
+			{
+				return GraphNodeDataLink?.Node.Graph;
+			}
 		}
 
 		private GraphNodeDataLink GraphNodeDataLink
