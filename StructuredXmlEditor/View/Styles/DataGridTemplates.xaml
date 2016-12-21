@@ -439,6 +439,7 @@
 			<ContentControl
 				Grid.Column="2"
 				VerticalAlignment="Center"
+				Margin="5,0,5,0"
 				Content="{Binding Description, Converter={v:ColourMarkupConverter}}" />
 		</Grid>
 	</DataTemplate>
@@ -593,6 +594,7 @@
 			<ContentControl
 				Grid.Column="2"
 				VerticalAlignment="Center"
+				Margin="5,0,5,0"
 				Content="{Binding Description, Converter={v:ColourMarkupConverter}}" />
 		</Grid>
 	</DataTemplate>
@@ -733,6 +735,7 @@
 			<ContentControl
 				Grid.Column="2"
 				VerticalAlignment="Center"
+				Margin="5,0,5,0"
 				Content="{Binding Description, Converter={v:ColourMarkupConverter}}" />
 
 		</Grid>
@@ -824,6 +827,7 @@
 			<ContentControl
 				Grid.Column="2"
 				VerticalAlignment="Center"
+				Margin="5,0,5,0"
 				Content="{Binding Description, Converter={v:ColourMarkupConverter}}" />
 
 		</Grid>

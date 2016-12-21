@@ -542,7 +542,7 @@ namespace StructuredXmlEditor.View
 						dstIndex = Math.Min(dstIndex + 1, collection.Children.Count - 1);
 					}
 
-					(collection as ICollectionItem).MoveItem(srcIndex, dstIndex);
+					if (srcIndex != dstIndex) (collection as ICollectionItem).MoveItem(srcIndex, dstIndex);
 				}
 			}
 			else if (DataContext is TreeItem)

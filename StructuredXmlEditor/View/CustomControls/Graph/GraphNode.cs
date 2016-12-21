@@ -180,6 +180,7 @@ namespace StructuredXmlEditor.View
 			popup.StaysOpen = true;
 			popup.Focusable = false;
 			popup.PopupAnimation = PopupAnimation.Slide;
+			popup.Width = 400;
 
 			popup.PlacementTarget = this;
 			popup.Placement = PlacementMode.Mouse;
@@ -190,12 +191,11 @@ namespace StructuredXmlEditor.View
 			contentBorder.Background = PopupBackgroundBrush;
 			popup.Child = contentBorder;
 
-			ItemsControl content = new ItemsControl();
-			content.ItemsSource = GraphNodeItem.Children;
-			content.Margin = new Thickness(1);
-			content.Style = Application.Current.FindResource("FlatDataGrid") as Style;
+			var content = new DataGridView();
+			content.HierarchicalItemsSource = new List<DataItem>() { GraphNodeItem };
+
+			content.Margin = new Thickness(5);
 			contentBorder.Child = content;
-			Grid.SetIsSharedSizeScope(content, true);
 
 			popup.IsOpen = true;
 		}

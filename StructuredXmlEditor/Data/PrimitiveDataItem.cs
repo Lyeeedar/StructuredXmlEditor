@@ -37,7 +37,7 @@ namespace StructuredXmlEditor.Data
 							RaisePropertyChangedEvent();
 							RaisePropertyChangedEvent("Description");
 						},
-						Name + " set from " + ValueToString(oldVal) + " to " + ValueToString(value));
+						"{" + Name + "} " + ValueToString(oldVal) + " -> " + ValueToString(value));
 				}
 			}
 		}
@@ -61,7 +61,7 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public virtual string ValueToString(T val)
 		{
-			return "" + Value;
+			return "" + val;
 		}
 
 		//-----------------------------------------------------------------------
