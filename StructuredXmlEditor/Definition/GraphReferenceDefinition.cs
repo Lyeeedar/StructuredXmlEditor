@@ -26,9 +26,10 @@ namespace StructuredXmlEditor.Definition
 			if (si.ChosenDefinition != null)
 			{
 				if (
-					(si.LinkType == LinkType.Reference || si.IsCircular()) && si.WrappedItem != null && 
+					si.Grid.FlattenData || 
+					((si.LinkType == LinkType.Reference || si.IsCircular()) && si.WrappedItem != null && 
 					(si.WrappedItem.LinkParents.Any(e => e.LinkType == LinkType.Duplicate) || si.WrappedItem.LinkParents.First() == si)
-					)
+					))
 				{
 					var el = new XElement(Name, si.WrappedItem.GUID);
 					el.SetAttributeValue("RefKey", si.ChosenDefinition.Name);
@@ -86,11 +87,15 @@ namespace StructuredXmlEditor.Definition
 			}
 		}
 
-		public override void RecursivelyResolve(Dictionary<string, DataDefinition> defs)
+		public override void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global)
 		{
 			foreach (var key in Keys)
 			{
-				if (defs.ContainsKey(key.ToLower()))
+				Dictionary<string, DataDefinition> defs = null;
+				if (local.ContainsKey(key.ToLower())) defs = local;
+				else if (global.ContainsKey(key.ToLower())) defs = global;
+
+				if (defs != null)
 				{
 					var def = defs[key.ToLower()];
 

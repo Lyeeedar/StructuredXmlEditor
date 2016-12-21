@@ -19,6 +19,8 @@ namespace StructuredXmlEditor.Definition
 
 		public virtual string CopyKey { get { return GetType().ToString() + "Copy"; } }
 
+		public string SrcFile { get; set; }
+
 		public string Name { get; set; } = "";
 
 		public string TextColour { get; set; } = "200,200,200";
@@ -28,6 +30,8 @@ namespace StructuredXmlEditor.Definition
 		public string VisibleIf { get; set; }
 
 		public virtual bool SkipIfDefault { get; set; }
+
+		public bool IsGlobal { get; set; }
 
 		public abstract void Parse(XElement definition);
 		public abstract void DoSaveData(XElement parent, DataItem item);
@@ -85,6 +89,7 @@ namespace StructuredXmlEditor.Definition
 				definition.TextColour = col;
 			}
 
+			definition.IsGlobal = definition.TryParseBool(element, "IsGlobal");
 			definition.VisibleIf = element.Attribute("VisibleIf")?.Value?.ToString();
 			definition.SkipIfDefault = definition.TryParseBool(element, "SkipIfDefault", true);
 
@@ -132,7 +137,7 @@ namespace StructuredXmlEditor.Definition
 			return temp;
 		}
 
-		public virtual void RecursivelyResolve(Dictionary<string, DataDefinition> defs)
+		public virtual void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global)
 		{
 
 		}

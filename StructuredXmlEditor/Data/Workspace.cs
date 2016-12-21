@@ -44,7 +44,7 @@ namespace StructuredXmlEditor.Data
 		public string DefsFolder { get; set; }
 
 		//-----------------------------------------------------------------------
-		public Dictionary<string, DataDefinition> ReferenceableDefinitions { get; set; } = new Dictionary<string, DataDefinition>();
+		public Dictionary<string, Dictionary<string, DataDefinition>> ReferenceableDefinitions = new Dictionary<string, Dictionary<string, DataDefinition>>();
 		public Dictionary<string, DataDefinition> SupportedResourceTypes { get; set; } = new Dictionary<string, DataDefinition>();
 
 		public Dictionary<string, DataDefinition> DataTypes { get; set; } = new Dictionary<string, DataDefinition>();
@@ -303,6 +303,8 @@ namespace StructuredXmlEditor.Data
 		public void LoadDefinitions()
 		{
 			ReferenceableDefinitions.Clear();
+			ReferenceableDefinitions[""] = new Dictionary<string, DataDefinition>();
+
 			SupportedResourceTypes.Clear();
 			DataTypes.Clear();
 			RootDefinition = null;
@@ -315,15 +317,25 @@ namespace StructuredXmlEditor.Data
 					foreach (var el in filedoc.Elements().First().Elements())
 					{
 						var def = DataDefinition.LoadDefinition(el);
+						def.SrcFile = file;
+
 						var defname = def.Name.ToLower();
 
 						var name = el.Attribute("RefKey")?.Value.ToString().ToLower();
 						if (name == null) name = el.Name.ToString().ToLower();
 
+						if (!ReferenceableDefinitions.ContainsKey(file))
+						{
+							ReferenceableDefinitions[file] = new Dictionary<string, DataDefinition>();
+						}
+
 						if (name.EndsWith("def"))
 						{
-							if (ReferenceableDefinitions.ContainsKey(defname)) Message.Show("Duplicate definitions for type " + defname, "Duplicate Definitions", "Ok");
-							ReferenceableDefinitions[defname] = def;
+							var scopeName = def.IsGlobal ? "" : file;
+							var scope = ReferenceableDefinitions[scopeName];
+
+							if (scope.ContainsKey(defname)) Message.Show("Duplicate definitions for type " + defname, "Duplicate Definitions", "Ok");
+							scope[defname] = def;
 						}
 						else
 						{
@@ -338,14 +350,17 @@ namespace StructuredXmlEditor.Data
 				}
 			}
 
-			foreach (var def in ReferenceableDefinitions.Values)
+			foreach (var scope in ReferenceableDefinitions.Values)
 			{
-				def.RecursivelyResolve(ReferenceableDefinitions);
+				foreach (var def in scope.Values)
+				{
+					def.RecursivelyResolve(ReferenceableDefinitions[def.SrcFile], ReferenceableDefinitions[""]);
+				}
 			}
 
 			foreach (var def in SupportedResourceTypes.Values)
 			{
-				def.RecursivelyResolve(ReferenceableDefinitions);
+				def.RecursivelyResolve(ReferenceableDefinitions[def.SrcFile], ReferenceableDefinitions[""]);
 			}
 
 			// load xmldef definition
@@ -379,9 +394,9 @@ namespace StructuredXmlEditor.Data
 
 			foreach (var type in DataTypes.Values)
 			{
-				type.RecursivelyResolve(DataTypes);
+				type.RecursivelyResolve(DataTypes, DataTypes);
 			}
-			RootDefinition.RecursivelyResolve(DataTypes);
+			RootDefinition.RecursivelyResolve(DataTypes, DataTypes);
 
 			RaisePropertyChangedEvent("ReferenceableDefinitions");
 			RaisePropertyChangedEvent("SupportedResourceTypes");
@@ -521,8 +536,24 @@ namespace StructuredXmlEditor.Data
 
 			using (document.UndoRedo.DisableUndoScope())
 			{
-				var item = data.LoadData(doc.Elements().First(), document.UndoRedo);
+				var firstEl = doc.Elements().First();
+				var item = data.LoadData(firstEl, document.UndoRedo);
+
 				document.SetData(item);
+
+				if (item is GraphNodeItem && (item.Definition as GraphNodeDefinition).FlattenData)
+				{
+					var nodesEl = firstEl.Element("Nodes");
+					foreach (var el in nodesEl.Elements())
+					{
+						var name = el.Name.ToString().ToLower();
+						var def = ReferenceableDefinitions[data.SrcFile].ContainsKey(name) ? ReferenceableDefinitions[data.SrcFile][name] : ReferenceableDefinitions[""][name];
+
+						var node = def.LoadData(el, document.UndoRedo);
+
+						document.Data.GraphNodeItems.Add(node as GraphNodeItem);
+					}
+				}
 			}
 
 			return document;

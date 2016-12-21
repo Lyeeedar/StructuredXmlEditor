@@ -68,38 +68,18 @@ namespace StructuredXmlEditor.Data
 		private ObservableCollection<GraphNodeItem> m_graphNodeItems;
 
 		//-----------------------------------------------------------------------
-		public bool AllowCircularLinks
+		private GraphNodeDefinition GraphNodeDefinition
 		{
 			get
 			{
-				foreach (var item in m_storedRootItems)
-				{
-					if (item is GraphNodeItem)
-					{
-						return (item.Definition as GraphNodeDefinition).AllowCircularLinks;
-					}
-				}
-
-				return false;
+				return m_storedRootItems.FirstOrDefault(e => e is GraphNodeItem)?.Definition as GraphNodeDefinition;
 			}
 		}
 
 		//-----------------------------------------------------------------------
-		public bool AllowReferenceLinks
-		{
-			get
-			{
-				foreach (var item in m_storedRootItems)
-				{
-					if (item is GraphNodeItem)
-					{
-						return (item.Definition as GraphNodeDefinition).AllowReferenceLinks;
-					}
-				}
-
-				return false;
-			}
-		}
+		public bool AllowCircularLinks { get { return GraphNodeDefinition?.AllowCircularLinks ?? false; } }
+		public bool AllowReferenceLinks { get { return GraphNodeDefinition?.AllowReferenceLinks ?? false; } }
+		public bool FlattenData { get { return GraphNodeDefinition?.FlattenData ?? false; } }
 
 		//-----------------------------------------------------------------------
 		public ObservableCollection<DataItem> RootItems
@@ -418,15 +398,29 @@ namespace StructuredXmlEditor.Data
 			Directory.CreateDirectory(Path.GetDirectoryName(path));
 
 			XDocument doc = new XDocument();
+
 			XElement fakeRoot = new XElement("FAKE_ROOT");
 			foreach (var item in m_storedRootItems)
 			{
 				item.Definition.SaveData(fakeRoot, item);
 			}
-
 			foreach (var el in fakeRoot.Elements())
 			{
 				doc.Add(el);
+			}
+
+			if (FlattenData)
+			{
+				var nodeEl = new XElement("Nodes");
+
+				foreach (var node in GraphNodeItems)
+				{
+					if (m_storedRootItems.Contains(node) || node.LinkParents.Count == 0) continue;
+
+					node.Definition.SaveData(nodeEl, node);
+				}
+
+				doc.Elements().First().Add(nodeEl);
 			}
 
 			if (isJson)

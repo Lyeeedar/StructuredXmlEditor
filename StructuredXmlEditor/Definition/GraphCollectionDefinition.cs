@@ -115,7 +115,7 @@ namespace StructuredXmlEditor.Definition
 			root.Add(new XAttribute("X", ci.X));
 			root.Add(new XAttribute("Y", ci.Y));
 
-			if (ci.LinkParents.Count > 1)
+			if (ci.LinkParents.Count > 1 || ci.Grid.FlattenData)
 			{
 				root.Add(new XAttribute("GUID", ci.GUID));
 			}
@@ -157,9 +157,9 @@ namespace StructuredXmlEditor.Definition
 			}
 		}
 
-		public override void RecursivelyResolve(Dictionary<string, DataDefinition> defs)
+		public override void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global)
 		{
-			ChildDefinition.WrappedDefinition.RecursivelyResolve(defs);
+			ChildDefinition.WrappedDefinition.RecursivelyResolve(local, global);
 		}
 	}
 }

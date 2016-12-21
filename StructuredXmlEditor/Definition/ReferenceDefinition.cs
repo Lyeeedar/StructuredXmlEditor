@@ -76,11 +76,15 @@ namespace StructuredXmlEditor.Definition
 			IsNullable = TryParseBool(definition, "Nullable", true);
 		}
 
-		public override void RecursivelyResolve(Dictionary<string, DataDefinition> defs)
+		public override void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global)
 		{
 			foreach (var key in Keys)
 			{
-				if (defs.ContainsKey(key.ToLower()))
+				Dictionary<string, DataDefinition> defs = null;
+				if (local.ContainsKey(key.ToLower())) defs = local;
+				else if (global.ContainsKey(key.ToLower())) defs = global;
+
+				if (defs != null)
 				{
 					Definitions[key] = defs[key.ToLower()];
 				}

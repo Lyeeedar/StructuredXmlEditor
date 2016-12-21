@@ -64,13 +64,19 @@ namespace StructuredXmlEditor.Definition
 			return item;
 		}
 
-		public override void RecursivelyResolve(Dictionary<string, DataDefinition> defs)
+		public override void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global)
 		{
 			if (Key != null)
 			{
-				if (defs.ContainsKey(Key.ToLower()))
+				var key = Key.ToLower();
+
+				Dictionary<string, DataDefinition> defs = null;
+				if (local.ContainsKey(key)) defs = local;
+				else if (global.ContainsKey(key)) defs = global;
+
+				if (defs != null)
 				{
-					var def = defs[Key.ToLower()] as EnumDefinition;
+					var def = defs[key] as EnumDefinition;
 					EnumValues = def.EnumValues;
 					if (Default == null) Default = EnumValues[0];
 				}

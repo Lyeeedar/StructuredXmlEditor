@@ -112,6 +112,7 @@
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
+			<Boolean Name="IsGlobal" ToolTip="Whether this definition can be referenced from other files." />
 		</Attributes>
 		<String Name="EnumValue" />
 	</CollectionDef>
@@ -152,6 +153,7 @@
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Collection" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
+			<Boolean Name="IsGlobal" ToolTip="Whether this definition can be referenced from other files." />
 		</Attributes>
 		<Reference Name="Item" Keys="Boolean,Collection,Colour,Enum,File,GraphReference,MultilineString,Number,Reference,String,Struct,Timeline,Tree,Vector" ToolTip="The child that this collection contains." />
 	</StructDef>
@@ -182,6 +184,7 @@
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Struct" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
+			<Boolean Name="IsGlobal" ToolTip="Whether this definition can be referenced from other files." />
 		</Attributes>
 		<Reference Name="Data" Keys="Boolean,Collection,Colour,Enum,File,GraphReference,MultilineString,Number,String,Struct,Reference,Timeline,Tree,Vector" ToolTip="The defined children of the struct" />
 	</CollectionDef>
@@ -209,6 +212,7 @@
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Struct" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
+			<Boolean Name="IsGlobal" ToolTip="Whether this definition can be referenced from other files." />
 		</Attributes>
 		<Reference Name="Data" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,String,Struct,Reference,Timeline,Tree,Vector,GraphReference" ToolTip="The defined children of the struct" />
 	</CollectionDef>
@@ -235,6 +239,7 @@
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Collection" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
+			<Boolean Name="IsGlobal" ToolTip="Whether this definition can be referenced from other files." />
 		</Attributes>
 		<Reference Name="Item" Keys="Boolean,Collection,Colour,Enum,File,GraphReference,MultilineString,Number,Reference,String,Struct,Timeline,Tree,Vector" ToolTip="The child that this collection contains." />
 	</StructDef>
