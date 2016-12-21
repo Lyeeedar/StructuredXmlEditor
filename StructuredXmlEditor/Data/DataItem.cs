@@ -316,8 +316,7 @@ namespace StructuredXmlEditor.Data
 		{
 			get
 			{
-				if (m_menu == null) m_menu = CreateContextMenu();
-				return m_menu;
+				return CreateContextMenu();
 			}
 		}
 		private ContextMenu m_menu;
@@ -694,7 +693,7 @@ namespace StructuredXmlEditor.Data
 			{
 				var gni = this as GraphNodeItem;
 
-				if (foundInChild != null && gni.Datas.Contains(foundInChild))
+				if (foundInChild != null)
 				{
 					IsFilterMatched = true;
 				}
@@ -705,12 +704,7 @@ namespace StructuredXmlEditor.Data
 				var gri = this as GraphReferenceItem;
 				if (gri.WrappedItem != null)
 				{
-					if (foundInChild != null && gri.WrappedItem.Datas.Contains(foundInChild))
-					{
-						IsFilterMatched = true;
-					}
-
-					gri.WrappedItem.IsFilterMatched = IsFilterMatched;
+					gri.WrappedItem.Filter(filter, regex, caseSensitive, showMatchesOnly);
 				}
 			}
 

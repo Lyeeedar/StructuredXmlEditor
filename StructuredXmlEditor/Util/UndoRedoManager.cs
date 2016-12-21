@@ -99,8 +99,21 @@ public class UndoRedoManager : NotifyPropertyChanged
 		});
 	}
 
+	public UsingContext ActionScope(string name)
+	{
+		var oldName = overrideName;
+		overrideName = name;
+
+		return new UsingContext(() =>
+		{
+			overrideName = oldName;
+		});
+	}
+
 	public void ApplyDoUndo(Action _do, Action _undo, string _desc = "")
 	{
+		if (overrideName != null) _desc = overrideName;
+
 		if (enableUndoRedo == 0)
 		{
 			if (isInApplyUndo)
@@ -223,6 +236,7 @@ public class UndoRedoManager : NotifyPropertyChanged
 	int enableUndoRedo;
 	UndoRedoGroup savePoint;
 	bool isInApplyUndo;
+	string overrideName;
 }
 
 //-----------------------------------------------------------------------

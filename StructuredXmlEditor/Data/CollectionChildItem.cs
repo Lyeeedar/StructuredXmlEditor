@@ -154,6 +154,33 @@ namespace StructuredXmlEditor.Data
 			pasteItem.Command = PasteCMD;
 
 			menu.Items.Add(pasteItem);
+
+			if (WrappedItem is ReferenceItem)
+			{
+				var ri = WrappedItem as ReferenceItem;
+
+				if ((ri.Definition as ReferenceDefinition).Definitions.Count > 1)
+				{
+					menu.Items.Add(new Separator());
+
+					MenuItem swapItem = new MenuItem();
+					swapItem.Header = "Swap";
+					menu.Items.Add(swapItem);
+
+					foreach (var def in (ri.Definition as ReferenceDefinition).Definitions.Values)
+					{
+						if (def != ri.ChosenDefinition)
+						{
+							MenuItem doSwapItem = new MenuItem();
+							doSwapItem.Header = def.Name;
+							doSwapItem.Command = ri.SwapCMD;
+							doSwapItem.CommandParameter = def;
+
+							swapItem.Items.Add(doSwapItem);
+						}
+					}
+				}
+			}
 		}
 
 		//-----------------------------------------------------------------------

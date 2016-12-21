@@ -32,6 +32,9 @@ namespace StructuredXmlEditor.Data
 				if (m_wrappedItem != null)
 				{
 					m_wrappedItem.PropertyChanged -= WrappedItemPropertyChanged;
+					m_wrappedItem.Children = new System.Collections.ObjectModel.ObservableCollection<DataItem>();
+					foreach (var child in Children) m_wrappedItem.Children.Add(child);
+
 					Children.Clear();
 				}
 
@@ -100,6 +103,9 @@ namespace StructuredXmlEditor.Data
 		public override Command<object> RemoveCMD { get { return new Command<object>((e) => Clear()); } }
 
 		//-----------------------------------------------------------------------
+		public Command<DataDefinition> SwapCMD { get { return new Command<DataDefinition>((e) => Swap(e)); } }
+
+		//-----------------------------------------------------------------------
 		public ReferenceItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
 			SelectedDefinition = (definition as ReferenceDefinition).Definitions.Values.First();
@@ -139,6 +145,28 @@ namespace StructuredXmlEditor.Data
 			menu.Items.Add(pasteItem);
 
 			menu.Items.Add(new Separator());
+
+			if (WrappedItem != null && (Definition as ReferenceDefinition).Definitions.Count > 1)
+			{
+				MenuItem swapItem = new MenuItem();
+				swapItem.Header = "Swap";
+				menu.Items.Add(swapItem);
+
+				foreach (var def in (Definition as ReferenceDefinition).Definitions.Values)
+				{
+					if (def != ChosenDefinition)
+					{
+						MenuItem doSwapItem = new MenuItem();
+						doSwapItem.Header = def.Name;
+						doSwapItem.Command = SwapCMD;
+						doSwapItem.CommandParameter = def;
+
+						swapItem.Items.Add(doSwapItem);
+					}
+				}
+
+				menu.Items.Add(new Separator());
+			}
 		}
 
 		//-----------------------------------------------------------------------
@@ -147,6 +175,19 @@ namespace StructuredXmlEditor.Data
 			if (args.PropertyName == "Description")
 			{
 				RaisePropertyChangedEvent("Description");
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public void Swap(DataDefinition def)
+		{
+			using (UndoRedo.ActionScope("Swap " + ChosenDefinition.Name + " to " + def.Name))
+			{
+				Copy();
+				SelectedDefinition = def;
+				Clear();
+				Create();
+				Paste();
 			}
 		}
 

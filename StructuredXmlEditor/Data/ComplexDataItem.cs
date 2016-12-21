@@ -237,6 +237,33 @@ namespace StructuredXmlEditor.Data
 
 				menu.Items.Add(clearItem);
 			}
+
+			if (Parent is ReferenceItem)
+			{
+				var ri = Parent as ReferenceItem;
+
+				if ((ri.Definition as ReferenceDefinition).Definitions.Count > 1)
+				{
+					MenuItem swapItem = new MenuItem();
+					swapItem.Header = "Swap";
+					menu.Items.Add(swapItem);
+
+					foreach (var def in (ri.Definition as ReferenceDefinition).Definitions.Values)
+					{
+						if (def != ri.ChosenDefinition)
+						{
+							MenuItem doSwapItem = new MenuItem();
+							doSwapItem.Header = def.Name;
+							doSwapItem.Command = ri.SwapCMD;
+							doSwapItem.CommandParameter = def;
+
+							swapItem.Items.Add(doSwapItem);
+						}
+					}
+
+					menu.Items.Add(new Separator());
+				}
+			}
 		}
 
 		//-----------------------------------------------------------------------
@@ -283,10 +310,19 @@ namespace StructuredXmlEditor.Data
 				var prevChildren = Children.ToList();
 				List<DataItem> newChildren = null;
 
+				List<DataItem> oldAtts = null;
+				List<DataItem> newAtts = null;
+
 				using (UndoRedo.DisableUndoScope())
 				{
 					var item = sdef.LoadData(root, UndoRedo);
 					newChildren = item.Children.ToList();
+					
+					if (item is ComplexDataItem)
+					{
+						oldAtts = (this as ComplexDataItem).Attributes.ToList();
+						newAtts = (item as ComplexDataItem).Attributes.ToList();
+					}
 				}
 
 				UndoRedo.ApplyDoUndo(
@@ -294,6 +330,14 @@ namespace StructuredXmlEditor.Data
 					{
 						Children.Clear();
 						foreach (var child in newChildren) Children.Add(child);
+
+						if (this is ComplexDataItem)
+						{
+							var si = this as ComplexDataItem;
+							Attributes.Clear();
+							foreach (var att in newAtts) Attributes.Add(att);
+						}
+
 						RaisePropertyChangedEvent("HasContent");
 						RaisePropertyChangedEvent("Description");
 					},
@@ -301,6 +345,14 @@ namespace StructuredXmlEditor.Data
 					{
 						Children.Clear();
 						foreach (var child in prevChildren) Children.Add(child);
+
+						if (this is ComplexDataItem)
+						{
+							var si = this as ComplexDataItem;
+							Attributes.Clear();
+							foreach (var att in oldAtts) Attributes.Add(att);
+						}
+
 						RaisePropertyChangedEvent("HasContent");
 						RaisePropertyChangedEvent("Description");
 					},

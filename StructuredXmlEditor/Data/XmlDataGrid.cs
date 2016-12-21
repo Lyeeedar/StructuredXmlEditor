@@ -269,11 +269,28 @@ namespace StructuredXmlEditor.Data
 
 				m_focusedItemsPath.Clear();
 
-				DataItem current = item.Parent;
+				DataItem current = null;
+				if (item is GraphNodeItem)
+				{
+					current = (item as GraphNodeItem).LinkParents.FirstOrDefault();
+				}
+				else
+				{
+					current = item.Parent;
+				}
+
 				while (current != null)
 				{
-					if (current is CollectionChildItem || !(current.Parent is CollectionChildItem)) m_focusedItemsPath.Add(current);
-					current = current.Parent;
+					if (current is CollectionChildItem || current is GraphNodeItem || !(current.Parent is CollectionChildItem)) m_focusedItemsPath.Add(current);
+
+					if (current is GraphNodeItem)
+					{
+						current = (current as GraphNodeItem).LinkParents.FirstOrDefault();
+					}
+					else
+					{
+						current = current.Parent;
+					}
 				}
 				m_focusedItemsPath.Remove(m_focusedItemsPath.Last());
 				m_focusedItemsPath.Add(m_proxyRootItem);
