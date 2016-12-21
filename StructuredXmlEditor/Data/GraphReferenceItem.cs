@@ -81,25 +81,22 @@ namespace StructuredXmlEditor.Data
 			get { return m_LinkType; }
 			set
 			{
-				if (value == LinkType.Reference)
+				if (m_LinkType != value)
 				{
-					bool duplicateExists = false;
-					foreach (var parent in WrappedItem.LinkParents)
-					{
-						if (parent == this) continue;
+					var oldType = m_LinkType;
 
-						if (parent.LinkType == LinkType.Duplicate)
+					UndoRedo.ApplyDoUndo(
+						delegate
 						{
-							duplicateExists = true;
-							break;
-						}
-					}
-
-					if (!duplicateExists) return;
+							m_LinkType = value;
+							RaisePropertyChangedEvent();
+						},
+						delegate
+						{
+							m_LinkType = oldType;
+							RaisePropertyChangedEvent();
+						}, "Change LinkType from " + oldType + " to " + value);
 				}
-
-				m_LinkType = value;
-				RaisePropertyChangedEvent();
 			}
 		}
 		public LinkType m_LinkType = LinkType.Duplicate;

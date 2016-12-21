@@ -25,7 +25,10 @@ namespace StructuredXmlEditor.Definition
 			var si = item as GraphReferenceItem;
 			if (si.ChosenDefinition != null)
 			{
-				if (si.LinkType == LinkType.Reference)
+				if (
+					si.LinkType == LinkType.Reference && si.WrappedItem != null && 
+					(si.WrappedItem.LinkParents.Any(e => e.LinkType == LinkType.Duplicate) || si.WrappedItem.LinkParents.First() == si)
+					)
 				{
 					var el = new XElement(Name, si.WrappedItem.GUID);
 					el.SetAttributeValue("RefKey", si.ChosenDefinition.Name);
