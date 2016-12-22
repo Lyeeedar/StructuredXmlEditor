@@ -130,6 +130,7 @@
     <Compile Include="Util\PopupCloser.cs" />
     <Compile Include="Util\SerializableDictionary.cs" />
     <Compile Include="Util\UndoRedoManager.cs" />
+    <Compile Include="Util\VersionInfo.cs" />
     <Compile Include="View\CustomControls\ColourPicker\ColorCanvas.cs" />
     <Compile Include="View\CustomControls\ColourPicker\ColorSpectrumSlider.cs" />
     <Compile Include="View\CustomControls\ColourPicker\ColourUtilities.cs" />

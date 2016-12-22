@@ -24,21 +24,21 @@ using StructuredXmlEditor.View;
 
 namespace StructuredXmlEditor
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
-    {
+	/// <summary>
+	/// Interaction logic for MainWindow.xaml
+	/// </summary>
+	public partial class MainWindow : Window
+	{
 		public static MainWindow Instance { get; set; }
 
 		public Workspace Workspace { get; set; }
 
-        public MainWindow()
-        {
+		public MainWindow()
+		{
 			Instance = this;
-            InitializeComponent();
+			InitializeComponent();
 
-			Loaded += (e, args) => 
+			Loaded += (e, args) =>
 			{
 				Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(() =>
 				{
@@ -47,9 +47,15 @@ namespace StructuredXmlEditor
 					DataContext = Workspace;
 
 					LoadLayout();
+
+					try
+					{
+						VersionInfo.CheckForUpdates(Workspace);
+					}
+					catch (Exception) { }
 				}));
 			};
-        }
+		}
 
 		protected override void OnPreviewKeyDown(KeyEventArgs e)
 		{
