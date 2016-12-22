@@ -54,6 +54,8 @@
 					Width="*" />
 				<ColumnDefinition
 					Width="*" />
+				<ColumnDefinition
+					Width="Auto" />
 			</Grid.ColumnDefinitions>
 
 			<TextBlock
@@ -65,6 +67,21 @@
 				Grid.Column="1"
 				VerticalAlignment="Center"
 				Content="{Binding Preview, Converter={local:ColourMarkupConverter}}" />
+
+			<Button
+				Grid.Column="2"
+				Margin="5"
+				Opacity="0.5"
+				Background="Transparent"
+				BorderBrush="Transparent"
+				ToolTip="Edit"
+				Command="{Binding EditCMD}">
+				<Image
+					Source="/Resources/Edit.png"
+					RenderOptions.BitmapScalingMode="NearestNeighbor"
+					Height="10"
+					Width="10" />
+			</Button>
 
 		</Grid>
 	</DataTemplate>
@@ -79,9 +96,9 @@
 				<ColumnDefinition
 					Width="*" />
 				<ColumnDefinition
-					Width="*" />
+					Width="Auto" />
 				<ColumnDefinition
-					Width="*" />
+					Width="Auto" />
 			</Grid.ColumnDefinitions>
 
 			<TextBlock
@@ -139,14 +156,15 @@
 				ShowArrow="False"
 				Background="Transparent"
 				BorderBrush="Transparent"
-				ToolTip="Create"
+				Opacity="0.5"
+				ToolTip="Link Type"
 				Visibility="{Binding Graph.AllowReferenceLinks, Converter={local:ValueTypeConverter}}"
 				x:Name="button2">
 				<Image
 					Source="/Resources/Edit.png"
 					RenderOptions.BitmapScalingMode="NearestNeighbor"
-					Height="12"
-					Width="12" />
+					Height="10"
+					Width="10" />
 				<local:PopupButton.PopupContent>
 					<ItemsControl
 						ItemsSource="{Binding LinkTypes}">

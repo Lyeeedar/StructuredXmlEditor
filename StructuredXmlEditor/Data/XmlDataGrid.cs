@@ -411,7 +411,7 @@ namespace StructuredXmlEditor.Data
 
 			if (FlattenData)
 			{
-				var nodeEl = new XElement("Nodes");
+				var nodeEl = new XElement(GraphNodeDefinition.NodeStoreName);
 
 				foreach (var node in GraphNodeItems)
 				{

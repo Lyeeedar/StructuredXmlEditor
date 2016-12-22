@@ -11,6 +11,7 @@ namespace StructuredXmlEditor.Definition
 		public bool AllowReferenceLinks { get; set; }
 		public bool AllowCircularLinks { get; set; }
 		public bool FlattenData { get; set; }
+		public string NodeStoreName { get; set; }
 
 		public GraphNodeDefinition()
 		{

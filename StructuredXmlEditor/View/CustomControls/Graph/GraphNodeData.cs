@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 
 namespace StructuredXmlEditor.View
 {
@@ -37,6 +39,8 @@ namespace StructuredXmlEditor.View
 		public override string Title { get { return data.Name; } }
 
 		public string Preview { get { return data.Description; } }
+
+		public Command<object> EditCMD { get { return new Command<object>((e) => { Node.Edit(data); }); } }
 
 		private DataItem data;
 

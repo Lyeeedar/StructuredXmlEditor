@@ -541,9 +541,12 @@ namespace StructuredXmlEditor.Data
 
 				document.SetData(item);
 
-				if (item is GraphNodeItem && (item.Definition as GraphNodeDefinition).FlattenData)
+				var graphdef = item.Definition as GraphNodeDefinition;
+				if (graphdef != null && graphdef.FlattenData)
 				{
-					var nodesEl = firstEl.Element("Nodes");
+					var nodesEl = firstEl.Element(graphdef.NodeStoreName);
+					nodesEl.Remove();
+
 					foreach (var el in nodesEl.Elements())
 					{
 						var name = el.Name.ToString().ToLower();

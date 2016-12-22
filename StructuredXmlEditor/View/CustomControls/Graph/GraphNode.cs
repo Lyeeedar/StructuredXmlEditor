@@ -24,7 +24,7 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		public Command<object> EditCMD { get { return new Command<object>((e) => { Edit(); }); } }
+		public Command<object> EditCMD { get { return new Command<object>((e) => { Edit(GraphNodeItem); }); } }
 
 		//--------------------------------------------------------------------------
 		public GraphNodeItem GraphNodeItem { get { return m_nodeItem; } }
@@ -167,16 +167,16 @@ namespace StructuredXmlEditor.View
 		}
 
 		//-----------------------------------------------------------------------
-		protected Brush PopupBackgroundBrush { get { return (Application.Current.TryFindResource("WindowBackgroundBrush") as SolidColorBrush); } }
+		public Brush PopupBackgroundBrush { get { return (Application.Current.TryFindResource("WindowBackgroundBrush") as SolidColorBrush); } }
 
 		//-----------------------------------------------------------------------
-		protected Brush PopupBorderBrush { get { return (Application.Current.TryFindResource("SelectionBorderBrush") as SolidColorBrush); } }
+		public Brush PopupBorderBrush { get { return (Application.Current.TryFindResource("SelectionBorderBrush") as SolidColorBrush); } }
 
 		//--------------------------------------------------------------------------
-		private void Edit()
+		public void Edit(DataItem data)
 		{
 			Popup popup = new Popup();
-			popup.DataContext = GraphNodeItem;
+			popup.DataContext = data;
 			popup.StaysOpen = true;
 			popup.Focusable = false;
 			popup.PopupAnimation = PopupAnimation.Slide;
@@ -192,7 +192,7 @@ namespace StructuredXmlEditor.View
 			popup.Child = contentBorder;
 
 			var content = new DataGridView();
-			content.HierarchicalItemsSource = new List<DataItem>() { GraphNodeItem };
+			content.HierarchicalItemsSource = new List<DataItem>() { data };
 
 			content.Margin = new Thickness(5);
 			contentBorder.Child = content;

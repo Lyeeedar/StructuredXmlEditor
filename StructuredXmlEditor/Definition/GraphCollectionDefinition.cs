@@ -84,6 +84,7 @@ namespace StructuredXmlEditor.Definition
 			AllowReferenceLinks = TryParseBool(definition, "AllowReferenceLinks", true);
 			AllowCircularLinks = TryParseBool(definition, "AllowCircularLinks", false);
 			FlattenData = TryParseBool(definition, "FlattenData", false);
+			NodeStoreName = definition.Attribute("NodeStoreName")?.Value?.ToString() ?? "Nodes";
 
 			ChildDefinition = new CollectionChildDefinition();
 			ChildDefinition.Parse(definition.Elements().Where(e => e.Name != "Attributes").First());
