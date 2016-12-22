@@ -35,6 +35,8 @@ namespace StructuredXmlEditor
 
 		public MainWindow()
 		{
+			Title = "Structured Xml Editor (" + VersionInfo.Version + ")";
+
 			Instance = this;
 			InitializeComponent();
 
@@ -48,11 +50,7 @@ namespace StructuredXmlEditor
 
 					LoadLayout();
 
-					try
-					{
-						VersionInfo.CheckForUpdates(Workspace);
-					}
-					catch (Exception) { }
+					VersionInfo.CheckForUpdates(Workspace);
 				}));
 			};
 		}

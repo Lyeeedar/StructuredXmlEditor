@@ -16,39 +16,53 @@ public class VersionInfo
 	public const int FeatureVersion = 0;
 	public const int BugFixVersion = 0;
 
+	public static string Version { get { return MajorVersion + "." + FeatureVersion + "." + BugFixVersion; } }
+
+	public static string AvailableMajorVersion { get; set; }
+	public static string AvailableFeatureVersion { get; set; }
+	public static string AvailableBugfixVersion { get; set; }
+	public static EventHandler VersionsUpdated;
+
 	public static void CheckForUpdates(Workspace workspace)
 	{
-		string newMajor = null;
-		string newFeature = null;
-		string newBugfix = null;
-
-		using (WebClient client = new WebClient())
+		Task.Run(() => 
 		{
-			string s = client.DownloadString("https://github.com/infinity8/StructuredXmlEditor/wiki/VersionList.txt");
-			var lines = s.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+			string newMajor = null;
+			string newFeature = null;
+			string newBugfix = null;
 
-			foreach (var version in lines)
+			using (WebClient client = new WebClient())
 			{
-				var parts = version.Split(' ')[0].Split('.');
-				int major = int.Parse(parts[0]);
-				int feature = int.Parse(parts[1]);
-				int bugfix = int.Parse(parts[2]);
+				string s = client.DownloadString("https://github.com/infinity8/StructuredXmlEditor/wiki/VersionList.txt");
+				var lines = s.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
-				if (major > MajorVersion)
+				foreach (var version in lines)
 				{
-					if (newMajor == null) newMajor = version;
-				}
-				else if (major == MajorVersion)
-				{
-					if (feature > FeatureVersion)
+					var parts = version.Split(' ')[0].Split('.');
+					int major = int.Parse(parts[0]);
+					int feature = int.Parse(parts[1]);
+					int bugfix = int.Parse(parts[2]);
+
+					if (major > MajorVersion)
 					{
-						if (newFeature == null) newFeature = version;
+						if (newMajor == null) newMajor = version;
 					}
-					else if (feature == FeatureVersion)
+					else if (major == MajorVersion)
 					{
-						if (bugfix > BugFixVersion)
+						if (feature > FeatureVersion)
 						{
-							if (newBugfix == null) newBugfix = version;
+							if (newFeature == null) newFeature = version;
+						}
+						else if (feature == FeatureVersion)
+						{
+							if (bugfix > BugFixVersion)
+							{
+								if (newBugfix == null) newBugfix = version;
+							}
+							else
+							{
+								break;
+							}
 						}
 						else
 						{
@@ -60,69 +74,78 @@ public class VersionInfo
 						break;
 					}
 				}
-				else
-				{
-					break;
-				}
 			}
-		}
 
-		if (newMajor != null)
-		{
-			var ignored = workspace.GetSetting<string>("IgnoredMajor");
-			if (newMajor != ignored)
+			Application.Current.Dispatcher.BeginInvoke(new Action(() => 
 			{
-				var version = newMajor.Split(' ')[0];
-				var result = Message.Show("A new major version of the tool is available (" + version + ")! This may break your current data so update at your own risk. For full change information check the wiki.", "Major Update Available", "Update", "Ignore");
-				if (result == "Update")
-				{
-					UpdateApplication(newMajor, workspace);
-					return;
-				}
-				else
-				{
-					workspace.StoreSetting("IgnoredMajor", newMajor);
-				}
-			}
-		}
+				AvailableMajorVersion = newMajor;
+				AvailableFeatureVersion = newFeature;
+				AvailableBugfixVersion = newBugfix;
 
-		if (newFeature != null)
-		{
-			var ignored = workspace.GetSetting<string>("IgnoredFeature");
-			if (newFeature != ignored)
-			{
-				var version = newFeature.Split(' ')[0];
-				var result = Message.Show("A new feature version of the tool is available (" + version + ")! This adds new functionality, for full information check the wiki.", "Feature Update Available", "Update", "Ignore");
-				if (result == "Update")
-				{
-					UpdateApplication(newFeature, workspace);
-					return;
-				}
-				else
-				{
-					workspace.StoreSetting("IgnoredFeature", newFeature);
-				}
-			}
-		}
+				VersionsUpdated?.Invoke(null, null);
 
-		if (newBugfix != null)
-		{
-			var ignored = workspace.GetSetting<string>("IgnoredBugFix");
-			if (newBugfix != ignored)
-			{
-				var version = newBugfix.Split(' ')[0];
-				var result = Message.Show("A new bugfix version of the tool is available (" + version + ")! This fixes numerous small issues, for full information check the wiki.", "Bugfix Update Available", "Update", "Ignore");
-				if (result == "Update")
+				try
 				{
-					UpdateApplication(newBugfix, workspace);
-					return;
+					if (newMajor != null)
+					{
+						var ignored = workspace.GetSetting<string>("IgnoredMajor");
+						if (newMajor != ignored)
+						{
+							var version = newMajor.Split(' ')[0];
+							var result = Message.Show("A new major version of the tool is available (" + version + ")! This may break your current data so update at your own risk. For full change information check the wiki.", "Major Update Available", "Update", "Ignore");
+							if (result == "Update")
+							{
+								UpdateApplication(newMajor, workspace);
+								return;
+							}
+							else
+							{
+								workspace.StoreSetting("IgnoredMajor", newMajor);
+							}
+						}
+					}
+
+					if (newFeature != null)
+					{
+						var ignored = workspace.GetSetting<string>("IgnoredFeature");
+						if (newFeature != ignored)
+						{
+							var version = newFeature.Split(' ')[0];
+							var result = Message.Show("A new feature version of the tool is available (" + version + ")! This adds new functionality, for full information check the wiki.", "Feature Update Available", "Update", "Ignore");
+							if (result == "Update")
+							{
+								UpdateApplication(newFeature, workspace);
+								return;
+							}
+							else
+							{
+								workspace.StoreSetting("IgnoredFeature", newFeature);
+							}
+						}
+					}
+
+					if (newBugfix != null)
+					{
+						var ignored = workspace.GetSetting<string>("IgnoredBugFix");
+						if (newBugfix != ignored)
+						{
+							var version = newBugfix.Split(' ')[0];
+							var result = Message.Show("A new bugfix version of the tool is available (" + version + ")! This fixes numerous small issues, for full information check the wiki.", "Bugfix Update Available", "Update", "Ignore");
+							if (result == "Update")
+							{
+								UpdateApplication(newBugfix, workspace);
+								return;
+							}
+							else
+							{
+								workspace.StoreSetting("IgnoredBugFix", newBugfix);
+							}
+						}
+					}
 				}
-				else
-				{
-					workspace.StoreSetting("IgnoredBugFix", newBugfix);
-				}
-			}
-		}
+				catch (Exception) { }
+			}));
+		});
 	}
 
 	public static void DeleteUpdater()

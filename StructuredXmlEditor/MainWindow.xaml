@@ -8,7 +8,6 @@
 	xmlns:t="clr-namespace:StructuredXmlEditor.Tools"
 	xmlns:dock="http://schemas.xceed.com/wpf/xaml/avalondock"
 	xmlns:dockctrl="clr-namespace:Xceed.Wpf.AvalonDock.Controls;assembly=Xceed.Wpf.AvalonDock"
-	Title="Structured Xml Editor"
 	WindowStartupLocation="CenterScreen"
 	Icon="pack://application:,,,/StructuredXmlEditor;component/Resources/Icon.png"
 	WindowState="Maximized">

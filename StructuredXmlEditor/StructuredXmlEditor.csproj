@@ -362,6 +362,9 @@
   <ItemGroup>
     <Resource Include="Resources\Edit.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Changelog.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.1.28.3\build\Fody.targets" Condition="Exists('..\packages\Fody.1.28.3\build\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -1,0 +1,36 @@
+﻿
+--------- 1.0.0 ---------
+
+- First major release.
+- Add support for loading and saving json.
+- Adds support for GraphNodes, and Graph based editing.
+- Added ability to generate a rough definition for a xml or json file. This show speed up the creation of definitions for existing data.
+- Added a 'Swap' option to references. This attempts to swap the current data with another definition. This should make creating definitions far less painful.
+
+- Adds dockable miscellaneous tools:
+ -- Add UndoHistory tool that allows viewing and browsing the Undo history.
+ -- Add StartPage that shows a fair amount of useful data.
+ -- Add FocusTool that allows for easily seeing the data for the selected node in the Graph view.
+
+- Optimised a lot.
+- Removed the ability to change the element name dynamically (via ChildAsName or ValueAsName).
+- Added support for updating the tool semi-automatically.
+
+
+--------- 0.2.1 ---------
+
+- Contains improvements to visibleif (add support for the || operator).
+- Fixes loading of structs made invisible by visibleif.
+- Improvements to saving that fix collections of primitives, collections of references and trees.
+
+
+--------- 0.2.0 ---------
+
+- Adds timeline element type.
+
+
+--------- 0.1.0 ---------
+
+- First release of the tool
+- General editors for all the major types.
+- Ability to create a definition from within the tool.
