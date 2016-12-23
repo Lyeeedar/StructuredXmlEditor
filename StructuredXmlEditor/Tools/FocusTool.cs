@@ -11,6 +11,7 @@ namespace StructuredXmlEditor.Tools
 	{
 		public FocusTool(Workspace workspace) : base(workspace, "FocusTool")
 		{
+			VisibleByDefault = false;
 		}
 	}
 }

@@ -31,6 +31,8 @@ namespace StructuredXmlEditor.Tools
 
 		public StartPage(Workspace workspace) : base(workspace, "StartPage")
 		{
+			DefaultPositionDocument = true;
+
 			Assembly assembly = Assembly.GetExecutingAssembly();
 
 			var culture = System.Threading.Thread.CurrentThread.CurrentCulture;

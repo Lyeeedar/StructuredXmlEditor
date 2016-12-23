@@ -48,7 +48,9 @@ namespace StructuredXmlEditor
 
 					DataContext = Workspace;
 
-					LoadLayout();
+
+					XDocument layout = File.Exists("Layout.xml") ? XDocument.Load("Layout.xml") : GenerateDefaultLayout();
+					LoadLayout(layout);
 
 					VersionInfo.CheckForUpdates(Workspace);
 				}));
@@ -125,6 +127,11 @@ namespace StructuredXmlEditor
 			Workspace.New(dataType);
 		}
 
+		private void ResetToDefaultLayoutClick(object sender, RoutedEventArgs e)
+		{
+			LoadLayout(GenerateDefaultLayout());
+		}
+
 		public void SaveLayout()
 		{
 			// serialize to a stream
@@ -157,21 +164,77 @@ namespace StructuredXmlEditor
 			}
 		}
 
-		public void LoadLayout()
+		public XDocument GenerateDefaultLayout()
 		{
-			if (!System.IO.File.Exists("Layout.xml"))
+			XDocument doc = new XDocument();
+
+			var layoutRoot = new XElement("LayoutRoot");
+			doc.Add(layoutRoot);
+
+			var rootPanel = new XElement("RootPanel", new XAttribute("Orientation", "Horizontal"));
+			layoutRoot.Add(rootPanel);
+
+			// Root level panels
+			var middlePanel = new XElement("LayoutDocumentPane", new XAttribute("Id", "DocumentPanel"));
+			var rightPanel = new XElement("LayoutAnchorablePane", new XAttribute("Id", "ToolPanel"), new XAttribute("DockWidth", "250"));
+
+			rootPanel.Add(middlePanel);
+			rootPanel.Add(rightPanel);
+
+			// Setup up the other unused stuff
+			layoutRoot.Add(new XElement("TopSide"));
+			layoutRoot.Add(new XElement("RightSide"));
+			layoutRoot.Add(new XElement("LeftSide"));
+			layoutRoot.Add(new XElement("BottomSide"));
+			layoutRoot.Add(new XElement("FloatingWindows"));
+
+			var hiddenPanel = new XElement("Hidden");
+			layoutRoot.Add(hiddenPanel);
+
+			// Add all tools to the relevant locations
+			foreach (var tool in Workspace.Tools)
 			{
-				return;
+				var el = new XElement("LayoutAnchorable",
+					new XAttribute("AutoHideMinWidth", "100"),
+					new XAttribute("AutoHideMinHeight", "100"),
+					new XAttribute("Title", tool.Title),
+					new XAttribute("ContentId", tool.Title),
+					new XAttribute("PreviousContainerId", tool.DefaultPositionDocument ? "DocumentPanel" : "ToolPanel"),
+					new XAttribute("PreviousContainerIndex", "0")
+					);
+
+				XElement targetPanel = hiddenPanel;
+
+				if (tool.VisibleByDefault)
+				{
+					if (tool.DefaultPositionDocument)
+					{
+						targetPanel = middlePanel;
+					}
+					else
+					{
+						targetPanel = rightPanel;
+					}
+
+					tool.IsVisible = true;
+				}
+
+				targetPanel.Add(el);
 			}
 
+			return doc;
+		}
+
+
+		public void LoadLayout(XDocument layout)
+		{
 			try
 			{
 				// Remove any stored documents
-				XDocument doc = XDocument.Load("Layout.xml");
-				RemoveDocumentsFromLayout(doc);
+				RemoveDocumentsFromLayout(layout);
 
 				// Remove any invalid tools
-				foreach (XElement el in doc.Root.Element("RootPanel").Descendants().ToArray())
+				foreach (XElement el in layout.Root.Element("RootPanel").Descendants().ToArray())
 				{
 					string contentId = (string)el.Attribute("ContentId");
 					if (contentId != null)
@@ -190,7 +253,7 @@ namespace StructuredXmlEditor
 				}
 
 				// retrieve visible tools in main panel
-				string[] visibleTools = doc.Root.Element("RootPanel")
+				string[] visibleTools = layout.Root.Element("RootPanel")
 					.Descendants()
 					.Select(e => (string)e.Attribute("ContentId"))
 					.ToArray();
@@ -204,7 +267,7 @@ namespace StructuredXmlEditor
 				}
 
 				// retrieve visible floating tools
-				visibleTools = doc.Root.Element("FloatingWindows")
+				visibleTools = layout.Root.Element("FloatingWindows")
 					.Descendants()
 					.Select(e => (string)e.Attribute("ContentId"))
 					.ToArray();
@@ -219,7 +282,7 @@ namespace StructuredXmlEditor
 
 				// now load the stream
 				var stream = new MemoryStream();
-				doc.Save(stream);
+				layout.Save(stream);
 				stream.Position = 0;
 				var layoutSerializer = new XmlLayoutSerializer(DockingManager);
 				layoutSerializer.Deserialize(stream);

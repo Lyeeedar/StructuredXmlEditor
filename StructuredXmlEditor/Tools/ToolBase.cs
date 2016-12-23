@@ -29,6 +29,10 @@ namespace StructuredXmlEditor.Tools
 
 		public Command<object> CloseCMD { get { return new Command<object>((obj) => { IsVisible = false; }); } }
 
+		public bool DefaultPositionDocument { get; set; }
+
+		public bool VisibleByDefault { get; set; } = true;
+
 		public ToolBase(Workspace workspace, string title)
 		{
 			this.Workspace = workspace;

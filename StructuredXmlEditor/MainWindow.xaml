@@ -155,6 +155,12 @@
 						</DataTemplate>
 					</MenuItem.ItemTemplate>
 				</MenuItem>
+				<MenuItem
+					Header="_Layout">
+					<MenuItem
+						Header="_Reset To Default Layout"
+						Click="ResetToDefaultLayoutClick" />
+				</MenuItem>
 			</Menu>
 
 			<Border
