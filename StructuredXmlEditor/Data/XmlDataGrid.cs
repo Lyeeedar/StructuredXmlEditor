@@ -80,6 +80,7 @@ namespace StructuredXmlEditor.Data
 		public bool AllowCircularLinks { get { return GraphNodeDefinition?.AllowCircularLinks ?? false; } }
 		public bool AllowReferenceLinks { get { return GraphNodeDefinition?.AllowReferenceLinks ?? false; } }
 		public bool FlattenData { get { return GraphNodeDefinition?.FlattenData ?? false; } }
+		public bool ShowLinkTypeMenu { get { return AllowReferenceLinks && !FlattenData; } }
 
 		//-----------------------------------------------------------------------
 		public ObservableCollection<DataItem> RootItems

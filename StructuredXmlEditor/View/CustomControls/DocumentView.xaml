@@ -233,7 +233,7 @@
 			<v:Graph
 				Visibility="{Binding ShowAsGraph, Converter={v:ValueTypeConverter}}"
 				CanHaveCircularReferences="{Binding AllowCircularLinks}"
-				AllowReferenceLinks="{Binding AllowReferenceLinks}"
+				AllowReferenceLinks="{Binding ShowLinkTypeMenu}"
 				Nodes="{Binding GraphNodes}">
 				
 			</v:Graph>

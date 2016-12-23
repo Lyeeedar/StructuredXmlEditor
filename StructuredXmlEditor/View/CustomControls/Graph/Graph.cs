@@ -129,7 +129,7 @@ namespace StructuredXmlEditor.View
 								var dst = new Point(link.Link.X + 10, link.Link.Y + 10);
 
 								Brush brush = Brushes.MediumSpringGreen;
-								if (link.GraphReferenceItem.LinkType == LinkType.Reference)
+								if (link.GraphReferenceItem.LinkType == LinkType.Reference || link.GraphReferenceItem.Grid.FlattenData)
 								{
 									brush = Brushes.MediumPurple;
 								}
