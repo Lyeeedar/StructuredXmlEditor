@@ -1,4 +1,12 @@
 ﻿
+--------- 1.2.0 ---------
+
+- Fix deleting of the Update executable.
+- Make all graph links look like reference ones if FlattenData is used. Also remove the LinkType edit box.
+- Slightly alter the padding of the graphnodes to waste less space.
+- Add a proper error reporting and feedback system, that sends the data via email.
+
+
 --------- 1.0.0 ---------
 
 - First major release.
