@@ -41,7 +41,7 @@ namespace Updater
 				catch (Exception) { }
 			}
 
-			Process process = Process.Start(appName, "Updated");
+			Process process = Process.Start(appName);
 		}
 	}
 }

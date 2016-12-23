@@ -154,11 +154,11 @@ public class VersionInfo
 		{
 			while (true)
 			{
-				if (File.Exists("Updater.exe"))
+				if (File.Exists("SXEUpdater.exe"))
 				{
 					try
 					{
-						File.Delete("Updater.exe");
+						File.Delete("SXEUpdater.exe");
 						break;
 					}
 					catch (Exception) { }
@@ -187,10 +187,10 @@ public class VersionInfo
 		using (var client = new WebClient())
 		{
 			client.DownloadFile(appPath, "Downloaded.exe");
-			client.DownloadFile("https://github.com/infinity8/StructuredXmlEditor/wiki/Updater.exe", "Updater.exe");
+			client.DownloadFile("https://github.com/infinity8/StructuredXmlEditor/wiki/Updater.exe", "SXEUpdater.exe");
 		}
 
-		Process process = Process.Start("Updater.exe", System.AppDomain.CurrentDomain.FriendlyName);
+		Process process = Process.Start("SXEUpdater.exe", System.AppDomain.CurrentDomain.FriendlyName);
 
 		Application.Current.Shutdown();
 	}

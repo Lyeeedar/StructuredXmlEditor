@@ -20,14 +20,7 @@ namespace StructuredXmlEditor
 		{
 			if (!Debugger.IsAttached) this.Dispatcher.UnhandledException += OnDispatcherUnhandledException;
 
-			string[] args = Environment.GetCommandLineArgs();
-			if (args.Length > 0)
-			{
-				if (args[0] == "Updated")
-				{
-					VersionInfo.DeleteUpdater();
-				}
-			}
+			VersionInfo.DeleteUpdater();
 		}
 
 		void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
