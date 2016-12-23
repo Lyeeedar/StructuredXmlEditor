@@ -107,6 +107,10 @@ namespace StructuredXmlEditor.Data
 		public Command<string> OpenBackupCMD { get { return new Command<string>((e) => OpenBackup(e)); } }
 
 		//-----------------------------------------------------------------------
+		public string Feedback { get; set; }
+		public Command<object> FeedbackCMD { get { return new Command<object>((e) => SendFeedback()); } }
+
+		//-----------------------------------------------------------------------
 		public Workspace()
 		{
 			Instance = this;
@@ -1173,6 +1177,18 @@ namespace StructuredXmlEditor.Data
 		{
 			if (Settings.ContainsKey(key)) return Settings[key].DeserializeObject<T>();
 			else return fallback;
+		}
+
+		//-----------------------------------------------------------------------
+		public void SendFeedback()
+		{
+			if (!string.IsNullOrWhiteSpace(Feedback))
+			{
+				Email.SendEmail("Feedback", Feedback + "\n\n\n--------------------------------------\nTime: " + DateTime.Now.ToString() + "\nEditor Version: " + VersionInfo.Version);
+
+				Feedback = "";
+				RaisePropertyChangedEvent("Feedback");
+			}
 		}
 	}
 }

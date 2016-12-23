@@ -25,9 +25,16 @@ namespace StructuredXmlEditor
 
 		void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
 		{
-			string errorMessage = string.Format("An unhandled exception occurred! The app has attempted to recover and carry on, but you may experience some weirdness. Please create a new issue on github and attach the error.log file so that I can fix this in the future.", e.Exception.Message);
+			string errorMessage = "An unhandled exception occurred! The app has attempted to recover and carry on, but you may experience some weirdness. Report error?.";
 			File.WriteAllText("error.log", e.Exception.ToString());
-			Message.Show(errorMessage, "Error", "Ok");
+
+			var choice = Message.Show(errorMessage, "Error", "Report", "Ignore");
+			if (choice == "Report")
+			{
+				Email.SendEmail("Crash Report", "Editor crashed on " + DateTime.Now + ".\nEditor Version: " + VersionInfo.Version, e.Exception.ToString());
+				Message.Show("Error Reported, I shall fix as soon as possible.", "Error reported", "Ok");
+			}
+
 			e.Handled = true;
 		}
 	}

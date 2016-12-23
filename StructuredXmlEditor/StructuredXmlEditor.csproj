@@ -126,6 +126,7 @@
     <Compile Include="Tools\ToolBase.cs" />
     <Compile Include="Tools\UndoHistoryTool.cs" />
     <Compile Include="Util\DescendantPropertyChangedEventArgs.cs" />
+    <Compile Include="Util\Email.cs" />
     <Compile Include="Util\Extensions.cs" />
     <Compile Include="Util\PopupCloser.cs" />
     <Compile Include="Util\SerializableDictionary.cs" />
