@@ -20,9 +20,9 @@
 					<Border
 						Background="LawnGreen"
 						BorderThickness="2"
-						Width="18"
-						Height="18"
-						CornerRadius="9">
+						Width="16"
+						Height="16"
+						CornerRadius="8">
 						<Border.Style>
 							<Style>
 								<Setter
@@ -48,7 +48,7 @@
 	<DataTemplate
 		DataType="{x:Type local:GraphNodeDataPreview}">
 		<Grid
-			Margin="5">
+			Margin="5,0,5,0">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition
 					Width="*" />
@@ -60,6 +60,7 @@
 
 			<TextBlock
 				Margin="5"
+				VerticalAlignment="Center"
 				Text="{Binding Title}" />
 
 			<ContentControl
@@ -74,6 +75,7 @@
 				Opacity="0.5"
 				Background="Transparent"
 				BorderBrush="Transparent"
+				VerticalAlignment="Center"
 				ToolTip="Edit"
 				Command="{Binding EditCMD}">
 				<Image
@@ -89,7 +91,7 @@
 	<DataTemplate
 		DataType="{x:Type local:GraphNodeDataLink}">
 		<Grid
-			Margin="5">
+			Margin="5,0,5,0">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition
 					Width="*" />
@@ -103,6 +105,7 @@
 
 			<TextBlock
 				Margin="5"
+				VerticalAlignment="Center"
 				Text="{Binding Title}" />
 
 			<Button
@@ -127,6 +130,7 @@
 				ShowArrow="False"
 				Background="Transparent"
 				BorderBrush="Transparent"
+				VerticalAlignment="Center"
 				ToolTip="Create"
 				Visibility="{Binding Link, Converter={local:NullOrZeroConverter}}"
 				x:Name="button">
@@ -156,6 +160,7 @@
 				ShowArrow="False"
 				Background="Transparent"
 				BorderBrush="Transparent"
+				VerticalAlignment="Center"
 				Opacity="0.5"
 				ToolTip="Link Type"
 				Visibility="{Binding Graph.AllowReferenceLinks, Converter={local:ValueTypeConverter}}"
@@ -184,6 +189,7 @@
 				Grid.Column="3"
 				Margin="0,0,-15,0"
 				HorizontalAlignment="Right"
+				VerticalAlignment="Center"
 				Position="{Binding Position, Mode=OneWayToSource}" />
 
 		</Grid>
@@ -218,7 +224,7 @@
 
 								<Button
 									DockPanel.Dock="Right"
-									Margin="5"
+									Margin="5,5,10,5"
 									Opacity="0.5"
 									Background="Transparent"
 									BorderBrush="Transparent"
