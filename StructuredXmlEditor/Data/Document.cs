@@ -104,6 +104,8 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void SetData(DataItem item)
 		{
+			Path = System.IO.Path.ChangeExtension(Path, item.Definition.Extension);
+
 			if (item is StructItem)
 			{
 				var si = item as StructItem;
@@ -136,7 +138,7 @@ namespace StructuredXmlEditor.Data
 		{
 			var path = isBackup ? BackupPath : Path;
 
-			Data.Save(path, path.EndsWith(".json"));
+			Data.Save(path);
 
 			if (isBackup)
 			{

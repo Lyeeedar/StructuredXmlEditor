@@ -25,7 +25,12 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public bool IsJson { get; set; }
+		public bool IsJson { get { return RootItems[0].Definition.DataType == "json"; } }
+
+		public XNamespace JsonNS = "http://james.newtonking.com/projects/json";
+
+		//-----------------------------------------------------------------------
+		public string Extension { get { return RootItems[0].Definition.Extension; } }
 
 		//-----------------------------------------------------------------------
 		public Command<object> FocusCMD { get { return new Command<object>((e) => FocusItem((DataItem)e)); } }
@@ -392,10 +397,8 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public void Save(string path, bool isJson)
+		public void Save(string path)
 		{
-			IsJson = isJson;
-
 			Directory.CreateDirectory(Path.GetDirectoryName(path));
 
 			XDocument doc = new XDocument();
@@ -414,6 +417,12 @@ namespace StructuredXmlEditor.Data
 			{
 				var nodeEl = new XElement(GraphNodeDefinition.NodeStoreName);
 
+				if (IsJson)
+				{
+					nodeEl.SetAttributeValue(XNamespace.Xmlns + "json", JsonNS);
+					nodeEl.SetAttributeValue(JsonNS + "Array", "true");
+				}
+
 				foreach (var node in GraphNodeItems)
 				{
 					if (m_storedRootItems.Contains(node) || node.LinkParents.Count == 0) continue;
@@ -424,7 +433,7 @@ namespace StructuredXmlEditor.Data
 				doc.Elements().First().Add(nodeEl);
 			}
 
-			if (isJson)
+			if (IsJson)
 			{
 				string json = JsonConvert.SerializeXNode(doc, Newtonsoft.Json.Formatting.Indented);
 				File.WriteAllText(path, json);

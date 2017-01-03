@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using StructuredXmlEditor.Definition;
 using StructuredXmlEditor.Tools;
 using StructuredXmlEditor.View;
@@ -318,9 +319,14 @@ namespace StructuredXmlEditor.Data
 				try
 				{
 					var filedoc = XDocument.Load(file);
+					var dataType = filedoc.Elements().First().Attribute("DataType")?.Value?.ToString().ToLower() ?? "xml";
+					var customExtension = filedoc.Elements().First().Attribute("Extension")?.Value?.ToString();
+
 					foreach (var el in filedoc.Elements().First().Elements())
 					{
 						var def = DataDefinition.LoadDefinition(el);
+						def.DataType = dataType;
+						def.CustomExtension = customExtension;
 						def.SrcFile = file;
 
 						var defname = def.Name.ToLower();
@@ -393,6 +399,8 @@ namespace StructuredXmlEditor.Data
 				{
 					if (RootDefinition != null) throw new Exception("Duplicate root definition!");
 					RootDefinition = def;
+
+					RootDefinition.CustomExtension = "xmldef";
 				}
 			}
 
@@ -465,25 +473,28 @@ namespace StructuredXmlEditor.Data
 				}
 
 				var document = OpenImpl(path);
-
-				Documents.Add(document);
-
-				Current = document;
-
-				if (!isBackup)
+				path = document.Path;
+				if (document != null)
 				{
-					RecentFiles.Remove(path);
-					RecentFiles.Insert(0, path);
+					Documents.Add(document);
 
-					while (RecentFiles.Count > 10)
+					Current = document;
+
+					if (!isBackup)
 					{
-						RecentFiles.RemoveAt(RecentFiles.Count - 1);
+						RecentFiles.Remove(path);
+						RecentFiles.Insert(0, path);
+
+						while (RecentFiles.Count > 10)
+						{
+							RecentFiles.RemoveAt(RecentFiles.Count - 1);
+						}
+
+						StoreSetting("RecentFiles", RecentFiles.ToArray());
 					}
 
-					StoreSetting("RecentFiles", RecentFiles.ToArray());
+					return document;
 				}
-
-				return document;
 			}
 			catch (Exception ex)
 			{
@@ -496,44 +507,56 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public Document OpenImpl(string path)
 		{
-			XDocument doc = null;
+			var extension = Path.GetExtension(path).ToLower();
+			DataDefinition matchedDef = null;
 
-			if (path.EndsWith(".json"))
+			if (extension == ".xmldef")
 			{
-				string json = File.ReadAllText(path);
+				matchedDef = RootDefinition;
+			}
+			else if (extension == ".xml" || extension == ".json")
+			{
+				string rootname = null;
 
-				var temp = JsonConvert.DeserializeXNode(json, "Root");
-				if (temp.Elements().First().Elements().Count() > 1)
+				if (extension == ".xml")
 				{
-					temp.Elements().First().Name = temp.Elements().First().Elements().First().Name;
-					doc = temp;
+					var root = XDocument.Load(path);
+					var firstEl = root.Elements().First();
+					rootname = firstEl.Name.ToString().ToLower();
 				}
-				else
+				else if (extension == ".json")
 				{
-					doc = new XDocument(temp.Elements().First());
+					string json = File.ReadAllText(path);
+
+					JObject firstEl = JObject.Parse(json);
+					JProperty root = firstEl.Root.First as JProperty;
+					rootname = root.Name;
 				}
-			}
-			else
-			{
-				doc = XDocument.Load(path);
-			}
 
-			var rootname = doc.Elements().First().Name.ToString().ToLower();
-
-			DataDefinition data = null;
-
-			if (path.EndsWith(".xmldef"))
-			{
-				data = RootDefinition;
-			}
-			else
-			{
 				if (!SupportedResourceTypes.ContainsKey(rootname))
 				{
 					Message.Show("No definition found for xml '" + rootname + "'! Cannot open document.", "Load Failed!");
 					return null;
 				}
-				data = SupportedResourceTypes[rootname];
+				matchedDef = SupportedResourceTypes[rootname];
+			}
+			else
+			{
+				matchedDef = SupportedResourceTypes.Values.FirstOrDefault(e => "." + e.CustomExtension?.ToLower() == extension);
+				if (matchedDef == null) throw new Exception("No definition found for extension '" + extension + "'!");
+			}
+
+			XDocument doc = null;
+
+			if (matchedDef.DataType == "xml")
+			{
+				doc = XDocument.Load(path);
+			}
+			else if (matchedDef.DataType == "json")
+			{
+				string json = File.ReadAllText(path);
+				var temp = JsonConvert.DeserializeXNode(json, "Root");
+				doc = new XDocument(temp.Elements().First().Elements().First());
 			}
 
 			var document = new Document(path, this);
@@ -541,26 +564,33 @@ namespace StructuredXmlEditor.Data
 			using (document.UndoRedo.DisableUndoScope())
 			{
 				var firstEl = doc.Elements().First();
-				var item = data.LoadData(firstEl, document.UndoRedo);
 
-				document.SetData(item);
-
-				var graphdef = item.Definition as GraphNodeDefinition;
+				var graphdef = matchedDef as GraphNodeDefinition;
 				if (graphdef != null && graphdef.FlattenData)
 				{
 					var nodesEl = firstEl.Element(graphdef.NodeStoreName);
 					nodesEl.Remove();
 
+					var item = matchedDef.LoadData(firstEl, document.UndoRedo);
+					document.SetData(item);
+
 					foreach (var el in nodesEl.Elements())
 					{
 						var name = el.Name.ToString().ToLower();
-						var def = ReferenceableDefinitions[data.SrcFile].ContainsKey(name) ? ReferenceableDefinitions[data.SrcFile][name] : ReferenceableDefinitions[""][name];
+						var def = ReferenceableDefinitions[matchedDef.SrcFile].ContainsKey(name) ? ReferenceableDefinitions[matchedDef.SrcFile][name] : ReferenceableDefinitions[""][name];
 
 						var node = def.LoadData(el, document.UndoRedo);
 
 						document.Data.GraphNodeItems.Add(node as GraphNodeItem);
 					}
 				}
+				else
+				{
+					var item = matchedDef.LoadData(firstEl, document.UndoRedo);
+					document.SetData(item);
+				}
+
+				
 			}
 
 			return document;
@@ -1034,8 +1064,6 @@ namespace StructuredXmlEditor.Data
 		{
 			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
 
-			dlg.DefaultExt = ".xml";
-			dlg.Filter = "Data Files (*.xml, *.xmldef, *.json)|*.xml; *.xmldef; *.json";
 			bool? result = dlg.ShowDialog();
 
 			if (result == true)
@@ -1082,14 +1110,16 @@ namespace StructuredXmlEditor.Data
 		{
 			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
 
-			dlg.DefaultExt = ".xml";
-			dlg.Filter = "XML File (*.xml)|*.xml|Json File (*.json)|*.json";
+			var data = SupportedResourceTypes[dataType.ToLower()];
+			var ext = data.Extension;
+
+			dlg.DefaultExt = "." + ext;
+			dlg.Filter = ext.ToUpper() + " File (*." + ext + ")|*." + ext;
 			bool? result = dlg.ShowDialog();
 
 			if (result == true)
 			{
 				var path = dlg.FileName;
-				var data = SupportedResourceTypes[dataType.ToLower()];
 
 				var document = new Document(path, this);
 
@@ -1103,6 +1133,8 @@ namespace StructuredXmlEditor.Data
 
 				Current = document;
 
+				path = document.Path;
+
 				RecentFiles.Remove(path);
 				RecentFiles.Insert(0, path);
 
@@ -1115,8 +1147,10 @@ namespace StructuredXmlEditor.Data
 		{
 			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
 
-			dlg.DefaultExt = ".xml";
-			dlg.Filter = "XML File (*.xml)|*.xml|Json File (*.json)|*.json";
+			var ext = Current.Data.Extension;
+
+			dlg.DefaultExt = "." + ext;
+			dlg.Filter = ext.ToUpper() + " File (*." + ext + ")|*." + ext;
 			bool? result = dlg.ShowDialog();
 
 			if (result == true)

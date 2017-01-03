@@ -1,4 +1,4 @@
-﻿<Definitions>
+﻿<Definitions Extension="xmldef">
 
 	<StructDef Name="Number" ToolTip="A number." TextColour="Primitive">
 		<Attributes>
@@ -286,6 +286,10 @@
 	</StructDef>
 
 	<Collection Name="Definitions" ToolTip="The definitions stored in this file. Can contain only a single non-def element.">
+		<Attributes>
+			<String Name="Extension" ToolTip="The extension to use for these definitions. Leave blank to revert to the data type (.xml, .json etc)." />
+			<Enum Name="DataType" EnumValues="xml,json" ToolTip="The data type of the data." />
+		</Attributes>
 		<Reference Name="Definition" Keys="Struct,Collection,GraphStruct,GraphCollection,StructDef,EnumDef,CollectionDef,GraphStructDef,GraphCollectionDef" ToolTip="A single definition." />
 	</Collection>
 	

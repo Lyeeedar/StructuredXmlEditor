@@ -132,13 +132,13 @@ namespace StructuredXmlEditor.Definition
 				child.Definition.SaveData(root, child);
 			}
 
+
 			if (item.Grid.IsJson)
 			{
-				foreach (var el in root.Elements())
-				{
-					el.Name = Name;
-					parent.Add(el);
-				}
+				parent.Add(root);
+
+				root.SetAttributeValue(XNamespace.Xmlns + "json", item.Grid.JsonNS);
+				root.SetAttributeValue(item.Grid.JsonNS + "Array", "true");
 			}
 			else
 			{

@@ -70,12 +70,6 @@ namespace StructuredXmlEditor.Definition
 				}
 			}
 
-			//for (int i = item.Children.Count; i < MinCount; i++)
-			//{
-			//	var child = ChildDefinition.CreateData(undoRedo);
-			//	item.Children.Add(child);
-			//}
-
 			foreach (var att in Attributes)
 			{
 				var el = element.Attribute(att.Name);
@@ -183,11 +177,10 @@ namespace StructuredXmlEditor.Definition
 
 				if (item.Grid.IsJson)
 				{
-					foreach (var el in root.Elements())
-					{
-						el.Name = Name;
-						parent.Add(el);
-					}
+					parent.Add(root);
+
+					root.SetAttributeValue(XNamespace.Xmlns + "json", item.Grid.JsonNS);
+					root.SetAttributeValue(item.Grid.JsonNS + "Array", "true");
 				}
 				else
 				{
