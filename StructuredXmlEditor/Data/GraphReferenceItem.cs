@@ -111,6 +111,7 @@ namespace StructuredXmlEditor.Data
 			{
 				if (WrappedItem == null) return "Unset";
 				else if (IsCircular()) return "Circular";
+				else if (Grid.AllowCircularLinks) return WrappedItem.Definition.Name;
 				else return WrappedItem.Description;
 			}
 		}
@@ -260,9 +261,12 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void WrappedItemPropertyChanged(object sender, PropertyChangedEventArgs args)
 		{
-			if (args.PropertyName == "Description")
+			if (!Grid.AllowCircularLinks)
 			{
-				if (!IsCircular()) RaisePropertyChangedEvent("Description");
+				if (args.PropertyName == "Description")
+				{
+					if (!IsCircular()) RaisePropertyChangedEvent("Description");
+				}
 			}
 		}
 

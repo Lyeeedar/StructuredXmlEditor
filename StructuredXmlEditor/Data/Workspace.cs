@@ -46,9 +46,11 @@ namespace StructuredXmlEditor.Data
 
 		//-----------------------------------------------------------------------
 		public Dictionary<string, Dictionary<string, DataDefinition>> ReferenceableDefinitions = new Dictionary<string, Dictionary<string, DataDefinition>>();
-		public Dictionary<string, DataDefinition> SupportedResourceTypes { get; set; } = new Dictionary<string, DataDefinition>();
+		public Dictionary<string, DataDefinition> SupportedResourceTypes { get; } = new Dictionary<string, DataDefinition>();
+		public Dictionary<string, DataDefinition> SupportedExtensionMap { get; } = new Dictionary<string, DataDefinition>();
 
-		public Dictionary<string, DataDefinition> DataTypes { get; set; } = new Dictionary<string, DataDefinition>();
+		//-----------------------------------------------------------------------
+		public Dictionary<string, DataDefinition> RootDataTypes { get; set; } = new Dictionary<string, DataDefinition>();
 		public DataDefinition RootDefinition { get; set; }
 
 		//-----------------------------------------------------------------------
@@ -171,6 +173,7 @@ namespace StructuredXmlEditor.Data
 			Tools.Add(new UndoHistoryTool(this));
 			Tools.Add(new StartPage(this));
 			Tools.Add(new FocusTool(this));
+			Tools.Add(new ProjectViewTool(this));
 		}
 
 		//-----------------------------------------------------------------------
@@ -311,7 +314,9 @@ namespace StructuredXmlEditor.Data
 			ReferenceableDefinitions[""] = new Dictionary<string, DataDefinition>();
 
 			SupportedResourceTypes.Clear();
-			DataTypes.Clear();
+			SupportedExtensionMap.Clear();
+
+			RootDataTypes.Clear();
 			RootDefinition = null;
 
 			foreach (var file in Directory.EnumerateFiles(Path.Combine(Path.GetDirectoryName(ProjectRoot), DefsFolder), "*.xmldef", SearchOption.AllDirectories))
@@ -351,6 +356,13 @@ namespace StructuredXmlEditor.Data
 						{
 							if (SupportedResourceTypes.ContainsKey(defname)) throw new Exception("Duplicate definitions for type " + defname);
 							SupportedResourceTypes[defname] = def;
+
+							if (def.CustomExtension != null)
+							{
+								var ext = "." + def.CustomExtension;
+								if (SupportedExtensionMap.ContainsKey(ext)) throw new Exception("Duplicate extension for " + ext + ". Found in " + def.Name + " and " + SupportedExtensionMap[ext].Name);
+								SupportedExtensionMap[ext] = def;
+							}
 						}
 					}
 				}
@@ -392,8 +404,8 @@ namespace StructuredXmlEditor.Data
 				var name = el.Name.ToString().ToLower();
 				if (name.EndsWith("def"))
 				{
-					if (DataTypes.ContainsKey(defname)) throw new Exception("Duplicate definitions for data type " + defname);
-					DataTypes[defname] = def;
+					if (RootDataTypes.ContainsKey(defname)) throw new Exception("Duplicate definitions for data type " + defname);
+					RootDataTypes[defname] = def;
 				}
 				else
 				{
@@ -404,17 +416,19 @@ namespace StructuredXmlEditor.Data
 				}
 			}
 
-			foreach (var type in DataTypes.Values)
+			foreach (var type in RootDataTypes.Values)
 			{
-				type.RecursivelyResolve(DataTypes, DataTypes);
+				type.RecursivelyResolve(RootDataTypes, RootDataTypes);
 			}
-			RootDefinition.RecursivelyResolve(DataTypes, DataTypes);
+			RootDefinition.RecursivelyResolve(RootDataTypes, RootDataTypes);
 
 			RaisePropertyChangedEvent("ReferenceableDefinitions");
 			RaisePropertyChangedEvent("SupportedResourceTypes");
 			RaisePropertyChangedEvent("DataTypes");
 			RaisePropertyChangedEvent("RootDefinition");
 			RaisePropertyChangedEvent("AllResourceTypes");
+
+			ProjectViewTool.Instance?.Reload();
 		}
 
 		//-----------------------------------------------------------------------
@@ -535,15 +549,20 @@ namespace StructuredXmlEditor.Data
 
 				if (!SupportedResourceTypes.ContainsKey(rootname))
 				{
-					Message.Show("No definition found for xml '" + rootname + "'! Cannot open document.", "Load Failed!");
-					return null;
+					throw new Exception("No definition found for xml '" + rootname + "'! Cannot open document.");
 				}
 				matchedDef = SupportedResourceTypes[rootname];
 			}
 			else
 			{
-				matchedDef = SupportedResourceTypes.Values.FirstOrDefault(e => "." + e.CustomExtension?.ToLower() == extension);
-				if (matchedDef == null) throw new Exception("No definition found for extension '" + extension + "'!");
+				if (SupportedExtensionMap.ContainsKey(extension))
+				{
+					matchedDef = SupportedExtensionMap[extension];
+				}
+				else
+				{
+					throw new Exception("No definition found for extension '" + extension + "'!");
+				}
 			}
 
 			XDocument doc = null;

@@ -292,6 +292,10 @@
 						DataType="{x:Type t:FocusTool}">
 						<v:FocusToolView />
 					</DataTemplate>
+					<DataTemplate
+						DataType="{x:Type t:ProjectViewTool}">
+						<v:ProjectViewView />
+					</DataTemplate>
 				</dock:DockingManager.Resources>
 
 				<dock:DockingManager.LayoutItemContainerStyleSelector>

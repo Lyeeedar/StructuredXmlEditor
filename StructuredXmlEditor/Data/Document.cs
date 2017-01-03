@@ -131,6 +131,8 @@ namespace StructuredXmlEditor.Data
 
 			Data = new XmlDataGrid();
 			Data.SetRootItem(item);
+
+			item.IsExpanded = true;
 		}
 
 		//-----------------------------------------------------------------------
