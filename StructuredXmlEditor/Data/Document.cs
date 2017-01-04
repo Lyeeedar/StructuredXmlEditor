@@ -80,9 +80,9 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public bool Close()
+		public bool Close(bool silent = false)
 		{
-			if (UndoRedo.IsModified || IsBackup)
+			if (!silent && (UndoRedo.IsModified || IsBackup))
 			{
 				var result = Message.Show("There are unsaved changes in this document. Do you wish to save before closing?", "Unsaved Changes", "Yes", "No", "Cancel");
 				if (result == "Cancel") return true;
@@ -139,6 +139,8 @@ namespace StructuredXmlEditor.Data
 		public void Save(bool isBackup = false)
 		{
 			var path = isBackup ? BackupPath : Path;
+
+			if (!isBackup) Workspace.SavingFile = Path;
 
 			Data.Save(path);
 

@@ -12,6 +12,8 @@ namespace StructuredXmlEditor.Tools
 	{
 		public static ProjectViewTool Instance;
 
+		public bool Refreshing = false;
+
 		public ProjectItem Root { get; private set; }
 		public IEnumerable<ProjectItem> Items
 		{
@@ -40,11 +42,25 @@ namespace StructuredXmlEditor.Tools
 			});
 		}
 
+		public void Add(string path)
+		{
+
+		}
+
+		public void Remove(string path)
+		{
+
+		}
+
 		public void DeferredRefresh()
 		{
+			if (Refreshing) return;
+
+			Refreshing = true;
 			Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() => 
 			{
 				RaisePropertyChangedEvent("Items");
+				Refreshing = false;
 			}));
 		}
 	}

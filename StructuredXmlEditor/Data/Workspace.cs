@@ -4,12 +4,14 @@ using StructuredXmlEditor.Definition;
 using StructuredXmlEditor.Tools;
 using StructuredXmlEditor.View;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
@@ -114,6 +116,21 @@ namespace StructuredXmlEditor.Data
 		public Command<object> FeedbackCMD { get { return new Command<object>((e) => SendFeedback()); } }
 
 		//-----------------------------------------------------------------------
+		public FileSystemWatcher Watcher;
+		BlockingCollection<FileSystemEventArgs> m_concurrentQueue = new BlockingCollection<FileSystemEventArgs>();
+
+		//--------------------------------------------------------------------------
+		public delegate void ChangedHandler(String path);
+		public event ChangedHandler FileChanged;
+		public event ChangedHandler FileCreated;
+		public event ChangedHandler FileDeleted;
+
+		public delegate void RenamedHandler(String oldPath, String newPath);
+		public event RenamedHandler FileRenamed;
+
+		public string SavingFile;
+
+		//-----------------------------------------------------------------------
 		public Workspace()
 		{
 			Instance = this;
@@ -174,6 +191,54 @@ namespace StructuredXmlEditor.Data
 			Tools.Add(new StartPage(this));
 			Tools.Add(new FocusTool(this));
 			Tools.Add(new ProjectViewTool(this));
+
+			Thread workerThread = new Thread(WorkerThreadLoop);
+			workerThread.IsBackground = true;
+			workerThread.SetApartmentState(ApartmentState.STA);
+			workerThread.Name = "FileChangeEventProcessor";
+			workerThread.Start();
+
+			SetupFileChangeHandlers();
+		}
+
+		//-----------------------------------------------------------------------
+		public void SetupFileChangeHandlers()
+		{
+			FileChanged += (path) =>
+			{
+				if (Path.GetExtension(path) == ".xmldef") LoadDefinitions();
+
+				var open = Documents.FirstOrDefault(e => e.Path == path);
+				if (open != null)
+				{
+					Current = open;
+					string response = Message.Show("This document changed on disk, do you want to reload it? Clicking Yes will discard any local changes.", "Document Changed On Disk", "Yes", "No");
+
+					if (response == "Yes")
+					{
+						open.Close(true);
+						Open(path);
+					}
+				}
+			};
+
+			FileCreated += (path) =>
+			{
+				if (Path.GetExtension(path) == ".xmldef") LoadDefinitions();
+				ProjectViewTool.Instance.Add(path);
+			};
+
+			FileDeleted += (path) =>
+			{
+				if (Path.GetExtension(path) == ".xmldef") LoadDefinitions();
+				ProjectViewTool.Instance.Remove(path);
+			};
+
+			FileRenamed += (oldPath, newPath) =>
+			{
+				ProjectViewTool.Instance.Remove(oldPath);
+				ProjectViewTool.Instance.Add(newPath);
+			};
 		}
 
 		//-----------------------------------------------------------------------
@@ -428,7 +493,70 @@ namespace StructuredXmlEditor.Data
 			RaisePropertyChangedEvent("RootDefinition");
 			RaisePropertyChangedEvent("AllResourceTypes");
 
+			if (Watcher != null)
+			{
+				Watcher.Dispose();
+				Watcher = null;
+			}
+
 			ProjectViewTool.Instance?.Reload();
+
+			Watcher = new FileSystemWatcher()
+			{
+				Path = Path.GetDirectoryName(ProjectRoot),
+				NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite,
+				IncludeSubdirectories = true,
+				Filter = "*.*"
+			};
+
+			Watcher.Created += (e, args) => { m_concurrentQueue.Add(args); };
+			Watcher.Deleted += (e, args) => { m_concurrentQueue.Add(args); };
+			Watcher.Renamed += (e, args) => { m_concurrentQueue.Add(args); };
+			Watcher.Changed += (e, args) => 
+			{
+				if (args.FullPath == SavingFile) SavingFile = null;
+				else m_concurrentQueue.Add(args);
+			};
+			Watcher.EnableRaisingEvents = true;
+		}
+
+		//-----------------------------------------------------------------------
+		private void WorkerThreadLoop()
+		{
+			FileSystemEventArgs args = null;
+
+			while (!m_concurrentQueue.IsAddingCompleted)
+			{
+				try
+				{
+					args = m_concurrentQueue.Take();
+				}
+				catch
+				{
+					break;
+				}
+
+				Application.Current.Dispatcher.Invoke(new Action(() => 
+				{
+					if (args.ChangeType == WatcherChangeTypes.Changed)
+					{
+						FileChanged?.Invoke(args.FullPath);
+					}
+					else if (args.ChangeType == WatcherChangeTypes.Created)
+					{
+						FileCreated?.Invoke(args.FullPath);
+					}
+					else if (args.ChangeType == WatcherChangeTypes.Deleted)
+					{
+						FileDeleted?.Invoke(args.FullPath);
+					}
+					else if (args.ChangeType == WatcherChangeTypes.Renamed)
+					{
+						RenamedEventArgs renameArgs = (RenamedEventArgs)args;
+						FileRenamed?.Invoke(renameArgs.OldFullPath, renameArgs.FullPath);
+					}
+				}));
+			}
 		}
 
 		//-----------------------------------------------------------------------
