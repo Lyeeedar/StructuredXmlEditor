@@ -21,6 +21,7 @@ using System.Windows.Threading;
 using System.IO;
 using Xceed.Wpf.AvalonDock.Layout.Serialization;
 using StructuredXmlEditor.View;
+using static StructuredXmlEditor.Tools.ToolBase;
 
 namespace StructuredXmlEditor
 {
@@ -175,9 +176,11 @@ namespace StructuredXmlEditor
 			layoutRoot.Add(rootPanel);
 
 			// Root level panels
+			var leftPanel = new XElement("LayoutAnchorablePane", new XAttribute("Id", "ProjectViewPanel"), new XAttribute("DockWidth", "200"));
 			var middlePanel = new XElement("LayoutDocumentPane", new XAttribute("Id", "DocumentPanel"));
 			var rightPanel = new XElement("LayoutAnchorablePane", new XAttribute("Id", "ToolPanel"), new XAttribute("DockWidth", "250"));
 
+			rootPanel.Add(leftPanel);
 			rootPanel.Add(middlePanel);
 			rootPanel.Add(rightPanel);
 
@@ -194,12 +197,22 @@ namespace StructuredXmlEditor
 			// Add all tools to the relevant locations
 			foreach (var tool in Workspace.Tools)
 			{
+				var defaultPos = "ToolPanel";
+				if (tool.DefaultPositionDocument == ToolPosition.Document)
+				{
+					defaultPos = "DocumentPanel";
+				}
+				else if (tool.DefaultPositionDocument == ToolPosition.ProjectView)
+				{
+					defaultPos = "ProjectViewPanel";
+				}
+
 				var el = new XElement("LayoutAnchorable",
 					new XAttribute("AutoHideMinWidth", "100"),
 					new XAttribute("AutoHideMinHeight", "100"),
 					new XAttribute("Title", tool.Title),
 					new XAttribute("ContentId", tool.Title),
-					new XAttribute("PreviousContainerId", tool.DefaultPositionDocument ? "DocumentPanel" : "ToolPanel"),
+					new XAttribute("PreviousContainerId", defaultPos),
 					new XAttribute("PreviousContainerIndex", "0")
 					);
 
@@ -207,9 +220,13 @@ namespace StructuredXmlEditor
 
 				if (tool.VisibleByDefault)
 				{
-					if (tool.DefaultPositionDocument)
+					if (tool.DefaultPositionDocument == ToolPosition.Document)
 					{
 						targetPanel = middlePanel;
+					}
+					else if (tool.DefaultPositionDocument == ToolPosition.ProjectView)
+					{
+						targetPanel = leftPanel;
 					}
 					else
 					{

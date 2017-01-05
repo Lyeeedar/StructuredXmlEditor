@@ -31,7 +31,7 @@ namespace StructuredXmlEditor.Tools
 
 		public StartPage(Workspace workspace) : base(workspace, "StartPage")
 		{
-			DefaultPositionDocument = true;
+			DefaultPositionDocument = ToolPosition.Document;
 
 			Assembly assembly = Assembly.GetExecutingAssembly();
 

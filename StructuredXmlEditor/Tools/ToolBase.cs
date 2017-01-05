@@ -10,6 +10,13 @@ namespace StructuredXmlEditor.Tools
 {
 	public class ToolBase : NotifyPropertyChanged
 	{
+		public enum ToolPosition
+		{
+			ProjectView,
+			Document,
+			Default
+		}
+
 		public string Title { get; set; }
 
 		public bool IsVisible
@@ -29,7 +36,7 @@ namespace StructuredXmlEditor.Tools
 
 		public Command<object> CloseCMD { get { return new Command<object>((obj) => { IsVisible = false; }); } }
 
-		public bool DefaultPositionDocument { get; set; }
+		public ToolPosition DefaultPositionDocument { get; set; } = ToolPosition.Default;
 
 		public bool VisibleByDefault { get; set; } = true;
 

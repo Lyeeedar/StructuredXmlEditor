@@ -71,6 +71,9 @@ namespace StructuredXmlEditor.Tools
 		//-----------------------------------------------------------------------
 		public ProjectViewTool(Workspace workspace) : base(workspace, "ProjectView")
 		{
+			DefaultPositionDocument = ToolPosition.ProjectView;
+			VisibleByDefault = true;
+
 			Instance = this;
 			Reload();
 		}
