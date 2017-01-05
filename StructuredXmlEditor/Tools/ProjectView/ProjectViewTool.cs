@@ -5,15 +5,20 @@ using System.Text;
 using System.Threading.Tasks;
 using StructuredXmlEditor.Data;
 using System.Windows;
+using System.Text.RegularExpressions;
+using StructuredXmlEditor.View;
 
 namespace StructuredXmlEditor.Tools
 {
 	public class ProjectViewTool : ToolBase
 	{
+		//-----------------------------------------------------------------------
 		public static ProjectViewTool Instance;
 
+		//-----------------------------------------------------------------------
 		public bool Refreshing = false;
 
+		//-----------------------------------------------------------------------
 		public ProjectItem Root { get; private set; }
 		public IEnumerable<ProjectItem> Items
 		{
@@ -21,17 +26,78 @@ namespace StructuredXmlEditor.Tools
 			{
 				if (Root != null)
 				{
-					foreach (var item in Root.Items) yield return item;
+					foreach (var item in Root.Items)
+					{
+						if (!item.IsVisible) continue;
+
+						yield return item;
+					}
 				}
 			}
 		}
 
+		//-----------------------------------------------------------------------
+		public bool UseRegex
+		{
+			get { return m_useRegex; }
+			set
+			{
+				m_useRegex = value;
+				ApplyFilter();
+
+				RaisePropertyChangedEvent();
+			}
+		}
+		private bool m_useRegex;
+
+		//-----------------------------------------------------------------------
+		public string Filter
+		{
+			get { return m_filter; }
+			set
+			{
+				m_filter = value;
+
+				ApplyFilter();
+
+				RaisePropertyChangedEvent();
+			}
+		}
+		private string m_filter;
+
+		//-----------------------------------------------------------------------
+		public Command<object> ClearFilterCMD { get { return new Command<object>((e) => Filter = null); } }
+
+		//-----------------------------------------------------------------------
 		public ProjectViewTool(Workspace workspace) : base(workspace, "ProjectView")
 		{
 			Instance = this;
 			Reload();
 		}
 
+		//-----------------------------------------------------------------------
+		private void ApplyFilter()
+		{
+			try
+			{
+				if (!string.IsNullOrEmpty(Filter))
+				{
+					string filter = Filter.ToLower();
+					Regex regex = UseRegex ? new Regex(filter) : null;
+
+					Root.Filter(filter, regex);
+				}
+				else
+				{
+					Root.Filter(null, null);
+				}
+			}
+			catch (Exception) { }
+
+			DeferredRefresh();
+		}
+
+		//-----------------------------------------------------------------------
 		public void Reload()
 		{
 			Task.Run(() =>
@@ -42,16 +108,85 @@ namespace StructuredXmlEditor.Tools
 			});
 		}
 
+		//-----------------------------------------------------------------------
 		public void Add(string path)
 		{
+			var ext = System.IO.Path.GetExtension(path);
+			if (ext != String.Empty && !Root.IsDataFile(ext)) return;
 
+			// make relative
+			Uri path1 = new Uri(path);
+			Uri path2 = new Uri(Workspace.Instance.ProjectRoot);
+			Uri diff = path2.MakeRelativeUri(path1);
+			string relPath = diff.OriginalString;
+
+			var parts = relPath.Split('/');
+
+			var current = Root;
+			foreach (var part in parts)
+			{
+				if (part == parts.Last())
+				{
+					new ProjectItem(Workspace, current, this, part);
+					current.UpdateChildFolders();
+				}
+				else
+				{
+					if (!current.ChildFolders.ContainsKey(part))
+					{
+						current.Add(part);
+					}
+
+					current = current.ChildFolders[part];
+				}
+			}
+
+			DeferredRefresh();
 		}
 
+		//-----------------------------------------------------------------------
 		public void Remove(string path)
 		{
+			var ext = System.IO.Path.GetExtension(path);
+			if (ext != String.Empty && !Root.IsDataFile(ext)) return;
 
+			// make relative
+			Uri path1 = new Uri(path);
+			Uri path2 = new Uri(Workspace.Instance.ProjectRoot);
+			Uri diff = path2.MakeRelativeUri(path1);
+			string relPath = diff.OriginalString;
+
+			var parts = relPath.Split('/');
+
+			var current = Root;
+			foreach (var part in parts)
+			{
+				if (part == parts.Last())
+				{
+					current.Remove(part);
+				}
+				else
+				{
+					if (!current.ChildFolders.ContainsKey(part)) return;
+
+					current = current.ChildFolders[part];
+				}
+			}
+
+			while (current != null)
+			{
+				if (current.Children.Count == 0)
+				{
+					current.Parent.Remove(current.Name);
+				}
+
+				current = current.Parent;
+			}
+
+			DeferredRefresh();
 		}
 
+		//-----------------------------------------------------------------------
 		public void DeferredRefresh()
 		{
 			if (Refreshing) return;

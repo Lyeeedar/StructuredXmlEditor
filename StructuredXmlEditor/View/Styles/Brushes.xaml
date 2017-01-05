@@ -32,6 +32,28 @@
 		po:Freeze="True"
 		Color="{StaticResource FontDarkColor}" />
 
+	<Color
+		x:Key="FontDimBlueColor"
+		A="255"
+		R="220"
+		B="230"
+		G="220" />
+	<SolidColorBrush
+		x:Key="FontDimBlueBrush"
+		po:Freeze="True"
+		Color="{StaticResource FontDimBlueColor}" />
+
+	<Color
+		x:Key="FontDarkBlueColor"
+		A="255"
+		R="150"
+		B="160"
+		G="160" />
+	<SolidColorBrush
+		x:Key="FontDarkBlueBrush"
+		po:Freeze="True"
+		Color="{StaticResource FontDarkBlueColor}" />
+
 	<!--**************************************************************-->
 	<!-- Window                                                       -->
 	<!--**************************************************************-->
