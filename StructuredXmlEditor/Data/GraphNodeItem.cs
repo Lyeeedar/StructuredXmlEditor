@@ -48,20 +48,11 @@ namespace StructuredXmlEditor.Data
 			{
 				if (m_x != value)
 				{
-					var oldval = m_x;
-
-					UndoRedo.ApplyDoUndo(
-						delegate
-						{
-							m_x = value;
-							RaisePropertyChangedEvent("X");
-						},
-						delegate
-						{
-							m_x = oldval;
-							RaisePropertyChangedEvent("X");
-						},
-						"Change X");
+					UndoRedo.DoValueChange<double>(this, m_x, value, (val) =>
+					{
+						m_x = val;
+						RaisePropertyChangedEvent("X");
+					}, "X");
 				}
 			}
 		}
@@ -75,20 +66,11 @@ namespace StructuredXmlEditor.Data
 			{
 				if (m_y != value)
 				{
-					var oldval = m_y;
-
-					UndoRedo.ApplyDoUndo(
-						delegate
-						{
-							m_y = value;
-							RaisePropertyChangedEvent("Y");
-						},
-						delegate
-						{
-							m_y = oldval;
-							RaisePropertyChangedEvent("Y");
-						},
-						"Change Y");
+					UndoRedo.DoValueChange<double>(this, m_y, value, (val) =>
+					{
+						m_y = val;
+						RaisePropertyChangedEvent("Y");
+					}, "Y");
 				}
 			}
 		}
@@ -159,8 +141,14 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		private IEnumerable<DataItem> GetAllUIGraphData(DataItem item)
 		{
-			foreach (var child in item.Children)
+			foreach (var c in item.Children)
 			{
+				var child = c;
+				if (child is CollectionChildItem)
+				{
+					child = (child as CollectionChildItem).WrappedItem;
+				}
+
 				if (child is GraphReferenceItem)
 				{
 					yield return child as GraphReferenceItem;
@@ -183,8 +171,14 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		private IEnumerable<DataItem> GetAllGraphData(DataItem item)
 		{
-			foreach (var child in item.Children)
+			foreach (var c in item.Children)
 			{
+				var child = c;
+				if (child is CollectionChildItem)
+				{
+					child = (child as CollectionChildItem).WrappedItem;
+				}
+
 				if (child is GraphReferenceItem)
 				{
 					yield return child as GraphReferenceItem;

@@ -140,9 +140,11 @@ namespace StructuredXmlEditor.Data
 		{
 			var path = isBackup ? BackupPath : Path;
 
-			if (!isBackup) Workspace.SavingFile = Path;
+			Workspace.DisableFileEvents = true;
 
 			Data.Save(path);
+			
+			Workspace.DisableFileEvents = false;
 
 			if (isBackup)
 			{

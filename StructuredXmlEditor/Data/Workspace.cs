@@ -118,6 +118,14 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public FileSystemWatcher Watcher;
 		BlockingCollection<FileSystemEventArgs> m_concurrentQueue = new BlockingCollection<FileSystemEventArgs>();
+		public bool DisableFileEvents
+		{
+			get { return !Watcher?.EnableRaisingEvents ?? true; }
+			set
+			{
+				if (Watcher != null) Watcher.EnableRaisingEvents = !value;
+			}
+		}
 
 		//--------------------------------------------------------------------------
 		public delegate void ChangedHandler(String path);
@@ -127,8 +135,6 @@ namespace StructuredXmlEditor.Data
 
 		public delegate void RenamedHandler(String oldPath, String newPath);
 		public event RenamedHandler FileRenamed;
-
-		public string SavingFile;
 
 		//-----------------------------------------------------------------------
 		public Workspace()
@@ -211,13 +217,20 @@ namespace StructuredXmlEditor.Data
 				var open = Documents.FirstOrDefault(e => e.Path == path);
 				if (open != null)
 				{
-					Current = open;
-					string response = Message.Show("This document changed on disk, do you want to reload it? Clicking Yes will discard any local changes.", "Document Changed On Disk", "Yes", "No");
-
-					if (response == "Yes")
+					if (open.JustSaved)
 					{
-						open.Close(true);
-						Open(path);
+						open.JustSaved = false;
+					}
+					else
+					{
+						Current = open;
+						string response = Message.Show("This document changed on disk, do you want to reload it? Clicking Yes will discard any local changes.", "Document Changed On Disk", "Yes", "No");
+
+						if (response == "Yes")
+						{
+							open.Close(true);
+							Open(path);
+						}
 					}
 				}
 			};
@@ -509,14 +522,10 @@ namespace StructuredXmlEditor.Data
 				Filter = "*.*"
 			};
 
-			Watcher.Created += (e, args) => { m_concurrentQueue.Add(args); };
-			Watcher.Deleted += (e, args) => { m_concurrentQueue.Add(args); };
-			Watcher.Renamed += (e, args) => { m_concurrentQueue.Add(args); };
-			Watcher.Changed += (e, args) => 
-			{
-				if (args.FullPath == SavingFile) SavingFile = null;
-				else m_concurrentQueue.Add(args);
-			};
+			Watcher.Created += (e, args) => { if (!DisableFileEvents) m_concurrentQueue.Add(args); };
+			Watcher.Deleted += (e, args) => { if (!DisableFileEvents) m_concurrentQueue.Add(args); };
+			Watcher.Renamed += (e, args) => { if (!DisableFileEvents) m_concurrentQueue.Add(args); };
+			Watcher.Changed += (e, args) => { if (!DisableFileEvents) m_concurrentQueue.Add(args); };
 			Watcher.EnableRaisingEvents = true;
 		}
 

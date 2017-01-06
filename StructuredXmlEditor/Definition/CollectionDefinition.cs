@@ -13,6 +13,7 @@ namespace StructuredXmlEditor.Definition
 		public bool Collapse { get; set; }
 		public string Seperator { get; set; }
 		public CollectionChildDefinition ChildDefinition { get; set; }
+		public List<DataDefinition> AdditionalDefs { get; set; } = new List<DataDefinition>();
 		public int MinCount { get; set; } = 0;
 		public int MaxCount { get; set; } = int.MaxValue;
 
@@ -24,6 +25,12 @@ namespace StructuredXmlEditor.Definition
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
 			var item = new CollectionItem(this, undoRedo);
+
+			foreach (var def in AdditionalDefs)
+			{
+				var child = def.CreateData(undoRedo);
+				item.Children.Add(child);
+			}
 
 			for (int i = 0; i < MinCount; i++)
 			{
@@ -58,15 +65,36 @@ namespace StructuredXmlEditor.Definition
 			}
 			else
 			{
-				if (!element.Elements().Any(e => e.Name != element.Elements().First().Name))
+				var uncreatedAdds = AdditionalDefs.ToList();
+
+				foreach (var el in element.Elements())
 				{
-					foreach (var el in element.Elements())
+					if (el.Name == ChildDefinition.WrappedDefinition.Name)
 					{
 						var child = ChildDefinition.LoadData(el, undoRedo);
 						item.Children.Add(child);
-
-						if (item.Children.Count == MaxCount) break;
 					}
+					else
+					{
+						var def = AdditionalDefs.FirstOrDefault(e => e.Name == el.Name);
+						if (def != null)
+						{
+							var child = def.LoadData(el, undoRedo);
+							item.Children.Insert(0, child);
+
+							uncreatedAdds.Remove(def);
+						}
+						else
+						{
+							throw new Exception("Unable to find def for '" + el.Name + "' in collection '" + Name + "'!");
+						}
+					}
+				}
+
+				foreach (var def in uncreatedAdds)
+				{
+					var child = def.CreateData(undoRedo);
+					item.Children.Insert(0, child);
 				}
 			}
 
@@ -98,8 +126,19 @@ namespace StructuredXmlEditor.Definition
 			MinCount = TryParseInt(definition, "MinCount", 0);
 			MaxCount = TryParseInt(definition, "MaxCount", int.MaxValue);
 
+			var childDef = definition.Elements().Where(e => e.Name != "Attributes" && e.Name != "AdditionalDefs").First();
 			ChildDefinition = new CollectionChildDefinition();
-			ChildDefinition.Parse(definition.Elements().Where(e => e.Name != "Attributes").First());
+			ChildDefinition.Parse(childDef);
+
+			var addEls = definition.Element("AdditionalDefs");
+			if (addEls != null)
+			{
+				foreach (var addEl in addEls.Elements())
+				{
+					var addDef = LoadDefinition(addEl);
+					AdditionalDefs.Add(addDef);
+				}
+			}
 
 			var attEl = definition.Element("Attributes");
 			if (attEl != null)
@@ -204,6 +243,8 @@ namespace StructuredXmlEditor.Definition
 		public override void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global)
 		{
 			ChildDefinition.WrappedDefinition.RecursivelyResolve(local, global);
+
+			foreach (var def in AdditionalDefs) def.RecursivelyResolve(local, global);
 		}
 	}
 }

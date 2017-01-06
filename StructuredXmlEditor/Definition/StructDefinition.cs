@@ -140,6 +140,7 @@ namespace StructuredXmlEditor.Definition
 				if (el != null)
 				{
 					attItem = att.LoadData(new XElement(el.Name, el.Value.ToString()), undoRedo);
+					hadData = true;
 				}
 				else
 				{

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 //-----------------------------------------------------------------------
 public class UndoRedoDescription
@@ -22,12 +23,60 @@ public class UndoRedoDescription
 }
 
 //-----------------------------------------------------------------------
+public interface IValueChangeAction
+{
+	DateTime GetTimeStamp();
+	void Do();
+	void Undo();
+}
+public class ValueChangeAction<T> : IValueChangeAction
+{
+	public DateTime timeStamp;
+
+	public T oldVal;
+	public T newVal;
+	public Action<T> setter;
+	public string valueName;
+
+	public ValueChangeAction(T oldVal, T newVal, Action<T> setter, DateTime timeStamp, string valueName)
+	{
+		this.oldVal = oldVal;
+		this.newVal = newVal;
+		this.setter = setter;
+		this.valueName = valueName;
+
+		this.timeStamp = timeStamp;
+	}
+
+	public DateTime GetTimeStamp()
+	{
+		return timeStamp;
+	}
+
+	public void Do()
+	{
+		setter(newVal);
+	}
+
+	public void Undo()
+	{
+		setter(oldVal);
+	}
+
+	public override string ToString()
+	{
+		return "Change " + valueName + " (" + oldVal + " -> " + newVal + ")";
+	}
+}
+
+//-----------------------------------------------------------------------
 public class UndoRedoManager : NotifyPropertyChanged
 {
 	public int GroupingMS { get; set; } = 500;
 
 	public Stack<UndoRedoGroup> UndoStack = new Stack<UndoRedoGroup>();
 	public Stack<UndoRedoGroup> RedoStack = new Stack<UndoRedoGroup>();
+	public Dictionary<string, IValueChangeAction> ValueChangeDict = new Dictionary<string, IValueChangeAction>();
 
 	public IEnumerable<UndoRedoDescription> DescriptionStack
 	{
@@ -89,6 +138,31 @@ public class UndoRedoManager : NotifyPropertyChanged
 		get { return RedoStack.Count > 0; }
 	}
 
+	public UndoRedoManager()
+	{
+		valueTimer = new Timer();
+		valueTimer.Interval = 500;
+		valueTimer.AutoReset = true;
+		valueTimer.Elapsed += (e, args) => 
+		{
+			foreach (var entry in ValueChangeDict.ToList())
+			{
+				var value = entry.Value;
+
+				if ((DateTime.Now - value.GetTimeStamp()).TotalMilliseconds > 300)
+				{
+					ApplyDoUndo(delegate { value.Do(); }, delegate { value.Undo(); }, value.ToString());
+					ValueChangeDict.Remove(entry.Key);
+				}
+			}
+
+			if (ValueChangeDict.Count == 0)
+			{
+				valueTimer.Stop();
+			}
+		};
+	}
+
 	public UsingContext DisableUndoScope()
 	{
 		--enableUndoRedo;
@@ -108,6 +182,36 @@ public class UndoRedoManager : NotifyPropertyChanged
 		{
 			overrideName = oldName;
 		});
+	}
+
+	public void DoValueChange<T>(object keyObj, T prevValue, T newValue, Action<T> setter, string valueName)
+	{
+		ValueChangeAction<T> desc = null;
+
+		if (enableUndoRedo != 0)
+		{
+			desc = new ValueChangeAction<T>(prevValue, newValue, setter, DateTime.Now, valueName);
+			desc.Do();
+			return;
+		}
+
+		string key = keyObj.GetHashCode().ToString() + valueName;
+
+		if (ValueChangeDict.ContainsKey(key))
+		{
+			desc = ValueChangeDict[key] as ValueChangeAction<T>;
+			desc.newVal = newValue;
+			desc.timeStamp = DateTime.Now;
+		}
+		else
+		{
+			desc = new ValueChangeAction<T>(prevValue, newValue, setter, DateTime.Now, valueName);
+			ValueChangeDict[key] = desc;
+		}
+
+		desc.Do();
+
+		if (!valueTimer.Enabled) valueTimer.Start();
 	}
 
 	public void ApplyDoUndo(Action _do, Action _undo, string _desc = "")
@@ -237,6 +341,7 @@ public class UndoRedoManager : NotifyPropertyChanged
 	UndoRedoGroup savePoint;
 	bool isInApplyUndo;
 	string overrideName;
+	Timer valueTimer;
 }
 
 //-----------------------------------------------------------------------
