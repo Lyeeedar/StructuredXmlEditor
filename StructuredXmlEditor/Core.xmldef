@@ -16,7 +16,7 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="false" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" />
 	</StructDef>
 
 	<StructDef Name="Vector" ToolTip="A vector." TextColour="Primitive">
@@ -35,7 +35,7 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="false" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" />
 	</StructDef>
 
 	<StructDef Name="String" ToolTip="A string." TextColour="Primitive" >
@@ -47,13 +47,14 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="false" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" />
 	</StructDef>
 
 	<StructDef Name="File" ToolTip="A file path (relative to the project root)." TextColour="Primitive" >
 		<Attributes>
 			<String Name="Name" Default="File" ToolTip="The name to be written for this element." />
 			<String Name="BasePath" ToolTip="The base path (relative to the project root) to convert any selected paths to." />
+			<Boolean Name="StripExtension" ToolTip="Whether to strip the extension from the chosen path" />
 			<String Name="AllowedFileTypes" ToolTip="A comma seperated list of allowed extensions." />
 			<String Name="Default" ToolTip="The default value for this element." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
@@ -61,7 +62,7 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="false" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" />
 	</StructDef>
 
 	<StructDef Name="Boolean" ToolTip="A boolean (true/false)." TextColour="Primitive">
@@ -73,7 +74,7 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="false" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" />
 	</StructDef>
 
 	<StructDef Name="Colour" ToolTip="A colour (stored as RGB or RGBA in 0-255 range)." TextColour="Primitive">
@@ -86,7 +87,7 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="false" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" />
 	</StructDef>
 
 	<StructDef Name="MultilineString" ToolTip="A string that spans multiple lines." TextColour="Primitive">
@@ -99,7 +100,7 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="false" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" />
 	</StructDef>
 
 	<StructDef Name="Enum" ToolTip="A value chosen from a series of valid values." TextColour="Primitive">
@@ -113,7 +114,7 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="false" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" />
 	</StructDef>
 
 	<CollectionDef Name="EnumDef" ToolTip="The definition for a collection of enumvalues that can be referenced by enums." TextColour="Primitive" Collapse="True" MinCount="1">
@@ -137,7 +138,7 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Collection" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="false" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" />
 	</StructDef>
 
 	<StructDef Name="Collection" ToolTip="A collection containing multiple elements of the specified child." TextColour="Collection">
@@ -152,7 +153,7 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Collection" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="false" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" />
 		<Reference Name="Item" Keys="Boolean,Collection,Colour,Enum,File,GraphReference,MultilineString,Number,Reference,String,Struct,Timeline,Tree,Vector" ToolTip="The child that this collection contains." />
 	</StructDef>
 
@@ -169,7 +170,7 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="IsGlobal" ToolTip="Whether this definition can be referenced from other files." />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="false" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" />
 		<Reference Name="Item" Keys="Boolean,Collection,Colour,Enum,File,GraphReference,MultilineString,Number,Reference,String,Struct,Timeline,Tree,Vector" ToolTip="The child that this collection contains." />
 	</StructDef>
 
@@ -187,7 +188,7 @@
 		</Attributes>
 		<Reference Name="Data" Keys="Boolean,Collection,Colour,Enum,File,GraphReference,MultilineString,Number,String,Struct,Reference,Timeline,Tree,Vector" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
-			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="false" />
+			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" />
 		</AdditionalDefs>
 	</CollectionDef>
 
@@ -206,7 +207,7 @@
 		</Attributes>
 		<Reference Name="Data" Keys="Boolean,Collection,Colour,Enum,File,GraphReference,MultilineString,Number,String,Struct,Reference,Timeline,Tree,Vector" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
-			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="false" />
+			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" />
 		</AdditionalDefs>
 	</CollectionDef>
 
@@ -225,7 +226,7 @@
 		</Attributes>
 		<Reference Name="Data" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,String,Struct,Reference,Timeline,Tree,Vector,GraphReference" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
-			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="false" />
+			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" />
 		</AdditionalDefs>
 	</CollectionDef>
 
@@ -241,7 +242,7 @@
 		</Attributes>
 		<Reference Name="Data" Keys="Boolean,Collection,Colour,Enum,File,MultilineString,Number,String,Struct,Reference,Timeline,Tree,Vector,GraphReference" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
-			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="false" />
+			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" />
 		</AdditionalDefs>
 	</CollectionDef>
 
@@ -259,7 +260,7 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Collection" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="false" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" />
 		<Reference Name="Item" Keys="Boolean,Collection,Colour,Enum,File,GraphReference,MultilineString,Number,Reference,String,Struct,Timeline,Tree,Vector" ToolTip="The child that this collection contains." />
 	</StructDef>
 
@@ -274,7 +275,7 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="IsGlobal" ToolTip="Whether this definition can be referenced from other files." />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="false" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" />
 		<Reference Name="Item" Keys="Boolean,Collection,Colour,Enum,File,GraphReference,MultilineString,Number,Reference,String,Struct,Timeline,Tree,Vector" ToolTip="The child that this collection contains." />
 	</StructDef>
 
@@ -286,7 +287,7 @@
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="false" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" />
 	</StructDef>
 
 	<StructDef Name="Timeline" ToolTip="A collection of keyframes." TextColour="Struct">
@@ -301,7 +302,6 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Struct" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="false" />
 		<Reference Name="Keyframe" Keys="Struct" Nullable="false" ToolTip="The keyframe. Must contain a number child with the name of the value in TimeChild." />
 	</StructDef>
 
@@ -314,7 +314,7 @@
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="false" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" />
 	</StructDef>
 
 	<Collection Name="Definitions" ToolTip="The definitions stored in this file. Can contain only a single non-def element.">

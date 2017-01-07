@@ -10,6 +10,7 @@ namespace StructuredXmlEditor.Definition
 {
 	class FileDefinition : PrimitiveDataDefinition
 	{
+		public bool StripExtension { get; set; }
 		public string Default { get; set; }
 		public string BasePath { get; set; }
 		public List<string> AllowedFileTypes { get; set; }
@@ -40,6 +41,8 @@ namespace StructuredXmlEditor.Definition
 
 			var allowedFileTypes = definition.Attribute("AllowedFileTypes")?.Value?.ToString();
 			if (allowedFileTypes != null) AllowedFileTypes = allowedFileTypes.Split(new char[] { ',' }).ToList();
+
+			StripExtension = TryParseBool(definition, "StripExtension");
 		}
 
 		public override void DoSaveData(XElement parent, DataItem item)

@@ -110,6 +110,14 @@ namespace StructuredXmlEditor.View
 		}
 
 		//-----------------------------------------------------------------------
+		private double GetKeyframeWidth(DataItem keyframe)
+		{
+			var preview = TimelineItem.GetImagePreview(keyframe);
+			if (preview != null) return ActualHeight - 20;
+			else return 10;
+		}
+
+		//-----------------------------------------------------------------------
 		protected override void OnRender(DrawingContext drawingContext)
 		{
 			base.OnRender(drawingContext);
@@ -267,7 +275,19 @@ namespace StructuredXmlEditor.View
 				var thickness = keyframe == mouseOverItem ? 2 : 1;
 				var pen = keyframe.IsSelected ? new Pen(SelectedBrush, thickness) : new Pen(UnselectedBrush, thickness);
 
-				drawingContext.DrawRectangle(null, pen, new Rect(TimelineItem.GetKeyframeTime(keyframe) * pixelsASecond - 5 + TimelineItem.LeftPad, 5, 10, ActualHeight-20));
+				var preview = TimelineItem.GetImagePreview(keyframe);
+				if (preview != null)
+				{
+					var size = ActualHeight - 20;
+					var rect = new Rect(TimelineItem.GetKeyframeTime(keyframe) * pixelsASecond - 5 + TimelineItem.LeftPad, 5, size, size);
+
+					drawingContext.DrawImage(preview, rect);
+					drawingContext.DrawRectangle(null, pen, rect);
+				}
+				else
+				{
+					drawingContext.DrawRectangle(null, pen, new Rect(TimelineItem.GetKeyframeTime(keyframe) * pixelsASecond - 5 + TimelineItem.LeftPad, 5, 10, ActualHeight - 20));
+				}
 			}
 		}
 
@@ -321,7 +341,7 @@ namespace StructuredXmlEditor.View
 			{
 				var time = TimelineItem.GetKeyframeTime(keyframe) * pixelsASecond;
 
-				if (Math.Abs(time - clickPos) < 10)
+				if (Math.Abs(time - clickPos) < GetKeyframeWidth(keyframe))
 				{
 					draggedItem = keyframe;
 					startPos = clickPos;
@@ -352,7 +372,7 @@ namespace StructuredXmlEditor.View
 			{
 				var time = TimelineItem.GetKeyframeTime(keyframe) * pixelsASecond;
 
-				if (Math.Abs(time - clickPos) < 10)
+				if (Math.Abs(time - clickPos) < GetKeyframeWidth(keyframe))
 				{
 					keyframe.IsSelected = true;
 
@@ -385,7 +405,7 @@ namespace StructuredXmlEditor.View
 				{
 					var time = TimelineItem.GetKeyframeTime(keyframe) * pixelsASecond;
 
-					if (Math.Abs(time - clickPos) < 10)
+					if (Math.Abs(time - clickPos) < GetKeyframeWidth(keyframe))
 					{
 						mouseOverItem = keyframe;
 

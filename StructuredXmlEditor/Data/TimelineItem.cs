@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using StructuredXmlEditor.View;
 using System.Windows.Media;
 using System.ComponentModel;
+using System.Windows.Media.Imaging;
 
 namespace StructuredXmlEditor.Data
 {
@@ -160,6 +161,14 @@ namespace StructuredXmlEditor.Data
 		{
 			var def = (Definition as TimelineDefinition).KeyframeDefinition.Children.Where((e) => e is NumberDefinition && e != (Definition as TimelineDefinition).TimeDefinition).ElementAt(index);
 			(keyframe.Children.First((e) => e.Definition == def) as NumberItem).Value = value;
+		}
+
+		//-----------------------------------------------------------------------
+		public BitmapImage GetImagePreview(DataItem keyframe)
+		{
+			var def = (Definition as TimelineDefinition).KeyframeDefinition.Children.Where((e) => e is FileDefinition).FirstOrDefault();
+			if (def == null) return null;
+			return (keyframe.Children.First((e) => e.Definition == def) as FileItem).Preview;
 		}
 
 		//-----------------------------------------------------------------------

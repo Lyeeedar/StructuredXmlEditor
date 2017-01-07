@@ -25,9 +25,12 @@ namespace StructuredXmlEditor.Data
 				{
 					UndoRedo.DoValueChange<T>(this, m_value, value, (val) =>
 					{
-						m_value = val;
-						RaisePropertyChangedEvent("Value");
-						RaisePropertyChangedEvent("Description");
+						if (m_value == null || !m_value.Equals(val))
+						{
+							m_value = val;
+							RaisePropertyChangedEvent("Value");
+							RaisePropertyChangedEvent("Description");
+						}
 					}, "Value");
 				}
 			}

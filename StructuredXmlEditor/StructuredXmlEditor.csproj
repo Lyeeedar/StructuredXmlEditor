@@ -175,6 +175,7 @@
     <Compile Include="View\CustomControls\MultilineTextEditor.cs" />
     <Compile Include="Util\NotifyPropertyChanged.cs" />
     <Compile Include="View\ValueConverters\LevelToIndentationConverter.cs" />
+    <Compile Include="View\ValueConverters\NullImageConverter.cs" />
     <Compile Include="View\ValueConverters\NullOrZeroConverter.cs" />
     <Compile Include="Util\Command.cs" />
     <Compile Include="View\ValueConverters\ValueTypeConverter.cs" />

@@ -217,20 +217,13 @@ namespace StructuredXmlEditor.Data
 				var open = Documents.FirstOrDefault(e => e.Path == path);
 				if (open != null)
 				{
-					if (open.JustSaved)
-					{
-						open.JustSaved = false;
-					}
-					else
-					{
-						Current = open;
-						string response = Message.Show("This document changed on disk, do you want to reload it? Clicking Yes will discard any local changes.", "Document Changed On Disk", "Yes", "No");
+					Current = open;
+					string response = Message.Show("This document changed on disk, do you want to reload it? Clicking Yes will discard any local changes.", "Document Changed On Disk", "Yes", "No");
 
-						if (response == "Yes")
-						{
-							open.Close(true);
-							Open(path);
-						}
+					if (response == "Yes")
+					{
+						open.Close(true);
+						Open(path);
 					}
 				}
 			};
