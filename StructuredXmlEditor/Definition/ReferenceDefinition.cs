@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using StructuredXmlEditor.Data;
 using StructuredXmlEditor.View;
+using System.Windows.Data;
 
 namespace StructuredXmlEditor.Definition
 {
 	public class ReferenceDefinition : ComplexDataDefinition
 	{
-		public List<string> Keys { get; set; } = new List<string>();
+		public ListCollectionView ItemsSource { get; set; }
+		public List<Tuple<string, string>> Keys { get; set; } = new List<Tuple<string, string>>();
 		public Dictionary<string, DataDefinition> Definitions { get; set; } = new Dictionary<string, DataDefinition>();
 		public bool IsNullable { get; set; }
 
@@ -70,7 +72,25 @@ namespace StructuredXmlEditor.Definition
 			var keyString = definition.Attribute("Keys")?.Value?.ToString();
 			if (!string.IsNullOrWhiteSpace(keyString))
 			{
-				Keys.AddRange(keyString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
+				if (!keyString.Contains('('))
+				{
+					Keys.AddRange(keyString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(e => new Tuple<string, string>(e, "Type")));
+				}
+				else
+				{
+					var categories = keyString.Split(new char[] { ')' }, StringSplitOptions.RemoveEmptyEntries);
+					foreach (var categoryString in categories)
+					{
+						var split = categoryString.Split('(');
+						var category = split[0];
+						if (category.StartsWith(",")) category = category.Substring(1);
+						Keys.AddRange(split[1].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(e => new Tuple<string, string>(e, category)));
+					}
+				}
+
+				ListCollectionView lcv = new ListCollectionView(Keys);
+				lcv.GroupDescriptions.Add(new PropertyGroupDescription("Item2"));
+				ItemsSource = lcv;
 			}
 
 			IsNullable = TryParseBool(definition, "Nullable", true);
@@ -81,12 +101,12 @@ namespace StructuredXmlEditor.Definition
 			foreach (var key in Keys)
 			{
 				Dictionary<string, DataDefinition> defs = null;
-				if (local.ContainsKey(key.ToLower())) defs = local;
-				else if (global.ContainsKey(key.ToLower())) defs = global;
+				if (local.ContainsKey(key.Item1.ToLower())) defs = local;
+				else if (global.ContainsKey(key.Item1.ToLower())) defs = global;
 
 				if (defs != null)
 				{
-					Definitions[key] = defs[key.ToLower()];
+					Definitions[key.Item1] = defs[key.Item1.ToLower()];
 				}
 				else
 				{

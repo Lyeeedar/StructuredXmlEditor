@@ -18,7 +18,7 @@ namespace StructuredXmlEditor.Data
 		public DataDefinition ChosenDefinition { get; set; }
 
 		//-----------------------------------------------------------------------
-		public DataDefinition SelectedDefinition { get; set; }
+		public Tuple<string, string> SelectedDefinition { get; set; }
 
 		//-----------------------------------------------------------------------
 		public DataItem WrappedItem
@@ -108,7 +108,7 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public ReferenceItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
-			SelectedDefinition = (definition as ReferenceDefinition).Definitions.Values.First();
+			SelectedDefinition = (Tuple<string, string>)(definition as ReferenceDefinition).ItemsSource.GetItemAt(0);
 		}
 
 		//-----------------------------------------------------------------------
@@ -184,7 +184,7 @@ namespace StructuredXmlEditor.Data
 			using (UndoRedo.ActionScope("Swap " + ChosenDefinition.Name + " to " + def.Name))
 			{
 				Copy();
-				SelectedDefinition = def;
+				ChosenDefinition = def;
 				Clear();
 				Create();
 				Paste();
@@ -207,7 +207,7 @@ namespace StructuredXmlEditor.Data
 		public void Create()
 		{
 			DataItem item = null;
-			var chosen = SelectedDefinition;
+			var chosen = (Definition as ReferenceDefinition).Definitions[SelectedDefinition.Item1];
 			using (UndoRedo.DisableUndoScope())
 			{
 				item = chosen.CreateData(UndoRedo);

@@ -494,12 +494,24 @@
 				Grid.Column="2"
 				Visibility="{Binding HasContent, Converter={v:ValueTypeConverter}, ConverterParameter=Not}"
 				VerticalAlignment="Center"
-				ItemsSource="{Binding Definition.Definitions.Values}"
+				ItemsSource="{Binding Definition.ItemsSource}"
 				SelectedItem="{Binding SelectedDefinition}">
+				<ComboBox.GroupStyle>
+					<GroupStyle>
+						<GroupStyle.HeaderTemplate>
+							<DataTemplate>
+								<TextBlock
+									FontWeight="Bold"
+									Foreground="{StaticResource FontDarkBlueBrush}"
+									Text="{Binding Name}" />
+							</DataTemplate>
+						</GroupStyle.HeaderTemplate>
+					</GroupStyle>
+				</ComboBox.GroupStyle>
 				<ComboBox.ItemTemplate>
 					<DataTemplate>
 						<TextBlock
-							Text="{Binding Name}" />
+							Text="{Binding Item1}" />
 					</DataTemplate>
 				</ComboBox.ItemTemplate>
 			</ComboBox>
@@ -649,12 +661,24 @@
 				Grid.Column="2"
 				Visibility="{Binding HasContent, Converter={v:ValueTypeConverter}, ConverterParameter=Not}"
 				VerticalAlignment="Center"
-				ItemsSource="{Binding Definition.Definitions.Values}"
+				ItemsSource="{Binding Definition.ItemsSource}"
 				SelectedItem="{Binding SelectedDefinition}">
+				<ComboBox.GroupStyle>
+					<GroupStyle>
+						<GroupStyle.HeaderTemplate>
+							<DataTemplate>
+								<TextBlock
+									FontWeight="Bold"
+									Foreground="{StaticResource FontDarkBlueBrush}"
+									Text="{Binding Name}" />
+							</DataTemplate>
+						</GroupStyle.HeaderTemplate>
+					</GroupStyle>
+				</ComboBox.GroupStyle>
 				<ComboBox.ItemTemplate>
 					<DataTemplate>
 						<TextBlock
-							Text="{Binding Name}" />
+							Text="{Binding Item1}" />
 					</DataTemplate>
 				</ComboBox.ItemTemplate>
 			</ComboBox>

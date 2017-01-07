@@ -5,13 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 using System.Xml.Linq;
 
 namespace StructuredXmlEditor.Definition
 {
 	public class GraphReferenceDefinition : ComplexDataDefinition
 	{
-		public List<string> Keys { get; set; } = new List<string>();
+		public ListCollectionView ItemsSource { get; set; }
+		public List<Tuple<string, string>> Keys { get; set; } = new List<Tuple<string, string>>();
 		public Dictionary<string, GraphNodeDefinition> Definitions { get; set; } = new Dictionary<string, GraphNodeDefinition>();
 
 		public override DataItem CreateData(UndoRedoManager undoRedo)
@@ -81,9 +83,28 @@ namespace StructuredXmlEditor.Definition
 		public override void Parse(XElement definition)
 		{
 			var keyString = definition.Attribute("Keys")?.Value?.ToString();
+
 			if (!string.IsNullOrWhiteSpace(keyString))
 			{
-				Keys.AddRange(keyString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
+				if (!keyString.Contains('('))
+				{
+					Keys.AddRange(keyString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(e => new Tuple<string, string>(e, "Node")));
+				}
+				else
+				{
+					var categories = keyString.Split(new char[] { ')' }, StringSplitOptions.RemoveEmptyEntries);
+					foreach (var categoryString in categories)
+					{
+						var split = categoryString.Split('(');
+						var category = split[0];
+						if (category.StartsWith(",")) category = category.Substring(1);
+						Keys.AddRange(split[1].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(e => new Tuple<string, string>(e, category)));
+					}
+				}
+
+				ListCollectionView lcv = new ListCollectionView(Keys);
+				lcv.GroupDescriptions.Add(new PropertyGroupDescription("Item2"));
+				ItemsSource = lcv;
 			}
 		}
 
@@ -92,16 +113,16 @@ namespace StructuredXmlEditor.Definition
 			foreach (var key in Keys)
 			{
 				Dictionary<string, DataDefinition> defs = null;
-				if (local.ContainsKey(key.ToLower())) defs = local;
-				else if (global.ContainsKey(key.ToLower())) defs = global;
+				if (local.ContainsKey(key.Item1.ToLower())) defs = local;
+				else if (global.ContainsKey(key.Item1.ToLower())) defs = global;
 
 				if (defs != null)
 				{
-					var def = defs[key.ToLower()];
+					var def = defs[key.Item1.ToLower()];
 
 					if (def is GraphNodeDefinition)
 					{
-						Definitions[key] = def as GraphNodeDefinition;
+						Definitions[key.Item1] = def as GraphNodeDefinition;
 					}
 					else
 					{

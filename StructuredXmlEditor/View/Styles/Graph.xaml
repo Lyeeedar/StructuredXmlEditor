@@ -141,13 +141,26 @@
 					Width="16" />
 				<local:PopupButton.PopupContent>
 					<ItemsControl
-						ItemsSource="{Binding AllowedTypes}">
+						Margin="3"
+						ItemsSource="{Binding GraphReferenceItem.Definition.ItemsSource}">
+						<ItemsControl.GroupStyle>
+							<GroupStyle>
+								<GroupStyle.HeaderTemplate>
+									<DataTemplate>
+										<TextBlock
+											FontWeight="Bold"
+											Foreground="{StaticResource FontDarkBlueBrush}"
+											Text="{Binding Name}" />
+									</DataTemplate>
+								</GroupStyle.HeaderTemplate>
+							</GroupStyle>
+						</ItemsControl.GroupStyle>
 						<ItemsControl.ItemTemplate>
 							<DataTemplate>
 								<Button
-									Content="{Binding}"
+									Content="{Binding Item1}"
 									Command="{Binding DataContext.CreateCMD, ElementName=button}"
-									CommandParameter="{Binding}" />
+									CommandParameter="{Binding Item1}" />
 							</DataTemplate>
 						</ItemsControl.ItemTemplate>
 					</ItemsControl>

@@ -23,7 +23,7 @@ namespace StructuredXmlEditor.Data
 		public GraphNodeDefinition ChosenDefinition { get; set; }
 
 		//-----------------------------------------------------------------------
-		public GraphNodeDefinition SelectedDefinition { get; set; }
+		public Tuple<string, string> SelectedDefinition { get; set; }
 
 		//-----------------------------------------------------------------------
 		public GraphNodeItem WrappedItem
@@ -158,7 +158,7 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public GraphReferenceItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
-			SelectedDefinition = (definition as GraphReferenceDefinition).Definitions.Values.First();
+			SelectedDefinition = (Tuple<string, string>)(definition as GraphReferenceDefinition).ItemsSource.GetItemAt(0);
 
 			PropertyChanged += (s, args) => 
 			{
@@ -383,14 +383,11 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void Create(string chosenName = null)
 		{
-			if (chosenName != null)
-			{
-				SelectedDefinition = (Definition as GraphReferenceDefinition).Definitions[chosenName];
-			}
-
 			var Node = GetParentNode();
 
-			var chosen = SelectedDefinition;
+			var chosen = chosenName != null ? 
+				(Definition as GraphReferenceDefinition).Definitions[chosenName] : 
+				(Definition as GraphReferenceDefinition).Definitions[SelectedDefinition.Item1];
 
 			GraphNodeItem item = null;
 			using (UndoRedo.DisableUndoScope())
