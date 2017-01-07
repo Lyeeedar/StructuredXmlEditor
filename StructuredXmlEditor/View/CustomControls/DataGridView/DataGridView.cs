@@ -238,7 +238,7 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		protected override DependencyObject GetContainerForItemOverride()
 		{
-			return new DataGridViewItem();
+			return new DataGridViewItem(this);
 		}
 
 		//-----------------------------------------------------------------------
@@ -339,7 +339,7 @@ namespace StructuredXmlEditor.View
 		}
 
 		//-----------------------------------------------------------------------
-		void DeferRefresh()
+		public void DeferRefresh()
 		{
 			m_requests++;
 			if (m_refreshOp == null)

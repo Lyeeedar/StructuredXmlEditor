@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -20,7 +21,7 @@ using System.Windows.Threading;
 namespace StructuredXmlEditor.View
 {
 	//-----------------------------------------------------------------------
-	public class DataGridViewItem : ListBoxItem
+	public class DataGridViewItem : ListBoxItem, INotifyPropertyChanged
 	{
 		//##############################################################################################################
 		#region Constructor
@@ -33,7 +34,7 @@ namespace StructuredXmlEditor.View
 		}
 
 		//-----------------------------------------------------------------------
-		public DataGridViewItem()
+		public DataGridViewItem(DataGridView DataGrid)
 		{
 			GotFocus += (e, args) => 
 			{
@@ -42,6 +43,8 @@ namespace StructuredXmlEditor.View
 			};
 
 			AllowDrop = true;
+
+			this.DataGrid = DataGrid;
 		}
 
 		#endregion Constructor
@@ -51,6 +54,8 @@ namespace StructuredXmlEditor.View
 		#endregion Properties
 		//##############################################################################################################
 		#region Dependecy Properties
+
+		public DataGridView DataGrid { get; set; }
 
 		#region HeaderForeground
 		//-----------------------------------------------------------------------
@@ -93,6 +98,7 @@ namespace StructuredXmlEditor.View
 
 		#region Items
 		//-----------------------------------------------------------------------
+		private List<IDataGridItem> storedItems = new List<IDataGridItem>();
 		public IEnumerable<IDataGridItem> Items
 		{
 			get { return (IEnumerable<IDataGridItem>)GetValue(ItemsProperty); }
@@ -126,34 +132,56 @@ namespace StructuredXmlEditor.View
 					incc.CollectionChanged += OnItemsCollectionChanged;
 				}
 
-				HasItems = newValue.Any();
+				HasItems = newValue.Any(e => e.IsVisible);
 			}
 		}
 
 		//-----------------------------------------------------------------------
-		void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
 		{
 			if (Items != null)
 			{
-				HasItems = Items.Any();
+				HasItems = Items.Any(e => e.IsVisible);
+			}
+
+			foreach (var oldItem in storedItems)
+			{
+				oldItem.PropertyChanged -= OnChildPropertyChanged;
+			}
+
+			storedItems = Items.ToList();
+
+			foreach (var newItem in storedItems)
+			{
+				newItem.PropertyChanged += OnChildPropertyChanged;
 			}
 		}
+		//-----------------------------------------------------------------------
+		void OnChildPropertyChanged(object sender, PropertyChangedEventArgs args)
+		{
+			if (args.PropertyName == "IsVisible")
+			{
+				HasItems = Items.Any(e => e.IsVisible);
+				DataGrid.DeferRefresh();
+			}
+		}
+
 		#endregion Items
 
 		#region HasItems
-		//-----------------------------------------------------------------------
-		static readonly DependencyPropertyKey HasItemsPropertyKey = DependencyProperty.RegisterReadOnly("HasItems",
-			typeof(bool), typeof(DataGridViewItem), new FrameworkPropertyMetadata(false));
-
-		//-----------------------------------------------------------------------
-		public static readonly DependencyProperty HasItemsProperty = HasItemsPropertyKey.DependencyProperty;
-
-		//-----------------------------------------------------------------------
 		public bool HasItems
 		{
-			get { return (bool)GetValue(HasItemsProperty); }
-			protected set { SetValue(HasItemsPropertyKey, value); }
+			get { return m_hasItems; }
+			set
+			{
+				if (m_hasItems != value)
+				{
+					m_hasItems = value;
+					RaisePropertyChangedEvent();
+				}
+			}
 		}
+		private bool m_hasItems;
 		#endregion HasItems
 
 		#region Level
@@ -620,6 +648,20 @@ namespace StructuredXmlEditor.View
 
 		#endregion Data
 		//##############################################################################################################
+		//--------------------------------------------------------------------------
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		//-----------------------------------------------------------------------
+		public void RaisePropertyChangedEvent
+		(
+			[CallerMemberName] string i_propertyName = ""
+		)
+		{
+			if (PropertyChanged != null)
+			{
+				PropertyChanged(this, new PropertyChangedEventArgs(i_propertyName));
+			}
+		}
 	}
 
 	//##############################################################################################################

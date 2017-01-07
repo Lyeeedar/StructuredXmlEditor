@@ -24,10 +24,13 @@ namespace StructuredXmlEditor.Data
 		public Command<object> AddCMD { get { return new Command<object>((e) => Add()); } }
 
 		//-----------------------------------------------------------------------
-		public bool IsAtMax { get { return Children.Count >= (Definition as CollectionDefinition).MaxCount; } }
+		public CollectionDefinition CDef { get { return Definition as CollectionDefinition; } }
 
 		//-----------------------------------------------------------------------
-		public bool IsAtMin { get { return Children.Count <= (Definition as CollectionDefinition).MinCount; } }
+		public bool IsAtMax { get { return Children.Where(e => e.Definition == CDef.ChildDefinition).Count() >= CDef.MaxCount; } }
+
+		//-----------------------------------------------------------------------
+		public bool IsAtMin { get { return Children.Where(e => e.Definition == CDef.ChildDefinition).Count() <= CDef.MinCount; } }
 
 		//-----------------------------------------------------------------------
 		public override bool CanPaste { get { return !IsAtMax; } }

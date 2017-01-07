@@ -213,13 +213,13 @@
 								Value="{StaticResource MouseOverBorderBrush}" />
 						</Trigger>
 
-						<Trigger
+						<!--<Trigger
 							Property="HasItems"
 							Value="true">
 							<Setter
 								Property="Visibility"
 								Value="Visible" />
-						</Trigger>
+						</Trigger>-->
 
 						<MultiTrigger>
 							<MultiTrigger.Conditions>

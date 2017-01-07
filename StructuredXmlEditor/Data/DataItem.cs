@@ -41,6 +41,9 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public DataItem Root { get { return Grid?.RootItems[0]; } }
+
+		//-----------------------------------------------------------------------
 		bool IDataGridItem.IsVisible { get { return IsVisible; } }
 
 		//-----------------------------------------------------------------------
@@ -105,6 +108,14 @@ namespace StructuredXmlEditor.Data
 					RaisePropertyChangedEvent();
 
 					UpdateVisibleIfBinding();
+
+					if (this is ComplexDataItem)
+					{
+						foreach (var att in (this as ComplexDataItem).Attributes)
+						{
+							att.UpdateVisibleIfBinding();
+						}
+					}
 				}
 			}
 		}
@@ -295,9 +306,9 @@ namespace StructuredXmlEditor.Data
 		{
 			get
 			{
-				if (m_grid == null && Parent != null)
+				if (m_grid == null && Parent?.Grid != null)
 				{
-					m_grid = Parent.Grid;
+					Grid = Parent.Grid;
 				}
 
 				return m_grid;
@@ -308,6 +319,16 @@ namespace StructuredXmlEditor.Data
 				{
 					m_grid = value;
 					RaisePropertyChangedEvent();
+
+					UpdateVisibleIfBinding();
+
+					if (this is ComplexDataItem)
+					{
+						foreach (var att in (this as ComplexDataItem).Attributes)
+						{
+							att.UpdateVisibleIfBinding();
+						}
+					}
 				}
 			}
 		}
@@ -373,6 +394,41 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public DataItem GetNonWrappedItem(DataItem current)
+		{
+			if (current is ReferenceItem)
+			{
+				var item = current as ReferenceItem;
+				return GetNonWrappedItem(item.WrappedItem);
+			}
+			else if (current is GraphReferenceItem)
+			{
+				var item = current as GraphReferenceItem;
+				return GetNonWrappedItem(item.WrappedItem);
+			}
+			else if (current is CollectionChildItem)
+			{
+				var item = current as CollectionChildItem;
+				return GetNonWrappedItem(item.WrappedItem);
+			}
+
+			return current;
+		}
+
+		//-----------------------------------------------------------------------
+		public DataItem FirstComplexParent(DataItem current)
+		{
+			if (current.Parent == null) return null;
+			else if (current.Parent is ComplexDataItem) return current.Parent;
+			else if (current.Parent is CollectionChildItem || current.Parent is ReferenceItem || current.Parent is GraphReferenceItem)
+			{
+				var nonWrapped = GetNonWrappedItem(current.Parent);
+				if (nonWrapped is ComplexDataItem) return nonWrapped;
+			}
+			return FirstComplexParent(current.Parent);
+		}
+
+		//-----------------------------------------------------------------------
 		public void UpdateVisibleIfBinding()
 		{
 			VisibleIfStatements.Clear();
@@ -395,26 +451,45 @@ namespace StructuredXmlEditor.Data
 						var stmnt = new Statement(statement);
 						group.Add(stmnt);
 
-						// We are an attribute, so use the attribute collection instead
-						IEnumerable<DataItem> collection = Children;
-						if (Parent is ComplexDataItem && ((ComplexDataItem)Parent).Attributes.Contains(this))
+						if (stmnt.TargetPath.Count > 1)
 						{
-							collection = ((ComplexDataItem)Parent).Attributes;
+							int i = 0;
 						}
 
 						// find the referenced element and bind to it
-						foreach (var child in collection)
+						DataItem current = this;
+						foreach (var part in stmnt.TargetPath)
 						{
-							if (child != this && child.Name == stmnt.TargetName)
+							if (part == "Root") current = Root;
+							else if (part == "Parent") current = FirstComplexParent(current);
+							else
 							{
-								stmnt.SetTarget(child);
-								child.PropertyChanged += (e, a) =>
+								// Combine children and attributes into one block
+								List<DataItem> collection = current.Children.ToList();
+								if (current is ComplexDataItem)
 								{
-									if (a.PropertyName == "Value") RaisePropertyChangedEvent("IsVisible");
-								};
+									collection.AddRange((current as ComplexDataItem).Attributes);
+								}
 
-								break;
+								// If we are an attribute then replace the children list with the parent attribute list
+								if (current.Parent is ComplexDataItem && ((ComplexDataItem)current.Parent).Attributes.Contains(this))
+								{
+									collection = ((ComplexDataItem)current.Parent).Attributes.ToList();
+								}
+
+								current = collection.FirstOrDefault(e => e.Name == part);
 							}
+
+							if (current == null) break;
+						}
+						
+						if (current != null)
+						{
+							stmnt.SetTarget(current);
+							current.PropertyChanged += (e, a) =>
+							{
+								if (a.PropertyName == "Value") RaisePropertyChangedEvent("IsVisible");
+							};
 						}
 					}
 				}
@@ -558,7 +633,7 @@ namespace StructuredXmlEditor.Data
 		{
 			foreach (var child in m_childrenCache)
 			{
-				child.Parent = null;
+				//child.Parent = null;
 				child.PropertyChanged -= ChildPropertyChanged;
 			}
 
@@ -820,7 +895,7 @@ namespace StructuredXmlEditor.Data
 
 		//-----------------------------------------------------------------------
 		public ComparisonOperation Operator { get; set; }
-		public string TargetName { get; set; }
+		public List<string> TargetPath { get; set; }
 		public string TargetValue { get; set; }
 
 		public DataItem Target { get; set; }
@@ -834,7 +909,7 @@ namespace StructuredXmlEditor.Data
 				if (statement.Contains(opString))
 				{
 					var split = statement.Split(new string[] { opString }, StringSplitOptions.RemoveEmptyEntries);
-					TargetName = split[0].Trim();
+					TargetPath = split[0].Trim().Split('.').ToList();
 					TargetValue = split[1].Trim();
 					Operator = op;
 

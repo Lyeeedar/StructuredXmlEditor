@@ -31,7 +31,7 @@ namespace StructuredXmlEditor.Data
 							RaisePropertyChangedEvent("Value");
 							RaisePropertyChangedEvent("Description");
 						}
-					}, "Value");
+					}, Definition.Name);
 				}
 			}
 		}
