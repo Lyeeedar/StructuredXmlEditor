@@ -218,8 +218,8 @@ namespace StructuredXmlEditor.Definition
 				{
 					parent.Add(root);
 
-					root.SetAttributeValue(XNamespace.Xmlns + "json", item.Grid.JsonNS);
-					root.SetAttributeValue(item.Grid.JsonNS + "Array", "true");
+					root.SetAttributeValue(XNamespace.Xmlns + "json", JsonNS);
+					root.SetAttributeValue(JsonNS + "Array", "true");
 				}
 				else
 				{

@@ -17,6 +17,9 @@ namespace StructuredXmlEditor.Definition
 			{ "Struct", "180,156,181" }
 		};
 
+		public static XNamespace JsonNS = "http://james.newtonking.com/projects/json";
+		public static XNamespace MetaNS = "Editor";
+
 		public virtual string CopyKey { get { return GetType().ToString() + "Copy"; } }
 
 		public string SrcFile { get; set; }
@@ -52,7 +55,7 @@ namespace StructuredXmlEditor.Definition
 
 		public static DataDefinition LoadDefinition(XElement element)
 		{
-			var name = element.Attribute("RefKey")?.Value.ToString().ToUpper();
+			var name = element.Attribute(MetaNS + "RefKey")?.Value.ToString().ToUpper();
 			if (name == null) name = element.Name.ToString().ToUpper();
 
 			if (name.EndsWith("DEF"))
@@ -109,7 +112,7 @@ namespace StructuredXmlEditor.Definition
 			return LoadDefinition(doc.Elements().First());
 		}
 
-		protected int TryParseInt(XElement definition, string att, int fallback = 0)
+		protected int TryParseInt(XElement definition, XName att, int fallback = 0)
 		{
 			var valueString = definition.Attribute(att)?.Value?.ToString();
 
@@ -120,7 +123,7 @@ namespace StructuredXmlEditor.Definition
 			return temp;
 		}
 
-		protected float TryParseFloat(XElement definition, string att, float fallback = 0f)
+		protected float TryParseFloat(XElement definition, XName att, float fallback = 0f)
 		{
 			var valueString = definition.Attribute(att)?.Value?.ToString();
 
@@ -131,7 +134,7 @@ namespace StructuredXmlEditor.Definition
 			return temp;
 		}
 
-		protected bool TryParseBool(XElement definition, string att, bool fallback = false)
+		protected bool TryParseBool(XElement definition, XName att, bool fallback = false)
 		{
 			var valueString = definition.Attribute(att)?.Value?.ToString();
 

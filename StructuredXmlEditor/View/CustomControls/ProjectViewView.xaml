@@ -52,6 +52,9 @@
 						<CheckBox
 							Content="Use Regex"
 							IsChecked="{Binding UseRegex}" />
+						<CheckBox
+							Content="Search File Contents"
+							IsChecked="{Binding SearchContents}" />
 					</StackPanel>
 				</Border>
 			</Popup>

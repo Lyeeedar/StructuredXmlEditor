@@ -37,13 +37,13 @@ namespace StructuredXmlEditor.Definition
 
 				var el = parent.Elements().Last();
 				if (Name != "") el.Name = Name;
-				el.SetAttributeValue("RefKey", si.ChosenDefinition.Name);
+				el.SetAttributeValue(MetaNS + "RefKey", si.ChosenDefinition.Name);
 			}
 		}
 
 		public override DataItem LoadData(XElement element, UndoRedoManager undoRedo)
 		{
-			var key = element.Attribute("RefKey")?.Value?.ToString();
+			var key = element.Attribute(MetaNS + "RefKey")?.Value?.ToString();
 
 			ReferenceItem item = null;
 

@@ -32,7 +32,7 @@ namespace StructuredXmlEditor.Definition
 					))
 				{
 					var el = new XElement(Name, si.WrappedItem.GUID);
-					el.SetAttributeValue("RefKey", si.ChosenDefinition.Name);
+					el.SetAttributeValue(DataDefinition.MetaNS + "RefKey", si.ChosenDefinition.Name);
 					parent.Add(el);
 				}
 				else
@@ -43,14 +43,14 @@ namespace StructuredXmlEditor.Definition
 
 					var el = parent.Elements().Last();
 					if (Name != "") el.Name = Name;
-					el.SetAttributeValue("RefKey", si.ChosenDefinition.Name);
+					el.SetAttributeValue(DataDefinition.MetaNS + "RefKey", si.ChosenDefinition.Name);
 				}
 			}
 		}
 
 		public override DataItem LoadData(XElement element, UndoRedoManager undoRedo)
 		{
-			var key = element.Attribute("RefKey")?.Value?.ToString();
+			var key = element.Attribute(DataDefinition.MetaNS + "RefKey")?.Value?.ToString();
 
 			GraphReferenceItem item = null;
 

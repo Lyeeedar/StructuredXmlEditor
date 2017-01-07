@@ -42,8 +42,8 @@ namespace StructuredXmlEditor.Definition
 		{
 			var item = new GraphCollectionItem(this, undoRedo);
 
-			item.X = TryParseFloat(element, "X");
-			item.Y = TryParseFloat(element, "Y");
+			item.X = TryParseFloat(element, MetaNS + "X");
+			item.Y = TryParseFloat(element, MetaNS + "Y");
 			item.GUID = element.Attribute("GUID")?.Value?.ToString();
 
 			if (!element.Elements().Any(e => e.Name != element.Elements().First().Name))
@@ -113,8 +113,8 @@ namespace StructuredXmlEditor.Definition
 
 			XElement root = new XElement(Name);
 
-			root.Add(new XAttribute("X", ci.X));
-			root.Add(new XAttribute("Y", ci.Y));
+			root.Add(new XAttribute(MetaNS + "X", ci.X));
+			root.Add(new XAttribute(MetaNS + "Y", ci.Y));
 
 			if (ci.LinkParents.Count > 1 || ci.Grid.FlattenData)
 			{
@@ -137,8 +137,8 @@ namespace StructuredXmlEditor.Definition
 			{
 				parent.Add(root);
 
-				root.SetAttributeValue(XNamespace.Xmlns + "json", item.Grid.JsonNS);
-				root.SetAttributeValue(item.Grid.JsonNS + "Array", "true");
+				root.SetAttributeValue(XNamespace.Xmlns + "json", JsonNS);
+				root.SetAttributeValue(JsonNS + "Array", "true");
 			}
 			else
 			{

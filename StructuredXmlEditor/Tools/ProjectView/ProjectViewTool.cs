@@ -7,6 +7,7 @@ using StructuredXmlEditor.Data;
 using System.Windows;
 using System.Text.RegularExpressions;
 using StructuredXmlEditor.View;
+using System.Threading;
 
 namespace StructuredXmlEditor.Tools
 {
@@ -51,6 +52,20 @@ namespace StructuredXmlEditor.Tools
 		private bool m_useRegex;
 
 		//-----------------------------------------------------------------------
+		public bool SearchContents
+		{
+			get { return m_searchContents; }
+			set
+			{
+				m_searchContents = value;
+				ApplyFilter();
+
+				RaisePropertyChangedEvent();
+			}
+		}
+		private bool m_searchContents;
+
+		//-----------------------------------------------------------------------
 		public string Filter
 		{
 			get { return m_filter; }
@@ -79,25 +94,40 @@ namespace StructuredXmlEditor.Tools
 		}
 
 		//-----------------------------------------------------------------------
+		private CancellationTokenSource tokenSource;
 		private void ApplyFilter()
 		{
-			try
+			if (tokenSource != null && !tokenSource.IsCancellationRequested)
 			{
-				if (!string.IsNullOrEmpty(Filter))
-				{
-					string filter = Filter.ToLower();
-					Regex regex = UseRegex ? new Regex(filter) : null;
-
-					Root.Filter(filter, regex);
-				}
-				else
-				{
-					Root.Filter(null, null);
-				}
+				tokenSource.Cancel();
+				tokenSource = null;
 			}
-			catch (Exception) { }
 
-			DeferredRefresh();
+			var thisTokenSource = new CancellationTokenSource();
+			tokenSource = thisTokenSource;
+
+			Task.Run(() =>
+			{
+				try
+				{
+					if (!string.IsNullOrEmpty(Filter))
+					{
+						string filter = Filter.ToLower();
+						Regex regex = UseRegex ? new Regex(filter) : null;
+
+						Root.Filter(filter, regex, SearchContents, thisTokenSource.Token);
+					}
+					else
+					{
+						Root.Filter(null, null, false, thisTokenSource.Token);
+					}
+				}
+				catch (Exception) { }
+
+				if (thisTokenSource.Token.IsCancellationRequested) thisTokenSource.Token.ThrowIfCancellationRequested();
+
+				DeferredRefresh();
+			}, thisTokenSource.Token);
 		}
 
 		//-----------------------------------------------------------------------

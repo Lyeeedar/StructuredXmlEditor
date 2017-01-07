@@ -27,8 +27,6 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public bool IsJson { get { return RootItems[0].Definition.DataType == "json"; } }
 
-		public XNamespace JsonNS = "http://james.newtonking.com/projects/json";
-
 		//-----------------------------------------------------------------------
 		public string Extension { get { return RootItems[0].Definition.Extension; } }
 
@@ -413,14 +411,16 @@ namespace StructuredXmlEditor.Data
 				doc.Add(el);
 			}
 
+			doc.Elements().First().SetAttributeValue(XNamespace.Xmlns + "meta", DataDefinition.MetaNS);
+
 			if (FlattenData)
 			{
 				var nodeEl = new XElement(GraphNodeDefinition.NodeStoreName);
 
 				if (IsJson)
 				{
-					nodeEl.SetAttributeValue(XNamespace.Xmlns + "json", JsonNS);
-					nodeEl.SetAttributeValue(JsonNS + "Array", "true");
+					nodeEl.SetAttributeValue(XNamespace.Xmlns + "json", DataDefinition.JsonNS);
+					nodeEl.SetAttributeValue(DataDefinition.JsonNS + "Array", "true");
 				}
 
 				foreach (var node in GraphNodeItems)

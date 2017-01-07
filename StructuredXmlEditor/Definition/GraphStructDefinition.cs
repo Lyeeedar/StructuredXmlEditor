@@ -58,8 +58,8 @@ namespace StructuredXmlEditor.Definition
 		{
 			var item = new GraphStructItem(this, undoRedo);
 
-			item.X = TryParseFloat(element, "X");
-			item.Y = TryParseFloat(element, "Y");
+			item.X = TryParseFloat(element, MetaNS + "X");
+			item.Y = TryParseFloat(element, MetaNS + "Y");
 			item.GUID = element.Attribute("GUID")?.Value?.ToString();
 
 			var createdChildren = new List<DataItem>();
@@ -189,8 +189,8 @@ namespace StructuredXmlEditor.Definition
 			var el = new XElement(name);
 			parent.Add(el);
 
-			el.Add(new XAttribute("X", si.X));
-			el.Add(new XAttribute("Y", si.Y));
+			el.Add(new XAttribute(MetaNS + "X", si.X));
+			el.Add(new XAttribute(MetaNS + "Y", si.Y));
 
 			if (string.IsNullOrWhiteSpace(ChildAsGUID) && (si.LinkParents.Count > 1 || si.Grid.FlattenData))
 			{

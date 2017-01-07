@@ -1,6 +1,6 @@
 ﻿<Definitions Extension="xmldef">
 
-	<CollectionDef Name="Attributes" ToolTip="A the attributes of this element." TextColour="Struct">
+	<CollectionDef Name="Attributes" ToolTip="A the attributes of this element." TextColour="Struct" SkipIfDefault="true">
 		<Reference Name="Attribute" Keys="Boolean,Colour,Enum,File,Number,String" ToolTip="The attribute" />
 	</CollectionDef>
 

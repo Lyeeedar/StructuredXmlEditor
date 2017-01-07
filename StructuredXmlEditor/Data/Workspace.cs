@@ -407,7 +407,7 @@ namespace StructuredXmlEditor.Data
 
 						var defname = def.Name.ToLower();
 
-						var name = el.Attribute("RefKey")?.Value.ToString().ToLower();
+						var name = el.Attribute(DataDefinition.MetaNS+"RefKey")?.Value.ToString().ToLower();
 						if (name == null) name = el.Name.ToString().ToLower();
 
 						if (!ReferenceableDefinitions.ContainsKey(file))
@@ -1135,7 +1135,7 @@ namespace StructuredXmlEditor.Data
 			{
 				var el = new XElement("Data");
 				el.Add(new XAttribute("Name", def.Name));
-				el.Add(new XAttribute("RefKey", "String"));
+				el.Add(new XAttribute(DataDefinition.MetaNS + "RefKey", "String"));
 
 				return el;
 			}
@@ -1143,7 +1143,7 @@ namespace StructuredXmlEditor.Data
 			{
 				var el = new XElement("Data");
 				el.Add(new XAttribute("Name", def.Name));
-				el.Add(new XAttribute("RefKey", "Boolean"));
+				el.Add(new XAttribute(DataDefinition.MetaNS + "RefKey", "Boolean"));
 
 				return el;
 			}
@@ -1156,7 +1156,7 @@ namespace StructuredXmlEditor.Data
 				el.Add(new XAttribute("Min", ndef.MinValue));
 				el.Add(new XAttribute("Max", ndef.MaxValue));
 				if (ndef.UseIntegers) el.Add(new XAttribute("Type", "int"));
-				el.Add(new XAttribute("RefKey", "Number"));
+				el.Add(new XAttribute(DataDefinition.MetaNS + "RefKey", "Number"));
 
 				return el;
 			}
@@ -1167,7 +1167,7 @@ namespace StructuredXmlEditor.Data
 				var el = new XElement("Data");
 				el.Add(new XAttribute("Name", def.Name));
 				el.Add(new XAttribute("EnumValues", string.Join(",", ndef.EnumValues.OrderBy(e => e))));
-				el.Add(new XAttribute("RefKey", "Enum"));
+				el.Add(new XAttribute(DataDefinition.MetaNS + "RefKey", "Enum"));
 
 				return el;
 			}
@@ -1177,7 +1177,7 @@ namespace StructuredXmlEditor.Data
 
 				var el = new XElement("Definition");
 				el.Add(new XAttribute("Name", def.Name));
-				el.Add(new XAttribute("RefKey", "Struct"));
+				el.Add(new XAttribute(DataDefinition.MetaNS + "RefKey", "Struct"));
 
 				foreach (var cdef in ndef.Children)
 				{
@@ -1195,7 +1195,7 @@ namespace StructuredXmlEditor.Data
 
 				var el = new XElement("Definition");
 				el.Add(new XAttribute("Name", def.Name));
-				el.Add(new XAttribute("RefKey", "Collection"));
+				el.Add(new XAttribute(DataDefinition.MetaNS + "RefKey", "Collection"));
 
 				var cel = DefinitionToElement(ndef.ChildDefinition.WrappedDefinition);
 				cel.Name = "Item";

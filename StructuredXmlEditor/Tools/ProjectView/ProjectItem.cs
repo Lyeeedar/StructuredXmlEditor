@@ -3,9 +3,11 @@ using StructuredXmlEditor.View;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace StructuredXmlEditor.Tools
 {
@@ -108,13 +110,15 @@ namespace StructuredXmlEditor.Tools
 			Process.Start("explorer.exe", string.Format("/select,\"{0}\"", path));
 		}
 
-		public void MakeVisible()
+		public void MakeVisible(CancellationToken token)
 		{
+			if (token.IsCancellationRequested) token.ThrowIfCancellationRequested();
+
 			IsVisible = true;
 
 			foreach (var child in Children)
 			{
-				child.MakeVisible();
+				child.MakeVisible(token);
 			}
 		}
 
@@ -125,8 +129,10 @@ namespace StructuredXmlEditor.Tools
 			foreach (var child in Children) child.SetExpand(state);
 		}
 
-		public bool Filter(string filter, Regex regex)
+		public bool Filter(string filter, Regex regex, bool searchContents, CancellationToken token)
 		{
+			if (token.IsCancellationRequested) token.ThrowIfCancellationRequested();
+
 			if (filter == null)
 			{
 				isFiltering = false;
@@ -135,7 +141,7 @@ namespace StructuredXmlEditor.Tools
 
 				foreach (var child in Children)
 				{
-					child.Filter(null, null);
+					child.Filter(null, null, false, token);
 				}
 			}
 			else
@@ -146,25 +152,44 @@ namespace StructuredXmlEditor.Tools
 					storedExpanded = IsExpanded;
 				}
 
-				bool thisVisible = regex != null ? regex.IsMatch(Name.ToLower()) : Name.ToLower().Contains(filter);
+				List<string> stringsToSearch = new List<string>();
+				stringsToSearch.Add(Name.ToLower());
+				if (searchContents && !IsDirectory)
+				{
+					try
+					{
+						var contents = File.ReadAllText(FullPath);
+						stringsToSearch.Add(contents.ToLower());
+					}
+					catch (Exception) { }
+				}
+
+				bool thisVisible = false;
+				foreach (var s in stringsToSearch)
+				{
+					thisVisible = regex != null ? regex.IsMatch(s) : s.Contains(filter);
+					if (thisVisible) break;
+				}
 
 				if (thisVisible)
 				{
 					foreach (var child in Children)
 					{
-						child.MakeVisible();
+						child.MakeVisible(token);
 					}
 				}
 				else
 				{
 					foreach (var child in Children)
 					{
-						if (child.Filter(filter, regex))
+						if (child.Filter(filter, regex, searchContents, token))
 						{
 							thisVisible = true;
 						}
 					}
 				}
+
+				if (token.IsCancellationRequested) token.ThrowIfCancellationRequested();
 
 				IsVisible = thisVisible;
 				IsExpanded = IsVisible;
