@@ -682,7 +682,10 @@ namespace StructuredXmlEditor.Data
 
 				if (extension == ".xml")
 				{
-					var root = XDocument.Load(path);
+					var docLines = File.ReadAllLines(path).ToList();
+					if (docLines[0].StartsWith("<?xml")) docLines = docLines.Skip(1).ToList();
+					var root = XDocument.Parse(string.Join(Environment.NewLine, docLines));
+
 					var firstEl = root.Elements().First();
 					rootname = firstEl.Name.ToString().ToLower();
 				}
@@ -717,7 +720,9 @@ namespace StructuredXmlEditor.Data
 
 			if (matchedDef.DataType == "xml")
 			{
-				doc = XDocument.Load(path);
+				var docLines = File.ReadAllLines(path).ToList();
+				if (docLines[0].StartsWith("<?xml")) docLines = docLines.Skip(1).ToList();
+				doc = XDocument.Parse(string.Join(Environment.NewLine, docLines));
 			}
 			else if (matchedDef.DataType == "json")
 			{
@@ -830,13 +835,17 @@ namespace StructuredXmlEditor.Data
 				}
 				else
 				{
-					doc = XDocument.Load(path);
+					var docLines = File.ReadAllLines(path).ToList();
+					if (docLines[0].StartsWith("<?xml")) docLines = docLines.Skip(1).ToList();
+					doc = XDocument.Parse(string.Join(Environment.NewLine, docLines));
 				}
 
 				var def = CreateDefinitionFromElement(doc.Root, null);
 				var element = DefinitionToElement(def);
 				var root = new XElement("Definitions");
 				root.Add(element);
+
+				root.SetAttributeValue(XNamespace.Xmlns + "meta", DataDefinition.MetaNS);
 
 				var outpath = Path.Combine(Path.GetDirectoryName(ProjectRoot), DefsFolder, def.Name + ".xmldef");
 

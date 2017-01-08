@@ -1,6 +1,7 @@
 ﻿using StructuredXmlEditor.Data;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -109,7 +110,10 @@ namespace StructuredXmlEditor.Definition
 
 		public static DataDefinition Load(string path)
 		{
-			var doc = XDocument.Load(path);
+			var docLines = File.ReadAllLines(path).ToList();
+			if (docLines[0].StartsWith("<?xml")) docLines = docLines.Skip(1).ToList();
+			var doc = XDocument.Parse(string.Join(Environment.NewLine, docLines));
+
 			return LoadDefinition(doc.Elements().First());
 		}
 

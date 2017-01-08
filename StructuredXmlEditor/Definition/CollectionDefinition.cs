@@ -85,6 +85,11 @@ namespace StructuredXmlEditor.Definition
 
 							uncreatedAdds.Remove(def);
 						}
+						else if (ChildDefinitions.Count == 1)
+						{
+							var child = ChildDefinitions[0].LoadData(el, undoRedo);
+							item.Children.Add(child);
+						}
 						else
 						{
 							throw new Exception("Unable to find def for '" + el.Name + "' in collection '" + Name + "'!");
