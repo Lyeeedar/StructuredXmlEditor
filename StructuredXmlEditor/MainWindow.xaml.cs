@@ -79,17 +79,22 @@ namespace StructuredXmlEditor
 
 		protected override void OnClosing(CancelEventArgs e)
 		{
-			foreach (var doc in Workspace.Documents.ToList())
+			if (Workspace?.Documents != null)
 			{
-				var cancelled = doc.Close();
-				if (cancelled)
+				foreach (var doc in Workspace.Documents.ToList())
 				{
-					e.Cancel = true;
-					break;
-				}
-			}
+					if (doc == null) continue;
 
-			SaveLayout();
+					var cancelled = doc.Close();
+					if (cancelled)
+					{
+						e.Cancel = true;
+						break;
+					}
+				}
+
+				SaveLayout();
+			}
 
 			base.OnClosing(e);
 		}
