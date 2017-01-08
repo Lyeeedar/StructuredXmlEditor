@@ -42,6 +42,9 @@ namespace StructuredXmlEditor.Data
 		public virtual Command<object> BrowseCMD { get { return new Command<object>((e) => Browse()); } }
 
 		//-----------------------------------------------------------------------
+		public Command<object> OpenCMD { get { return new Command<object>(e => Open()); } }
+
+		//-----------------------------------------------------------------------
 		public FileItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
 			PropertyChanged += (e, args) => 
@@ -93,6 +96,12 @@ namespace StructuredXmlEditor.Data
 					}));
 				}
 			});
+		}
+
+		//-----------------------------------------------------------------------
+		public void Open()
+		{
+			Workspace.Instance.Open(FullPath);
 		}
 
 		//-----------------------------------------------------------------------
