@@ -1,4 +1,14 @@
-﻿
+﻿--------- 1.3.0 ---------
+
+- Add support for giving data files a custom extension, and choosing whether the data should be xml or json.
+- Add a ProjectView tool that allows browsing the data files in the project.
+- Add support for adding attributes to the xmldef. This is found by checking the 'HasAttributes' attribute on an element.
+- Add grouping of entries in the reference dropdown. e.g. Apples,Oranges,Carrots,Cucumber -> Fruit(Apples,Oranges),Vegetables(Carrots,Cucumber).
+- Allow for far more complex visibleif bindings. They can now bind to the values of attributes, and also use a path from the current node. e.g. Apples.Name or Parent.Size.
+- Collections can now have multiple allowed child types. The one to be spawned can be chosen via the dropdown by the add button.
+- Files now display a preview of any linked images. Additionally in the timeline if a keyframe contains a fileimage then it will display a preview of that too.
+
+
 --------- 1.2.0 ---------
 
 - Fix deleting of the Update executable.
