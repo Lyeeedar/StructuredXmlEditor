@@ -12,8 +12,8 @@ namespace StructuredXmlEditor.Definition
 	{
 		public bool Collapse { get; set; }
 		public string Seperator { get; set; }
-		public CollectionChildDefinition ChildDefinition { get; set; }
-		public List<DataDefinition> AdditionalDefs { get; set; } = new List<DataDefinition>();
+		public List<CollectionChildDefinition> ChildDefinitions { get; } = new List<CollectionChildDefinition>();
+		public List<DataDefinition> AdditionalDefs { get; } = new List<DataDefinition>();
 		public int MinCount { get; set; } = 0;
 		public int MaxCount { get; set; } = int.MaxValue;
 
@@ -32,11 +32,11 @@ namespace StructuredXmlEditor.Definition
 				item.Children.Add(child);
 			}
 
-			for (int i = 0; i < MinCount; i++)
-			{
-				var child = ChildDefinition.CreateData(undoRedo);
-				item.Children.Add(child);
-			}
+			//for (int i = 0; i < MinCount; i++)
+			//{
+			//	var child = ChildDefinition.CreateData(undoRedo);
+			//	item.Children.Add(child);
+			//}
 
 			foreach (var att in Attributes)
 			{
@@ -51,9 +51,9 @@ namespace StructuredXmlEditor.Definition
 		{
 			var item = new CollectionItem(this, undoRedo);
 
-			if (Collapse && ChildDefinition.WrappedDefinition is PrimitiveDataDefinition)
+			if (Collapse && ChildDefinitions.Count == 1 && ChildDefinitions[0].WrappedDefinition is PrimitiveDataDefinition)
 			{
-				var primDef = ChildDefinition.WrappedDefinition as PrimitiveDataDefinition;
+				var primDef = ChildDefinitions[0].WrappedDefinition as PrimitiveDataDefinition;
 				var split = element.Value.Split(new string[] { Seperator }, StringSplitOptions.None);
 				foreach (var s in split)
 				{
@@ -69,9 +69,10 @@ namespace StructuredXmlEditor.Definition
 
 				foreach (var el in element.Elements())
 				{
-					if (el.Name == ChildDefinition.WrappedDefinition.Name)
+					var cdef = ChildDefinitions.FirstOrDefault(e => e.Name == el.Name);
+					if (cdef != null)
 					{
-						var child = ChildDefinition.LoadData(el, undoRedo);
+						var child = cdef.LoadData(el, undoRedo);
 						item.Children.Add(child);
 					}
 					else
@@ -126,9 +127,14 @@ namespace StructuredXmlEditor.Definition
 			MinCount = TryParseInt(definition, "MinCount", 0);
 			MaxCount = TryParseInt(definition, "MaxCount", int.MaxValue);
 
-			var childDef = definition.Elements().Where(e => e.Name != "Attributes" && e.Name != "AdditionalDefs").First();
-			ChildDefinition = new CollectionChildDefinition();
-			ChildDefinition.Parse(childDef);
+			var childDefs = definition.Elements().Where(e => e.Name != "Attributes" && e.Name != "AdditionalDefs");
+			foreach (var childDef in childDefs)
+			{
+				var cdef = new CollectionChildDefinition();
+				cdef.Parse(childDef);
+
+				ChildDefinitions.Add(cdef);
+			}
 
 			var addEls = definition.Element("AdditionalDefs");
 			if (addEls != null)
@@ -162,9 +168,9 @@ namespace StructuredXmlEditor.Definition
 		{
 			var ci = item as CollectionItem;
 
-			if (Collapse && ChildDefinition.WrappedDefinition is PrimitiveDataDefinition)
+			if (Collapse && ChildDefinitions.Count == 1 && ChildDefinitions[0].WrappedDefinition is PrimitiveDataDefinition)
 			{
-				var primDef = ChildDefinition.WrappedDefinition as PrimitiveDataDefinition;
+				var primDef = ChildDefinitions[0].WrappedDefinition as PrimitiveDataDefinition;
 				var data = "";
 
 				if (ci.Children.Count > 0)
@@ -242,8 +248,7 @@ namespace StructuredXmlEditor.Definition
 
 		public override void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global)
 		{
-			ChildDefinition.WrappedDefinition.RecursivelyResolve(local, global);
-
+			foreach (var def in ChildDefinitions) def.WrappedDefinition.RecursivelyResolve(local, global);
 			foreach (var def in AdditionalDefs) def.RecursivelyResolve(local, global);
 		}
 	}

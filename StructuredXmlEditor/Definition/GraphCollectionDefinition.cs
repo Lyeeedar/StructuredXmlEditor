@@ -10,7 +10,7 @@ namespace StructuredXmlEditor.Definition
 {
 	public class GraphCollectionDefinition : GraphNodeDefinition
 	{
-		public CollectionChildDefinition ChildDefinition { get; set; }
+		public List<CollectionChildDefinition> ChildDefinitions { get; } = new List<CollectionChildDefinition>();
 		public int MinCount { get; set; } = 0;
 		public int MaxCount { get; set; } = int.MaxValue;
 
@@ -23,11 +23,11 @@ namespace StructuredXmlEditor.Definition
 		{
 			var item = new GraphCollectionItem(this, undoRedo);
 
-			for (int i = 0; i < MinCount; i++)
-			{
-				var child = ChildDefinition.CreateData(undoRedo);
-				item.Children.Add(child);
-			}
+			//for (int i = 0; i < MinCount; i++)
+			//{
+			//	var child = ChildDefinition.CreateData(undoRedo);
+			//	item.Children.Add(child);
+			//}
 
 			foreach (var att in Attributes)
 			{
@@ -46,15 +46,13 @@ namespace StructuredXmlEditor.Definition
 			item.Y = TryParseFloat(element, MetaNS + "Y");
 			item.GUID = element.Attribute("GUID")?.Value?.ToString();
 
-			if (!element.Elements().Any(e => e.Name != element.Elements().First().Name))
+			foreach (var el in element.Elements())
 			{
-				foreach (var el in element.Elements())
-				{
-					var child = ChildDefinition.LoadData(el, undoRedo);
-					item.Children.Add(child);
+				var cdef = ChildDefinitions.FirstOrDefault(e => e.Name == el.Name);
+				var child = cdef.LoadData(el, undoRedo);
+				item.Children.Add(child);
 
-					if (item.Children.Count == MaxCount) break;
-				}
+				if (item.Children.Count == MaxCount) break;
 			}
 
 			foreach (var att in Attributes)
@@ -86,8 +84,14 @@ namespace StructuredXmlEditor.Definition
 			FlattenData = TryParseBool(definition, "FlattenData", false);
 			NodeStoreName = definition.Attribute("NodeStoreName")?.Value?.ToString() ?? "Nodes";
 
-			ChildDefinition = new CollectionChildDefinition();
-			ChildDefinition.Parse(definition.Elements().Where(e => e.Name != "Attributes").First());
+			var childDefs = definition.Elements().Where(e => e.Name != "Attributes");
+			foreach (var childDef in childDefs)
+			{
+				var cdef = new CollectionChildDefinition();
+				cdef.Parse(childDef);
+
+				ChildDefinitions.Add(cdef);
+			}
 
 			var attEl = definition.Element("Attributes");
 			if (attEl != null)
@@ -160,7 +164,7 @@ namespace StructuredXmlEditor.Definition
 
 		public override void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global)
 		{
-			ChildDefinition.WrappedDefinition.RecursivelyResolve(local, global);
+			foreach (var def in ChildDefinitions) def.WrappedDefinition.RecursivelyResolve(local, global);
 		}
 	}
 }

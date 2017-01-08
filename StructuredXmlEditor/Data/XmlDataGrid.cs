@@ -118,7 +118,7 @@ namespace StructuredXmlEditor.Data
 		{
 			get
 			{
-				foreach (var item in GraphNodeItems)
+				foreach (var item in GraphNodeItems.ToList())
 				{
 					if (item.Grid != this)
 					{

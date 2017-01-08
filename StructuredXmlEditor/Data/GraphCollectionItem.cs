@@ -23,16 +23,25 @@ namespace StructuredXmlEditor.Data
 		public Command<object> AddCMD { get { return new Command<object>((e) => Add()); } }
 
 		//-----------------------------------------------------------------------
+		public GraphCollectionDefinition CDef { get { return Definition as GraphCollectionDefinition; } }
+
+		//-----------------------------------------------------------------------
 		public bool IsAtMax { get { return Children.Count >= (Definition as GraphCollectionDefinition).MaxCount; } }
 
 		//-----------------------------------------------------------------------
 		public bool IsAtMin { get { return Children.Count <= (Definition as GraphCollectionDefinition).MinCount; } }
 
 		//-----------------------------------------------------------------------
+		public CollectionChildDefinition SelectedDefinition { get; set; }
+
+		//-----------------------------------------------------------------------
+		public bool ShowComboBox { get { return CDef.ChildDefinitions.Count > 1; } }
+
+		//-----------------------------------------------------------------------
 		public override bool CanPaste { get { return !IsAtMax; } }
 
 		//-----------------------------------------------------------------------
-		public virtual Command<object> PasteNewCMD { get { return new Command<object>((e) => PasteNew(), (e) => CanPaste && Clipboard.ContainsData((Definition as GraphCollectionDefinition).ChildDefinition.WrappedDefinition.CopyKey)); } }
+		public virtual Command<object> PasteNewCMD { get { return new Command<object>((e) => PasteNew(), (e) => CanPaste); } }
 
 		//-----------------------------------------------------------------------
 		public GraphCollectionItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
@@ -48,6 +57,8 @@ namespace StructuredXmlEditor.Data
 					RaisePropertyChangedEvent("GraphData");
 				}
 			};
+
+			SelectedDefinition = CDef.ChildDefinitions.First();
 		}
 
 		//-----------------------------------------------------------------------
@@ -97,12 +108,7 @@ namespace StructuredXmlEditor.Data
 
 			using (UndoRedo.DisableUndoScope())
 			{
-				item = cdef.ChildDefinition.CreateData(UndoRedo);
-
-				if (cdef.ChildDefinition.WrappedDefinition is StructDefinition)
-				{
-					//(cdef.ChildDefinition.WrappedDefinition as StructDefinition).CreateChildren((item as CollectionChildItem).WrappedItem as StructItem, UndoRedo);
-				}
+				item = SelectedDefinition.CreateData(UndoRedo);
 			}
 
 			UndoRedo.ApplyDoUndo(
@@ -169,38 +175,39 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void PasteNew()
 		{
-			var sdef = Definition as GraphCollectionDefinition;
-
-			if (Clipboard.ContainsData(sdef.ChildDefinition.WrappedDefinition.CopyKey))
+			foreach (var childDef in CDef.ChildDefinitions)
 			{
-				var flat = Clipboard.GetData(sdef.ChildDefinition.WrappedDefinition.CopyKey) as string;
-				var root = XElement.Parse(flat);
-
-				CollectionChildItem child = null;
-
-				using (UndoRedo.DisableUndoScope())
+				if (Clipboard.ContainsData(childDef.WrappedDefinition.CopyKey))
 				{
-					var item = sdef.ChildDefinition.WrappedDefinition.LoadData(root, UndoRedo);
-					child = sdef.ChildDefinition.CreateData(UndoRedo) as CollectionChildItem;
-					child.WrappedItem = item;
+					var flat = Clipboard.GetData(childDef.WrappedDefinition.CopyKey) as string;
+					var root = XElement.Parse(flat);
+
+					CollectionChildItem child = null;
+
+					using (UndoRedo.DisableUndoScope())
+					{
+						var item = childDef.WrappedDefinition.LoadData(root, UndoRedo);
+						child = childDef.CreateData(UndoRedo) as CollectionChildItem;
+						child.WrappedItem = item;
+					}
+
+					UndoRedo.ApplyDoUndo(
+						delegate
+						{
+							Children.Add(child);
+							RaisePropertyChangedEvent("HasContent");
+							RaisePropertyChangedEvent("Description");
+						},
+						delegate
+						{
+							Children.Remove(child);
+							RaisePropertyChangedEvent("HasContent");
+							RaisePropertyChangedEvent("Description");
+						},
+						Name + " pasted new");
+
+					IsExpanded = true;
 				}
-
-				UndoRedo.ApplyDoUndo(
-					delegate
-					{
-						Children.Add(child);
-						RaisePropertyChangedEvent("HasContent");
-						RaisePropertyChangedEvent("Description");
-					},
-					delegate
-					{
-						Children.Remove(child);
-						RaisePropertyChangedEvent("HasContent");
-						RaisePropertyChangedEvent("Description");
-					},
-					Name + " pasted new");
-
-				IsExpanded = true;
 			}
 		}
 	}

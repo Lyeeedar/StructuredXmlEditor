@@ -109,6 +109,7 @@ namespace StructuredXmlEditor.Data
 		public ReferenceItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
 			SelectedDefinition = (Tuple<string, string>)(definition as ReferenceDefinition).ItemsSource.GetItemAt(0);
+			IsContextMenuDynamic = true;
 		}
 
 		//-----------------------------------------------------------------------
@@ -184,6 +185,7 @@ namespace StructuredXmlEditor.Data
 			using (UndoRedo.ActionScope("Swap " + ChosenDefinition.Name + " to " + def.Name))
 			{
 				Copy();
+				SelectedDefinition = (Definition as ReferenceDefinition).Keys.FirstOrDefault(e => e.Item1 == def.Name);
 				ChosenDefinition = def;
 				Clear();
 				Create();

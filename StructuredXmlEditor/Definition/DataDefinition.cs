@@ -24,7 +24,7 @@ namespace StructuredXmlEditor.Definition
 
 		public string SrcFile { get; set; }
 
-		public string Name { get; set; } = "";
+		public virtual string Name { get; set; } = "";
 
 		public string TextColour { get; set; } = "200,200,200";
 
@@ -56,6 +56,7 @@ namespace StructuredXmlEditor.Definition
 		public static DataDefinition LoadDefinition(XElement element)
 		{
 			var name = element.Attribute(MetaNS + "RefKey")?.Value.ToString().ToUpper();
+			if (name == null) name = element.Attribute("RefKey")?.Value.ToString().ToUpper();
 			if (name == null) name = element.Name.ToString().ToUpper();
 
 			if (name.EndsWith("DEF"))

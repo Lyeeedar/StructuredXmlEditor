@@ -408,6 +408,7 @@ namespace StructuredXmlEditor.Data
 						var defname = def.Name.ToLower();
 
 						var name = el.Attribute(DataDefinition.MetaNS+"RefKey")?.Value.ToString().ToLower();
+						if (name == null) name = el.Attribute("RefKey")?.Value.ToString().ToUpper();
 						if (name == null) name = el.Name.ToString().ToLower();
 
 						if (!ReferenceableDefinitions.ContainsKey(file))
@@ -983,8 +984,8 @@ namespace StructuredXmlEditor.Data
 							{
 								coldef = new CollectionDefinition();
 								coldef.Name = cel.Name.ToString();
-								coldef.ChildDefinition = new CollectionChildDefinition();
-								coldef.ChildDefinition.Name = cel.Name.ToString();
+								coldef.ChildDefinitions.Add(new CollectionChildDefinition());
+								coldef.ChildDefinitions[0].Name = cel.Name.ToString();
 
 								def.Children.Add(coldef);
 							}
@@ -996,15 +997,15 @@ namespace StructuredXmlEditor.Data
 							{
 								coldef = new CollectionDefinition();
 								coldef.Name = cel.Name.ToString();
-								coldef.ChildDefinition = new CollectionChildDefinition();
-								coldef.ChildDefinition.Name = cel.Name.ToString();
-								coldef.ChildDefinition.WrappedDefinition = existingChild;
+								coldef.ChildDefinitions.Add(new CollectionChildDefinition());
+								coldef.ChildDefinitions[0].Name = cel.Name.ToString();
+								coldef.ChildDefinitions[0].WrappedDefinition = existingChild;
 
 								var index = def.Children.IndexOf(existingChild);
 								def.Children[index] = coldef;
 							}
 
-							coldef.ChildDefinition.WrappedDefinition = CreateDefinitionFromElement(cel, coldef.ChildDefinition.WrappedDefinition);
+							coldef.ChildDefinitions[0].WrappedDefinition = CreateDefinitionFromElement(cel, coldef.ChildDefinitions[0].WrappedDefinition);
 						}
 						else
 						{
@@ -1024,7 +1025,7 @@ namespace StructuredXmlEditor.Data
 									{
 										var coldef = ec as CollectionDefinition;
 
-										coldef.ChildDefinition.WrappedDefinition = CreateDefinitionFromElement(cel, coldef.ChildDefinition.WrappedDefinition);
+										coldef.ChildDefinitions[0].WrappedDefinition = CreateDefinitionFromElement(cel, coldef.ChildDefinitions[0].WrappedDefinition);
 									}
 								}
 								else
@@ -1059,13 +1060,13 @@ namespace StructuredXmlEditor.Data
 							{
 								coldef = new CollectionDefinition();
 								coldef.Name = cel.Name.ToString();
-								coldef.ChildDefinition = new CollectionChildDefinition();
-								coldef.ChildDefinition.Name = cel.Name.ToString();
+								coldef.ChildDefinitions.Add(new CollectionChildDefinition());
+								coldef.ChildDefinitions[0].Name = cel.Name.ToString();
 
 								def.Children.Add(coldef);
 							}
 
-							coldef.ChildDefinition.WrappedDefinition = CreateDefinitionFromElement(cel, coldef.ChildDefinition.WrappedDefinition);
+							coldef.ChildDefinitions[0].WrappedDefinition = CreateDefinitionFromElement(cel, coldef.ChildDefinitions[0].WrappedDefinition);
 						}
 						else
 						{
@@ -1088,7 +1089,7 @@ namespace StructuredXmlEditor.Data
 
 						foreach (var cel in el.Elements())
 						{
-							def.ChildDefinition.WrappedDefinition = CreateDefinitionFromElement(cel, def.ChildDefinition.WrappedDefinition);
+							def.ChildDefinitions[0].WrappedDefinition = CreateDefinitionFromElement(cel, def.ChildDefinitions[0].WrappedDefinition);
 						}
 
 						return def;
@@ -1097,13 +1098,13 @@ namespace StructuredXmlEditor.Data
 					{
 						var def = new CollectionDefinition();
 						def.Name = el.Name.ToString();
-						def.ChildDefinition = new CollectionChildDefinition();
-						def.ChildDefinition.Name = el.Elements().First().Name.ToString();
-						def.ChildDefinition.WrappedDefinition = existing;
+						def.ChildDefinitions.Add(new CollectionChildDefinition());
+						def.ChildDefinitions[0].Name = el.Elements().First().Name.ToString();
+						def.ChildDefinitions[0].WrappedDefinition = existing;
 
 						foreach (var cel in el.Elements())
 						{
-							def.ChildDefinition.WrappedDefinition = CreateDefinitionFromElement(cel, def.ChildDefinition.WrappedDefinition);
+							def.ChildDefinitions[0].WrappedDefinition = CreateDefinitionFromElement(cel, def.ChildDefinitions[0].WrappedDefinition);
 						}
 
 						return def;
@@ -1113,12 +1114,12 @@ namespace StructuredXmlEditor.Data
 				{
 					var def = new CollectionDefinition();
 					def.Name = el.Name.ToString();
-					def.ChildDefinition = new CollectionChildDefinition();
-					def.ChildDefinition.Name = el.Elements().First().Name.ToString();
+					def.ChildDefinitions.Add(new CollectionChildDefinition());
+					def.ChildDefinitions[0].Name = el.Elements().First().Name.ToString();
 
 					foreach (var cel in el.Elements())
 					{
-						def.ChildDefinition.WrappedDefinition = CreateDefinitionFromElement(cel, def.ChildDefinition.WrappedDefinition);
+						def.ChildDefinitions[0].WrappedDefinition = CreateDefinitionFromElement(cel, def.ChildDefinitions[0].WrappedDefinition);
 					}
 
 					return def;
@@ -1197,7 +1198,7 @@ namespace StructuredXmlEditor.Data
 				el.Add(new XAttribute("Name", def.Name));
 				el.Add(new XAttribute(DataDefinition.MetaNS + "RefKey", "Collection"));
 
-				var cel = DefinitionToElement(ndef.ChildDefinition.WrappedDefinition);
+				var cel = DefinitionToElement(ndef.ChildDefinitions[0].WrappedDefinition);
 				cel.Name = "Item";
 
 				el.Add(cel);

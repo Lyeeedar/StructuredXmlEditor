@@ -46,6 +46,7 @@ namespace StructuredXmlEditor.Definition
 		public override DataItem LoadData(XElement element, UndoRedoManager undoRedo)
 		{
 			var key = element.Attribute(MetaNS + "RefKey")?.Value?.ToString();
+			if (key == null) key = element.Attribute("RefKey")?.Value?.ToString();
 
 			ReferenceItem item = null;
 
@@ -110,7 +111,7 @@ namespace StructuredXmlEditor.Definition
 				}
 				else
 				{
-					Message.Show("Failed to find key " + key + "!", "Reference Resolve Failed", "Ok");
+					Message.Show("Failed to find key " + key.Item1 + "!", "Reference Resolve Failed", "Ok");
 				}				
 			}
 		}

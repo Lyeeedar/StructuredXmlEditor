@@ -150,7 +150,7 @@
 		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
 	</StructDef>
 
-	<StructDef Name="Collection" ToolTip="A collection containing multiple elements of the specified child." TextColour="Collection">
+	<CollectionDef Name="Collection" ToolTip="A collection containing multiple elements of the specified child." TextColour="Collection">
 		<Attributes>
 			<String Name="Name" Default="Collection" ToolTip="The name to be written for this element." />
 			<Boolean Name="Collapse" ToolTip="If set to true the collection will be collapsed to a single line seperated by the Seperator string. Only works if the child is a primitive item." />
@@ -163,11 +163,13 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
-		<Reference Name="Item" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The child that this collection contains." />
-	</StructDef>
+		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The elements that can be placed in this collection" />
+		<AdditionalDefs>
+			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+		</AdditionalDefs>
+	</CollectionDef>
 
-	<StructDef Name="CollectionDef" ToolTip="A definition for a collection that can be referenced." TextColour="Collection">
+	<CollectionDef Name="CollectionDef" ToolTip="A definition for a collection that can be referenced." TextColour="Collection">
 		<Attributes>
 			<String Name="Name" Default="CollectionDef" ToolTip="The name to be written for this element. This will be used as the key when referencing it." />
 			<Boolean Name="Collapse" ToolTip="If set to true the collection will be collapsed to a single line seperated by the Seperator string. Only works if the child is a primitive item." />
@@ -181,11 +183,13 @@
 			<Boolean Name="IsGlobal" ToolTip="Whether this definition can be referenced from other files." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
-		<Reference Name="Item" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The child that this collection contains." />
-	</StructDef>
+		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The elements that can be placed in this collection" />
+		<AdditionalDefs>
+			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+		</AdditionalDefs>
+	</CollectionDef>
 
-	<CollectionDef Name="Struct" ToolTip="A collection of elements to be placed within a single element." TextColour="Struct" MinCount="1">
+	<CollectionDef Name="Struct" ToolTip="A collection of elements to be placed within a single element." TextColour="Struct">
 		<Attributes>
 			<String Name="Name" Default="Struct" ToolTip="The name to be written for this element." />
 			<Boolean Name="Nullable" Default="true" ToolTip="Whether this element can be empty." />
@@ -204,7 +208,7 @@
 		</AdditionalDefs>
 	</CollectionDef>
 
-	<CollectionDef Name="StructDef" ToolTip="A definition for a struct that can be referenced." TextColour="Struct" MinCount="1">
+	<CollectionDef Name="StructDef" ToolTip="A definition for a struct that can be referenced." TextColour="Struct">
 		<Attributes>
 			<String Name="Name" Default="StructDef" ToolTip="The name to be written for this element. This will be used as the key when referencing it." />
 			<Boolean Name="Nullable" Default="true" ToolTip="Whether this element can be empty." />
@@ -224,7 +228,7 @@
 		</AdditionalDefs>
 	</CollectionDef>
 
-	<CollectionDef Name="GraphStruct" ToolTip="A node on a graph." TextColour="Struct" MinCount="1">
+	<CollectionDef Name="GraphStruct" ToolTip="A node on a graph." TextColour="Struct">
 		<Attributes>
 			<String Name="Name" Default="GraphStruct" ToolTip="The name to be written for this element." />
 			<String Name="ChildAsGUID" ToolTip="The child to use as this elements GUID." />
@@ -244,7 +248,7 @@
 		</AdditionalDefs>
 	</CollectionDef>
 
-	<CollectionDef Name="GraphStructDef" ToolTip="A node on a graph that can be referenced." TextColour="Struct" MinCount="1">
+	<CollectionDef Name="GraphStructDef" ToolTip="A node on a graph that can be referenced." TextColour="Struct">
 		<Attributes>
 			<String Name="Name" Default="GraphStruct" ToolTip="The name to be written for this element." />
 			<String Name="Description" ToolTip="The description to be used. Add a child names inside {} to use the contents of it in the description." />
@@ -261,7 +265,7 @@
 		</AdditionalDefs>
 	</CollectionDef>
 
-	<StructDef Name="GraphCollection" ToolTip="A node on a graph that can be referenced." TextColour="Collection">
+	<CollectionDef Name="GraphCollection" ToolTip="A node on a graph that can be referenced." TextColour="Collection">
 		<Attributes>
 			<String Name="Name" Default="GraphCollection" ToolTip="The name to be written for this element." />
 			<Boolean Name="AllowReferenceLinks" Default="true" ToolTip="Whether to allow links to be by reference." />
@@ -276,11 +280,13 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
-		<Reference Name="Item" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The child that this collection contains." />
-	</StructDef>
+		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The elements that can be placed in this collection" />
+		<AdditionalDefs>
+			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+		</AdditionalDefs>
+	</CollectionDef>
 
-	<StructDef Name="GraphCollectionDef" ToolTip="A node on a graph that can be referenced." TextColour="Collection">
+	<CollectionDef Name="GraphCollectionDef" ToolTip="A node on a graph that can be referenced." TextColour="Collection">
 		<Attributes>
 			<String Name="Name" Default="GraphCollection" ToolTip="The name to be written for this element. This will be used as the key when referencing it." />
 			<Number Name="MinCount" Min="0" ToolTip="The minimum number of child elements this can have." />
@@ -292,9 +298,11 @@
 			<Boolean Name="IsGlobal" ToolTip="Whether this definition can be referenced from other files." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
-		<Reference Name="Item" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The child that this collection contains." />
-	</StructDef>
+		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The elements that can be placed in this collection" />
+		<AdditionalDefs>
+			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+		</AdditionalDefs>
+	</CollectionDef>
 
 	<StructDef Name="GraphReference" ToolTip="An element that links to another graphnode.">
 		<Attributes>

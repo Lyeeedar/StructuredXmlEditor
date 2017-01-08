@@ -12,6 +12,19 @@ namespace StructuredXmlEditor.Definition
 	{
 		public DataDefinition WrappedDefinition { get; set; }
 
+		public override string Name
+		{
+			get
+			{
+				return WrappedDefinition.Name;
+			}
+
+			set
+			{
+				WrappedDefinition.Name = value;
+			}
+		}
+
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
 			var data = WrappedDefinition.CreateData(undoRedo);

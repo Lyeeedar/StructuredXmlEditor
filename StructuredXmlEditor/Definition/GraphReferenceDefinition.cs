@@ -53,6 +53,7 @@ namespace StructuredXmlEditor.Definition
 		public override DataItem LoadData(XElement element, UndoRedoManager undoRedo)
 		{
 			var key = element.Attribute(DataDefinition.MetaNS + "RefKey")?.Value?.ToString();
+			if (key == null) key = element.Attribute("RefKey")?.Value?.ToString();
 
 			GraphReferenceItem item = null;
 
@@ -126,12 +127,12 @@ namespace StructuredXmlEditor.Definition
 					}
 					else
 					{
-						Message.Show("Tried to add definition of type " + def.GetType() + " (key = " + key + ") to graph reference!", "Reference Resolve Failed", "Ok");
+						Message.Show("Tried to add definition of type " + def.GetType() + " (key = " + key.Item1 + ") to graph reference!", "Reference Resolve Failed", "Ok");
 					}
 				}
 				else
 				{
-					Message.Show("Failed to find key " + key + "!", "Reference Resolve Failed", "Ok");
+					Message.Show("Failed to find key " + key.Item1 + "!", "Reference Resolve Failed", "Ok");
 				}
 			}
 		}

@@ -161,8 +161,10 @@ namespace StructuredXmlEditor.View
 		{
 			if (args.PropertyName == "IsVisible")
 			{
+				var oldVal = HasItems;
 				HasItems = Items.Any(e => e.IsVisible);
-				DataGrid.DeferRefresh();
+
+				if (HasItems != oldVal) DataGrid.DeferRefresh();
 			}
 		}
 

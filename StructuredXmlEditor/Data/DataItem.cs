@@ -156,6 +156,8 @@ namespace StructuredXmlEditor.Data
 			{
 				if (VisibleIfStatements.Count == 0) return true;
 
+				UpdateVisibleIfBinding();
+
 				foreach (var group in VisibleIfStatements)
 				{
 					var isValid = true;
@@ -335,11 +337,13 @@ namespace StructuredXmlEditor.Data
 		private XmlDataGrid m_grid;
 
 		//-----------------------------------------------------------------------
+		public bool IsContextMenuDynamic;
 		public ContextMenu ContextMenu
 		{
 			get
 			{
-				return CreateContextMenu();
+				if (m_menu == null || IsContextMenuDynamic) m_menu = CreateContextMenu();
+				return m_menu;
 			}
 		}
 		private ContextMenu m_menu;
@@ -450,11 +454,6 @@ namespace StructuredXmlEditor.Data
 					{
 						var stmnt = new Statement(statement);
 						group.Add(stmnt);
-
-						if (stmnt.TargetPath.Count > 1)
-						{
-							int i = 0;
-						}
 
 						// find the referenced element and bind to it
 						DataItem current = this;

@@ -27,16 +27,22 @@ namespace StructuredXmlEditor.Data
 		public CollectionDefinition CDef { get { return Definition as CollectionDefinition; } }
 
 		//-----------------------------------------------------------------------
-		public bool IsAtMax { get { return Children.Where(e => e.Definition == CDef.ChildDefinition).Count() >= CDef.MaxCount; } }
+		public CollectionChildDefinition SelectedDefinition { get; set; }
 
 		//-----------------------------------------------------------------------
-		public bool IsAtMin { get { return Children.Where(e => e.Definition == CDef.ChildDefinition).Count() <= CDef.MinCount; } }
+		public bool ShowComboBox { get { return CDef.ChildDefinitions.Count > 1; } }
+
+		//-----------------------------------------------------------------------
+		public bool IsAtMax { get { return Children.Where(e => CDef.ChildDefinitions.Contains(e.Definition)).Count() >= CDef.MaxCount; } }
+
+		//-----------------------------------------------------------------------
+		public bool IsAtMin { get { return Children.Where(e => CDef.ChildDefinitions.Contains(e.Definition)).Count() <= CDef.MinCount; } }
 
 		//-----------------------------------------------------------------------
 		public override bool CanPaste { get { return !IsAtMax; } }
 
 		//-----------------------------------------------------------------------
-		public virtual Command<object> PasteNewCMD { get { return new Command<object>((e) => PasteNew(), (e) => CanPaste && Clipboard.ContainsData((Definition as CollectionDefinition).ChildDefinition.WrappedDefinition.CopyKey)); } }
+		public virtual Command<object> PasteNewCMD { get { return new Command<object>((e) => PasteNew(), (e) => CanPaste); } }
 
 		//-----------------------------------------------------------------------
 		public CollectionItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
@@ -49,6 +55,8 @@ namespace StructuredXmlEditor.Data
 					RaisePropertyChangedEvent("IsAtMax");
 				}
 			};
+
+			SelectedDefinition = CDef.ChildDefinitions.First();
 		}
 
 		//-----------------------------------------------------------------------
@@ -98,12 +106,7 @@ namespace StructuredXmlEditor.Data
 
 			using (UndoRedo.DisableUndoScope())
 			{
-				item = cdef.ChildDefinition.CreateData(UndoRedo);
-
-				if (cdef.ChildDefinition.WrappedDefinition is StructDefinition)
-				{
-					//(cdef.ChildDefinition.WrappedDefinition as StructDefinition).CreateChildren((item as CollectionChildItem).WrappedItem as StructItem, UndoRedo);
-				}
+				item = SelectedDefinition.CreateData(UndoRedo);
 			}
 
 			UndoRedo.ApplyDoUndo(
@@ -170,38 +173,39 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void PasteNew()
 		{
-			var sdef = Definition as CollectionDefinition;
-
-			if (Clipboard.ContainsData(sdef.ChildDefinition.WrappedDefinition.CopyKey))
+			foreach (var childDef in CDef.ChildDefinitions)
 			{
-				var flat = Clipboard.GetData(sdef.ChildDefinition.WrappedDefinition.CopyKey) as string;
-				var root = XElement.Parse(flat);
-
-				CollectionChildItem child = null;
-
-				using (UndoRedo.DisableUndoScope())
+				if (Clipboard.ContainsData(childDef.WrappedDefinition.CopyKey))
 				{
-					var item = sdef.ChildDefinition.WrappedDefinition.LoadData(root, UndoRedo);
-					child = sdef.ChildDefinition.CreateData(UndoRedo) as CollectionChildItem;
-					child.WrappedItem = item;
+					var flat = Clipboard.GetData(childDef.WrappedDefinition.CopyKey) as string;
+					var root = XElement.Parse(flat);
+
+					CollectionChildItem child = null;
+
+					using (UndoRedo.DisableUndoScope())
+					{
+						var item = childDef.WrappedDefinition.LoadData(root, UndoRedo);
+						child = childDef.CreateData(UndoRedo) as CollectionChildItem;
+						child.WrappedItem = item;
+					}
+
+					UndoRedo.ApplyDoUndo(
+						delegate
+						{
+							Children.Add(child);
+							RaisePropertyChangedEvent("HasContent");
+							RaisePropertyChangedEvent("Description");
+						},
+						delegate
+						{
+							Children.Remove(child);
+							RaisePropertyChangedEvent("HasContent");
+							RaisePropertyChangedEvent("Description");
+						},
+						Name + " pasted new");
+
+					IsExpanded = true;
 				}
-
-				UndoRedo.ApplyDoUndo(
-					delegate
-					{
-						Children.Add(child);
-						RaisePropertyChangedEvent("HasContent");
-						RaisePropertyChangedEvent("Description");
-					},
-					delegate
-					{
-						Children.Remove(child);
-						RaisePropertyChangedEvent("HasContent");
-						RaisePropertyChangedEvent("Description");
-					},
-					Name + " pasted new");
-
-				IsExpanded = true;
 			}
 		}
 	}

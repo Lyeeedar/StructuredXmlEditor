@@ -289,12 +289,19 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public override void Copy()
 		{
-			var root = new XElement("Item");
-			Definition.SaveData(root, this);
+			try
+			{
+				var root = new XElement("Item");
+				Definition.SaveData(root, this);
 
-			var flat = root.Elements().First().ToString();
+				var flat = root.Elements().First().ToString();
 
-			Clipboard.SetData(CopyKey, flat);
+				Clipboard.SetData(CopyKey, flat);
+			}
+			catch (Exception e)
+			{
+				Message.Show(e.Message, "Failed To Copy", "Ok");
+			}
 		}
 
 		//-----------------------------------------------------------------------
