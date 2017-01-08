@@ -172,14 +172,31 @@ namespace StructuredXmlEditor.Data
 				}
 			}
 
-			if (ProjectRoot == null)
-			{
-				ProjectRoot = LoadProjectRoot();
-				StoreSetting("ProjectRoot", ProjectRoot);
-			}
+			XDocument rootdoc = null;
 
-			var rootdoc = XDocument.Load(ProjectRoot);
-			DefsFolder = rootdoc.Elements().First().Element("Definitions").Value;
+			while (true)
+			{
+				if (ProjectRoot == null || !File.Exists(ProjectRoot))
+				{
+					ProjectRoot = LoadProjectRoot();
+					StoreSetting("ProjectRoot", ProjectRoot);
+				}
+
+				if (File.Exists(ProjectRoot))
+				{
+					rootdoc = XDocument.Load(ProjectRoot);
+					DefsFolder = rootdoc?.Elements()?.First()?.Element("Definitions")?.Value;
+				}
+
+				if (DefsFolder == null)
+				{
+					Message.Show("File '" + ProjectRoot + "' is not a valid ProjectRoot file. Please select an existing one or create a new one.", "Failed to open Project Root File", "Ok");
+					ProjectRoot = null;
+					continue;
+				}
+
+				break;
+			}
 
 			if (!Directory.Exists(Path.Combine(Path.GetDirectoryName(ProjectRoot), DefsFolder)))
 			{

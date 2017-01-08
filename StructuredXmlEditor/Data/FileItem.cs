@@ -42,7 +42,7 @@ namespace StructuredXmlEditor.Data
 		public virtual Command<object> BrowseCMD { get { return new Command<object>((e) => Browse()); } }
 
 		//-----------------------------------------------------------------------
-		public Command<object> OpenCMD { get { return new Command<object>(e => Open()); } }
+		public Command<object> OpenCMD { get { return new Command<object>(e => Open(), e => File.Exists(FullPath)); } }
 
 		//-----------------------------------------------------------------------
 		public FileItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
