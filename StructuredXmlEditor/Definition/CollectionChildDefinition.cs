@@ -16,12 +16,12 @@ namespace StructuredXmlEditor.Definition
 		{
 			get
 			{
-				return WrappedDefinition.Name;
+				return WrappedDefinition?.Name ?? base.Name;
 			}
 
 			set
 			{
-				WrappedDefinition.Name = value;
+				
 			}
 		}
 
