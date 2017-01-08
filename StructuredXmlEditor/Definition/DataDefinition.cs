@@ -110,7 +110,7 @@ namespace StructuredXmlEditor.Definition
 
 		public static DataDefinition Load(string path)
 		{
-			var docLines = File.ReadAllLines(path).ToList();
+			var docLines = File.ReadAllLines(path).Where(e => !string.IsNullOrWhiteSpace(e)).ToList();
 			if (docLines[0].StartsWith("<?xml")) docLines = docLines.Skip(1).ToList();
 			var doc = XDocument.Parse(string.Join(Environment.NewLine, docLines));
 

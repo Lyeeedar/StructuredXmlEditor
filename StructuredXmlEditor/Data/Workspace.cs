@@ -720,7 +720,7 @@ namespace StructuredXmlEditor.Data
 
 			if (matchedDef.DataType == "xml")
 			{
-				var docLines = File.ReadAllLines(path).ToList();
+				var docLines = File.ReadAllLines(path).Where(e => !string.IsNullOrWhiteSpace(e)).ToList();
 				if (docLines[0].StartsWith("<?xml")) docLines = docLines.Skip(1).ToList();
 				doc = XDocument.Parse(string.Join(Environment.NewLine, docLines));
 			}
@@ -818,26 +818,34 @@ namespace StructuredXmlEditor.Data
 
 				XDocument doc = null;
 
-				if (path.EndsWith(".json"))
+				try
 				{
-					string json = File.ReadAllText(path);
-
-					var temp = JsonConvert.DeserializeXNode(json, "Root");
-					if (temp.Elements().First().Elements().Count() > 1)
+					if (path.EndsWith(".json"))
 					{
-						temp.Elements().First().Name = temp.Elements().First().Elements().First().Name;
-						doc = temp;
+						string json = File.ReadAllText(path);
+
+						var temp = JsonConvert.DeserializeXNode(json, "Root");
+						if (temp.Elements().First().Elements().Count() > 1)
+						{
+							temp.Elements().First().Name = temp.Elements().First().Elements().First().Name;
+							doc = temp;
+						}
+						else
+						{
+							doc = new XDocument(temp.Elements().First());
+						}
 					}
 					else
 					{
-						doc = new XDocument(temp.Elements().First());
+						var docLines = File.ReadAllLines(path).Where(e => !string.IsNullOrWhiteSpace(e)).ToList();
+						if (docLines[0].StartsWith("<?xml")) docLines = docLines.Skip(1).ToList();
+						doc = XDocument.Parse(string.Join(Environment.NewLine, docLines));
 					}
 				}
-				else
+				catch (Exception e)
 				{
-					var docLines = File.ReadAllLines(path).ToList();
-					if (docLines[0].StartsWith("<?xml")) docLines = docLines.Skip(1).ToList();
-					doc = XDocument.Parse(string.Join(Environment.NewLine, docLines));
+					Message.Show(e.Message, "Unable to open document", "Ok");
+					return;
 				}
 
 				var def = CreateDefinitionFromElement(doc.Root, null);
@@ -868,7 +876,7 @@ namespace StructuredXmlEditor.Data
 
 				LoadDefinitions();
 
-				Message.Show("Done", "Defintion Created", "Ok");
+				Message.Show("Done. Definition saved to " + outpath, "Defintion Created", "Ok");
 			}
 		}
 
