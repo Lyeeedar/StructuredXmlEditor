@@ -25,7 +25,7 @@ namespace StructuredXmlEditor
 
 		void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
 		{
-			string errorMessage = "An unhandled exception occurred!\n" + e.Exception.Message + "\n\nThe app has attempted to recover and carry on, but you may experience some weirdness. Report error?.";
+			string errorMessage = "An unhandled exception occurred!\n\n" + e.Exception.Message + "\n\nThe app has attempted to recover and carry on, but you may experience some weirdness. Report error?";
 			File.WriteAllText("error.log", e.Exception.ToString());
 
 			var choice = Message.Show(errorMessage, "Error", "Report", "Ignore");
