@@ -582,22 +582,26 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void LoadBackups()
 		{
-			BackupDocuments.Clear();
-
-			if (Directory.Exists(Document.BackupFolder))
+			try
 			{
-				foreach (var file in Directory.EnumerateFiles(Document.BackupFolder, "*.*", SearchOption.AllDirectories))
-				{
-					try
-					{
-						// attempt to load to check its vaguely valid
-						var doc = OpenImpl(file);
+				BackupDocuments.Clear();
 
-						BackupDocuments.Add(file);
+				if (Directory.Exists(Document.BackupFolder))
+				{
+					foreach (var file in Directory.EnumerateFiles(Document.BackupFolder, "*.*", SearchOption.AllDirectories))
+					{
+						try
+						{
+							// attempt to load to check its vaguely valid
+							var doc = OpenImpl(file);
+
+							BackupDocuments.Add(file);
+						}
+						catch (Exception) { }
 					}
-					catch (Exception) { }
 				}
 			}
+			catch (Exception) { }
 		}
 
 		//-----------------------------------------------------------------------
