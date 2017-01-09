@@ -49,7 +49,6 @@ namespace StructuredXmlEditor
 
 					DataContext = Workspace;
 
-
 					XDocument layout = File.Exists("Layout.xml") ? XDocument.Load("Layout.xml") : GenerateDefaultLayout();
 					LoadLayout(layout);
 
