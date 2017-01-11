@@ -160,6 +160,12 @@ namespace StructuredXmlEditor.Definition
 				else
 				{
 					var childDef = LoadDefinition(child);
+
+					if (FlattenData && childDef.Name == NodeStoreName)
+					{
+						throw new Exception("A child of the graph node struct has the same name as the node store! Make sure they are different!\nName='" + NodeStoreName + "'");
+					}
+
 					Children.Add(childDef);
 
 					if (!foundChildAsGUID && !string.IsNullOrWhiteSpace(ChildAsGUID))

@@ -110,6 +110,17 @@ namespace StructuredXmlEditor.Data
 		{
 			SelectedDefinition = (Tuple<string, string>)(definition as ReferenceDefinition).ItemsSource.GetItemAt(0);
 			IsContextMenuDynamic = true;
+
+			PropertyChanged += (e, args) =>
+			{
+				if (args.PropertyName == "Grid")
+				{
+					if (WrappedItem != null)
+					{
+						WrappedItem.Grid = Grid;
+					}
+				}
+			};
 		}
 
 		//-----------------------------------------------------------------------

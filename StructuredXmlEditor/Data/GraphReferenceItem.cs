@@ -111,7 +111,7 @@ namespace StructuredXmlEditor.Data
 			{
 				if (WrappedItem == null) return "Unset";
 				else if (IsCircular()) return "Circular";
-				else if (Grid.AllowCircularLinks) return WrappedItem.Definition.Name;
+				else if (Grid.AllowCircularLinks || Grid.FlattenData) return WrappedItem.Definition.Name;
 				else return WrappedItem.Description;
 			}
 		}
@@ -201,12 +201,12 @@ namespace StructuredXmlEditor.Data
 							}
 							else
 							{
-								Grid.GraphNodeItems.Add(m_wrappedItem);
+								if (!Grid.GraphNodeItems.Contains(m_wrappedItem)) Grid.GraphNodeItems.Add(m_wrappedItem);
 							}
 						}
 						else
 						{
-							Grid.GraphNodeItems.Add(m_wrappedItem);
+							if (!Grid.GraphNodeItems.Contains(m_wrappedItem)) Grid.GraphNodeItems.Add(m_wrappedItem);
 						}
 					}
 
@@ -415,7 +415,7 @@ namespace StructuredXmlEditor.Data
 			UndoRedo.ApplyDoUndo(delegate
 			{
 				WrappedItem = item;
-				Grid.GraphNodeItems.Add(item);
+				if (!Grid.GraphNodeItems.Contains(item)) Grid.GraphNodeItems.Add(item);
 			},
 			delegate
 			{

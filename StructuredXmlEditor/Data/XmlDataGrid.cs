@@ -375,7 +375,7 @@ namespace StructuredXmlEditor.Data
 
 				if (item is GraphNodeItem && !GraphNodeItems.Contains(item))
 				{
-					GraphNodeItems.Add(item as GraphNodeItem);
+					if (!GraphNodeItems.Contains(item as GraphNodeItem)) GraphNodeItems.Add(item as GraphNodeItem);
 				}
 			}
 

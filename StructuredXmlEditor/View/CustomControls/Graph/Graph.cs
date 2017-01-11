@@ -368,6 +368,8 @@ namespace StructuredXmlEditor.View
 			{
 				foreach (var node in Selected.ToList())
 				{
+					if (node.GraphNodeItem.Grid.RootItems.Contains(node.GraphNodeItem)) continue;
+
 					foreach (var parent in node.GraphNodeItem.LinkParents.ToList())
 					{
 						parent.Clear();
@@ -380,7 +382,7 @@ namespace StructuredXmlEditor.View
 						},
 						delegate
 						{
-							node.GraphNodeItem.Grid.GraphNodeItems.Add(node.GraphNodeItem);
+							if (!node.GraphNodeItem.Grid.GraphNodeItems.Contains(node.GraphNodeItem)) node.GraphNodeItem.Grid.GraphNodeItems.Add(node.GraphNodeItem);
 						},
 						"Delete " + node.GraphNodeItem.Name);
 				}

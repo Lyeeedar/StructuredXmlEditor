@@ -198,6 +198,13 @@ namespace StructuredXmlEditor.Data
 					Name += WrappedItem.Name;
 				}
 			}
+			else if (e.PropertyName == "Grid")
+			{
+				if (WrappedItem != null)
+				{
+					WrappedItem.Grid = Grid;
+				}
+			}
 		}
 
 		//-----------------------------------------------------------------------
