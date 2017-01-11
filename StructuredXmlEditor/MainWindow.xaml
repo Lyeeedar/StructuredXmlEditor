@@ -331,6 +331,9 @@
 									Property="Title"
 									Value="{Binding Model.Title}" />
 								<Setter
+									Property="ToolTip"
+									Value="{Binding Model.Path}" />
+								<Setter
 									Property="CloseCommand"
 									Value="{Binding Model.CloseCMD}" />
 							</Style>

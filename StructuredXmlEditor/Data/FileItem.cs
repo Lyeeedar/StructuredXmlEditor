@@ -31,6 +31,26 @@ namespace StructuredXmlEditor.Data
 
 				var fdef = Definition as FileDefinition;
 				var path = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Workspace.Instance.ProjectRoot), fdef.BasePath, Value));
+
+				if (fdef.StripExtension)
+				{
+					foreach (var type in fdef.AllowedFileTypes)
+					{
+						var tpath = path + "." + type;
+						if (File.Exists(tpath))
+						{
+							path = tpath;
+							break;
+						}
+					}
+				}
+				else if (Path.GetExtension(path) == string.Empty)
+				{
+					var dir = Path.GetDirectoryName(path);
+
+					path = Directory.EnumerateFiles(dir, "*" + Path.GetFileName(path) + ".*", SearchOption.TopDirectoryOnly).FirstOrDefault() ?? path;
+				}
+
 				return path;
 			}
 		}
