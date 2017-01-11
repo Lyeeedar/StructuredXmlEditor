@@ -141,6 +141,11 @@ namespace StructuredXmlEditor.Definition
 				ChildDefinitions.Add(cdef);
 			}
 
+			if (ChildDefinitions.Count == 0)
+			{
+				throw new Exception("No child definitions in collection '" + Name + "'!");
+			}
+
 			var addEls = definition.Element("AdditionalDefs");
 			if (addEls != null)
 			{
