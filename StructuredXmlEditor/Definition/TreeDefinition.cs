@@ -45,12 +45,15 @@ namespace StructuredXmlEditor.Definition
 
 			if (ti.IsCollectionChild)
 			{
-				var root = new XElement(ti.Value);
-				parent.Add(root);
-
-				foreach (var child in ti.Children)
+				if (ti.Value != null)
 				{
-					child.Definition.SaveData(root, child);
+					var root = new XElement(ti.Value);
+					parent.Add(root);
+
+					foreach (var child in ti.Children)
+					{
+						child.Definition.SaveData(root, child);
+					}
 				}
 			}
 			else
