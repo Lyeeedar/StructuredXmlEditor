@@ -67,6 +67,8 @@
 				Margin="5"
 				Grid.Column="1"
 				VerticalAlignment="Center"
+				MaxWidth="100"
+				ToolTip="{Binding Preview, Converter={local:ColourMarkupConverter}}"
 				Content="{Binding Preview, Converter={local:ColourMarkupConverter}}" />
 
 			<Button
