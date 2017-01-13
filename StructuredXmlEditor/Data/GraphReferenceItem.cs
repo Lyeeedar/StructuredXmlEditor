@@ -271,48 +271,48 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public bool IsCircular()
+		public override void ChildPropertyChanged(object sender, PropertyChangedEventArgs args)
 		{
-			if (WrappedItem == null || !Grid.AllowCircularLinks) return false;
-
-			var pathsFromRoot = new List<List<DataItem>>();
-			GetPathsFromRoot(pathsFromRoot);
-
-			foreach (var path in pathsFromRoot)
-			{
-				if (path.Contains(WrappedItem)) return true;
-			}
-
-			return false;
+			if (!IsCircular()) base.ChildPropertyChanged(sender, args);
 		}
 
 		//-----------------------------------------------------------------------
-		public void GetPathsFromRoot(List<List<DataItem>> output, List<DataItem> path = null, DataItem current = null)
+		public override void DescendantPropertyChanged(object sender, DescendantPropertyChangedEventArgs args)
 		{
-			if (path == null) path = new List<DataItem>();
-			if (current == null) current = Grid.RootItems[0];
+			if (!IsCircular()) base.DescendantPropertyChanged(sender, args);
+		}
 
-			if (path.Contains(current)) return;
-			if (current == this)
-			{
-				output.Add(path);
+		//-----------------------------------------------------------------------
+		public bool IsCircular()
+		{
+			if (WrappedItem == null) return false;
+			return IsCircular(WrappedItem);
+		}
 
-				return;
-			}
-
-			path.Add(current);
-
-			foreach (var child in current.Children)
-			{
-				GetPathsFromRoot(output, path.ToList(), child);
-			}
+		//-----------------------------------------------------------------------
+		public bool IsCircular(DataItem current, HashSet<DataItem> visitedNodes = null)
+		{
+			if (current == this) return true;
+			if (visitedNodes == null) visitedNodes = new HashSet<DataItem>();
 
 			if (current is GraphReferenceItem)
 			{
 				var gri = current as GraphReferenceItem;
 
-				GetPathsFromRoot(output, path.ToList(), gri.WrappedItem);
+				if (gri.WrappedItem == null) return false;
+
+				current = gri.WrappedItem;
 			}
+
+			if (visitedNodes.Contains(current)) return false;
+			visitedNodes.Add(current);
+
+			foreach (var child in current.Children)
+			{
+				if (IsCircular(child, visitedNodes)) return true;
+			}
+
+			return false;
 		}
 
 		//-----------------------------------------------------------------------

@@ -257,17 +257,28 @@ namespace StructuredXmlEditor.View
 			base.OnMouseDown(e);
 		}
 
-		//--------------------------------------------------------------------------
-		private bool HasParent(GraphNode node)
+		//-----------------------------------------------------------------------
+		public bool IsCircular(GraphNode current, HashSet<GraphNode> visitedNodes = null)
 		{
-			var parent = this;
+			if (current == this) return true;
+			if (visitedNodes == null) visitedNodes = new HashSet<GraphNode>();
 
-			do
+			if (visitedNodes.Contains(current)) return false;
+			visitedNodes.Add(current);
+
+			foreach (var data in current.Datas)
 			{
-				if (parent == node) return true;
-				parent = parent.ParentNodes.FirstOrDefault();
+				if (data is GraphNodeDataLink)
+				{
+					var link = data as GraphNodeDataLink;
+					var child = link.Link;
+
+					if (child != null)
+					{
+						if (IsCircular(child, visitedNodes)) return true;
+					}
+				}
 			}
-			while (parent != null);
 
 			return false;
 		}
@@ -277,7 +288,7 @@ namespace StructuredXmlEditor.View
 		{
 			if (Graph.CreatingLink != null)
 			{
-				if (Graph.CreatingLink.AllowedTypes.Contains(GraphNodeItem.Definition.Name) && Graph.CanHaveCircularReferences || Graph.CreatingLink.Link == this || !Graph.CreatingLink.Node.HasParent(this))
+				if (Graph.CreatingLink.AllowedTypes.Contains(GraphNodeItem.Definition.Name) && Graph.CanHaveCircularReferences || Graph.CreatingLink.Link == this || !Graph.CreatingLink.Node.IsCircular(this))
 				{
 					Graph.ConnectedLinkTo = this;
 					if (!(Graph.MouseOverItem is Connection)) Graph.MouseOverItem = this;

@@ -720,7 +720,8 @@ namespace StructuredXmlEditor.Data
 
 						if (!matchFound && IsPrimitive)
 						{
-							stringsToCheck.Add(GetValue());
+							var value = GetValue();
+							if (value != null) stringsToCheck.Add(value);
 						}
 					}
 					else
@@ -729,7 +730,8 @@ namespace StructuredXmlEditor.Data
 
 						if (!matchFound && IsPrimitive)
 						{
-							stringsToCheck.Add(GetValue().ToLower());
+							var value = GetValue()?.ToLower();
+							if (value != null) stringsToCheck.Add(value);
 						}
 					}
 

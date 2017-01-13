@@ -118,7 +118,11 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public GraphNodeItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
-
+			Children.CollectionChanged += (e, args) => 
+			{
+				RaisePropertyChangedEvent("GraphData");
+				RaisePropertyChangedEvent("Datas");
+			};
 		}
 
 		//-----------------------------------------------------------------------

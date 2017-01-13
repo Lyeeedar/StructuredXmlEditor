@@ -243,12 +243,22 @@ namespace StructuredXmlEditor.Data
 					{
 						item.Filter(filter, regex, CaseSensitiveFilter, ShowMatchElementsOnly);
 					}
+
+					foreach (var node in GraphNodeItems)
+					{
+						node.Filter(filter, regex, CaseSensitiveFilter, ShowMatchElementsOnly);
+					}
 				}
 				else
 				{
 					foreach (DataItem item in RootItems)
 					{
 						item.Filter(null, null, false, false);
+					}
+
+					foreach (var node in GraphNodeItems)
+					{
+						node.Filter(null, null, false, false);
 					}
 				}
 

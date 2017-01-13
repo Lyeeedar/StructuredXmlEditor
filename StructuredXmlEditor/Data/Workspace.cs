@@ -757,7 +757,11 @@ namespace StructuredXmlEditor.Data
 
 						var node = def.LoadData(el, document.UndoRedo);
 
-						if (!document.Data.GraphNodeItems.Contains(node as GraphNodeItem)) document.Data.GraphNodeItems.Add(node as GraphNodeItem);
+						if (!document.Data.GraphNodeItems.Contains(node as GraphNodeItem))
+						{
+							document.Data.GraphNodeItems.Add(node as GraphNodeItem);
+							node.Grid = document.Data;
+						}
 					}
 				}
 				else

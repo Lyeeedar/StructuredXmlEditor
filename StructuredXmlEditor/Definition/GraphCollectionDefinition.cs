@@ -122,6 +122,7 @@ namespace StructuredXmlEditor.Definition
 
 			if (ci.LinkParents.Count > 1 || ci.Grid.FlattenData)
 			{
+				if (item.Grid.GraphNodeItems.Where(e => e != item).Any(e => e.GUID == ci.GUID)) throw new Exception("Duplicate GUID '" + ci.GUID + "' in items!");
 				root.Add(new XAttribute("GUID", ci.GUID));
 			}
 

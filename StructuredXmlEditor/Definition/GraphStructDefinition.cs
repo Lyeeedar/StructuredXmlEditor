@@ -200,7 +200,12 @@ namespace StructuredXmlEditor.Definition
 
 			if (string.IsNullOrWhiteSpace(ChildAsGUID) && (si.LinkParents.Count > 1 || si.Grid.FlattenData))
 			{
+				if (item.Grid.GraphNodeItems.Where(e => e != item).Any(e => e.GUID == si.GUID)) throw new Exception("Duplicate GUID '" + si.GUID + "' in items!");
 				el.Add(new XAttribute("GUID", si.GUID));
+			}
+			else if (!string.IsNullOrWhiteSpace(ChildAsGUID))
+			{
+				if (item.Grid.GraphNodeItems.Where(e => e != item).Any(e => e.GUID == si.GUID)) throw new Exception("Duplicate GUID '" + si.GUID + "' in items!");
 			}
 
 			foreach (var att in si.Attributes)
