@@ -456,7 +456,7 @@ namespace StructuredXmlEditor.Data
 						group.Add(stmnt);
 
 						// find the referenced element and bind to it
-						DataItem current = this;
+						DataItem current = FirstComplexParent(this);
 						foreach (var part in stmnt.TargetPath)
 						{
 							if (part == "Root") current = Root;

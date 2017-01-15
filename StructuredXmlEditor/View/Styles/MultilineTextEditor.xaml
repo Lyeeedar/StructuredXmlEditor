@@ -62,22 +62,14 @@
 										Color="Gray" />
 								</Border.Effect>
 								<Grid>
-									<DockPanel>
-										<TextBlock
-											DockPanel.Dock="Bottom"
-											Text="[Ctrl + Enter] to manually propagate change"
-											VerticalAlignment="Center"
-											TextAlignment="Center"
-											Margin="2" />
-										<TextBox
-											x:Name="PART_TextBox"
-											AcceptsReturn="true"
-											VerticalScrollBarVisibility="Auto"
-											HorizontalScrollBarVisibility="Auto"
-											FontFamily="Courier New"
-											Text="{Binding Text, ValidatesOnExceptions=True, RelativeSource={RelativeSource TemplatedParent}}"
-											Margin="5,5,5,0" />
-									</DockPanel>
+									<TextBox
+										x:Name="PART_TextBox"
+										AcceptsReturn="true"
+										VerticalScrollBarVisibility="Auto"
+										HorizontalScrollBarVisibility="Auto"
+										FontFamily="Courier New"
+										Text="{Binding Text, ValidatesOnExceptions=True, RelativeSource={RelativeSource TemplatedParent}}"
+										Margin="5,5,5,0" />
 									<Thumb
 										x:Name="PART_ResizeThumb"
 										HorizontalAlignment="Right"

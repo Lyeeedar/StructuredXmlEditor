@@ -16,7 +16,7 @@ namespace StructuredXmlEditor.Definition
 		{
 			get
 			{
-				return WrappedDefinition?.Name ?? base.Name;
+				return WrappedDefinition.Name ?? base.Name;
 			}
 
 			set

@@ -17,7 +17,7 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 	</StructDef>
 
 	<StructDef Name="Vector" ToolTip="A vector." TextColour="Primitive">
@@ -37,7 +37,7 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 	</StructDef>
 
 	<StructDef Name="String" ToolTip="A string." TextColour="Primitive" >
@@ -50,7 +50,7 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 	</StructDef>
 
 	<StructDef Name="File" ToolTip="A file path (relative to the project root)." TextColour="Primitive" >
@@ -66,7 +66,7 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 	</StructDef>
 
 	<StructDef Name="Boolean" ToolTip="A boolean (true/false)." TextColour="Primitive">
@@ -79,7 +79,7 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 	</StructDef>
 
 	<StructDef Name="Colour" ToolTip="A colour (stored as RGB or RGBA in 0-255 range)." TextColour="Primitive">
@@ -93,7 +93,7 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 	</StructDef>
 
 	<StructDef Name="MultilineString" ToolTip="A string that spans multiple lines." TextColour="Primitive">
@@ -107,7 +107,7 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 	</StructDef>
 
 	<StructDef Name="Enum" ToolTip="A value chosen from a series of valid values." TextColour="Primitive">
@@ -122,7 +122,7 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 	</StructDef>
 
 	<CollectionDef Name="EnumDef" ToolTip="The definition for a collection of enumvalues that can be referenced by enums." TextColour="Primitive" Collapse="True" MinCount="1">
@@ -147,7 +147,7 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 	</StructDef>
 
 	<CollectionDef Name="Collection" ToolTip="A collection containing multiple elements of the specified child." TextColour="Collection">
@@ -165,7 +165,7 @@
 		</Attributes>
 		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The elements that can be placed in this collection" />
 		<AdditionalDefs>
-			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 		</AdditionalDefs>
 	</CollectionDef>
 
@@ -185,7 +185,7 @@
 		</Attributes>
 		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The elements that can be placed in this collection" />
 		<AdditionalDefs>
-			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 		</AdditionalDefs>
 	</CollectionDef>
 
@@ -204,7 +204,7 @@
 		</Attributes>
 		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
-			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 		</AdditionalDefs>
 	</CollectionDef>
 
@@ -224,7 +224,7 @@
 		</Attributes>
 		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
-			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 		</AdditionalDefs>
 	</CollectionDef>
 
@@ -244,7 +244,7 @@
 		</Attributes>
 		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
-			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true"/>
+			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true"/>
 		</AdditionalDefs>
 	</CollectionDef>
 
@@ -261,7 +261,7 @@
 		</Attributes>
 		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
-			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 		</AdditionalDefs>
 	</CollectionDef>
 
@@ -282,7 +282,7 @@
 		</Attributes>
 		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The elements that can be placed in this collection" />
 		<AdditionalDefs>
-			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 		</AdditionalDefs>
 	</CollectionDef>
 
@@ -300,7 +300,7 @@
 		</Attributes>
 		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The elements that can be placed in this collection" />
 		<AdditionalDefs>
-			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 		</AdditionalDefs>
 	</CollectionDef>
 
@@ -313,7 +313,7 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="Parent.HasAttributes==true" />
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 	</StructDef>
 
 	<StructDef Name="Timeline" ToolTip="A collection of keyframes." TextColour="Struct">

@@ -86,7 +86,7 @@ namespace StructuredXmlEditor.Definition
 			else throw new Exception("Unknown definition type " + name + "!");
 
 			definition.Name = element.Attribute("Name")?.Value?.ToString();
-			if (definition.Name == null) definition.Name = "";
+			if (string.IsNullOrWhiteSpace(definition.Name)) definition.Name = definition.GetType().ToString().Replace("Definition", "");
 
 			definition.ToolTip = element.Attribute("ToolTip")?.Value?.ToString();
 
