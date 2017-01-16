@@ -414,12 +414,14 @@ namespace StructuredXmlEditor.Data
 			XElement fakeRoot = new XElement("FAKE_ROOT");
 			foreach (var item in m_storedRootItems)
 			{
-				item.Definition.SaveData(fakeRoot, item);
+				item.Definition.SaveData(fakeRoot, item, true);
 			}
 			foreach (var el in fakeRoot.Elements())
 			{
 				doc.Add(el);
 			}
+
+			if (doc.Elements().Count() == 0) return;
 
 			doc.Elements().First().SetAttributeValue(XNamespace.Xmlns + "meta", DataDefinition.MetaNS);
 

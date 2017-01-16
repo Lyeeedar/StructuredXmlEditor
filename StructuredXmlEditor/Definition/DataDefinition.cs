@@ -46,10 +46,13 @@ namespace StructuredXmlEditor.Definition
 		public abstract DataItem CreateData(UndoRedoManager undoRedo);
 		public abstract bool IsDefault(DataItem item);
 
-		public void SaveData(XElement parent, DataItem item)
+		public void SaveData(XElement parent, DataItem item, bool isRoot = false)
 		{
-			if (!item.IsVisibleFromBindings) return;
-			if (SkipIfDefault && IsDefault(item)) return;
+			if (!isRoot)
+			{
+				if (!item.IsVisibleFromBindings) return;
+				if (SkipIfDefault && IsDefault(item)) return;
+			}
 
 			DoSaveData(parent, item);
 		}
