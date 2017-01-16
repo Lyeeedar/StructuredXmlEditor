@@ -574,33 +574,33 @@ namespace StructuredXmlEditor.View
 				}
 				else if (args.ChangedButton == MouseButton.Left)
 				{
-					var selected = TimelineItem.Children.FirstOrDefault((e) => e.IsSelected);
-					if (selected != null)
-					{
-						Popup popup = new Popup();
-						popup.DataContext = selected;
-						popup.StaysOpen = true;
-						popup.Focusable = false;
-						popup.PopupAnimation = PopupAnimation.Slide;
+					//var selected = TimelineItem.Children.FirstOrDefault((e) => e.IsSelected);
+					//if (selected != null)
+					//{
+					//	Popup popup = new Popup();
+					//	popup.DataContext = selected;
+					//	popup.StaysOpen = true;
+					//	popup.Focusable = false;
+					//	popup.PopupAnimation = PopupAnimation.Slide;
 
-						popup.PlacementTarget = this;
-						popup.Placement = PlacementMode.Mouse;
+					//	popup.PlacementTarget = this;
+					//	popup.Placement = PlacementMode.Mouse;
 
-						Border contentBorder = new Border();
-						contentBorder.BorderThickness = new Thickness(1);
-						contentBorder.BorderBrush = PopupBorderBrush;
-						contentBorder.Background = PopupBackgroundBrush;
-						popup.Child = contentBorder;
+					//	Border contentBorder = new Border();
+					//	contentBorder.BorderThickness = new Thickness(1);
+					//	contentBorder.BorderBrush = PopupBorderBrush;
+					//	contentBorder.Background = PopupBackgroundBrush;
+					//	popup.Child = contentBorder;
 
-						ItemsControl content = new ItemsControl();
-						content.ItemsSource = selected.Children;
-						content.Margin = new Thickness(1);
-						content.Style = Application.Current.FindResource("FlatDataGrid") as Style;
-						contentBorder.Child = content;
-						Grid.SetIsSharedSizeScope(content, true);
+					//	ItemsControl content = new ItemsControl();
+					//	content.ItemsSource = selected.Children;
+					//	content.Margin = new Thickness(1);
+					//	content.Style = Application.Current.FindResource("FlatDataGrid") as Style;
+					//	contentBorder.Child = content;
+					//	Grid.SetIsSharedSizeScope(content, true);
 
-						popup.IsOpen = true;
-					}
+					//	popup.IsOpen = true;
+					//}
 				}
 			}
 

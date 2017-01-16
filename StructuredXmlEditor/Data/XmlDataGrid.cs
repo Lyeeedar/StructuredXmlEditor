@@ -111,7 +111,22 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public ObservableCollection<DataItem> Selected { get; } = new ObservableCollection<DataItem>();
+		public object Selected
+		{
+			get { return m_selected; }
+			set
+			{
+				if (m_selected != value)
+				{
+					m_selected = value;
+					RaisePropertyChangedEvent();
+					RaisePropertyChangedEvent("IsSelectedDataItem");
+				}
+			}
+		}
+		private object m_selected;
+
+		public bool IsSelectedDataItem { get { return Selected is List<DataItem>; } }
 
 		//-----------------------------------------------------------------------
 		public IEnumerable<GraphNode> GraphNodes

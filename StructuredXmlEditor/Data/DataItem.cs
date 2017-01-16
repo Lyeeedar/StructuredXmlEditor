@@ -267,7 +267,31 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public bool IsSelected { get; set; }
+		public bool IsSelected
+		{
+			get { return m_isSelected; }
+			set
+			{
+				if (m_isSelected != value)
+				{
+					m_isSelected = value;
+					RaisePropertyChangedEvent();
+
+					if (value)
+					{
+						Grid.Selected = new List<DataItem>() { this };
+					}
+					else
+					{
+						if (Grid.Selected is List<DataItem> && (Grid.Selected as List<DataItem>)[0] == this)
+						{
+							Grid.Selected = null;
+						}
+					}
+				}
+			}
+		}
+		private bool m_isSelected;
 
 		//-----------------------------------------------------------------------
 		public bool HasParent { get { return Parent != null; } }

@@ -82,14 +82,7 @@ namespace StructuredXmlEditor.View
 					m_isSelected = value;
 					RaisePropertyChangedEvent();
 
-					if (value)
-					{
-						GraphNodeItem.Grid.Selected.Add(GraphNodeItem);
-					}
-					else
-					{
-						GraphNodeItem.Grid.Selected.Remove(GraphNodeItem);
-					}
+					GraphNodeItem.IsSelected = value;
 				}
 			}
 		}

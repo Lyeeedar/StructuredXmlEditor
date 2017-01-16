@@ -4,10 +4,12 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:data="clr-namespace:StructuredXmlEditor.Data"
 	xmlns:v="clr-namespace:StructuredXmlEditor.View">
 	<Grid>
 
 		<v:DataGridView
+			Visibility="{Binding Workspace.Current.Data.IsSelectedDataItem, Converter={v:ValueTypeConverter}}"
 			HierarchicalItemsSource="{Binding Workspace.Current.Data.Selected}">
 			<v:DataGridView.ItemContainerStyle>
 				<Style
