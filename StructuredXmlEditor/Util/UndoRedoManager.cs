@@ -25,6 +25,7 @@ public class UndoRedoDescription
 //-----------------------------------------------------------------------
 public interface IValueChangeAction
 {
+	bool IsChange { get; }
 	DateTime GetTimeStamp();
 	void Do();
 	void Undo();
@@ -33,12 +34,14 @@ public class ValueChangeAction<T> : IValueChangeAction
 {
 	public DateTime timeStamp;
 
+	public object oldData;
+	public object newData;
 	public T oldVal;
 	public T newVal;
-	public Action<T> setter;
+	public Action<T, object> setter;
 	public string valueName;
 
-	public ValueChangeAction(T oldVal, T newVal, Action<T> setter, DateTime timeStamp, string valueName)
+	public ValueChangeAction(T oldVal, T newVal, Action<T, object> setter, DateTime timeStamp, string valueName)
 	{
 		this.oldVal = oldVal;
 		this.newVal = newVal;
@@ -53,14 +56,16 @@ public class ValueChangeAction<T> : IValueChangeAction
 		return timeStamp;
 	}
 
+	public bool IsChange { get { return !newVal.Equals(oldVal); } }
+
 	public void Do()
 	{
-		setter(newVal);
+		setter(newVal, newData);
 	}
 
 	public void Undo()
 	{
-		setter(oldVal);
+		setter(oldVal, oldData);
 	}
 
 	public override string ToString()
@@ -151,7 +156,7 @@ public class UndoRedoManager : NotifyPropertyChanged
 
 				if ((DateTime.Now - value.GetTimeStamp()).TotalMilliseconds > 300)
 				{
-					if (value.newVal != value.oldVal) ApplyDoUndo(delegate { value.Do(); }, delegate { value.Undo(); }, value.ToString());
+					if (value.IsChange) ApplyDoUndo(delegate { value.Do(); }, delegate { value.Undo(); }, value.ToString());
 					ValueChangeDict.Remove(entry.Key);
 				}
 			}
@@ -184,13 +189,15 @@ public class UndoRedoManager : NotifyPropertyChanged
 		});
 	}
 
-	public void DoValueChange<T>(object keyObj, T prevValue, T newValue, Action<T> setter, string valueName)
+	public void DoValueChange<T>(object keyObj, T prevValue, object prevData, T newValue, object newData, Action<T, object> setter, string valueName)
 	{
 		ValueChangeAction<T> desc = null;
 
 		if (enableUndoRedo != 0)
 		{
 			desc = new ValueChangeAction<T>(prevValue, newValue, setter, DateTime.Now, valueName);
+			desc.oldData = prevData;
+			desc.newData = newData;
 			desc.Do();
 			return;
 		}
@@ -201,11 +208,14 @@ public class UndoRedoManager : NotifyPropertyChanged
 		{
 			desc = ValueChangeDict[key] as ValueChangeAction<T>;
 			desc.newVal = newValue;
+			desc.newData = newData;
 			desc.timeStamp = DateTime.Now;
 		}
 		else
 		{
 			desc = new ValueChangeAction<T>(prevValue, newValue, setter, DateTime.Now, valueName);
+			desc.oldData = prevData;
+			desc.newData = newData;
 			ValueChangeDict[key] = desc;
 		}
 

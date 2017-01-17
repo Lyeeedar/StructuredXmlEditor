@@ -20,6 +20,42 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public override string Value
+		{
+			get { return m_value; }
+			set
+			{
+				if (!value.Equals(m_value))
+				{
+					UndoRedo.DoValueChange<string>(this, m_value, LastZeroPoint, value, ZeroPoint, (val, data) =>
+					{
+						if (m_value == null || !m_value.Equals(val))
+						{
+							m_value = val;
+							ZeroPoint = (IntPoint)data;
+
+							RaisePropertyChangedEvent("Value");
+							RaisePropertyChangedEvent("Description");
+						}
+					}, Definition.Name);
+				}
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		private IntPoint LastZeroPoint;
+		public IntPoint ZeroPoint
+		{
+			get { return m_zeroPoint; }
+			set
+			{
+				LastZeroPoint = m_zeroPoint;
+				m_zeroPoint = value;
+			}
+		}
+		private IntPoint m_zeroPoint = new IntPoint(0, 0);
+
+		//-----------------------------------------------------------------------
 		public Command<object> EditCMD { get { return new Command<object>((e) => Grid.Selected = this); } }
 
 		//-----------------------------------------------------------------------

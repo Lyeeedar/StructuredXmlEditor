@@ -16,14 +16,14 @@ namespace StructuredXmlEditor.Data
 		public override bool IsPrimitive { get { return true; } }
 
 		//-----------------------------------------------------------------------
-		public T Value
+		public virtual T Value
 		{
 			get { return m_value; }
 			set
 			{
 				if (!value.Equals(m_value))
 				{
-					UndoRedo.DoValueChange<T>(this, m_value, value, (val) =>
+					UndoRedo.DoValueChange<T>(this, m_value, null, value, null, (val, data) =>
 					{
 						if (m_value == null || !m_value.Equals(val))
 						{
@@ -35,7 +35,7 @@ namespace StructuredXmlEditor.Data
 				}
 			}
 		}
-		private T m_value;
+		protected T m_value;
 
 		//-----------------------------------------------------------------------
 		public override string Description

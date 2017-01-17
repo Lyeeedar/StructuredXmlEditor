@@ -48,7 +48,7 @@ namespace StructuredXmlEditor.Data
 			{
 				if (m_x != value)
 				{
-					UndoRedo.DoValueChange<double>(this, m_x, value, (val) =>
+					UndoRedo.DoValueChange<double>(this, m_x, null, value, null, (val, data) =>
 					{
 						m_x = val;
 						RaisePropertyChangedEvent("X");
@@ -66,7 +66,7 @@ namespace StructuredXmlEditor.Data
 			{
 				if (m_y != value)
 				{
-					UndoRedo.DoValueChange<double>(this, m_y, value, (val) =>
+					UndoRedo.DoValueChange<double>(this, m_y, null, value, null, (val, data) =>
 					{
 						m_y = val;
 						RaisePropertyChangedEvent("Y");

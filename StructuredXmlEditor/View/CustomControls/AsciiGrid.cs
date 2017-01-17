@@ -1,6 +1,7 @@
 ﻿using StructuredXmlEditor.Data;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -48,7 +49,7 @@ namespace StructuredXmlEditor.View
 
 		//-----------------------------------------------------------------------
 		private char[,] Grid { get; set; }
-		private IntPoint ZeroPoint { get; set; } = new IntPoint(0, 0);
+		private IntPoint ZeroPoint { get { return Item.ZeroPoint; } set { Item.ZeroPoint = value; } }
 
 		//-----------------------------------------------------------------------
 		private int GridWidth { get { return Grid?.GetLength(0) ?? 0; } }
@@ -74,6 +75,7 @@ namespace StructuredXmlEditor.View
 					newItem.PropertyChanged += OnPropertyChange;
 
 					UpdateGrid();
+					ZoomToBestFit();
 				}
 
 				InvalidateVisual();
@@ -104,6 +106,8 @@ namespace StructuredXmlEditor.View
 		private void UpdateGrid()
 		{
 			var lines = Item.Value.Split('\n');
+			if (lines.Last() == "") lines = lines.Take(lines.Length - 1).ToArray();
+
 			var width = lines[0].Length;
 			var height = lines.Length;
 
@@ -113,13 +117,38 @@ namespace StructuredXmlEditor.View
 			{
 				for (int y = 0; y < GridHeight; y++)
 				{
-					Grid[x, y] = lines[y][x];
+					var line = lines[y];
+					if (line.Length > x)
+					{
+						Grid[x, y] = line[x];
+					}
+					else
+					{
+						Grid[x, y] = ' ';
+					}
 				}
 			}
 
-			ZoomToBestFit();
-
 			m_dirty = true;
+		}
+
+		//-----------------------------------------------------------------------
+		private void UpdateSrcGrid()
+		{
+			var value = "";
+
+			for (int y = 0; y < GridHeight; y++)
+				
+			{
+				for (int x = 0; x < GridWidth; x++)
+				{
+					value += Grid[x, y];
+				}
+
+				value += "\n";
+			}
+
+			Item.Value = value;
 		}
 
 		//-----------------------------------------------------------------------
@@ -182,13 +211,80 @@ namespace StructuredXmlEditor.View
 				Grid = newGrid;
 			}
 
+			UpdateSrcGrid();
+
 			m_dirty = true;
 		}
 
 		//-----------------------------------------------------------------------
-		private void OnPropertyChange(object sender, EventArgs args)
+		private void Delete(IntPoint point)
 		{
-			m_dirty = true;
+			var bounds = new Int32Rect(-ZeroPoint.X, -ZeroPoint.Y, GridWidth, GridHeight);
+
+			if (point.X >= bounds.X && point.Y >= bounds.Y && point.X < bounds.X + bounds.Width && point.Y < bounds.Y + bounds.Height)
+			{
+				// only delete when in bounds
+
+				Grid[point.X + ZeroPoint.X, point.Y + ZeroPoint.Y] = ' ';
+
+				// check if we need to remove any
+				IntPoint min = new IntPoint(int.MaxValue, int.MaxValue);
+				IntPoint max = new IntPoint(0, 0);
+
+				for (int x = 0; x < GridWidth; x++)
+				{
+					for (int y = 0; y < GridHeight; y++)
+					{
+						if (Grid[x, y] != ' ')
+						{
+							if (x < min.X) min = new IntPoint(x, min.Y);
+							if (y < min.Y) min = new IntPoint(min.X, y);
+							if (x > max.X) max = new IntPoint(x, max.Y);
+							if (y > max.Y) max = new IntPoint(max.X, y);
+						}
+					}
+				}
+
+				if (min.X != 0 || min.Y != 0)
+				{
+					// move zero point
+					ZeroPoint = new IntPoint(ZeroPoint.X - min.X, ZeroPoint.Y - min.Y);
+
+					var newGrid = new char[(max.X - min.X)+1, (max.Y - min.Y)+1];
+					for (int x = 0; x < newGrid.GetLength(0); x++)
+					{
+						for (int y = 0; y < newGrid.GetLength(1); y++)
+						{
+							newGrid[x, y] = Grid[x + min.X, y + min.Y];
+						}
+					}
+
+					Grid = newGrid;
+				}
+				else if (max.X != GridWidth || max.Y != GridHeight)
+				{
+					// shave off edge
+					var newGrid = new char[(max.X - min.X)+1, (max.Y - min.Y)+1];
+					for (int x = 0; x < newGrid.GetLength(0); x++)
+					{
+						for (int y = 0; y < newGrid.GetLength(1); y++)
+						{
+							newGrid[x, y] = Grid[x, y];
+						}
+					}
+
+					Grid = newGrid;
+				}
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		private void OnPropertyChange(object sender, PropertyChangedEventArgs args)
+		{
+			if (args.PropertyName == "Value")
+			{
+				UpdateGrid();
+			}
 		}
 
 		//-----------------------------------------------------------------------
@@ -244,16 +340,14 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		protected override void OnMouseWheel(MouseWheelEventArgs e)
 		{
-			var mousePos = e.GetPosition(this);
+			var pos = e.GetPosition(this);
 
-			var storedPos = new Point(mousePos.X / (double)PixelsATile, mousePos.Y / (double)PixelsATile);
+			var local = new Point((pos.X + ViewPos.X) / PixelsATile, (pos.Y + ViewPos.Y) / PixelsATile);
 
 			PixelsATile += (e.Delta / 120);
 			if (PixelsATile < 5) PixelsATile = 5;
 
-			var restoredPos = new Point(mousePos.X - storedPos.X * (double)PixelsATile, mousePos.Y - storedPos.Y * (double)PixelsATile);
-
-			ViewPos = new Point(ViewPos.X - restoredPos.X, ViewPos.Y + restoredPos.Y);
+			ViewPos = new Point(local.X * PixelsATile - pos.X, local.Y * PixelsATile - pos.Y);
 
 			InvalidateVisual();
 
@@ -274,6 +368,22 @@ namespace StructuredXmlEditor.View
 			}
 
 			Keyboard.Focus(this);
+		}
+
+		//-----------------------------------------------------------------------
+		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+		{
+			base.OnMouseLeftButtonDown(e);
+
+			var pos = e.GetPosition(this);
+
+			var local = new Point((pos.X + ViewPos.X) / PixelsATile, (pos.Y + ViewPos.Y) / PixelsATile);
+			var roundedX = local.X < 0 ? (int)Math.Floor(local.X) : (int)local.X;
+			var roundedY = local.Y < 0 ? (int)Math.Floor(local.Y) : (int)local.Y;
+
+			Selected = new IntPoint(roundedX, roundedY);
+
+			m_dirty = true;
 		}
 
 		//-----------------------------------------------------------------------
@@ -370,7 +480,11 @@ namespace StructuredXmlEditor.View
 			}
 			else if (e.Key == Key.Delete)
 			{
+				Delete(Selected);
 
+				UpdateSrcGrid();
+
+				Selected = new IntPoint(Selected.X + 1, Selected.Y);
 			}
 			else
 			{
@@ -384,7 +498,28 @@ namespace StructuredXmlEditor.View
 
 					Grid[Selected.X+ZeroPoint.X, Selected.Y+ZeroPoint.Y] = key;
 					Selected = new IntPoint(Selected.X + 1, Selected.Y);
+
+					UpdateSrcGrid();
 				}
+			}
+
+			var viewPos = new Point(Selected.X * PixelsATile - ViewPos.X, Selected.Y * PixelsATile - ViewPos.Y);
+			if (viewPos.X < 0)
+			{
+				ViewPos = new Point(ViewPos.X - PixelsATile, ViewPos.Y);
+			}
+			else if (viewPos.X+PixelsATile > ActualWidth)
+			{
+				ViewPos = new Point(ViewPos.X + PixelsATile, ViewPos.Y);
+			}
+
+			if (viewPos.Y < 0)
+			{
+				ViewPos = new Point(ViewPos.X, ViewPos.Y - PixelsATile);
+			}
+			else if (viewPos.Y + PixelsATile > ActualHeight)
+			{
+				ViewPos = new Point(ViewPos.X, ViewPos.Y + PixelsATile);
 			}
 
 			m_dirty = true;
@@ -433,7 +568,7 @@ namespace StructuredXmlEditor.View
 		Timer redrawTimer;
 	}
 
-	struct IntPoint
+	public struct IntPoint
 	{
 		public int X { get; set; }
 		public int Y { get; set; }
