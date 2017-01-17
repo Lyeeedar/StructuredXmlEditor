@@ -1,4 +1,5 @@
 ﻿using StructuredXmlEditor.Definition;
+using StructuredXmlEditor.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,10 @@ namespace StructuredXmlEditor.Data
 			}
 		}
 
+		//-----------------------------------------------------------------------
+		public Command<object> EditCMD { get { return new Command<object>((e) => Grid.Selected = this); } }
+
+		//-----------------------------------------------------------------------
 		public MultilineStringItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
 

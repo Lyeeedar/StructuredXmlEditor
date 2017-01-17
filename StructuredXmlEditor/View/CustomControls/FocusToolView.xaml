@@ -6,11 +6,11 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:data="clr-namespace:StructuredXmlEditor.Data"
 	xmlns:v="clr-namespace:StructuredXmlEditor.View">
-	<Grid>
+	<Grid x:Name="Root">
 
 		<v:DataGridView
 			Visibility="{Binding Workspace.Current.Data.IsSelectedDataItem, Converter={v:ValueTypeConverter}}"
-			HierarchicalItemsSource="{Binding Workspace.Current.Data.Selected}">
+			HierarchicalItemsSource="{Binding Workspace.Current.Data.SelectedItems}">
 			<v:DataGridView.ItemContainerStyle>
 				<Style
 					TargetType="{x:Type v:DataGridViewItem}"
@@ -24,6 +24,12 @@
 				</Style>
 			</v:DataGridView.ItemContainerStyle>
 		</v:DataGridView>
+
+		<v:AsciiGrid
+			Visibility="{Binding DataContext.Workspace.Current.Data.IsSelectedAsciiGrid, Converter={v:ValueTypeConverter}, ConverterParameter=Yo, ElementName=Root, FallbackValue=Collapsed}"
+			DataContext="{Binding Workspace.Current.Data.Selected}">
+
+		</v:AsciiGrid>
 
 	</Grid>
 </UserControl>

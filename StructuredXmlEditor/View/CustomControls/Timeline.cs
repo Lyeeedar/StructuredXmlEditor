@@ -426,6 +426,7 @@ namespace StructuredXmlEditor.View
 					if (Math.Abs(diff) > SystemParameters.MinimumHorizontalDragDistance)
 					{
 						CaptureMouse();
+						Mouse.OverrideCursor = Cursors.ScrollWE;
 					}
 
 					panPos = pos.X;
@@ -616,6 +617,8 @@ namespace StructuredXmlEditor.View
 			isPanning = false;
 
 			ReleaseMouseCapture();
+
+			Mouse.OverrideCursor = null;
 
 			if (wasDragging)
 			{

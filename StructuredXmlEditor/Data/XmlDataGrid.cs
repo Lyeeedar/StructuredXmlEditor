@@ -120,13 +120,21 @@ namespace StructuredXmlEditor.Data
 				{
 					m_selected = value;
 					RaisePropertyChangedEvent();
+					RaisePropertyChangedEvent("SelectedItems");
 					RaisePropertyChangedEvent("IsSelectedDataItem");
+					RaisePropertyChangedEvent("IsSelectedAsciiGrid");
 				}
 			}
 		}
 		private object m_selected;
 
-		public bool IsSelectedDataItem { get { return Selected is List<DataItem>; } }
+		public List<DataItem> SelectedItems
+		{
+			get { return Selected as List<DataItem>; }
+		}
+
+		public bool IsSelectedDataItem { get { return SelectedItems != null; } }
+		public bool IsSelectedAsciiGrid { get { return Selected is MultilineStringItem; } }
 
 		//-----------------------------------------------------------------------
 		public IEnumerable<GraphNode> GraphNodes
