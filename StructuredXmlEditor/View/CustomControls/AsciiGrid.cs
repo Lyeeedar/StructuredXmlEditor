@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -47,10 +48,14 @@ namespace StructuredXmlEditor.View
 
 		//-----------------------------------------------------------------------
 		private char[,] Grid { get; set; }
+		private IntPoint ZeroPoint { get; set; } = new IntPoint(0, 0);
 
 		//-----------------------------------------------------------------------
 		private int GridWidth { get { return Grid?.GetLength(0) ?? 0; } }
 		private int GridHeight { get { return Grid?.GetLength(1) ?? 0; } }
+
+		//-----------------------------------------------------------------------
+		private IntPoint Selected { get; set; } = new IntPoint(0, 0);
 
 		//-----------------------------------------------------------------------
 		public AsciiGrid()
@@ -85,6 +90,8 @@ namespace StructuredXmlEditor.View
 				}
 			};
 			redrawTimer.Start();
+
+			Focusable = true;
 		}
 
 		//-----------------------------------------------------------------------
@@ -116,6 +123,69 @@ namespace StructuredXmlEditor.View
 		}
 
 		//-----------------------------------------------------------------------
+		private void ResizeGrid(IntPoint point)
+		{
+			var bounds = new Int32Rect(-ZeroPoint.X, -ZeroPoint.Y, GridWidth, GridHeight);
+
+			if (point.X >= bounds.X && point.Y >= bounds.Y && point.X < bounds.X+bounds.Width && point.Y < bounds.Y+bounds.Height)
+			{
+				// in bounds, do nothing
+				return;
+			}
+
+			var min = new IntPoint(Math.Min(point.X, bounds.X), Math.Min(point.Y, bounds.Y));
+			var max = new IntPoint(Math.Max(point.X+1, bounds.X+bounds.Width), Math.Max(point.Y+1, bounds.Y+bounds.Height));
+
+			if (min.X < bounds.X || min.Y < bounds.Y)
+			{
+				// move zero point
+				ZeroPoint = new IntPoint(ZeroPoint.X + (bounds.X - min.X), ZeroPoint.Y + (bounds.Y - min.Y));
+
+				var newGrid = new char[max.X - min.X, max.Y - min.Y];
+				for (int x = 0; x < newGrid.GetLength(0); x++)
+				{
+					for (int y = 0; y < newGrid.GetLength(1); y++)
+					{
+						newGrid[x, y] = ' ';
+					}
+				}
+
+				for (int x = 0; x < GridWidth; x++)
+				{
+					for (int y = 0; y < GridHeight; y++)
+					{
+						newGrid[(bounds.X - min.X) + x, (bounds.Y - min.Y) + y] = Grid[x, y];
+					}
+				}
+
+				Grid = newGrid;
+			}
+			else
+			{
+				var newGrid = new char[max.X - min.X, max.Y - min.Y];
+				for (int x = 0; x < newGrid.GetLength(0); x++)
+				{
+					for (int y = 0; y < newGrid.GetLength(1); y++)
+					{
+						newGrid[x, y] = ' ';
+					}
+				}
+
+				for (int x = 0; x < GridWidth; x++)
+				{
+					for (int y = 0; y < GridHeight; y++)
+					{
+						newGrid[x, y] = Grid[x, y];
+					}
+				}
+
+				Grid = newGrid;
+			}
+
+			m_dirty = true;
+		}
+
+		//-----------------------------------------------------------------------
 		private void OnPropertyChange(object sender, EventArgs args)
 		{
 			m_dirty = true;
@@ -131,7 +201,7 @@ namespace StructuredXmlEditor.View
 			drawingContext.DrawRectangle(BackgroundBrush, null, new System.Windows.Rect(0, 0, ActualWidth, ActualHeight));
 
 			// draw used area
-			drawingContext.DrawRectangle(UsedAreaBrush, null, new System.Windows.Rect(-ViewPos.X, -ViewPos.Y, GridWidth * PixelsATile, GridHeight * PixelsATile));
+			drawingContext.DrawRectangle(UsedAreaBrush, null, new System.Windows.Rect(-ViewPos.X - (ZeroPoint.X * PixelsATile), -ViewPos.Y - (ZeroPoint.Y * PixelsATile), GridWidth * PixelsATile, GridHeight * PixelsATile));
 
 			// draw grid lines
 			var startX = (Math.Floor(ViewPos.X / PixelsATile) * PixelsATile) - ViewPos.X;
@@ -139,6 +209,9 @@ namespace StructuredXmlEditor.View
 
 			var gridPen = new Pen(GridBrush, 1);
 			gridPen.Freeze();
+
+			var selectedPen = new Pen(SelectedBrush, 1);
+			selectedPen.Freeze();
 
 			Typeface typeface = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
 
@@ -158,12 +231,14 @@ namespace StructuredXmlEditor.View
 				for (int y = 0; y < GridHeight; y++)
 				{
 					FormattedText text = new FormattedText(Grid[x, y].ToString(), CultureInfo.InvariantCulture, FlowDirection.LeftToRight, typeface, PixelsATile, FontBrush);
-					Point centerPoint = new Point(x * PixelsATile + PixelsATile / 2 - ViewPos.X, y * PixelsATile - PixelsATile / 4 - ViewPos.Y);
+					Point centerPoint = new Point((x-ZeroPoint.X) * PixelsATile + PixelsATile / 2 - ViewPos.X, (y-ZeroPoint.Y) * PixelsATile - PixelsATile / 4 - ViewPos.Y);
 					Point textLocation = new Point(centerPoint.X - text.WidthIncludingTrailingWhitespace / 2, centerPoint.Y);
 
 					drawingContext.DrawText(text, textLocation);
 				}
 			}
+
+			drawingContext.DrawRectangle(null, selectedPen, new Rect(Selected.X * PixelsATile - ViewPos.X, Selected.Y * PixelsATile - ViewPos.Y, PixelsATile, PixelsATile));
 		}
 
 		//-----------------------------------------------------------------------
@@ -197,6 +272,8 @@ namespace StructuredXmlEditor.View
 				panPos = pos;
 				isPanning = true;
 			}
+
+			Keyboard.Focus(this);
 		}
 
 		//-----------------------------------------------------------------------
@@ -271,11 +348,100 @@ namespace StructuredXmlEditor.View
 		}
 
 		//-----------------------------------------------------------------------
+		protected override void OnKeyDown(KeyEventArgs e)
+		{
+			base.OnKeyDown(e);
+
+			if (e.Key == Key.Left)
+			{
+				Selected = new IntPoint(Selected.X-1, Selected.Y);
+			}
+			else if (e.Key == Key.Up)
+			{
+				Selected = new IntPoint(Selected.X, Selected.Y - 1);
+			}
+			else if (e.Key == Key.Right)
+			{
+				Selected = new IntPoint(Selected.X + 1, Selected.Y);
+			}
+			else if (e.Key == Key.Down)
+			{
+				Selected = new IntPoint(Selected.X, Selected.Y + 1);
+			}
+			else if (e.Key == Key.Delete)
+			{
+
+			}
+			else
+			{
+				string rawResult = KeyCodeToUnicode(e.Key);
+
+				if (!string.IsNullOrWhiteSpace(rawResult))
+				{
+					char key = rawResult.FirstOrDefault();
+
+					ResizeGrid(Selected);
+
+					Grid[Selected.X+ZeroPoint.X, Selected.Y+ZeroPoint.Y] = key;
+					Selected = new IntPoint(Selected.X + 1, Selected.Y);
+				}
+			}
+
+			m_dirty = true;
+		}
+
+		//-----------------------------------------------------------------------
+		public string KeyCodeToUnicode(Key key)
+		{
+			byte[] keyboardState = new byte[255];
+			bool keyboardStateStatus = GetKeyboardState(keyboardState);
+
+			if (!keyboardStateStatus)
+			{
+				return "";
+			}
+
+			uint virtualKeyCode = (uint)KeyInterop.VirtualKeyFromKey(key);
+			uint scanCode = MapVirtualKey(virtualKeyCode, 0);
+			IntPtr inputLocaleIdentifier = GetKeyboardLayout(0);
+
+			StringBuilder result = new StringBuilder();
+			ToUnicodeEx(virtualKeyCode, scanCode, keyboardState, result, (int)5, (uint)0, inputLocaleIdentifier);
+
+			return result.ToString();
+		}
+
+		//-----------------------------------------------------------------------
+		[DllImport("user32.dll")]
+		static extern bool GetKeyboardState(byte[] lpKeyState);
+
+		[DllImport("user32.dll")]
+		static extern uint MapVirtualKey(uint uCode, uint uMapType);
+
+		[DllImport("user32.dll")]
+		static extern IntPtr GetKeyboardLayout(uint idThread);
+
+		[DllImport("user32.dll")]
+		static extern int ToUnicodeEx(uint wVirtKey, uint wScanCode, byte[] lpKeyState, [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pwszBuff, int cchBuff, uint wFlags, IntPtr dwhkl);
+
+		//-----------------------------------------------------------------------
 		Point startPos;
 		Point panPos;
 		bool isDragging = false;
 		bool isPanning = false;
 		private bool m_dirty;
 		Timer redrawTimer;
+	}
+
+	struct IntPoint
+	{
+		public int X { get; set; }
+		public int Y { get; set; }
+
+		public IntPoint(int x, int y)
+		{
+			this.X = x;
+			this.Y = y;
+		}
 	}
 }
