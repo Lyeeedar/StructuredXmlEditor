@@ -151,7 +151,7 @@ public class UndoRedoManager : NotifyPropertyChanged
 
 				if ((DateTime.Now - value.GetTimeStamp()).TotalMilliseconds > 300)
 				{
-					ApplyDoUndo(delegate { value.Do(); }, delegate { value.Undo(); }, value.ToString());
+					if (value.newVal != value.oldVal) ApplyDoUndo(delegate { value.Do(); }, delegate { value.Undo(); }, value.ToString());
 					ValueChangeDict.Remove(entry.Key);
 				}
 			}
