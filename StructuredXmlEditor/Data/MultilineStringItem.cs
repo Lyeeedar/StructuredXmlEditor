@@ -45,7 +45,7 @@ namespace StructuredXmlEditor.Data
 
 		//-----------------------------------------------------------------------
 		private IntPoint LastZeroPoint;
-		private bool consumedLastZeroPoint;
+		private bool consumedLastZeroPoint = true;
 		public IntPoint ZeroPoint
 		{
 			get { return m_zeroPoint; }
