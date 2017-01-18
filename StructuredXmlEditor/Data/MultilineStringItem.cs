@@ -38,18 +38,25 @@ namespace StructuredXmlEditor.Data
 							RaisePropertyChangedEvent("Description");
 						}
 					}, Definition.Name);
+					consumedLastZeroPoint = true;
 				}
 			}
 		}
 
 		//-----------------------------------------------------------------------
 		private IntPoint LastZeroPoint;
+		private bool consumedLastZeroPoint;
 		public IntPoint ZeroPoint
 		{
 			get { return m_zeroPoint; }
 			set
 			{
-				LastZeroPoint = m_zeroPoint;
+				if (consumedLastZeroPoint)
+				{
+					LastZeroPoint = m_zeroPoint;
+					consumedLastZeroPoint = false;
+				}
+
 				m_zeroPoint = value;
 			}
 		}

@@ -25,11 +25,41 @@
 			</v:DataGridView.ItemContainerStyle>
 		</v:DataGridView>
 
-		<v:AsciiGrid
-			Visibility="{Binding DataContext.Workspace.Current.Data.IsSelectedAsciiGrid, Converter={v:ValueTypeConverter}, ConverterParameter=Yo, ElementName=Root, FallbackValue=Collapsed}"
+		<Grid
+			Visibility="{Binding DataContext.Workspace.Current.Data.IsSelectedAsciiGrid, Converter={v:ValueTypeConverter}, ElementName=Root, FallbackValue=Collapsed}"
 			DataContext="{Binding Workspace.Current.Data.Selected}">
 
-		</v:AsciiGrid>
+			<Grid.RowDefinitions>
+				<RowDefinition
+					Height="Auto" />
+				<RowDefinition
+					Height="*" />
+				<RowDefinition
+					Height="Auto" />
+			</Grid.RowDefinitions>
 
+			<DockPanel
+				LastChildFill="False">
+				<ToggleButton
+					DockPanel.Dock="Left"
+					IsChecked="{Binding MagicWandMode, ElementName=AsciiGrid}"
+					ToolTip="Magic wand mode"
+					Content="I" />
+				<ToggleButton
+					DockPanel.Dock="Left"
+					IsChecked="{Binding Continuous, ElementName=AsciiGrid}"
+					IsEnabled="{Binding MagicWandMode, ElementName=AsciiGrid}"
+					ToolTip="Whether magic wand mode should select continous blocks or not"
+					Content="C" />
+			</DockPanel>
+			
+			<v:AsciiGrid
+				x:Name="AsciiGrid"
+				Grid.Row="1" />
+
+			<TextBlock
+				Grid.Row="2"
+				Text="{Binding InfoText, ElementName=AsciiGrid}" />
+		</Grid>
 	</Grid>
 </UserControl>
