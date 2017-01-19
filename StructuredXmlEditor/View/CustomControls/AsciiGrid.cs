@@ -40,6 +40,12 @@ namespace StructuredXmlEditor.View
 		protected Brush SelectedBrush { get { return (Application.Current.TryFindResource("SelectionBorderBrush") as SolidColorBrush); } }
 
 		//-----------------------------------------------------------------------
+		protected Color SelectedColour { get { return (Color)(Application.Current.TryFindResource("SelectionBorderColour")); } }
+
+		//-----------------------------------------------------------------------
+		protected Brush SelectionBackgroundBrush { get { return new SolidColorBrush(Color.FromScRgb(0.1f, SelectedColour.ScR, SelectedColour.ScG, SelectedColour.ScB)); } }
+
+		//-----------------------------------------------------------------------
 		protected Brush UnselectedBrush { get { return (Application.Current.TryFindResource("BorderLightBrush") as SolidColorBrush); } }
 
 		//-----------------------------------------------------------------------
@@ -72,6 +78,37 @@ namespace StructuredXmlEditor.View
 		private string m_infoText = "";
 
 		//-----------------------------------------------------------------------
+		public string ModeString
+		{
+			get
+			{
+				if (NormalMode) return "Mode: Normal";
+				if (MagicWandMode) return "Mode: MagicWand";
+				if (DrawMode) return "Mode: Draw";
+				return "Mode: ???";
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public bool NormalMode
+		{
+			get { return m_normalMode; }
+			set
+			{
+				m_normalMode = value;
+				RaisePropertyChangedEvent();
+				RaisePropertyChangedEvent("ModeString");
+
+				if (value)
+				{
+					MagicWandMode = false;
+					DrawMode = false;
+				}
+			}
+		}
+		private bool m_normalMode = true;
+
+		//-----------------------------------------------------------------------
 		public bool MagicWandMode
 		{
 			get { return m_magicWandMode; }
@@ -79,6 +116,13 @@ namespace StructuredXmlEditor.View
 			{
 				m_magicWandMode = value;
 				RaisePropertyChangedEvent();
+				RaisePropertyChangedEvent("ModeString");
+
+				if (value)
+				{
+					NormalMode = false;
+					DrawMode = false;
+				}
 			}
 		}
 		private bool m_magicWandMode;
@@ -102,9 +146,13 @@ namespace StructuredXmlEditor.View
 			{
 				m_drawMode = value;
 				RaisePropertyChangedEvent();
+				RaisePropertyChangedEvent("ModeString");
 
 				if (value)
 				{
+					NormalMode = false;
+					MagicWandMode = false;
+
 					Selected.Clear();
 					m_dirty = true;
 				}
@@ -446,6 +494,41 @@ namespace StructuredXmlEditor.View
 				drawingContext.DrawLine(gridPen, new Point(0, y), new Point(ActualWidth, y));
 			}
 
+			var usedTiles = new HashSet<int>();
+			foreach (var point in Selected)
+			{
+				usedTiles.Add(point.FastHash);
+			}
+
+			foreach (var point in Selected)
+			{
+				var x = point.X * PixelsATile - ViewPos.X;
+				var y = point.Y * PixelsATile - ViewPos.Y;
+
+				if (!usedTiles.Contains(point.Offset(0, -1).FastHash))
+				{
+					// draw top
+					drawingContext.DrawLine(selectedPen, new Point(x, y), new Point(x + PixelsATile, y));
+				}
+				if (!usedTiles.Contains(point.Offset(0, 1).FastHash))
+				{
+					// draw bottom
+					drawingContext.DrawLine(selectedPen, new Point(x, y + PixelsATile), new Point(x + PixelsATile, y + PixelsATile));
+				}
+				if (!usedTiles.Contains(point.Offset(-1, 0).FastHash))
+				{
+					// draw left
+					drawingContext.DrawLine(selectedPen, new Point(x, y), new Point(x, y + PixelsATile));
+				}
+				if (!usedTiles.Contains(point.Offset(1, 0).FastHash))
+				{
+					// draw right
+					drawingContext.DrawLine(selectedPen, new Point(x + PixelsATile, y), new Point(x + PixelsATile, y + PixelsATile));
+				}
+
+				drawingContext.DrawRectangle(SelectionBackgroundBrush, null, new Rect(x, y, PixelsATile, PixelsATile));
+			}
+
 			// draw characters
 			for (int x = 0; x < GridWidth; x++)
 			{
@@ -457,11 +540,6 @@ namespace StructuredXmlEditor.View
 
 					drawingContext.DrawText(text, textLocation);
 				}
-			}
-
-			foreach (var point in Selected)
-			{
-				drawingContext.DrawRectangle(null, selectedPen, new Rect(point.X * PixelsATile - ViewPos.X, point.Y * PixelsATile - ViewPos.Y, PixelsATile, PixelsATile));
 			}
 		}
 
@@ -1075,5 +1153,12 @@ namespace StructuredXmlEditor.View
 			this.X = x;
 			this.Y = y;
 		}
+
+		public IntPoint Offset(int x, int y)
+		{
+			return new IntPoint(X + x, Y + y);
+		}
+
+		public int FastHash { get { return X * 100000 + Y; } }
 	}
 }
