@@ -95,6 +95,36 @@ namespace StructuredXmlEditor.View
 		private bool m_continuous = false;
 
 		//-----------------------------------------------------------------------
+		public bool DrawMode
+		{
+			get { return m_drawMode; }
+			set
+			{
+				m_drawMode = value;
+				RaisePropertyChangedEvent();
+
+				if (value)
+				{
+					Selected.Clear();
+					m_dirty = true;
+				}
+			}
+		}
+		private bool m_drawMode;
+
+		//-----------------------------------------------------------------------
+		public char ActiveChar
+		{
+			get { return m_activeChar; }
+			set
+			{
+				m_activeChar = value;
+				RaisePropertyChangedEvent();
+			}
+		}
+		private char m_activeChar = ' ';
+
+		//-----------------------------------------------------------------------
 		public AsciiGrid()
 		{
 			DataContextChanged += (e, args) =>
@@ -156,6 +186,7 @@ namespace StructuredXmlEditor.View
 				Selected.Clear();
 				UpdateGrid();
 				ZoomToBestFit();
+				Item.ResetZeroPoint();
 			}
 		}
 
@@ -498,6 +529,8 @@ namespace StructuredXmlEditor.View
 		{
 			base.OnMouseLeftButtonDown(args);
 
+			Keyboard.Focus(this);
+
 			var pos = args.GetPosition(this);
 
 			var local = new Point((pos.X + ViewPos.X) / PixelsATile, (pos.Y + ViewPos.Y) / PixelsATile);
@@ -505,9 +538,26 @@ namespace StructuredXmlEditor.View
 			var roundedY = local.Y < 0 ? (int)Math.Floor(local.Y) : (int)local.Y;
 
 			startPos = new IntPoint(roundedX, roundedY);
-			marqueeStart = pos;
 
-			if (MagicWandMode)
+			if (DrawMode)
+			{
+				if (ActiveChar == ' ')
+				{
+					Delete(new IntPoint(roundedX, roundedY));
+
+					ContractGrid();
+					UpdateSrcGrid();
+				}
+				else
+				{
+					ExpandGrid(new IntPoint(roundedX, roundedY));
+
+					Grid[roundedX + ZeroPoint.X, roundedY + ZeroPoint.Y] = ActiveChar;
+
+					UpdateSrcGrid();
+				}
+			}
+			else if (MagicWandMode)
 			{
 				Selected.Clear();
 
@@ -555,7 +605,7 @@ namespace StructuredXmlEditor.View
 					}
 				}
 
-
+				marqueeStart = pos;
 				isMarqueeSelecting = true;
 			}
 
@@ -565,6 +615,8 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
+			Keyboard.Focus(this);
+
 			if (e.LeftButton != MouseButtonState.Pressed && e.MiddleButton != MouseButtonState.Pressed)
 			{
 				EndDrag();
@@ -587,30 +639,57 @@ namespace StructuredXmlEditor.View
 
 				panPos = pos;
 			}
-			else if (e.LeftButton == MouseButtonState.Pressed && isMarqueeSelecting)
+			else if (e.LeftButton == MouseButtonState.Pressed)
 			{
-				var diff = pos - marqueeStart;
-
-				if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
+				if (DrawMode)
 				{
 					var local = new Point((pos.X + ViewPos.X) / PixelsATile, (pos.Y + ViewPos.Y) / PixelsATile);
 					var roundedX = local.X < 0 ? (int)Math.Floor(local.X) : (int)local.X;
 					var roundedY = local.Y < 0 ? (int)Math.Floor(local.Y) : (int)local.Y;
 
-					Selected.Clear();
-
-					var min = new IntPoint(Math.Min(startPos.X, roundedX), Math.Min(startPos.Y, roundedY));
-					var max = new IntPoint(Math.Max(startPos.X, roundedX), Math.Max(startPos.Y, roundedY));
-
-					for (int x = min.X; x <= max.X; x++)
+					if (ActiveChar == ' ')
 					{
-						for (int y = min.Y; y <= max.Y; y++)
-						{
-							Selected.Add(new IntPoint(x, y));
-						}
+						Delete(new IntPoint(roundedX, roundedY));
+
+						ContractGrid();
+						UpdateSrcGrid();
+					}
+					else
+					{
+						ExpandGrid(new IntPoint(roundedX, roundedY));
+
+						Grid[roundedX + ZeroPoint.X, roundedY + ZeroPoint.Y] = ActiveChar;
+
+						UpdateSrcGrid();
 					}
 
 					m_dirty = true;
+				}
+				else if (isMarqueeSelecting)
+				{
+					var diff = pos - marqueeStart;
+
+					if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
+					{
+						var local = new Point((pos.X + ViewPos.X) / PixelsATile, (pos.Y + ViewPos.Y) / PixelsATile);
+						var roundedX = local.X < 0 ? (int)Math.Floor(local.X) : (int)local.X;
+						var roundedY = local.Y < 0 ? (int)Math.Floor(local.Y) : (int)local.Y;
+
+						Selected.Clear();
+
+						var min = new IntPoint(Math.Min(startPos.X, roundedX), Math.Min(startPos.Y, roundedY));
+						var max = new IntPoint(Math.Max(startPos.X, roundedX), Math.Max(startPos.Y, roundedY));
+
+						for (int x = min.X; x <= max.X; x++)
+						{
+							for (int y = min.Y; y <= max.Y; y++)
+							{
+								Selected.Add(new IntPoint(x, y));
+							}
+						}
+
+						m_dirty = true;
+					}
 				}
 			}
 
@@ -620,6 +699,8 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		protected override void OnPreviewMouseUp(MouseButtonEventArgs args)
 		{
+			Keyboard.Focus(this);
+
 			var pos = args.GetPosition(this);
 
 			isMarqueeSelecting = false;
@@ -757,6 +838,10 @@ namespace StructuredXmlEditor.View
 						}
 					}
 				}
+				else if (DrawMode)
+				{
+					ActiveChar = ' ';
+				}
 			}
 			else if (args.Key == Key.C && Keyboard.IsKeyDown(Key.LeftCtrl))
 			{
@@ -857,7 +942,11 @@ namespace StructuredXmlEditor.View
 				{
 					char key = rawResult.FirstOrDefault();
 
-					if (MagicWandMode)
+					if (DrawMode)
+					{
+						ActiveChar = key;
+					}
+					else if (MagicWandMode)
 					{
 						Selected.Clear();
 

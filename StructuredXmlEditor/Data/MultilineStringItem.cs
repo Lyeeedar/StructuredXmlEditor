@@ -61,6 +61,12 @@ namespace StructuredXmlEditor.Data
 			}
 		}
 		private IntPoint m_zeroPoint = new IntPoint(0, 0);
+		public void ResetZeroPoint()
+		{
+			consumedLastZeroPoint = true;
+			LastZeroPoint = new IntPoint(0, 0);
+			m_zeroPoint = new IntPoint(0, 0);
+		}
 
 		//-----------------------------------------------------------------------
 		public Command<object> EditCMD { get { return new Command<object>((e) => Grid.Selected = this); } }

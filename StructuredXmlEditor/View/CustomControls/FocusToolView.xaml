@@ -51,6 +51,14 @@
 					IsEnabled="{Binding MagicWandMode, ElementName=AsciiGrid}"
 					ToolTip="Whether magic wand mode should select continous blocks or not"
 					Content="C" />
+				<ToggleButton
+					DockPanel.Dock="Left"
+					IsChecked="{Binding DrawMode, ElementName=AsciiGrid}"
+					ToolTip="Draw mode"
+					Content="D" />
+				<TextBlock
+					DockPanel.Dock="Left"
+					Text="{Binding ActiveChar, ElementName=AsciiGrid}" />
 			</DockPanel>
 			
 			<v:AsciiGrid
