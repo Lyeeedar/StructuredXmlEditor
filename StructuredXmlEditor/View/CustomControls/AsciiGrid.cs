@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -13,6 +15,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace StructuredXmlEditor.View
 {
@@ -41,9 +44,6 @@ namespace StructuredXmlEditor.View
 
 		//-----------------------------------------------------------------------
 		protected Color SelectedColour { get { return (Color)(Application.Current.TryFindResource("SelectionBorderColour")); } }
-
-		//-----------------------------------------------------------------------
-		protected Brush SelectionBackgroundBrush { get { return new SolidColorBrush(Color.FromScRgb(0.1f, SelectedColour.ScR, SelectedColour.ScG, SelectedColour.ScB)); } }
 
 		//-----------------------------------------------------------------------
 		protected Brush UnselectedBrush { get { return (Application.Current.TryFindResource("BorderLightBrush") as SolidColorBrush); } }
@@ -82,9 +82,20 @@ namespace StructuredXmlEditor.View
 		{
 			get
 			{
+				if (MagicWandMode) return "Mode: Magic Wand";
 				if (NormalMode) return "Mode: Normal";
-				if (MagicWandMode) return "Mode: MagicWand";
-				if (DrawMode) return "Mode: Draw";
+
+				if (DrawMode)
+				{
+					if (Keyboard.IsKeyDown(Key.LeftAlt))
+					{
+						return "Mode: Eyedropper";
+					}
+					else
+					{
+						return "Mode: Draw";
+					}
+				}
 				return "Mode: ???";
 			}
 		}
@@ -111,7 +122,7 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		public bool MagicWandMode
 		{
-			get { return m_magicWandMode; }
+			get { return m_magicWandMode || NormalMode && Keyboard.IsKeyDown(Key.LeftAlt); }
 			set
 			{
 				m_magicWandMode = value;
@@ -127,6 +138,7 @@ namespace StructuredXmlEditor.View
 		}
 		private bool m_magicWandMode;
 
+		//-----------------------------------------------------------------------
 		public bool Continuous
 		{
 			get { return m_continuous; }
@@ -198,19 +210,35 @@ namespace StructuredXmlEditor.View
 			redrawTimer.Interval = 1.0 / 15.0;
 			redrawTimer.Elapsed += (e, args) =>
 			{
+				if (!NormalMode && !MagicWandMode && !DrawMode)
+				{
+					Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+					{
+						NormalMode = true;
+					}));
+				}
+
 				if (m_dirty)
 				{
-					Application.Current.Dispatcher.BeginInvoke(new Action(() => 
+					Application.Current.Dispatcher.BeginInvoke(new Action(() =>
 					{
 						InvalidateVisual();
 						UpdateInfoText();
+						RaisePropertyChangedEvent("ModeString");
 					}));
 					m_dirty = false;
 				}
 			};
 			redrawTimer.Start();
 
+			this.Cursor = Cursors.None;
+
 			Focusable = true;
+
+			normalImg = new BitmapImage(new Uri("pack://application:,,,/StructuredXmlEditor;component/Resources/Edit.png", UriKind.RelativeOrAbsolute));
+			magicWandImg = new BitmapImage(new Uri("pack://application:,,,/StructuredXmlEditor;component/Resources/MagicWand.png", UriKind.RelativeOrAbsolute));
+			drawImg = new BitmapImage(new Uri("pack://application:,,,/StructuredXmlEditor;component/Resources/Draw.png", UriKind.RelativeOrAbsolute));
+			eyedropperImg = new BitmapImage(new Uri("pack://application:,,,/StructuredXmlEditor;component/Resources/Eyedropper.png", UriKind.RelativeOrAbsolute));
 		}
 
 		//-----------------------------------------------------------------------
@@ -265,7 +293,7 @@ namespace StructuredXmlEditor.View
 			var width = lines.FirstOrDefault()?.Length ?? 0;
 			var height = lines.Length;
 
-			Grid = new char[width,height];
+			Grid = new char[width, height];
 
 			for (int x = 0; x < GridWidth; x++)
 			{
@@ -298,7 +326,7 @@ namespace StructuredXmlEditor.View
 					value += Grid[x, y];
 				}
 
-				if (y < GridHeight-1) value += "\n";
+				if (y < GridHeight - 1) value += "\n";
 			}
 
 			Item.Value = value;
@@ -318,14 +346,14 @@ namespace StructuredXmlEditor.View
 
 			var bounds = new Int32Rect(-ZeroPoint.X, -ZeroPoint.Y, GridWidth, GridHeight);
 
-			if (point.X >= bounds.X && point.Y >= bounds.Y && point.X < bounds.X+bounds.Width && point.Y < bounds.Y+bounds.Height)
+			if (point.X >= bounds.X && point.Y >= bounds.Y && point.X < bounds.X + bounds.Width && point.Y < bounds.Y + bounds.Height)
 			{
 				// in bounds, do nothing
 				return;
 			}
 
 			var min = new IntPoint(Math.Min(point.X, bounds.X), Math.Min(point.Y, bounds.Y));
-			var max = new IntPoint(Math.Max(point.X+1, bounds.X+bounds.Width), Math.Max(point.Y+1, bounds.Y+bounds.Height));
+			var max = new IntPoint(Math.Max(point.X + 1, bounds.X + bounds.Width), Math.Max(point.Y + 1, bounds.Y + bounds.Height));
 
 			if (min.X < bounds.X || min.Y < bounds.Y)
 			{
@@ -463,6 +491,24 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		protected override void OnRender(DrawingContext drawingContext)
 		{
+			if (selectionBackBrush == null)
+			{
+				selectionBackBrush = new SolidColorBrush(Color.FromScRgb(0.1f, SelectedColour.ScR, SelectedColour.ScG, SelectedColour.ScB));
+				selectionBackBrush.Freeze();
+			}
+
+			if (gridPen == null)
+			{
+				gridPen = new Pen(GridBrush, 1);
+				gridPen.Freeze();
+			}
+
+			if (selectedPen == null)
+			{
+				selectedPen = new Pen(SelectedBrush, 1);
+				selectedPen.Freeze();
+			}
+
 			base.OnRender(drawingContext);
 
 			drawingContext.PushClip(new RectangleGeometry(new Rect(0, 0, ActualWidth, ActualHeight)));
@@ -475,12 +521,6 @@ namespace StructuredXmlEditor.View
 			// draw grid lines
 			var startX = (Math.Floor(ViewPos.X / PixelsATile) * PixelsATile) - ViewPos.X;
 			var startY = (Math.Floor(ViewPos.Y / PixelsATile) * PixelsATile) - ViewPos.Y;
-
-			var gridPen = new Pen(GridBrush, 1);
-			gridPen.Freeze();
-
-			var selectedPen = new Pen(SelectedBrush, 1);
-			selectedPen.Freeze();
 
 			Typeface typeface = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
 
@@ -526,7 +566,7 @@ namespace StructuredXmlEditor.View
 					drawingContext.DrawLine(selectedPen, new Point(x + PixelsATile, y), new Point(x + PixelsATile, y + PixelsATile));
 				}
 
-				drawingContext.DrawRectangle(SelectionBackgroundBrush, null, new Rect(x, y, PixelsATile, PixelsATile));
+				drawingContext.DrawRectangle(selectionBackBrush, null, new Rect(x, y, PixelsATile, PixelsATile));
 			}
 
 			// draw characters
@@ -535,10 +575,34 @@ namespace StructuredXmlEditor.View
 				for (int y = 0; y < GridHeight; y++)
 				{
 					FormattedText text = new FormattedText(Grid[x, y].ToString(), CultureInfo.InvariantCulture, FlowDirection.LeftToRight, typeface, PixelsATile, FontBrush);
-					Point centerPoint = new Point((x-ZeroPoint.X) * PixelsATile + PixelsATile / 2 - ViewPos.X, (y-ZeroPoint.Y) * PixelsATile - PixelsATile / 4 - ViewPos.Y);
+					Point centerPoint = new Point((x - ZeroPoint.X) * PixelsATile + PixelsATile / 2 - ViewPos.X, (y - ZeroPoint.Y) * PixelsATile - PixelsATile / 4 - ViewPos.Y);
 					Point textLocation = new Point(centerPoint.X - text.WidthIncludingTrailingWhitespace / 2, centerPoint.Y);
 
 					drawingContext.DrawText(text, textLocation);
+				}
+			}
+
+			// draw cursor
+			if (mouseInside)
+			{
+				if (DrawMode)
+				{
+					if (Keyboard.IsKeyDown(Key.LeftAlt))
+					{
+						drawingContext.DrawImage(eyedropperImg, new Rect(mousePos.X, mousePos.Y, 16, 16));
+					}
+					else
+					{
+						drawingContext.DrawImage(drawImg, new Rect(mousePos.X, mousePos.Y, 16, 16));
+					}
+				}
+				else if (MagicWandMode)
+				{
+					drawingContext.DrawImage(magicWandImg, new Rect(mousePos.X, mousePos.Y, 16, 16));
+				}
+				else
+				{
+					drawingContext.DrawImage(normalImg, new Rect(mousePos.X, mousePos.Y, 16, 16));
 				}
 			}
 		}
@@ -577,7 +641,7 @@ namespace StructuredXmlEditor.View
 		}
 
 		//-----------------------------------------------------------------------
-		private static int[][] Offsets = { new int[]{ 0, 1 }, new int[] { 1, 0 }, new int[] { 0, -1 }, new int[] { -1, 0 } };
+		private static int[][] Offsets = { new int[] { 0, 1 }, new int[] { 1, 0 }, new int[] { 0, -1 }, new int[] { -1, 0 } };
 		private void RecursiveFloodSelect(IntPoint pos, char c, List<IntPoint> output)
 		{
 			foreach (var offset in Offsets)
@@ -619,7 +683,19 @@ namespace StructuredXmlEditor.View
 
 			if (DrawMode)
 			{
-				if (ActiveChar == ' ')
+				if (Keyboard.IsKeyDown(Key.LeftAlt))
+				{
+					if (roundedX + ZeroPoint.X >= 0 && roundedX + ZeroPoint.X < GridWidth && roundedY + ZeroPoint.Y >= 0 && roundedY + ZeroPoint.Y < GridHeight)
+					{
+						var c = Grid[roundedX + ZeroPoint.X, roundedY + ZeroPoint.Y];
+						ActiveChar = c;
+					}
+					else
+					{
+						ActiveChar = ' ';
+					}
+				}
+				else if (ActiveChar == ' ')
 				{
 					Delete(new IntPoint(roundedX, roundedY));
 
@@ -691,19 +767,98 @@ namespace StructuredXmlEditor.View
 		}
 
 		//-----------------------------------------------------------------------
-		protected override void OnMouseMove(MouseEventArgs e)
+		protected override void OnMouseRightButtonDown(MouseButtonEventArgs margs)
+		{
+			base.OnMouseRightButtonDown(margs);
+
+			var pos = margs.GetPosition(this);
+
+			var local = new Point((pos.X + ViewPos.X) / PixelsATile, (pos.Y + ViewPos.Y) / PixelsATile);
+			var roundedX = local.X < 0 ? (int)Math.Floor(local.X) : (int)local.X;
+			var roundedY = local.Y < 0 ? (int)Math.Floor(local.Y) : (int)local.Y;
+
+			var contextMenu = new ContextMenu();
+
+			// Mode
+
+			contextMenu.AddCheckable("Normal Mode", (val) => { NormalMode = true; }, NormalMode);
+			contextMenu.AddCheckable("Magic Wand Mode", (val) => { MagicWandMode = true; }, MagicWandMode);
+			contextMenu.AddCheckable("Draw Mode", (val) => { DrawMode = true; }, DrawMode);
+
+			contextMenu.AddSeperator();
+
+			// special
+
+			if (MagicWandMode)
+			{
+				contextMenu.AddCheckable("Continuous", (val) => { Continuous = val; }, Continuous);
+			}
+			if (DrawMode)
+			{
+				if (roundedX + ZeroPoint.X >= 0 && roundedX + ZeroPoint.X < GridWidth && roundedY + ZeroPoint.Y >= 0 && roundedY + ZeroPoint.Y < GridHeight)
+				{
+					var c = Grid[roundedX + ZeroPoint.X, roundedY + ZeroPoint.Y];
+					contextMenu.AddItem("Pick '" + c +"' as active character", () => { ActiveChar = c; });
+				}
+				contextMenu.AddItem("Switch to erase", () => { ActiveChar = ' '; });
+			}
+
+			contextMenu.AddSeperator();
+
+			// Insert
+
+			var movedY = roundedY + ZeroPoint.Y;
+			var movedX = roundedX + ZeroPoint.X;
+
+			if (movedY >= 0 && movedY < GridHeight)
+			{
+				contextMenu.AddItem("Insert Row", () => { InsertRow(movedY); });
+				contextMenu.AddItem("Delete Row", () => { DeleteRow(movedY); });
+			}
+
+			if (movedX >= 0 && movedX < GridWidth)
+			{
+				contextMenu.AddItem("Insert Column", () => { InsertColumn(movedX); });
+				contextMenu.AddItem("Delete Column", () => { DeleteColumn(movedX); });
+			}
+
+			contextMenu.AddSeperator();
+
+			// Copy/paste
+
+			contextMenu.AddItem("Cut", () => { Cut(); });
+			contextMenu.AddItem("Copy", () => { Copy(); });
+			contextMenu.AddItem("Paste", () => { Paste(); });
+
+			ContextMenu = contextMenu;
+		}
+
+		//-----------------------------------------------------------------------
+		protected override void OnMouseLeave(MouseEventArgs e)
+		{
+			base.OnMouseLeave(e);
+
+			mouseInside = false;
+			m_dirty = true;
+		}
+
+		//-----------------------------------------------------------------------
+		protected override void OnMouseMove(MouseEventArgs args)
 		{
 			Keyboard.Focus(this);
 
-			if (e.LeftButton != MouseButtonState.Pressed && e.MiddleButton != MouseButtonState.Pressed)
+			mouseInside = true;
+
+			if (args.LeftButton != MouseButtonState.Pressed && args.MiddleButton != MouseButtonState.Pressed)
 			{
 				EndDrag();
 				isMarqueeSelecting = false;
 			}
 
-			var pos = e.GetPosition(this);
+			var pos = args.GetPosition(this);
+			mousePos = pos;
 
-			if (e.MiddleButton == MouseButtonState.Pressed && isPanning)
+			if (args.MiddleButton == MouseButtonState.Pressed && isPanning)
 			{
 				var diff = pos - panPos;
 				ViewPos -= diff;
@@ -717,7 +872,7 @@ namespace StructuredXmlEditor.View
 
 				panPos = pos;
 			}
-			else if (e.LeftButton == MouseButtonState.Pressed)
+			else if (args.LeftButton == MouseButtonState.Pressed)
 			{
 				if (DrawMode)
 				{
@@ -725,7 +880,15 @@ namespace StructuredXmlEditor.View
 					var roundedX = local.X < 0 ? (int)Math.Floor(local.X) : (int)local.X;
 					var roundedY = local.Y < 0 ? (int)Math.Floor(local.Y) : (int)local.Y;
 
-					if (ActiveChar == ' ')
+					if (Keyboard.IsKeyDown(Key.LeftAlt))
+					{
+						if (roundedX + ZeroPoint.X >= 0 && roundedX + ZeroPoint.X < GridWidth && roundedY + ZeroPoint.Y >= 0 && roundedY + ZeroPoint.Y < GridHeight)
+						{
+							var c = Grid[roundedX + ZeroPoint.X, roundedY + ZeroPoint.Y];
+							ActiveChar = c;
+						}
+					}
+					else if (ActiveChar == ' ')
 					{
 						Delete(new IntPoint(roundedX, roundedY));
 
@@ -740,19 +903,25 @@ namespace StructuredXmlEditor.View
 
 						UpdateSrcGrid();
 					}
-
-					m_dirty = true;
 				}
 				else if (isMarqueeSelecting)
 				{
 					var diff = pos - marqueeStart;
 
-					if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
-					{
-						var local = new Point((pos.X + ViewPos.X) / PixelsATile, (pos.Y + ViewPos.Y) / PixelsATile);
-						var roundedX = local.X < 0 ? (int)Math.Floor(local.X) : (int)local.X;
-						var roundedY = local.Y < 0 ? (int)Math.Floor(local.Y) : (int)local.Y;
+					var local = new Point((pos.X + ViewPos.X) / PixelsATile, (pos.Y + ViewPos.Y) / PixelsATile);
+					var roundedX = local.X < 0 ? (int)Math.Floor(local.X) : (int)local.X;
+					var roundedY = local.Y < 0 ? (int)Math.Floor(local.Y) : (int)local.Y;
 
+					if (Keyboard.IsKeyDown(Key.LeftCtrl))
+					{
+						var existing = Selected.Where(e => e.X == roundedX && e.Y == roundedY).Cast<IntPoint?>().FirstOrDefault();
+						if (existing == null)
+						{
+							Selected.Add(new IntPoint(roundedX, roundedY));
+						}
+					}
+					else if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
+					{
 						Selected.Clear();
 
 						var min = new IntPoint(Math.Min(startPos.X, roundedX), Math.Min(startPos.Y, roundedY));
@@ -765,13 +934,11 @@ namespace StructuredXmlEditor.View
 								Selected.Add(new IntPoint(x, y));
 							}
 						}
-
-						m_dirty = true;
 					}
 				}
 			}
 
-			InvalidateVisual();
+			m_dirty = true;
 		}
 
 		//-----------------------------------------------------------------------
@@ -923,90 +1090,15 @@ namespace StructuredXmlEditor.View
 			}
 			else if (args.Key == Key.C && Keyboard.IsKeyDown(Key.LeftCtrl))
 			{
-				if (Selected.Count != 0)
-				{
-					var copy = new List<string>();
-
-					var valid = Selected.Where(e => e.X + ZeroPoint.X >= 0 && e.X + ZeroPoint.X < GridWidth && e.Y + ZeroPoint.Y >= 0 && e.Y + ZeroPoint.Y < GridHeight);
-					var min = valid.OrderBy(e => e.X).ThenBy(e => e.Y).First();
-
-					foreach (var point in Selected)
-					{
-						var data = (point.X - min.X) + "," + (point.Y + min.Y) + "|" + Grid[point.X + ZeroPoint.X, point.Y + ZeroPoint.Y];
-						copy.Add(data);
-					}
-
-					Clipboard.SetData("AsciiGridCopy", string.Join("@", copy));
-				}
+				Copy();
 			}
 			else if (args.Key == Key.X && Keyboard.IsKeyDown(Key.LeftCtrl))
 			{
-				if (Selected.Count != 0)
-				{
-					var copy = new List<string>();
-
-					var valid = Selected.Where(e => e.X + ZeroPoint.X >= 0 && e.X + ZeroPoint.X < GridWidth && e.Y + ZeroPoint.Y >= 0 && e.Y + ZeroPoint.Y < GridHeight);
-					var min = valid.OrderBy(e => e.X).ThenBy(e => e.Y).First();
-
-					foreach (var point in Selected)
-					{
-						var data = (point.X - min.X) + "," + (point.Y + min.Y) + "|" + Grid[point.X + ZeroPoint.X, point.Y + ZeroPoint.Y];
-						copy.Add(data);
-
-						Grid[point.X + ZeroPoint.X, point.Y + ZeroPoint.Y] = ' ';
-					}
-
-					ContractGrid();
-					UpdateSrcGrid();
-
-					Clipboard.SetData("AsciiGridCopy", string.Join("@", copy));
-				}
+				Cut();
 			}
 			else if (args.Key == Key.V && Keyboard.IsKeyDown(Key.LeftCtrl))
 			{
-				if (Selected.Count != 0 && Clipboard.ContainsData("AsciiGridCopy"))
-				{
-					var data = (string)Clipboard.GetData("AsciiGridCopy");
-					var copy = data.Split('@');
-
-					var start = Selected.OrderBy(e => e.X).ThenBy(e => e.Y).First();
-
-					var used = new List<Tuple<IntPoint, char>>();
-
-					foreach (var block in copy)
-					{
-						var split = block.Split('|');
-						var posSplit = split[0].Split(',');
-						var x = int.Parse(posSplit[0]);
-						var y = int.Parse(posSplit[1]);
-						var c = split[1][0];
-
-						used.Add(new Tuple<IntPoint, char>(new IntPoint(x, y), c));
-					}
-
-					IntPoint min = new IntPoint(int.MaxValue, int.MaxValue);
-					IntPoint max = new IntPoint(-int.MaxValue, -int.MaxValue);
-
-					foreach (var block in used)
-					{
-						var point = block.Item1;
-
-						if (point.X < min.X) min = new IntPoint(point.X, min.Y);
-						if (point.Y < min.Y) min = new IntPoint(min.X, point.Y);
-						if (point.X > max.X) max = new IntPoint(point.X, max.Y);
-						if (point.Y > max.Y) max = new IntPoint(max.X, point.Y);
-					}
-
-					ExpandGrid(new IntPoint(min.X + start.X + ZeroPoint.X, min.Y + start.Y + ZeroPoint.Y));
-					ExpandGrid(new IntPoint(max.X + start.X + ZeroPoint.X, max.Y + start.Y + ZeroPoint.Y));
-
-					foreach (var block in used)
-					{
-						Grid[block.Item1.X + start.X + ZeroPoint.X, block.Item1.Y + start.Y + ZeroPoint.Y] = block.Item2;
-					}
-
-					UpdateSrcGrid();
-				}
+				Paste();
 			}
 			else if (args.Key == Key.D && Keyboard.IsKeyDown(Key.LeftCtrl))
 			{
@@ -1104,6 +1196,173 @@ namespace StructuredXmlEditor.View
 		}
 
 		//-----------------------------------------------------------------------
+		private void InsertRow(int movedY)
+		{
+			if (movedY > 0 && movedY < GridHeight)
+			{
+				ExpandGrid(new IntPoint(0, GridHeight));
+
+				for (int x = 0; x < GridWidth; x++)
+				{
+					for (int y = GridHeight-1; y >= movedY; y--)
+					{
+						Grid[x, y] = y == movedY ? ' ' : Grid[x, y - 1];
+					}
+				}
+
+				UpdateSrcGrid();
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		private void DeleteRow(int movedY)
+		{
+			if (movedY >= 0 && movedY < GridHeight)
+			{
+				for (int x = 0; x < GridWidth; x++)
+				{
+					for (int y = movedY; y < GridHeight; y++)
+					{
+						Grid[x, y] = y == GridHeight-1 ? ' ' : Grid[x, y + 1];
+					}
+				}
+
+				ContractGrid();
+				UpdateSrcGrid();
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		private void InsertColumn(int movedX)
+		{
+			if (movedX > 0 && movedX < GridWidth)
+			{
+				ExpandGrid(new IntPoint(GridWidth, 0));
+
+				for (int y = 0; y< GridHeight; y++)
+				{
+					for (int x = GridWidth - 1; x >= movedX; x--)
+					{
+						Grid[x, y] = x == movedX ? ' ' : Grid[x - 1, y];
+					}
+				}
+
+				UpdateSrcGrid();
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		private void DeleteColumn(int movedX)
+		{
+			if (movedX >= 0 && movedX < GridWidth)
+			{
+				for (int y = 0; y < GridHeight; y++)
+				{
+					for (int x = movedX; x < GridWidth; x++)
+					{
+						Grid[x, y] = x == GridWidth-1 ? ' ' : Grid[x + 1, y];
+					}
+				}
+
+				ContractGrid();
+				UpdateSrcGrid();
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		private void Cut()
+		{
+			if (Selected.Count != 0)
+			{
+				var copy = new List<string>();
+
+				var valid = Selected.Where(e => e.X + ZeroPoint.X >= 0 && e.X + ZeroPoint.X < GridWidth && e.Y + ZeroPoint.Y >= 0 && e.Y + ZeroPoint.Y < GridHeight);
+				var min = valid.OrderBy(e => e.X).ThenBy(e => e.Y).First();
+
+				foreach (var point in Selected)
+				{
+					var data = (point.X - min.X) + "," + (point.Y + min.Y) + "|" + Grid[point.X + ZeroPoint.X, point.Y + ZeroPoint.Y];
+					copy.Add(data);
+
+					Grid[point.X + ZeroPoint.X, point.Y + ZeroPoint.Y] = ' ';
+				}
+
+				ContractGrid();
+				UpdateSrcGrid();
+
+				Clipboard.SetData("AsciiGridCopy", string.Join("@", copy));
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		private void Copy()
+		{
+			if (Selected.Count != 0)
+			{
+				var copy = new List<string>();
+
+				var valid = Selected.Where(e => e.X + ZeroPoint.X >= 0 && e.X + ZeroPoint.X < GridWidth && e.Y + ZeroPoint.Y >= 0 && e.Y + ZeroPoint.Y < GridHeight);
+				var min = valid.OrderBy(e => e.X).ThenBy(e => e.Y).First();
+
+				foreach (var point in Selected)
+				{
+					var data = (point.X - min.X) + "," + (point.Y + min.Y) + "|" + Grid[point.X + ZeroPoint.X, point.Y + ZeroPoint.Y];
+					copy.Add(data);
+				}
+
+				Clipboard.SetData("AsciiGridCopy", string.Join("@", copy));
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		private void Paste()
+		{
+			if (Selected.Count != 0 && Clipboard.ContainsData("AsciiGridCopy"))
+			{
+				var data = (string)Clipboard.GetData("AsciiGridCopy");
+				var copy = data.Split('@');
+
+				var start = Selected.OrderBy(e => e.X).ThenBy(e => e.Y).First();
+
+				var used = new List<Tuple<IntPoint, char>>();
+
+				foreach (var block in copy)
+				{
+					var split = block.Split('|');
+					var posSplit = split[0].Split(',');
+					var x = int.Parse(posSplit[0]);
+					var y = int.Parse(posSplit[1]);
+					var c = split[1][0];
+
+					used.Add(new Tuple<IntPoint, char>(new IntPoint(x, y), c));
+				}
+
+				IntPoint min = new IntPoint(int.MaxValue, int.MaxValue);
+				IntPoint max = new IntPoint(-int.MaxValue, -int.MaxValue);
+
+				foreach (var block in used)
+				{
+					var point = block.Item1;
+
+					if (point.X < min.X) min = new IntPoint(point.X, min.Y);
+					if (point.Y < min.Y) min = new IntPoint(min.X, point.Y);
+					if (point.X > max.X) max = new IntPoint(point.X, max.Y);
+					if (point.Y > max.Y) max = new IntPoint(max.X, point.Y);
+				}
+
+				ExpandGrid(new IntPoint(min.X + start.X + ZeroPoint.X, min.Y + start.Y + ZeroPoint.Y));
+				ExpandGrid(new IntPoint(max.X + start.X + ZeroPoint.X, max.Y + start.Y + ZeroPoint.Y));
+
+				foreach (var block in used)
+				{
+					Grid[block.Item1.X + start.X + ZeroPoint.X, block.Item1.Y + start.Y + ZeroPoint.Y] = block.Item2;
+				}
+
+				UpdateSrcGrid();
+			}
+		}
+
+		//-----------------------------------------------------------------------
 		[DllImport("user32.dll")]
 		static extern bool GetKeyboardState(byte[] lpKeyState);
 
@@ -1132,6 +1391,14 @@ namespace StructuredXmlEditor.View
 		}
 
 		//-----------------------------------------------------------------------
+		ImageSource normalImg;
+		ImageSource magicWandImg;
+		ImageSource drawImg;
+		ImageSource eyedropperImg;
+
+		Point mousePos;
+		bool mouseInside = false;
+
 		IntPoint startPos;
 		Point marqueeStart;
 		bool isMarqueeSelecting;
@@ -1141,6 +1408,10 @@ namespace StructuredXmlEditor.View
 		bool isPanning = false;
 		private bool m_dirty;
 		Timer redrawTimer;
+
+		Pen gridPen;
+		Pen selectedPen;
+		Brush selectionBackBrush;
 	}
 
 	public struct IntPoint

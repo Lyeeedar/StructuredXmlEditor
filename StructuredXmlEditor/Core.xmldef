@@ -102,6 +102,7 @@
 			<String Name="Default" ToolTip="The default value for this element." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<Boolean Name="ElementPerLine" ToolTip="If true then the string will be split line by line into child elements." />
+			<String Name="LineElementName" ToolTip="The name of the element that holds each line of the string" Default="Line" VisibleIf="ElementPerLine==true" />
 			<Boolean Name="IsAsciiGrid" ToolTip="If true then the option to use the ascii grid editor will be present for this element." />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />

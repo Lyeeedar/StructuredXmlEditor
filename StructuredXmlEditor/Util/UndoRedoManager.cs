@@ -376,7 +376,7 @@ public class UndoRedoGroup
 	{
 		get
 		{
-			return string.Join(",", Actions.Select(e => e.Desc).Distinct());
+			return string.Join(",", Actions.Select(e => e.Desc.Replace("\n", "")).Distinct());
 		}
 	}
 }

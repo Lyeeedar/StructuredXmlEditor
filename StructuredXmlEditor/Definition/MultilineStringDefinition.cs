@@ -15,6 +15,8 @@ namespace StructuredXmlEditor.Definition
 		public string Default { get; set; }
 		public bool ElementPerLine { get; set; }
 		public bool IsAsciiGrid { get; set; }
+		public string LineElementName { get; set; }
+
 
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
@@ -53,6 +55,7 @@ namespace StructuredXmlEditor.Definition
 
 			ElementPerLine = TryParseBool(definition, "ElementPerLine");
 			IsAsciiGrid = TryParseBool(definition, "IsAsciiGrid");
+			LineElementName = definition.Attribute("LineElementName")?.Value?.ToString() ?? "Line";
 		}
 
 		public override void DoSaveData(XElement parent, DataItem item)
@@ -69,7 +72,7 @@ namespace StructuredXmlEditor.Definition
 				var split = si.Value.Split(new string[] { Seperator }, StringSplitOptions.None);
 				foreach (var line in split)
 				{
-					root.Add(new XElement("Line", line));
+					root.Add(new XElement(LineElementName, line));
 				}
 			}
 			else

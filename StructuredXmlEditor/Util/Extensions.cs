@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Xml.Serialization;
 
@@ -142,6 +143,66 @@ namespace StructuredXmlEditor
 					source.Add(sortedItem);
 				}
 			}
+		}
+
+		//-----------------------------------------------------------------------
+		public static MenuItem AddItem(this ContextMenu menu, string header, Action action = null)
+		{
+			var item = new MenuItem();
+			item.Header = header;
+			if (action != null) item.Click += (e, args) => { action(); };
+
+			menu.Items.Add(item);
+
+			return item;
+		}
+
+		//-----------------------------------------------------------------------
+		public static MenuItem AddItem(this MenuItem menu, string header, Action action = null)
+		{
+			var item = new MenuItem();
+			item.Header = header;
+			if (action != null) item.Click += (e, args) => { action(); };
+
+			menu.Items.Add(item);
+
+			return item;
+		}
+
+		//-----------------------------------------------------------------------
+		public static void AddSeperator(this ContextMenu menu)
+		{
+			if (menu.Items.Count > 0 && !(menu.Items.GetItemAt(menu.Items.Count - 1) is Separator)) menu.Items.Add(new Separator());
+		}
+
+		//-----------------------------------------------------------------------
+		public static void AddSeperator(this MenuItem menu)
+		{
+			if (menu.Items.Count > 0 && !(menu.Items.GetItemAt(menu.Items.Count - 1) is Separator)) menu.Items.Add(new Separator());
+		}
+
+		//-----------------------------------------------------------------------
+		public static void AddCheckable(this ContextMenu menu, string header, Action<bool> action, bool value)
+		{
+			var item = new MenuItem();
+			item.Header = header;
+			item.IsCheckable = true;
+			item.IsChecked = value;
+			item.Click += (e, args) => { action(item.IsChecked); };
+
+			menu.Items.Add(item);
+		}
+
+		//-----------------------------------------------------------------------
+		public static void AddCheckable(this MenuItem menu, string header, Action<bool> action, bool value)
+		{
+			var item = new MenuItem();
+			item.Header = header;
+			item.IsCheckable = true;
+			item.IsChecked = value;
+			item.Click += (e, args) => { action(item.IsChecked); };
+
+			menu.Items.Add(item);
 		}
 	}
 }
