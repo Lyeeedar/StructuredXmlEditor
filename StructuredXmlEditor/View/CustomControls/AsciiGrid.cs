@@ -249,6 +249,9 @@ namespace StructuredXmlEditor.View
 		private string m_selectedShape = "Rectangle";
 
 		//-----------------------------------------------------------------------
+		private GlyphRunBuilder GlyphRunBuilder;
+
+		//-----------------------------------------------------------------------
 		public AsciiGrid()
 		{
 			DataContextChanged += (e, args) =>
@@ -303,6 +306,10 @@ namespace StructuredXmlEditor.View
 			magicWandImg = new BitmapImage(new Uri("pack://application:,,,/StructuredXmlEditor;component/Resources/MagicWand.png", UriKind.RelativeOrAbsolute));
 			drawImg = new BitmapImage(new Uri("pack://application:,,,/StructuredXmlEditor;component/Resources/Draw.png", UriKind.RelativeOrAbsolute));
 			eyedropperImg = new BitmapImage(new Uri("pack://application:,,,/StructuredXmlEditor;component/Resources/Eyedropper.png", UriKind.RelativeOrAbsolute));
+			shapeImg = new BitmapImage(new Uri("pack://application:,,,/StructuredXmlEditor;component/Resources/Shape.png", UriKind.RelativeOrAbsolute));
+
+			Typeface typeface = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
+			GlyphRunBuilder = new GlyphRunBuilder(typeface);
 		}
 
 		//-----------------------------------------------------------------------
@@ -586,8 +593,6 @@ namespace StructuredXmlEditor.View
 			var startX = (Math.Floor(ViewPos.X / PixelsATile) * PixelsATile) - ViewPos.X;
 			var startY = (Math.Floor(ViewPos.Y / PixelsATile) * PixelsATile) - ViewPos.Y;
 
-			Typeface typeface = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
-
 			for (double x = startX; x < ActualWidth; x += PixelsATile)
 			{
 				drawingContext.DrawLine(gridPen, new Point(x, 0), new Point(x, ActualHeight));
@@ -609,22 +614,22 @@ namespace StructuredXmlEditor.View
 				var x = point.X * PixelsATile - ViewPos.X;
 				var y = point.Y * PixelsATile - ViewPos.Y;
 
-				if (!usedTiles.Contains(point.Offset(0, -1).FastHash))
+				if (!usedTiles.Contains(point.OffsetHash(0, -1)))
 				{
 					// draw top
 					drawingContext.DrawLine(selectedPen, new Point(x, y), new Point(x + PixelsATile, y));
 				}
-				if (!usedTiles.Contains(point.Offset(0, 1).FastHash))
+				if (!usedTiles.Contains(point.OffsetHash(0, 1)))
 				{
 					// draw bottom
 					drawingContext.DrawLine(selectedPen, new Point(x, y + PixelsATile), new Point(x + PixelsATile, y + PixelsATile));
 				}
-				if (!usedTiles.Contains(point.Offset(-1, 0).FastHash))
+				if (!usedTiles.Contains(point.OffsetHash(-1, 0)))
 				{
 					// draw left
 					drawingContext.DrawLine(selectedPen, new Point(x, y), new Point(x, y + PixelsATile));
 				}
-				if (!usedTiles.Contains(point.Offset(1, 0).FastHash))
+				if (!usedTiles.Contains(point.OffsetHash(1, 0)))
 				{
 					// draw right
 					drawingContext.DrawLine(selectedPen, new Point(x + PixelsATile, y), new Point(x + PixelsATile, y + PixelsATile));
@@ -633,8 +638,9 @@ namespace StructuredXmlEditor.View
 				drawingContext.DrawRectangle(selectionBackBrush, null, new Rect(x, y, PixelsATile, PixelsATile));
 			}
 
+			GlyphRunBuilder.StartRun(PixelsATile, -ViewPos.X - ZeroPoint.X * PixelsATile + PixelsATile / 4, -ViewPos.Y - ZeroPoint.Y * PixelsATile - PixelsATile / 5);
+
 			// draw shape
-			var shapeTiles = new HashSet<int>();
 			if (ShapeMode)
 			{
 				// draw if different
@@ -651,13 +657,8 @@ namespace StructuredXmlEditor.View
 							for (int y = min.Y; y <= max.Y; y++)
 							{
 								var c = x == min.X || x == max.X || y == min.Y || y == max.Y ? BorderChar : FillChar;
-								FormattedText text = new FormattedText("" + c, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, typeface, PixelsATile, FontBrush);
-								Point centerPoint = new Point(x * PixelsATile + PixelsATile / 2 - ViewPos.X, y * PixelsATile - PixelsATile / 4 - ViewPos.Y);
-								Point textLocation = new Point(centerPoint.X - text.WidthIncludingTrailingWhitespace / 2, centerPoint.Y);
 
-								drawingContext.DrawText(text, textLocation);
-
-								shapeTiles.Add(new IntPoint(x + ZeroPoint.X, y + ZeroPoint.Y).FastHash);
+								GlyphRunBuilder.AddGlyph(x + ZeroPoint.X, y + ZeroPoint.Y, c);
 							}
 						}
 					}
@@ -669,13 +670,8 @@ namespace StructuredXmlEditor.View
 							int x = point.X;
 							int y = point.Y;
 							var c = BorderChar;
-							FormattedText text = new FormattedText("" + c, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, typeface, PixelsATile, FontBrush);
-							Point centerPoint = new Point(x * PixelsATile + PixelsATile / 2 - ViewPos.X, y * PixelsATile - PixelsATile / 4 - ViewPos.Y);
-							Point textLocation = new Point(centerPoint.X - text.WidthIncludingTrailingWhitespace / 2, centerPoint.Y);
 
-							drawingContext.DrawText(text, textLocation);
-
-							shapeTiles.Add(new IntPoint(x + ZeroPoint.X, y + ZeroPoint.Y).FastHash);
+							GlyphRunBuilder.AddGlyph(x + ZeroPoint.X, y + ZeroPoint.Y, c);
 						}
 					}
 					else if (SelectedShape == "Ellipse")
@@ -692,13 +688,8 @@ namespace StructuredXmlEditor.View
 								if (compVal > 0)
 								{
 									var c = compVal == 2 ? BorderChar : FillChar;
-									FormattedText text = new FormattedText("" + c, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, typeface, PixelsATile, FontBrush);
-									Point centerPoint = new Point(x * PixelsATile + PixelsATile / 2 - ViewPos.X, y * PixelsATile - PixelsATile / 4 - ViewPos.Y);
-									Point textLocation = new Point(centerPoint.X - text.WidthIncludingTrailingWhitespace / 2, centerPoint.Y);
 
-									drawingContext.DrawText(text, textLocation);
-
-									shapeTiles.Add(new IntPoint(x + ZeroPoint.X, y + ZeroPoint.Y).FastHash);
+									GlyphRunBuilder.AddGlyph(x + ZeroPoint.X, y + ZeroPoint.Y, c);
 								}
 							}
 						}
@@ -711,16 +702,12 @@ namespace StructuredXmlEditor.View
 			{
 				for (int y = 0; y < GridHeight; y++)
 				{
-					if (!shapeTiles.Contains(new IntPoint(x, y).FastHash))
-					{
-						FormattedText text = new FormattedText(Grid[x, y].ToString(), CultureInfo.InvariantCulture, FlowDirection.LeftToRight, typeface, PixelsATile, FontBrush);
-						Point centerPoint = new Point((x - ZeroPoint.X) * PixelsATile + PixelsATile / 2 - ViewPos.X, (y - ZeroPoint.Y) * PixelsATile - PixelsATile / 4 - ViewPos.Y);
-						Point textLocation = new Point(centerPoint.X - text.WidthIncludingTrailingWhitespace / 2, centerPoint.Y);
-
-						drawingContext.DrawText(text, textLocation);
-					}
+					GlyphRunBuilder.AddGlyph(x, y, Grid[x, y]);
 				}
 			}
+
+			var run = GlyphRunBuilder.GetRun();
+			drawingContext.DrawGlyphRun(FontBrush, run);
 
 			// draw cursor
 			if (mouseInside)
@@ -748,7 +735,7 @@ namespace StructuredXmlEditor.View
 					}
 					else
 					{
-						drawingContext.DrawImage(drawImg, new Rect(mousePos.X, mousePos.Y, 16, 16));
+						drawingContext.DrawImage(shapeImg, new Rect(mousePos.X, mousePos.Y, 16, 16));
 					}
 				}
 				else
@@ -756,6 +743,51 @@ namespace StructuredXmlEditor.View
 					drawingContext.DrawImage(normalImg, new Rect(mousePos.X, mousePos.Y, 16, 16));
 				}
 			}
+		}
+
+		private GlyphRun ConvertTextLinesToGlyphRun()
+		{
+			GlyphTypeface typeface;
+			new Typeface(FontFamily, FontStyle, FontWeight, FontStretch).TryGetGlyphTypeface(out typeface);
+
+			var glyphIndices = new List<ushort>();
+			var advanceWidths = new List<double>();
+			var glyphOffsets = new List<Point>();
+
+			var y = (GridHeight-1) * PixelsATile + PixelsATile / 5;
+			for (int i = 0; i < GridHeight; ++i)
+			{
+				var x = PixelsATile / 4;
+				for (int j = 0; j < GridWidth; ++j)
+				{
+					var glyphIndex = typeface.CharacterToGlyphMap[Grid[j, i]];
+					glyphIndices.Add(glyphIndex);
+					advanceWidths.Add(0);
+					glyphOffsets.Add(new Point(x, y));
+
+					x += PixelsATile;
+
+				}
+
+				y -= PixelsATile;
+			}
+
+			if (glyphIndices.Count == 0) return null;
+
+			return new GlyphRun(
+				typeface,
+				0,
+				false,
+				PixelsATile,
+				glyphIndices,
+				new Point(-ViewPos.X - ZeroPoint.X * PixelsATile, -ViewPos.Y - ZeroPoint.Y * PixelsATile + GridHeight * PixelsATile),
+				advanceWidths,
+				glyphOffsets,
+				null,
+				null,
+				null,
+				null,
+				null);
 		}
 
 		//-----------------------------------------------------------------------
@@ -1751,6 +1783,7 @@ namespace StructuredXmlEditor.View
 		ImageSource magicWandImg;
 		ImageSource drawImg;
 		ImageSource eyedropperImg;
+		ImageSource shapeImg;
 
 		Point mousePos;
 		bool mouseInside = false;
@@ -1782,11 +1815,80 @@ namespace StructuredXmlEditor.View
 			this.Y = y;
 		}
 
-		public IntPoint Offset(int x, int y)
+		public int OffsetHash(int x, int y)
 		{
-			return new IntPoint(X + x, Y + y);
+			return GetFastHash(X + x, Y + y);
 		}
 
-		public int FastHash { get { return X * 100000 + Y; } }
+		public static int GetFastHash(int x, int y)
+		{
+			return x * 100000 + y;
+		}
+
+		public int FastHash { get { return GetFastHash(X, Y); } }
+	}
+
+	public class GlyphRunBuilder
+	{
+		private HashSet<int> usedPoints = new HashSet<int>();
+		private double tileSize;
+		private double xOff;
+		private double yOff;
+		private List<ushort> glyphIndices = new List<ushort>();
+		private List<double> advanceWidths = new List<double>();
+		private List<Point> glyphOffsets = new List<Point>();
+		private GlyphTypeface typeface;
+
+		public GlyphRunBuilder(Typeface type)
+		{
+			type.TryGetGlyphTypeface(out typeface);
+		}
+
+		public void StartRun(double tileSize, double xOff, double yOff)
+		{
+			usedPoints.Clear();
+			glyphIndices.Clear();
+			advanceWidths.Clear();
+			glyphOffsets.Clear();
+
+			this.tileSize = tileSize;
+			this.xOff = xOff;
+			this.yOff = yOff;
+		}
+
+		public void AddGlyph(int x, int y, char c)
+		{
+			int posHash = x * 100000 + y;
+			if (!usedPoints.Contains(posHash))
+			{
+				usedPoints.Add(posHash);
+
+				if (c == ' ') return;
+
+				var glyphIndex = typeface.CharacterToGlyphMap[c];
+				glyphIndices.Add(glyphIndex);
+				advanceWidths.Add(0);
+				glyphOffsets.Add(new Point(x * tileSize, (y+1) * tileSize * -1));
+			}
+		}
+
+		public GlyphRun GetRun()
+		{
+			if (usedPoints.Count == 0) return null;
+			return new GlyphRun(
+				typeface,
+				0,
+				false,
+				tileSize,
+				glyphIndices,
+				new Point(xOff, yOff),
+				advanceWidths,
+				glyphOffsets,
+				null,
+				null,
+				null,
+				null,
+				null);
+		}
 	}
 }

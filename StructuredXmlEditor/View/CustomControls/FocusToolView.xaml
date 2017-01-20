@@ -96,7 +96,7 @@
 					IsChecked="{Binding ShapeMode, ElementName=AsciiGrid}"
 					ToolTip="Shape mode">
 					<Image
-						Source="/Resources/Draw.png"
+						Source="/Resources/Shape.png"
 						RenderOptions.BitmapScalingMode="NearestNeighbor"
 						Height="16"
 						Width="16" />
