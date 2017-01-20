@@ -24,5 +24,10 @@ namespace StructuredXmlEditor.View
 		{
 			InitializeComponent();
 		}
+
+		private void FillMouseDown(object sender, MouseButtonEventArgs e)
+		{
+			AsciiGrid.SetFill = true;
+		}
 	}
 }

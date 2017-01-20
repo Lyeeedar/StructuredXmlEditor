@@ -90,6 +90,18 @@
 						Width="16" />
 				</ToggleButton>
 
+				<ToggleButton
+					DockPanel.Dock="Left"
+					Margin="2"
+					IsChecked="{Binding ShapeMode, ElementName=AsciiGrid}"
+					ToolTip="Shape mode">
+					<Image
+						Source="/Resources/Draw.png"
+						RenderOptions.BitmapScalingMode="NearestNeighbor"
+						Height="16"
+						Width="16" />
+				</ToggleButton>
+
 				<Border
 					DockPanel.Dock="Left"
 					Width="1"
@@ -97,6 +109,8 @@
 					BorderBrush="{StaticResource BorderLightBrush}"
 					Margin="15,2,15,2" />
 
+				<!-- Magic Wand -->
+				
 				<CheckBox
 					DockPanel.Dock="Left"
 					Margin="2"
@@ -105,6 +119,8 @@
 					ToolTip="Whether magic wand mode should select continous blocks or not"
 					Content="Continuous" />
 
+				<!-- Draw -->
+				
 				<TextBlock
 					DockPanel.Dock="Left"
 					Margin="2"
@@ -121,6 +137,48 @@
 					Visibility="{Binding DrawMode, ElementName=AsciiGrid, Converter={v:ValueTypeConverter}}"
 					Text="{Binding ActiveChar, ElementName=AsciiGrid}" />
 				
+				<!-- Shape -->
+
+				<ComboBox
+					ItemsSource="{Binding shapes, ElementName=AsciiGrid}"
+					Visibility="{Binding ShapeMode, ElementName=AsciiGrid, Converter={v:ValueTypeConverter}}"
+					SelectedItem="{Binding SelectedShape, ElementName=AsciiGrid}" />
+
+				<TextBlock
+					DockPanel.Dock="Left"
+					Margin="2"
+					Visibility="{Binding ShapeMode, ElementName=AsciiGrid, Converter={v:ValueTypeConverter}}"
+					ToolTip="Border character"
+					Text="Border: " />
+
+				<TextBox
+					IsEnabled="False"
+					DockPanel.Dock="Left"
+					Margin="2"
+					Width="20"
+					ToolTip="Border character."
+					Visibility="{Binding ShapeMode, ElementName=AsciiGrid, Converter={v:ValueTypeConverter}}"
+					Text="{Binding BorderChar, ElementName=AsciiGrid}" />
+
+				<TextBlock
+					DockPanel.Dock="Left"
+					Margin="2"
+					Visibility="{Binding ShapeMode, ElementName=AsciiGrid, Converter={v:ValueTypeConverter}}"
+					ToolTip="Fill character"
+					Text="Fill: " />
+
+				<ContentControl
+					DockPanel.Dock="Left"
+					PreviewMouseDown="FillMouseDown">
+					<TextBox
+						IsEnabled="False"
+						Margin="2"
+						Width="20"
+						ToolTip="Fill character."
+						Visibility="{Binding ShapeMode, ElementName=AsciiGrid, Converter={v:ValueTypeConverter}}"
+						Text="{Binding FillChar, ElementName=AsciiGrid}" />
+				</ContentControl>
+
 			</DockPanel>
 			
 			<v:AsciiGrid

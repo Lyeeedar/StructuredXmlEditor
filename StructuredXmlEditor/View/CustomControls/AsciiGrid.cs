@@ -84,7 +84,7 @@ namespace StructuredXmlEditor.View
 			{
 				if (MagicWandMode) return "Mode: Magic Wand";
 				if (NormalMode) return "Mode: Normal";
-
+				if (ShapeMode) return "Mode: Shape";
 				if (DrawMode)
 				{
 					if (Keyboard.IsKeyDown(Key.LeftAlt))
@@ -114,6 +114,7 @@ namespace StructuredXmlEditor.View
 				{
 					MagicWandMode = false;
 					DrawMode = false;
+					ShapeMode = false;
 				}
 			}
 		}
@@ -133,6 +134,7 @@ namespace StructuredXmlEditor.View
 				{
 					NormalMode = false;
 					DrawMode = false;
+					ShapeMode = false;
 				}
 			}
 		}
@@ -164,6 +166,7 @@ namespace StructuredXmlEditor.View
 				{
 					NormalMode = false;
 					MagicWandMode = false;
+					ShapeMode = false;
 
 					Selected.Clear();
 					m_dirty = true;
@@ -183,6 +186,67 @@ namespace StructuredXmlEditor.View
 			}
 		}
 		private char m_activeChar = ' ';
+
+		//-----------------------------------------------------------------------
+		public bool ShapeMode
+		{
+			get { return m_shapeMode; }
+			set
+			{
+				m_shapeMode = value;
+				RaisePropertyChangedEvent();
+				RaisePropertyChangedEvent("ModeString");
+
+				if (value)
+				{
+					NormalMode = false;
+					MagicWandMode = false;
+					DrawMode = false;
+
+					Selected.Clear();
+					m_dirty = true;
+				}
+			}
+		}
+		private bool m_shapeMode;
+
+		//-----------------------------------------------------------------------
+		public char BorderChar
+		{
+			get { return m_borderChar; }
+			set
+			{
+				m_borderChar = value;
+				RaisePropertyChangedEvent();
+			}
+		}
+		private char m_borderChar = '#';
+
+		//-----------------------------------------------------------------------
+		public char FillChar
+		{
+			get { return m_fillChar; }
+			set
+			{
+				m_fillChar = value;
+				RaisePropertyChangedEvent();
+			}
+		}
+		private char m_fillChar = ' ';
+		public bool SetFill;
+
+		//-----------------------------------------------------------------------
+		public List<string> shapes { get; } = new List<string>() { "Rectangle", "Line", "Ellipse" };
+		public string SelectedShape
+		{
+			get { return m_selectedShape; }
+			set
+			{
+				m_selectedShape = value;
+				RaisePropertyChangedEvent();
+			}
+		}
+		private string m_selectedShape = "Rectangle";
 
 		//-----------------------------------------------------------------------
 		public AsciiGrid()
@@ -210,7 +274,7 @@ namespace StructuredXmlEditor.View
 			redrawTimer.Interval = 1.0 / 15.0;
 			redrawTimer.Elapsed += (e, args) =>
 			{
-				if (!NormalMode && !MagicWandMode && !DrawMode)
+				if (!NormalMode && !MagicWandMode && !DrawMode && !ShapeMode)
 				{
 					Application.Current.Dispatcher.BeginInvoke(new Action(() =>
 					{
@@ -569,16 +633,92 @@ namespace StructuredXmlEditor.View
 				drawingContext.DrawRectangle(selectionBackBrush, null, new Rect(x, y, PixelsATile, PixelsATile));
 			}
 
+			// draw shape
+			var shapeTiles = new HashSet<int>();
+			if (ShapeMode)
+			{
+				// draw if different
+				if (startPos.FastHash != endPos.FastHash)
+				{
+					// Do rectangle
+					if (SelectedShape == "Rectangle")
+					{
+						var min = new IntPoint(Math.Min(startPos.X, endPos.X), Math.Min(startPos.Y, endPos.Y));
+						var max = new IntPoint(Math.Max(startPos.X, endPos.X), Math.Max(startPos.Y, endPos.Y));
+
+						for (int x = min.X; x <= max.X; x++)
+						{
+							for (int y = min.Y; y <= max.Y; y++)
+							{
+								var c = x == min.X || x == max.X || y == min.Y || y == max.Y ? BorderChar : FillChar;
+								FormattedText text = new FormattedText("" + c, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, typeface, PixelsATile, FontBrush);
+								Point centerPoint = new Point(x * PixelsATile + PixelsATile / 2 - ViewPos.X, y * PixelsATile - PixelsATile / 4 - ViewPos.Y);
+								Point textLocation = new Point(centerPoint.X - text.WidthIncludingTrailingWhitespace / 2, centerPoint.Y);
+
+								drawingContext.DrawText(text, textLocation);
+
+								shapeTiles.Add(new IntPoint(x + ZeroPoint.X, y + ZeroPoint.Y).FastHash);
+							}
+						}
+					}
+					else if (SelectedShape == "Line")
+					{
+						var points = Line(startPos.X, startPos.Y, endPos.X, endPos.Y);
+						foreach (var point in points)
+						{
+							int x = point.X;
+							int y = point.Y;
+							var c = BorderChar;
+							FormattedText text = new FormattedText("" + c, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, typeface, PixelsATile, FontBrush);
+							Point centerPoint = new Point(x * PixelsATile + PixelsATile / 2 - ViewPos.X, y * PixelsATile - PixelsATile / 4 - ViewPos.Y);
+							Point textLocation = new Point(centerPoint.X - text.WidthIncludingTrailingWhitespace / 2, centerPoint.Y);
+
+							drawingContext.DrawText(text, textLocation);
+
+							shapeTiles.Add(new IntPoint(x + ZeroPoint.X, y + ZeroPoint.Y).FastHash);
+						}
+					}
+					else if (SelectedShape == "Ellipse")
+					{
+						var min = new IntPoint(Math.Min(startPos.X, endPos.X), Math.Min(startPos.Y, endPos.Y));
+						var max = new IntPoint(Math.Max(startPos.X, endPos.X), Math.Max(startPos.Y, endPos.Y));
+
+						for (int x = min.X; x <= max.X; x++)
+						{
+							for (int y = min.Y; y <= max.Y; y++)
+							{
+								var compVal = IsPointInEllipse(min, max, new IntPoint(x, y));
+
+								if (compVal > 0)
+								{
+									var c = compVal == 2 ? BorderChar : FillChar;
+									FormattedText text = new FormattedText("" + c, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, typeface, PixelsATile, FontBrush);
+									Point centerPoint = new Point(x * PixelsATile + PixelsATile / 2 - ViewPos.X, y * PixelsATile - PixelsATile / 4 - ViewPos.Y);
+									Point textLocation = new Point(centerPoint.X - text.WidthIncludingTrailingWhitespace / 2, centerPoint.Y);
+
+									drawingContext.DrawText(text, textLocation);
+
+									shapeTiles.Add(new IntPoint(x + ZeroPoint.X, y + ZeroPoint.Y).FastHash);
+								}
+							}
+						}
+					}
+				}
+			}
+
 			// draw characters
 			for (int x = 0; x < GridWidth; x++)
 			{
 				for (int y = 0; y < GridHeight; y++)
 				{
-					FormattedText text = new FormattedText(Grid[x, y].ToString(), CultureInfo.InvariantCulture, FlowDirection.LeftToRight, typeface, PixelsATile, FontBrush);
-					Point centerPoint = new Point((x - ZeroPoint.X) * PixelsATile + PixelsATile / 2 - ViewPos.X, (y - ZeroPoint.Y) * PixelsATile - PixelsATile / 4 - ViewPos.Y);
-					Point textLocation = new Point(centerPoint.X - text.WidthIncludingTrailingWhitespace / 2, centerPoint.Y);
+					if (!shapeTiles.Contains(new IntPoint(x, y).FastHash))
+					{
+						FormattedText text = new FormattedText(Grid[x, y].ToString(), CultureInfo.InvariantCulture, FlowDirection.LeftToRight, typeface, PixelsATile, FontBrush);
+						Point centerPoint = new Point((x - ZeroPoint.X) * PixelsATile + PixelsATile / 2 - ViewPos.X, (y - ZeroPoint.Y) * PixelsATile - PixelsATile / 4 - ViewPos.Y);
+						Point textLocation = new Point(centerPoint.X - text.WidthIncludingTrailingWhitespace / 2, centerPoint.Y);
 
-					drawingContext.DrawText(text, textLocation);
+						drawingContext.DrawText(text, textLocation);
+					}
 				}
 			}
 
@@ -599,6 +739,17 @@ namespace StructuredXmlEditor.View
 				else if (MagicWandMode)
 				{
 					drawingContext.DrawImage(magicWandImg, new Rect(mousePos.X, mousePos.Y, 16, 16));
+				}
+				else if (ShapeMode)
+				{
+					if (Keyboard.IsKeyDown(Key.LeftAlt) || SetFill)
+					{
+						drawingContext.DrawImage(eyedropperImg, new Rect(mousePos.X, mousePos.Y, 16, 16));
+					}
+					else
+					{
+						drawingContext.DrawImage(drawImg, new Rect(mousePos.X, mousePos.Y, 16, 16));
+					}
 				}
 				else
 				{
@@ -680,6 +831,7 @@ namespace StructuredXmlEditor.View
 			var roundedY = local.Y < 0 ? (int)Math.Floor(local.Y) : (int)local.Y;
 
 			startPos = new IntPoint(roundedX, roundedY);
+			endPos = startPos;
 
 			if (DrawMode)
 			{
@@ -711,6 +863,30 @@ namespace StructuredXmlEditor.View
 					UpdateSrcGrid();
 				}
 			}
+			else if (ShapeMode)
+			{
+				if (Keyboard.IsKeyDown(Key.LeftAlt) || SetFill)
+				{
+					if (roundedX + ZeroPoint.X >= 0 && roundedX + ZeroPoint.X < GridWidth && roundedY + ZeroPoint.Y >= 0 && roundedY + ZeroPoint.Y < GridHeight)
+					{
+						var c = Grid[roundedX + ZeroPoint.X, roundedY + ZeroPoint.Y];
+
+						if (SetFill)
+						{
+							FillChar = c;
+							SetFill = false;
+						}
+						else
+						{
+							BorderChar = c;
+						}
+					}
+					else
+					{
+						BorderChar = ' ';
+					}
+				}
+			}
 			else if (MagicWandMode)
 			{
 				Selected.Clear();
@@ -732,7 +908,7 @@ namespace StructuredXmlEditor.View
 							{
 								if (Grid[x, y] == c)
 								{
-									Selected.Add(new IntPoint(x, y));
+									Selected.Add(new IntPoint(x - ZeroPoint.X, y - ZeroPoint.Y));
 								}
 							}
 						}
@@ -784,6 +960,7 @@ namespace StructuredXmlEditor.View
 			contextMenu.AddCheckable("Normal Mode", (val) => { NormalMode = true; }, NormalMode);
 			contextMenu.AddCheckable("Magic Wand Mode", (val) => { MagicWandMode = true; }, MagicWandMode);
 			contextMenu.AddCheckable("Draw Mode", (val) => { DrawMode = true; }, DrawMode);
+			contextMenu.AddCheckable("Shape Mode", (val) => { ShapeMode = true; }, ShapeMode);
 
 			contextMenu.AddSeperator();
 
@@ -793,6 +970,11 @@ namespace StructuredXmlEditor.View
 			{
 				contextMenu.AddCheckable("Continuous", (val) => { Continuous = val; }, Continuous);
 			}
+			if (MagicWandMode || NormalMode)
+			{
+				contextMenu.AddItem("Fill with '" + ActiveChar + "'", () => { Fill(ActiveChar); });
+				contextMenu.AddItem("Delete", () => { Fill(' '); });
+			}
 			if (DrawMode)
 			{
 				if (roundedX + ZeroPoint.X >= 0 && roundedX + ZeroPoint.X < GridWidth && roundedY + ZeroPoint.Y >= 0 && roundedY + ZeroPoint.Y < GridHeight)
@@ -801,6 +983,22 @@ namespace StructuredXmlEditor.View
 					contextMenu.AddItem("Pick '" + c +"' as active character", () => { ActiveChar = c; });
 				}
 				contextMenu.AddItem("Switch to erase", () => { ActiveChar = ' '; });
+			}
+			if (ShapeMode)
+			{
+				var shapeGroup = contextMenu.AddItem("Shape");
+				foreach (var shape in shapes)
+				{
+					shapeGroup.AddCheckable(shape, (val) => { SelectedShape = shape; }, SelectedShape == shape);
+				}
+
+				if (roundedX + ZeroPoint.X >= 0 && roundedX + ZeroPoint.X < GridWidth && roundedY + ZeroPoint.Y >= 0 && roundedY + ZeroPoint.Y < GridHeight)
+				{
+					var c = Grid[roundedX + ZeroPoint.X, roundedY + ZeroPoint.Y];
+					contextMenu.AddItem("Pick '" + c + "' as border character", () => { BorderChar = c; });
+					contextMenu.AddItem("Pick '" + c + "' as fill character", () => { FillChar = c; });
+				}
+				contextMenu.AddItem("Clear fill character", () => { FillChar = ' '; });
 			}
 
 			contextMenu.AddSeperator();
@@ -849,14 +1047,24 @@ namespace StructuredXmlEditor.View
 
 			mouseInside = true;
 
+			var pos = args.GetPosition(this);
+			mousePos = pos;
+
+			var local = new Point((pos.X + ViewPos.X) / PixelsATile, (pos.Y + ViewPos.Y) / PixelsATile);
+			var roundedX = local.X < 0 ? (int)Math.Floor(local.X) : (int)local.X;
+			var roundedY = local.Y < 0 ? (int)Math.Floor(local.Y) : (int)local.Y;
+
 			if (args.LeftButton != MouseButtonState.Pressed && args.MiddleButton != MouseButtonState.Pressed)
 			{
 				EndDrag();
 				isMarqueeSelecting = false;
-			}
 
-			var pos = args.GetPosition(this);
-			mousePos = pos;
+				endPos = startPos;
+			}
+			else if (args.LeftButton == MouseButtonState.Pressed)
+			{
+				endPos = new IntPoint(roundedX, roundedY);
+			}
 
 			if (args.MiddleButton == MouseButtonState.Pressed && isPanning)
 			{
@@ -876,10 +1084,6 @@ namespace StructuredXmlEditor.View
 			{
 				if (DrawMode)
 				{
-					var local = new Point((pos.X + ViewPos.X) / PixelsATile, (pos.Y + ViewPos.Y) / PixelsATile);
-					var roundedX = local.X < 0 ? (int)Math.Floor(local.X) : (int)local.X;
-					var roundedY = local.Y < 0 ? (int)Math.Floor(local.Y) : (int)local.Y;
-
 					if (Keyboard.IsKeyDown(Key.LeftAlt))
 					{
 						if (roundedX + ZeroPoint.X >= 0 && roundedX + ZeroPoint.X < GridWidth && roundedY + ZeroPoint.Y >= 0 && roundedY + ZeroPoint.Y < GridHeight)
@@ -904,13 +1108,20 @@ namespace StructuredXmlEditor.View
 						UpdateSrcGrid();
 					}
 				}
+				else if (ShapeMode)
+				{
+					if (Keyboard.IsKeyDown(Key.LeftAlt))
+					{
+						if (roundedX + ZeroPoint.X >= 0 && roundedX + ZeroPoint.X < GridWidth && roundedY + ZeroPoint.Y >= 0 && roundedY + ZeroPoint.Y < GridHeight)
+						{
+							var c = Grid[roundedX + ZeroPoint.X, roundedY + ZeroPoint.Y];
+							BorderChar = c;
+						}
+					}
+				}
 				else if (isMarqueeSelecting)
 				{
 					var diff = pos - marqueeStart;
-
-					var local = new Point((pos.X + ViewPos.X) / PixelsATile, (pos.Y + ViewPos.Y) / PixelsATile);
-					var roundedX = local.X < 0 ? (int)Math.Floor(local.X) : (int)local.X;
-					var roundedY = local.Y < 0 ? (int)Math.Floor(local.Y) : (int)local.Y;
 
 					if (Keyboard.IsKeyDown(Key.LeftCtrl))
 					{
@@ -950,7 +1161,83 @@ namespace StructuredXmlEditor.View
 
 			isMarqueeSelecting = false;
 
+			if (ShapeMode)
+			{
+				if (startPos.FastHash != endPos.FastHash)
+				{
+					DrawShape();
+
+					endPos = startPos;
+				}
+			}
+
 			EndDrag();
+		}
+
+		//-----------------------------------------------------------------------
+		private void DrawShape()
+		{
+			if (SelectedShape == "Rectangle")
+			{
+				var min = new IntPoint(Math.Min(startPos.X, endPos.X), Math.Min(startPos.Y, endPos.Y));
+				var max = new IntPoint(Math.Max(startPos.X, endPos.X), Math.Max(startPos.Y, endPos.Y));
+
+				ExpandGrid(min);
+				ExpandGrid(max);
+
+				for (int x = min.X; x <= max.X; x++)
+				{
+					for (int y = min.Y; y <= max.Y; y++)
+					{
+						var c = x == min.X || x == max.X || y == min.Y || y == max.Y ? BorderChar : FillChar;
+						Grid[x + ZeroPoint.X, y + ZeroPoint.Y] = c;
+					}
+				}
+
+				UpdateSrcGrid();
+			}
+			else if (SelectedShape == "Line")
+			{
+				ExpandGrid(startPos);
+				ExpandGrid(endPos);
+
+				var points = Line(startPos.X, startPos.Y, endPos.X, endPos.Y);
+				foreach (var point in points)
+				{
+					int x = point.X;
+					int y = point.Y;
+					var c = BorderChar;
+
+					Grid[x + ZeroPoint.X, y + ZeroPoint.Y] = c;
+				}
+
+				UpdateSrcGrid();
+			}
+			else if (SelectedShape == "Ellipse")
+			{
+				var min = new IntPoint(Math.Min(startPos.X, endPos.X), Math.Min(startPos.Y, endPos.Y));
+				var max = new IntPoint(Math.Max(startPos.X, endPos.X), Math.Max(startPos.Y, endPos.Y));
+
+				ExpandGrid(min);
+				ExpandGrid(max);
+
+				for (int x = min.X; x <= max.X; x++)
+				{
+					for (int y = min.Y; y <= max.Y; y++)
+					{
+						var compVal = IsPointInEllipse(min, max, new IntPoint(x, y));
+
+						if (compVal > 0)
+						{
+							var c = compVal == 2 ? BorderChar : FillChar;
+							Grid[x + ZeroPoint.X, y + ZeroPoint.Y] = c;
+						}
+					}
+				}
+
+				ContractGrid();
+				UpdateSrcGrid();
+			}
 		}
 
 		//-----------------------------------------------------------------------
@@ -1061,13 +1348,7 @@ namespace StructuredXmlEditor.View
 			{
 				if (Selected.Count != 0)
 				{
-					foreach (var point in Selected)
-					{
-						Delete(point);
-					}
-
-					ContractGrid();
-					UpdateSrcGrid();
+					Fill(' ');
 
 					if (Selected.Count == 1)
 					{
@@ -1112,9 +1393,19 @@ namespace StructuredXmlEditor.View
 				{
 					char key = rawResult.FirstOrDefault();
 
-					if (DrawMode)
+					ActiveChar = key;
+
+					if (ShapeMode)
 					{
-						ActiveChar = key;
+						if (SetFill)
+						{
+							FillChar = key;
+							SetFill = false;
+						}
+						else
+						{
+							BorderChar = key;
+						}
 					}
 					else if (MagicWandMode)
 					{
@@ -1133,26 +1424,7 @@ namespace StructuredXmlEditor.View
 					}
 					else if (Selected.Count != 0)
 					{
-						IntPoint min = new IntPoint(int.MaxValue, int.MaxValue);
-						IntPoint max = new IntPoint(-int.MaxValue, -int.MaxValue);
-
-						foreach (var point in Selected)
-						{
-							if (point.X < min.X) min = new IntPoint(point.X, min.Y);
-							if (point.Y < min.Y) min = new IntPoint(min.X, point.Y);
-							if (point.X > max.X) max = new IntPoint(point.X, max.Y);
-							if (point.Y > max.Y) max = new IntPoint(max.X, point.Y);
-						}
-
-						ExpandGrid(min);
-						ExpandGrid(max);
-
-						foreach (var point in Selected)
-						{
-							Grid[point.X + ZeroPoint.X, point.Y + ZeroPoint.Y] = key;
-						}
-
-						UpdateSrcGrid();
+						Fill(key);
 
 						if (Selected.Count == 1)
 						{
@@ -1172,6 +1444,44 @@ namespace StructuredXmlEditor.View
 			}
 
 			m_dirty = true;
+		}
+
+		//-----------------------------------------------------------------------
+		public void Fill(char c)
+		{
+			if (c == ' ')
+			{
+				foreach (var point in Selected)
+				{
+					Delete(point);
+				}
+
+				ContractGrid();
+				UpdateSrcGrid();
+			}
+			else
+			{
+				IntPoint min = new IntPoint(int.MaxValue, int.MaxValue);
+				IntPoint max = new IntPoint(-int.MaxValue, -int.MaxValue);
+
+				foreach (var point in Selected)
+				{
+					if (point.X < min.X) min = new IntPoint(point.X, min.Y);
+					if (point.Y < min.Y) min = new IntPoint(min.X, point.Y);
+					if (point.X > max.X) max = new IntPoint(point.X, max.Y);
+					if (point.Y > max.Y) max = new IntPoint(max.X, point.Y);
+				}
+
+				ExpandGrid(min);
+				ExpandGrid(max);
+
+				foreach (var point in Selected)
+				{
+					Grid[point.X + ZeroPoint.X, point.Y + ZeroPoint.Y] = c;
+				}
+
+				UpdateSrcGrid();
+			}
 		}
 
 		//-----------------------------------------------------------------------
@@ -1363,6 +1673,52 @@ namespace StructuredXmlEditor.View
 		}
 
 		//-----------------------------------------------------------------------
+		public int IsPointInEllipse(IntPoint min, IntPoint max, IntPoint point)
+		{
+			double rx = Math.Abs(max.X - min.X) / 2.0;
+			double ry = Math.Abs(max.Y - min.Y) / 2.0;
+
+			if (rx <= 0 || ry <= 0) return 0;
+
+			double h = min.X + rx;
+			double k = min.Y + ry;
+
+			var xh = point.X - h;
+			var yk = point.Y - k;
+
+			var dist = (xh * xh) / (rx * rx) + (yk * yk) / (ry * ry);
+
+			var border = 2.0 / Math.Max(rx, ry);
+
+			if (dist <= 1.0 && dist >= 1.0 - border) return 2;
+			if (dist < 1.0) return 1;
+			else return 0;
+		}
+
+		//-----------------------------------------------------------------------
+		private static void Swap<T>(ref T lhs, ref T rhs) { T temp; temp = lhs; lhs = rhs; rhs = temp; }
+		public static List<IntPoint> Line(int x0, int y0, int x1, int y1)
+		{
+			var list = new List<IntPoint>();
+
+			bool steep = Math.Abs(y1 - y0) > Math.Abs(x1 - x0);
+			if (steep) { Swap<int>(ref x0, ref y0); Swap<int>(ref x1, ref y1); }
+			if (x0 > x1) { Swap<int>(ref x0, ref x1); Swap<int>(ref y0, ref y1); }
+			int dX = (x1 - x0), dY = Math.Abs(y1 - y0), err = (dX / 2), ystep = (y0 < y1 ? 1 : -1), y = y0;
+
+			for (int x = x0; x <= x1; ++x)
+			{
+				if (steep) list.Add(new IntPoint(y, x));
+				else list.Add(new IntPoint(x, y));
+
+				err = err - dY;
+				if (err < 0) { y += ystep; err += dX; }
+			}
+
+			return list;
+		}
+
+		//-----------------------------------------------------------------------
 		[DllImport("user32.dll")]
 		static extern bool GetKeyboardState(byte[] lpKeyState);
 
@@ -1400,6 +1756,7 @@ namespace StructuredXmlEditor.View
 		bool mouseInside = false;
 
 		IntPoint startPos;
+		IntPoint endPos;
 		Point marqueeStart;
 		bool isMarqueeSelecting;
 
