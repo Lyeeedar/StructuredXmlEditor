@@ -816,47 +816,53 @@ namespace StructuredXmlEditor.Data
 		{
 			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
 
+			dlg.Multiselect = true;
 			dlg.DefaultExt = ".xml";
 			dlg.Filter = "Data Files (*.xml, *.json)|*.xml; *.json";
 			bool? result = dlg.ShowDialog();
 
 			if (result == true)
 			{
-				var path = dlg.FileName;
+				DataDefinition def = null;
 
-				XDocument doc = null;
-
-				try
+				foreach (var path in dlg.FileNames)
 				{
-					if (path.EndsWith(".json"))
-					{
-						string json = File.ReadAllText(path);
+					XDocument doc = null;
 
-						var temp = JsonConvert.DeserializeXNode(json, "Root");
-						if (temp.Elements().First().Elements().Count() > 1)
+					try
+					{
+						if (path.EndsWith(".json"))
 						{
-							temp.Elements().First().Name = temp.Elements().First().Elements().First().Name;
-							doc = temp;
+							string json = File.ReadAllText(path);
+
+							var temp = JsonConvert.DeserializeXNode(json, "Root");
+							if (temp.Elements().First().Elements().Count() > 1)
+							{
+								temp.Elements().First().Name = temp.Elements().First().Elements().First().Name;
+								doc = temp;
+							}
+							else
+							{
+								doc = new XDocument(temp.Elements().First());
+							}
 						}
 						else
 						{
-							doc = new XDocument(temp.Elements().First());
+							var docLines = File.ReadAllLines(path).Where(e => !string.IsNullOrWhiteSpace(e)).ToList();
+							if (docLines[0].StartsWith("<?xml")) docLines = docLines.Skip(1).ToList();
+							doc = XDocument.Parse(string.Join(Environment.NewLine, docLines));
 						}
 					}
-					else
+					catch (Exception e)
 					{
-						var docLines = File.ReadAllLines(path).Where(e => !string.IsNullOrWhiteSpace(e)).ToList();
-						if (docLines[0].StartsWith("<?xml")) docLines = docLines.Skip(1).ToList();
-						doc = XDocument.Parse(string.Join(Environment.NewLine, docLines));
+						Message.Show(e.Message, "Unable to open document", "Ok");
+						return;
 					}
-				}
-				catch (Exception e)
-				{
-					Message.Show(e.Message, "Unable to open document", "Ok");
-					return;
+
+					if (def == null) def = CreateDefinitionFromElement(doc.Root, null);
+					else def = CreateDefinitionFromElement(doc.Root, def);
 				}
 
-				var def = CreateDefinitionFromElement(doc.Root, null);
 				var element = DefinitionToElement(def);
 				var root = new XElement("Definitions");
 				root.Add(element);
@@ -945,7 +951,14 @@ namespace StructuredXmlEditor.Data
 					{
 						if (existing is EnumDefinition)
 						{
-							if (el.Value.Contains(" "))
+							if (el.Value.Contains("/") || el.Value.Contains(@"\\"))
+							{
+								var def = new FileDefinition();
+								def.Name = el.Name.ToString();
+
+								return def;
+							}
+							else if (el.Value.Contains(" "))
 							{
 								var def = new StringDefinition();
 								def.Name = el.Name.ToString();
@@ -987,7 +1000,14 @@ namespace StructuredXmlEditor.Data
 					}
 					else
 					{
-						if (el.Value.Contains(" "))
+						if (el.Value.Contains("/") || el.Value.Contains(@"\\"))
+						{
+							var def = new FileDefinition();
+							def.Name = el.Name.ToString();
+
+							return def;
+						}
+						else if (el.Value.Contains(" "))
 						{
 							var def = new StringDefinition();
 							def.Name = el.Name.ToString();
@@ -1014,77 +1034,80 @@ namespace StructuredXmlEditor.Data
 				{
 					var def = existing as StructDefinition;
 
-					foreach (var cel in el.Elements())
+					if (def != null)
 					{
-						if (el.Elements(cel.Name).Count() > 1)
+						foreach (var cel in el.Elements())
 						{
-							// this is actually a collection
-							var existingChild = def.Children.FirstOrDefault(e => e.Name == cel.Name.ToString());
-							CollectionDefinition coldef = null;
-
-							if (existingChild == null)
+							if (el.Elements(cel.Name).Count() > 1)
 							{
-								coldef = new CollectionDefinition();
-								coldef.Name = cel.Name.ToString();
-								coldef.ChildDefinitions.Add(new CollectionChildDefinition());
-								coldef.ChildDefinitions[0].Name = cel.Name.ToString();
+								// this is actually a collection
+								var existingChild = def.Children.FirstOrDefault(e => e.Name == cel.Name.ToString());
+								CollectionDefinition coldef = null;
 
-								def.Children.Add(coldef);
-							}
-							else if (existingChild is CollectionDefinition)
-							{
-								coldef = existingChild as CollectionDefinition;
+								if (existingChild == null)
+								{
+									coldef = new CollectionDefinition();
+									coldef.Name = cel.Name.ToString();
+									coldef.ChildDefinitions.Add(new CollectionChildDefinition());
+									coldef.ChildDefinitions[0].Name = cel.Name.ToString();
+
+									def.Children.Add(coldef);
+								}
+								else if (existingChild is CollectionDefinition)
+								{
+									coldef = existingChild as CollectionDefinition;
+								}
+								else
+								{
+									coldef = new CollectionDefinition();
+									coldef.Name = cel.Name.ToString();
+									coldef.ChildDefinitions.Add(new CollectionChildDefinition());
+									coldef.ChildDefinitions[0].Name = cel.Name.ToString();
+									coldef.ChildDefinitions[0].WrappedDefinition = existingChild;
+
+									var index = def.Children.IndexOf(existingChild);
+									def.Children[index] = coldef;
+								}
+
+								coldef.ChildDefinitions[0].WrappedDefinition = CreateDefinitionFromElement(cel, coldef.ChildDefinitions[0].WrappedDefinition);
 							}
 							else
 							{
-								coldef = new CollectionDefinition();
-								coldef.Name = cel.Name.ToString();
-								coldef.ChildDefinitions.Add(new CollectionChildDefinition());
-								coldef.ChildDefinitions[0].Name = cel.Name.ToString();
-								coldef.ChildDefinitions[0].WrappedDefinition = existingChild;
-
-								var index = def.Children.IndexOf(existingChild);
-								def.Children[index] = coldef;
-							}
-
-							coldef.ChildDefinitions[0].WrappedDefinition = CreateDefinitionFromElement(cel, coldef.ChildDefinitions[0].WrappedDefinition);
-						}
-						else
-						{
-							// find existing child
-							var ec = def.Children.FirstOrDefault(e => e.Name == cel.Name.ToString());
-							if (ec != null)
-							{
-								if (ec is CollectionDefinition)
+								// find existing child
+								var ec = def.Children.FirstOrDefault(e => e.Name == cel.Name.ToString());
+								if (ec != null)
 								{
-									var actualDef = CreateDefinitionFromElement(cel, null);
-									if (actualDef is CollectionDefinition)
+									if (ec is CollectionDefinition)
+									{
+										var actualDef = CreateDefinitionFromElement(cel, null);
+										if (actualDef is CollectionDefinition)
+										{
+											var cdef = CreateDefinitionFromElement(cel, ec);
+											def.Children[def.Children.IndexOf(ec)] = cdef;
+										}
+										else
+										{
+											var coldef = ec as CollectionDefinition;
+
+											coldef.ChildDefinitions[0].WrappedDefinition = CreateDefinitionFromElement(cel, coldef.ChildDefinitions[0].WrappedDefinition);
+										}
+									}
+									else
 									{
 										var cdef = CreateDefinitionFromElement(cel, ec);
 										def.Children[def.Children.IndexOf(ec)] = cdef;
 									}
-									else
-									{
-										var coldef = ec as CollectionDefinition;
-
-										coldef.ChildDefinitions[0].WrappedDefinition = CreateDefinitionFromElement(cel, coldef.ChildDefinitions[0].WrappedDefinition);
-									}
 								}
 								else
 								{
-									var cdef = CreateDefinitionFromElement(cel, ec);
-									def.Children[def.Children.IndexOf(ec)] = cdef;
+									var cdef = CreateDefinitionFromElement(cel, null);
+									def.Children.Add(cdef);
 								}
-							}
-							else
-							{
-								var cdef = CreateDefinitionFromElement(cel, null);
-								def.Children.Add(cdef);
 							}
 						}
 					}
 
-					return def;
+					return existing;
 				}
 				else
 				{
@@ -1179,6 +1202,14 @@ namespace StructuredXmlEditor.Data
 				var el = new XElement("Data");
 				el.Add(new XAttribute("Name", def.Name));
 				el.Add(new XAttribute(DataDefinition.MetaNS + "RefKey", "String"));
+
+				return el;
+			}
+			else if (def is FileDefinition)
+			{
+				var el = new XElement("Data");
+				el.Add(new XAttribute("Name", def.Name));
+				el.Add(new XAttribute(DataDefinition.MetaNS + "RefKey", "File"));
 
 				return el;
 			}
