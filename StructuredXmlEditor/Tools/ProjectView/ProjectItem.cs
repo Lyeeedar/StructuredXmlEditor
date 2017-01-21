@@ -48,19 +48,18 @@ namespace StructuredXmlEditor.Tools
 
 		public bool IsExpanded
 		{
-			get { return m_isExpanded; }
+			get { return Tool.ExpansionMap[Path]; }
 			set
 			{
-				if (m_isExpanded != value)
+				if (IsExpanded != value)
 				{
-					m_isExpanded = value;
+					Tool.ExpansionMap[Path] = value;
 
 					RaisePropertyChangedEvent("IsExpanded");
 					Tool.DeferredRefresh();
 				}
 			}
 		}
-		private bool m_isExpanded = false;
 
 		//-----------------------------------------------------------------------
 		public Command<object> ExpandAllCMD { get { return new Command<object>((e) => Tool.Root.SetExpand(true)); } }
@@ -73,6 +72,11 @@ namespace StructuredXmlEditor.Tools
 			this.Parent = parent;
 			this.Tool = tool;
 			this.Name = name;
+
+			if (!tool.ExpansionMap.ContainsKey(Path))
+			{
+				tool.ExpansionMap[Path] = false;
+			}
 
 			if (!skipLoadAndAdd)
 			{

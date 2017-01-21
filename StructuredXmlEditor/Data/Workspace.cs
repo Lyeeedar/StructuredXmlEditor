@@ -243,6 +243,8 @@ namespace StructuredXmlEditor.Data
 						Open(path);
 					}
 				}
+
+				ProjectViewTool.Instance.Add(path);
 			};
 
 			FileCreated += (path) =>

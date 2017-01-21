@@ -26,7 +26,7 @@ namespace StructuredXmlEditor.Data
 		protected abstract string EmptyString { get; }
 
 		//-----------------------------------------------------------------------
-		public bool HasContent { get { return Children.Count > 0 || Attributes.Count != 0; } }
+		public virtual bool HasContent { get { return Children.Count > 0 || Attributes.Count != 0; } }
 
 		//-----------------------------------------------------------------------
 		public override string Description

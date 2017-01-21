@@ -588,6 +588,8 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		protected override void OnRender(DrawingContext drawingContext)
 		{
+			if (Item == null) return;
+
 			if (selectionBackBrush == null)
 			{
 				selectionBackBrush = new SolidColorBrush(Color.FromScRgb(0.1f, SelectedColour.ScR, SelectedColour.ScG, SelectedColour.ScB));

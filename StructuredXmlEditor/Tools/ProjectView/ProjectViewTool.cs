@@ -14,6 +14,9 @@ namespace StructuredXmlEditor.Tools
 	public class ProjectViewTool : ToolBase
 	{
 		//-----------------------------------------------------------------------
+		public Dictionary<string, bool> ExpansionMap { get; } = new Dictionary<string, bool>();
+
+		//-----------------------------------------------------------------------
 		public static ProjectViewTool Instance;
 
 		//-----------------------------------------------------------------------
@@ -160,8 +163,19 @@ namespace StructuredXmlEditor.Tools
 			{
 				if (part == parts.Last())
 				{
-					new ProjectItem(Workspace, current, this, part);
-					current.UpdateChildFolders();
+					if (ext != String.Empty)
+					{
+						new ProjectItem(Workspace, current, this, part);
+						current.UpdateChildFolders();
+					}
+					else
+					{
+						var folder = current.ChildFolders[part];
+						current.Children.Remove(folder);
+
+						new ProjectItem(Workspace, current, this, part);
+						current.UpdateChildFolders();
+					}
 				}
 				else
 				{

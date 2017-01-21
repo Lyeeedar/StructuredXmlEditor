@@ -27,6 +27,9 @@ namespace StructuredXmlEditor.Data
 		protected override string EmptyString { get { return "null"; } }
 
 		//-----------------------------------------------------------------------
+		public override bool HasContent { get { return Children.Count == (Definition as StructDefinition).Children.Count; } }
+
+		//-----------------------------------------------------------------------
 		public StructItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
 			PropertyChanged += (e, a) =>

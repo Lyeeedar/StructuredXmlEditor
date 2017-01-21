@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace StructuredXmlEditor.Data
 {
@@ -75,6 +76,31 @@ namespace StructuredXmlEditor.Data
 		public MultilineStringItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
 
+		}
+
+		//-----------------------------------------------------------------------
+		public override void ResetToDefault()
+		{
+			Value = (Definition as MultilineStringDefinition).Default;
+		}
+
+		//-----------------------------------------------------------------------
+		public override void Copy()
+		{
+			var asString = Value;
+
+			Clipboard.SetData(CopyKey, asString);
+		}
+
+		//-----------------------------------------------------------------------
+		public override void Paste()
+		{
+			if (Clipboard.ContainsData(CopyKey))
+			{
+				var asString = Clipboard.GetData(CopyKey) as string;
+
+				Value = asString;
+			}
 		}
 	}
 }
