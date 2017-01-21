@@ -53,6 +53,8 @@
 							PopupAnimation="Fade"
 							x:Name="PART_Popup">
 							<Border
+								MinWidth="100"
+								MinHeight="100"
 								BorderThickness="1"
 								Background="{StaticResource BackgroundDarkBrush}"
 								BorderBrush="{StaticResource SelectionBorderBrush}"

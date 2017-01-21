@@ -342,25 +342,32 @@ namespace StructuredXmlEditor.View
 		{
 			var text = "";
 
-			if (Selected.Count == 1) text = "Selected 1 (" + (Selected[0].X + ZeroPoint.X) + "," + (Selected[0].Y + ZeroPoint.Y) + ")";
+			if (Selected.Count == 1)
+			{
+				if (GridWidth == 0 && GridHeight == 0) text += "Selected 1 (0,0)";
+				else text = "Selected 1 (" + (Selected[0].X + ZeroPoint.X) + "," + (Selected[0].Y + ZeroPoint.Y) + ")";
+			}
 			else if (Selected.Count > 1)
 			{
 				var ordered = Selected.OrderBy(e => e.X).ThenBy(e => e.Y);
 				var min = ordered.First();
 				var max = ordered.Last();
 
-				text += "Selected " + Selected.Count + " (" + (min.X + ZeroPoint.X) + "," + (min.Y + ZeroPoint.Y) + " -> " + (max.X + ZeroPoint.X) + "," + (max.Y + ZeroPoint.Y) + ")";
+				if (GridWidth == 0 && GridHeight == 0) text += "Selected " + Selected.Count + " (0,0 -> " + (max.X - min.X) + "," + (max.Y - min.Y) + ")";
+				else text += "Selected " + Selected.Count + " (" + (min.X + ZeroPoint.X) + "," + (min.Y + ZeroPoint.Y) + " -> " + (max.X + ZeroPoint.X) + "," + (max.Y + ZeroPoint.Y) + ")";
 			}
 			else if (startPos.FastHash != endPos.FastHash)
 			{
 				var min = new IntPoint(Math.Min(startPos.X, endPos.X), Math.Min(startPos.Y, endPos.Y));
 				var max = new IntPoint(Math.Max(startPos.X, endPos.X), Math.Max(startPos.Y, endPos.Y));
 
-				text += "Shape (" + (min.X + ZeroPoint.X) + "," + (min.Y + ZeroPoint.Y) + " -> " + (max.X + ZeroPoint.X) + "," + (max.Y + ZeroPoint.Y) + ")";
+				if (GridWidth == 0 && GridHeight == 0) text += "Shape (0,0 -> " + (max.X - min.X) + "," + (max.Y - min.Y) + ")";
+				else text += "Shape (" + (min.X + ZeroPoint.X) + "," + (min.Y + ZeroPoint.Y) + " -> " + (max.X + ZeroPoint.X) + "," + (max.Y + ZeroPoint.Y) + ")";
 			}
 			else if (mouseInside)
 			{
-				text += "Mouse Over (" + (mouseOverTile.X + ZeroPoint.X) + "," + (mouseOverTile.Y + ZeroPoint.Y) + ")";
+				if (GridWidth == 0 && GridHeight == 0) text += "Mouse Over (0,0)";
+				else text += "Mouse Over (" + (mouseOverTile.X + ZeroPoint.X) + "," + (mouseOverTile.Y + ZeroPoint.Y) + ")";
 			}
 
 			InfoText = text;
@@ -775,7 +782,7 @@ namespace StructuredXmlEditor.View
 
 			var local = new Point((pos.X + ViewPos.X) / PixelsATile, (pos.Y + ViewPos.Y) / PixelsATile);
 
-			PixelsATile += (e.Delta / 120);
+			PixelsATile += (e.Delta / 120) * (int)Math.Ceiling((double)PixelsATile / 10.0);
 			if (PixelsATile < 5) PixelsATile = 5;
 
 			ViewPos = new Point(local.X * PixelsATile - pos.X, local.Y * PixelsATile - pos.Y);
@@ -1269,6 +1276,12 @@ namespace StructuredXmlEditor.View
 		{
 			if (ActualWidth == 0 || ActualHeight == 0)
 			{
+				return;
+			}
+
+			if (GridWidth == 0 && GridHeight == 0)
+			{
+				PixelsATile = 50;
 				return;
 			}
 
