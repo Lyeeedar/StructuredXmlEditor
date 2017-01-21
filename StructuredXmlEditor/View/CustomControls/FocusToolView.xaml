@@ -58,7 +58,7 @@
 					DockPanel.Dock="Left"
 					Margin="2"
 					IsChecked="{Binding NormalMode, ElementName=AsciiGrid}"
-					ToolTip="Normal mode">
+					ToolTip="Normal mode (Ctrl+1)">
 					<Image
 						Source="/Resources/Edit.png"
 						RenderOptions.BitmapScalingMode="NearestNeighbor"
@@ -70,7 +70,7 @@
 					DockPanel.Dock="Left"
 					Margin="2"
 					IsChecked="{Binding MagicWandMode, ElementName=AsciiGrid}"
-					ToolTip="Magic wand mode">
+					ToolTip="Magic wand mode (Ctrl+2)">
 					<Image
 						Source="/Resources/MagicWand.png"
 						RenderOptions.BitmapScalingMode="NearestNeighbor"
@@ -82,7 +82,7 @@
 					DockPanel.Dock="Left"
 					Margin="2"
 					IsChecked="{Binding DrawMode, ElementName=AsciiGrid}"
-					ToolTip="Draw mode">
+					ToolTip="Draw mode (Ctrl+3)">
 					<Image
 						Source="/Resources/Draw.png"
 						RenderOptions.BitmapScalingMode="NearestNeighbor"
@@ -94,7 +94,7 @@
 					DockPanel.Dock="Left"
 					Margin="2"
 					IsChecked="{Binding ShapeMode, ElementName=AsciiGrid}"
-					ToolTip="Shape mode">
+					ToolTip="Shape mode (Ctrl+4)">
 					<Image
 						Source="/Resources/Shape.png"
 						RenderOptions.BitmapScalingMode="NearestNeighbor"

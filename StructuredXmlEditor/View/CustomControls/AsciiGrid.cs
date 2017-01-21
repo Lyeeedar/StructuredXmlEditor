@@ -87,7 +87,7 @@ namespace StructuredXmlEditor.View
 				if (ShapeMode) return "Mode: Shape";
 				if (DrawMode)
 				{
-					if (Keyboard.IsKeyDown(Key.LeftAlt))
+					if (Alt)
 					{
 						return "Mode: Eyedropper";
 					}
@@ -123,7 +123,7 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		public bool MagicWandMode
 		{
-			get { return m_magicWandMode || NormalMode && Keyboard.IsKeyDown(Key.LeftAlt); }
+			get { return m_magicWandMode || NormalMode && Alt; }
 			set
 			{
 				m_magicWandMode = value;
@@ -252,6 +252,11 @@ namespace StructuredXmlEditor.View
 		private GlyphRunBuilder GlyphRunBuilder;
 
 		//-----------------------------------------------------------------------
+		private bool Ctrl { get { return Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl); } }
+		private bool Alt { get { return Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt); } }
+		private bool Shift { get { return Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift); } }
+
+		//-----------------------------------------------------------------------
 		public AsciiGrid()
 		{
 			DataContextChanged += (e, args) =>
@@ -361,8 +366,11 @@ namespace StructuredXmlEditor.View
 				var min = new IntPoint(Math.Min(startPos.X, endPos.X), Math.Min(startPos.Y, endPos.Y));
 				var max = new IntPoint(Math.Max(startPos.X, endPos.X), Math.Max(startPos.Y, endPos.Y));
 
-				if (GridWidth == 0 && GridHeight == 0) text += "Shape (0,0 -> " + (max.X - min.X) + "," + (max.Y - min.Y) + ")";
-				else text += "Shape (" + (min.X + ZeroPoint.X) + "," + (min.Y + ZeroPoint.Y) + " -> " + (max.X + ZeroPoint.X) + "," + (max.Y + ZeroPoint.Y) + ")";
+				var area = "" + (max.X - min.X) + "x" + (max.Y - min.Y);
+				if (SelectedShape == "Line") area = "" + Line(min.X, min.Y, max.X, max.Y).Count;
+
+				if (GridWidth == 0 && GridHeight == 0) text += "Shape " + area + " (0,0 -> " + (max.X - min.X) + "," + (max.Y - min.Y) + ")";
+				else text += "Shape " + area + " (" + (min.X + ZeroPoint.X) + "," + (min.Y + ZeroPoint.Y) + " -> " + (max.X + ZeroPoint.X) + "," + (max.Y + ZeroPoint.Y) + ")";
 			}
 			else if (mouseInside)
 			{
@@ -744,7 +752,7 @@ namespace StructuredXmlEditor.View
 			{
 				if (DrawMode)
 				{
-					if (Keyboard.IsKeyDown(Key.LeftAlt))
+					if (Alt)
 					{
 						drawingContext.DrawImage(eyedropperImg, new Rect(mousePos.X, mousePos.Y, 16, 16));
 					}
@@ -759,7 +767,7 @@ namespace StructuredXmlEditor.View
 				}
 				else if (ShapeMode)
 				{
-					if (Keyboard.IsKeyDown(Key.LeftAlt) || SetFill)
+					if (Alt || SetFill)
 					{
 						drawingContext.DrawImage(eyedropperImg, new Rect(mousePos.X, mousePos.Y, 16, 16));
 					}
@@ -852,7 +860,7 @@ namespace StructuredXmlEditor.View
 
 			if (DrawMode)
 			{
-				if (Keyboard.IsKeyDown(Key.LeftAlt))
+				if (Alt)
 				{
 					if (roundedX + ZeroPoint.X >= 0 && roundedX + ZeroPoint.X < GridWidth && roundedY + ZeroPoint.Y >= 0 && roundedY + ZeroPoint.Y < GridHeight)
 					{
@@ -882,7 +890,7 @@ namespace StructuredXmlEditor.View
 			}
 			else if (ShapeMode)
 			{
-				if (Keyboard.IsKeyDown(Key.LeftAlt) || SetFill)
+				if (Alt || SetFill)
 				{
 					if (roundedX + ZeroPoint.X >= 0 && roundedX + ZeroPoint.X < GridWidth && roundedY + ZeroPoint.Y >= 0 && roundedY + ZeroPoint.Y < GridHeight)
 					{
@@ -934,7 +942,7 @@ namespace StructuredXmlEditor.View
 			}
 			else
 			{
-				if (!Keyboard.IsKeyDown(Key.LeftCtrl))
+				if (!Ctrl)
 				{
 					Selected.Clear();
 					Selected.Add(new IntPoint(roundedX, roundedY));
@@ -1103,7 +1111,7 @@ namespace StructuredXmlEditor.View
 			{
 				if (DrawMode)
 				{
-					if (Keyboard.IsKeyDown(Key.LeftAlt))
+					if (Alt)
 					{
 						if (roundedX + ZeroPoint.X >= 0 && roundedX + ZeroPoint.X < GridWidth && roundedY + ZeroPoint.Y >= 0 && roundedY + ZeroPoint.Y < GridHeight)
 						{
@@ -1129,7 +1137,7 @@ namespace StructuredXmlEditor.View
 				}
 				else if (ShapeMode)
 				{
-					if (Keyboard.IsKeyDown(Key.LeftAlt))
+					if (Alt)
 					{
 						if (roundedX + ZeroPoint.X >= 0 && roundedX + ZeroPoint.X < GridWidth && roundedY + ZeroPoint.Y >= 0 && roundedY + ZeroPoint.Y < GridHeight)
 						{
@@ -1142,7 +1150,7 @@ namespace StructuredXmlEditor.View
 				{
 					var diff = pos - marqueeStart;
 
-					if (Keyboard.IsKeyDown(Key.LeftCtrl))
+					if (Ctrl)
 					{
 						var existing = Selected.Where(e => e.X == roundedX && e.Y == roundedY).Cast<IntPoint?>().FirstOrDefault();
 						if (existing == null)
@@ -1394,21 +1402,37 @@ namespace StructuredXmlEditor.View
 					ActiveChar = ' ';
 				}
 			}
-			else if (args.Key == Key.C && Keyboard.IsKeyDown(Key.LeftCtrl))
+			else if (args.Key == Key.C && Ctrl)
 			{
 				Copy();
 			}
-			else if (args.Key == Key.X && Keyboard.IsKeyDown(Key.LeftCtrl))
+			else if (args.Key == Key.X && Ctrl)
 			{
 				Cut();
 			}
-			else if (args.Key == Key.V && Keyboard.IsKeyDown(Key.LeftCtrl))
+			else if (args.Key == Key.V && Ctrl)
 			{
 				Paste();
 			}
-			else if (args.Key == Key.D && Keyboard.IsKeyDown(Key.LeftCtrl))
+			else if (args.Key == Key.D && Ctrl)
 			{
 				Selected.Clear();
+			}
+			else if ((args.Key == Key.D1 || args.Key == Key.NumPad1) && Ctrl)
+			{
+				NormalMode = true;
+			}
+			else if ((args.Key == Key.D2 || args.Key == Key.NumPad2) && Ctrl)
+			{
+				MagicWandMode = true;
+			}
+			else if ((args.Key == Key.D3 || args.Key == Key.NumPad3) && Ctrl)
+			{
+				DrawMode = true;
+			}
+			else if ((args.Key == Key.D4 || args.Key == Key.NumPad4) && Ctrl)
+			{
+				ShapeMode = true;
 			}
 			else
 			{
