@@ -827,7 +827,7 @@ namespace StructuredXmlEditor.View
 
 				if (x + ZeroPoint.X >= 0 && x + ZeroPoint.X < GridWidth && y + ZeroPoint.Y >= 0 && y + ZeroPoint.Y < GridHeight)
 				{
-					if (Grid[x, y] == c)
+					if (Grid[x + ZeroPoint.X, y + ZeroPoint.Y] == c)
 					{
 						var existing = output.Any(e => e.X == x && e.Y == y);
 						if (!existing)
@@ -1102,7 +1102,7 @@ namespace StructuredXmlEditor.View
 				if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
 				{
 					CaptureMouse();
-					Mouse.OverrideCursor = Cursors.ScrollWE;
+					Mouse.OverrideCursor = Cursors.ScrollAll;
 				}
 
 				panPos = pos;
@@ -1466,7 +1466,7 @@ namespace StructuredXmlEditor.View
 							{
 								if (Grid[x, y] == key)
 								{
-									Selected.Add(new IntPoint(x, y));
+									Selected.Add(new IntPoint(x - ZeroPoint.X, y - ZeroPoint.Y));
 								}
 							}
 						}
