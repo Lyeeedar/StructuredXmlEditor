@@ -351,6 +351,17 @@ namespace StructuredXmlEditor.View
 
 				text += "Selected " + Selected.Count + " (" + (min.X + ZeroPoint.X) + "," + (min.Y + ZeroPoint.Y) + " -> " + (max.X + ZeroPoint.X) + "," + (max.Y + ZeroPoint.Y) + ")";
 			}
+			else if (startPos.FastHash != endPos.FastHash)
+			{
+				var min = new IntPoint(Math.Min(startPos.X, endPos.X), Math.Min(startPos.Y, endPos.Y));
+				var max = new IntPoint(Math.Max(startPos.X, endPos.X), Math.Max(startPos.Y, endPos.Y));
+
+				text += "Shape (" + (min.X + ZeroPoint.X) + "," + (min.Y + ZeroPoint.Y) + " -> " + (max.X + ZeroPoint.X) + "," + (max.Y + ZeroPoint.Y) + ")";
+			}
+			else if (mouseInside)
+			{
+				text += "Mouse Over (" + (mouseOverTile.X + ZeroPoint.X) + "," + (mouseOverTile.Y + ZeroPoint.Y) + ")";
+			}
 
 			InfoText = text;
 		}
@@ -568,6 +579,13 @@ namespace StructuredXmlEditor.View
 				selectionBackBrush.Freeze();
 			}
 
+			if (mouseOverBackPen == null)
+			{
+				var brush = new SolidColorBrush(Color.FromScRgb(0.5f, SelectedColour.ScR, SelectedColour.ScG, SelectedColour.ScB));
+				mouseOverBackPen = new Pen(brush, 1);
+				mouseOverBackPen.Freeze();
+			}
+
 			if (gridPen == null)
 			{
 				gridPen = new Pen(GridBrush, 1);
@@ -607,6 +625,11 @@ namespace StructuredXmlEditor.View
 			foreach (var point in Selected)
 			{
 				usedTiles.Add(point.FastHash);
+			}
+
+			if (mouseInside)
+			{
+				drawingContext.DrawRectangle(null, mouseOverBackPen, new Rect(mouseOverTile.X * PixelsATile - ViewPos.X, mouseOverTile.Y * PixelsATile - ViewPos.Y, PixelsATile, PixelsATile));
 			}
 
 			foreach (var point in Selected)
@@ -743,51 +766,6 @@ namespace StructuredXmlEditor.View
 					drawingContext.DrawImage(normalImg, new Rect(mousePos.X, mousePos.Y, 16, 16));
 				}
 			}
-		}
-
-		private GlyphRun ConvertTextLinesToGlyphRun()
-		{
-			GlyphTypeface typeface;
-			new Typeface(FontFamily, FontStyle, FontWeight, FontStretch).TryGetGlyphTypeface(out typeface);
-
-			var glyphIndices = new List<ushort>();
-			var advanceWidths = new List<double>();
-			var glyphOffsets = new List<Point>();
-
-			var y = (GridHeight-1) * PixelsATile + PixelsATile / 5;
-			for (int i = 0; i < GridHeight; ++i)
-			{
-				var x = PixelsATile / 4;
-				for (int j = 0; j < GridWidth; ++j)
-				{
-					var glyphIndex = typeface.CharacterToGlyphMap[Grid[j, i]];
-					glyphIndices.Add(glyphIndex);
-					advanceWidths.Add(0);
-					glyphOffsets.Add(new Point(x, y));
-
-					x += PixelsATile;
-
-				}
-
-				y -= PixelsATile;
-			}
-
-			if (glyphIndices.Count == 0) return null;
-
-			return new GlyphRun(
-				typeface,
-				0,
-				false,
-				PixelsATile,
-				glyphIndices,
-				new Point(-ViewPos.X - ZeroPoint.X * PixelsATile, -ViewPos.Y - ZeroPoint.Y * PixelsATile + GridHeight * PixelsATile),
-				advanceWidths,
-				glyphOffsets,
-				null,
-				null,
-				null,
-				null,
-				null);
 		}
 
 		//-----------------------------------------------------------------------
@@ -1085,6 +1063,8 @@ namespace StructuredXmlEditor.View
 			var local = new Point((pos.X + ViewPos.X) / PixelsATile, (pos.Y + ViewPos.Y) / PixelsATile);
 			var roundedX = local.X < 0 ? (int)Math.Floor(local.X) : (int)local.X;
 			var roundedY = local.Y < 0 ? (int)Math.Floor(local.Y) : (int)local.Y;
+
+			mouseOverTile = new IntPoint(roundedX, roundedY);
 
 			if (args.LeftButton != MouseButtonState.Pressed && args.MiddleButton != MouseButtonState.Pressed)
 			{
@@ -1786,6 +1766,7 @@ namespace StructuredXmlEditor.View
 		ImageSource shapeImg;
 
 		Point mousePos;
+		IntPoint mouseOverTile;
 		bool mouseInside = false;
 
 		IntPoint startPos;
@@ -1802,6 +1783,7 @@ namespace StructuredXmlEditor.View
 		Pen gridPen;
 		Pen selectedPen;
 		Brush selectionBackBrush;
+		Pen mouseOverBackPen;
 	}
 
 	public struct IntPoint
