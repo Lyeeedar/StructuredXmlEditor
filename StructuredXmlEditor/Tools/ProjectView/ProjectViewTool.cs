@@ -170,8 +170,11 @@ namespace StructuredXmlEditor.Tools
 					}
 					else
 					{
-						var folder = current.ChildFolders[part];
-						current.Children.Remove(folder);
+						if (current.ChildFolders.ContainsKey(part))
+						{
+							var folder = current.ChildFolders[part];
+							current.Children.Remove(folder);
+						}
 
 						new ProjectItem(Workspace, current, this, part);
 						current.UpdateChildFolders();
