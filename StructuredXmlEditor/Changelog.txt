@@ -1,4 +1,9 @@
-﻿--------- 1.3.0 ---------
+﻿--------- 1.4.0 ---------
+
+- Added a new AsciiGrid for editing ascii grids. This is a focus editor for the MultilineString element type.
+
+
+--------- 1.3.0 ---------
 
 - Add support for giving data files a custom extension, and choosing whether the data should be xml or json.
 - Add a ProjectView tool that allows browsing the data files in the project.
@@ -38,8 +43,6 @@
 --------- 0.2.1 ---------
 
 - Contains improvements to visibleif (add support for the || operator).
-- Fixes loading of structs made invisible by visibleif.
-- Improvements to saving that fix collections of primitives, collections of references and trees.
 
 
 --------- 0.2.0 ---------
