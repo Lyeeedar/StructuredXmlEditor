@@ -54,6 +54,9 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public VectorItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
+			var vDef = Definition as VectorDefinition;
+			if (!Value.Initialised) Value = (VectorN)vDef.DefaultValue();
+
 			PropertyChanged += (e, args) =>
 			{
 				if (args.PropertyName == "Value")
@@ -69,7 +72,8 @@ namespace StructuredXmlEditor.Data
 
 	public struct VectorN
 	{
-		public int Components { get; set; }
+		public bool Initialised;
+		public int Components { get; private set; }
 		public float X { get; set; }
 		public float Y { get; set; }
 		public float Z { get; set; }
@@ -77,11 +81,15 @@ namespace StructuredXmlEditor.Data
 
 		public VectorN(int components, float x = 0.0f, float y = 0.0f, float z = 0.0f, float w = 0.0f)
 		{
+			if (components < 2 || components > 4) throw new Exception("Invalid number of components '" + components + "'!");
+
 			Components = components;
 			X = x;
 			Y = y;
 			Z = z;
 			W = w;
+
+			Initialised = true;
 		}
 
 		public override string ToString()
@@ -99,11 +107,12 @@ namespace StructuredXmlEditor.Data
 				return X + "," + Y + "," + Z + "," + W;
 			}
 			return "";
+			//throw new Exception("Invalid number of components '" + Components + "'!");
 		}
 
 		public static VectorN FromString(string data, int components = -1)
 		{
-			var split = data.Split(new char[] { ',' });
+			var split = string.IsNullOrWhiteSpace(data) ? new string[] { "0", "0" } : data.Split(new char[] { ',' });
 
 			float x = 0f;
 			float y = 0f;

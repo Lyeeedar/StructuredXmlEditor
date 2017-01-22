@@ -30,6 +30,7 @@
 			<String Name="Name4" Default="W" ToolTip="The name to display for component 4." VisibleIf="NumComponents==4" />
 			<Number Name="Min" Default="-9999999" ToolTip="The minimum value this element can contain." />
 			<Number Name="Max" Default="9999999" ToolTip="The maximum value this element can contain." />
+			<String Name="Default" Default="0,0,0,0" ToolTip="The comma seperated default values" />
 			<Enum Name="Type" Default="Float" EnumValues="Float,Int" ToolTip="The value type." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />

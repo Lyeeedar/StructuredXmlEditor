@@ -55,7 +55,7 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public virtual string ValueToString(T val)
 		{
-			return "" + val;
+			return val.ToString();
 		}
 
 		//-----------------------------------------------------------------------

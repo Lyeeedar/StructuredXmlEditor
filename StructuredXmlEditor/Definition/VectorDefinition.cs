@@ -10,7 +10,7 @@ namespace StructuredXmlEditor.Definition
 {
 	public class VectorDefinition : PrimitiveDataDefinition
 	{
-		public string Default { get; set; }
+		public VectorN Default { get; set; }
 		public int NumComponents { get; set; } = 2;
 
 		public string XName { get; set; } = "X";
@@ -30,18 +30,18 @@ namespace StructuredXmlEditor.Definition
 
 		public override object DefaultValue()
 		{
-			return VectorN.FromString(Default);
+			return Default;
 		}
 
 		public override string DefaultValueString()
 		{
-			return Default;
+			return Default.ToString();
 		}
 
 		public override void DoSaveData(XElement parent, DataItem item)
 		{
 			var si = item as VectorItem;
-			parent.Add(new XElement(Name, si.Value));
+			parent.Add(new XElement(Name, si.Value.ToString()));
 		}
 
 		public override DataItem LoadData(XElement element, UndoRedoManager undoRedo)
@@ -76,7 +76,8 @@ namespace StructuredXmlEditor.Definition
 				UseIntegers = true;
 			}
 
-			Default = definition.Attribute("Default")?.Value?.ToString() ?? "0,0,0,0";
+			var defaultString = definition.Attribute("Default")?.Value?.ToString() ?? "0,0,0,0";
+			Default = VectorN.FromString(defaultString, NumComponents);
 		}
 
 		public override string WriteToString(DataItem item)
