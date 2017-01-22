@@ -187,7 +187,14 @@ namespace StructuredXmlEditor.Tools
 						current.Add(part);
 					}
 
-					current = current.ChildFolders[part];
+					if (current.ChildFolders.ContainsKey(part))
+					{
+						current = current.ChildFolders[part];
+					}
+					else
+					{
+						return;
+					}
 				}
 			}
 
