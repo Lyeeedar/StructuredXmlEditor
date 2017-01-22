@@ -50,7 +50,7 @@ namespace StructuredXmlEditor.Data
 
 				if (WrappedItem != null)
 				{
-					Name = WrappedItem.Name;
+					Name = Parent is CollectionChildItem ? WrappedItem.Name : Definition.Name + " (" + WrappedItem.Name + ")";
 					ToolTip = WrappedItem.ToolTip;
 					TextColour = WrappedItem.TextColour;
 				}
@@ -118,6 +118,13 @@ namespace StructuredXmlEditor.Data
 					if (WrappedItem != null)
 					{
 						WrappedItem.Grid = Grid;
+					}
+				}
+				else if (args.PropertyName == "Parent")
+				{
+					if (WrappedItem != null)
+					{
+						Name = Parent is CollectionChildItem ? WrappedItem.Name : Definition.Name + " (" + WrappedItem.Name + ")";
 					}
 				}
 			};
