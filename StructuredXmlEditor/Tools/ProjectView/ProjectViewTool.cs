@@ -165,8 +165,12 @@ namespace StructuredXmlEditor.Tools
 				{
 					if (ext != String.Empty)
 					{
-						new ProjectItem(Workspace, current, this, part);
-						current.UpdateChildFolders();
+						var existing = current.Children.FirstOrDefault(e => e.Name == part);
+						if (existing == null)
+						{
+							new ProjectItem(Workspace, current, this, part);
+							current.UpdateChildFolders();
+						}
 					}
 					else
 					{
