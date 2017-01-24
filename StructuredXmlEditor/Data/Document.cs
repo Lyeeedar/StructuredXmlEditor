@@ -1,4 +1,5 @@
-﻿using StructuredXmlEditor.View;
+﻿using StructuredXmlEditor.Tools;
+using StructuredXmlEditor.View;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -143,6 +144,7 @@ namespace StructuredXmlEditor.Data
 			Workspace.DisableFileEvents = true;
 
 			Data.Save(path);
+			if (!isBackup) ProjectViewTool.Instance.Add(path);
 			
 			Workspace.DisableFileEvents = false;
 

@@ -530,11 +530,13 @@ namespace StructuredXmlEditor.Data
 			Watcher = new FileSystemWatcher()
 			{
 				Path = Path.GetDirectoryName(ProjectRoot),
-				NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite,
+				NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Size | NotifyFilters.Attributes,
 				IncludeSubdirectories = true,
-				Filter = "*.*"
+				Filter = "*",
+				InternalBufferSize = 16384
 			};
 
+			Watcher.Error += (e, args) => { System.Diagnostics.Debug.WriteLine("File watcher error!" + args.GetException().Message); };
 			Watcher.Created += (e, args) => { if (!DisableFileEvents) m_concurrentQueue.Add(args); };
 			Watcher.Deleted += (e, args) => { if (!DisableFileEvents) m_concurrentQueue.Add(args); };
 			Watcher.Renamed += (e, args) => { if (!DisableFileEvents) m_concurrentQueue.Add(args); };
@@ -560,22 +562,37 @@ namespace StructuredXmlEditor.Data
 
 				Application.Current.Dispatcher.Invoke(new Action(() => 
 				{
+					
+
 					if (args.ChangeType == WatcherChangeTypes.Changed)
 					{
+						System.Diagnostics.Debug.WriteLine("File Change: " + args.FullPath);
+
 						FileChanged?.Invoke(args.FullPath);
 					}
 					else if (args.ChangeType == WatcherChangeTypes.Created)
 					{
+						System.Diagnostics.Debug.WriteLine("File Created: " + args.FullPath);
+
 						FileCreated?.Invoke(args.FullPath);
 					}
 					else if (args.ChangeType == WatcherChangeTypes.Deleted)
 					{
+						System.Diagnostics.Debug.WriteLine("File Deleted: " + args.FullPath);
+
 						FileDeleted?.Invoke(args.FullPath);
 					}
 					else if (args.ChangeType == WatcherChangeTypes.Renamed)
 					{
 						RenamedEventArgs renameArgs = (RenamedEventArgs)args;
+
+						System.Diagnostics.Debug.WriteLine("File Renamed: " + renameArgs.OldFullPath + " -> " + renameArgs.FullPath);
+
 						FileRenamed?.Invoke(renameArgs.OldFullPath, renameArgs.FullPath);
+					}
+					else
+					{
+						System.Diagnostics.Debug.WriteLine("Unknown Event!");
 					}
 				}));
 			}
@@ -677,6 +694,8 @@ namespace StructuredXmlEditor.Data
 		{
 			var extension = Path.GetExtension(path).ToLower();
 			DataDefinition matchedDef = null;
+
+			if (!File.Exists(path)) return null;
 
 			if (extension == ".xmldef")
 			{

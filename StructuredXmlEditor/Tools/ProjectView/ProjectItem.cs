@@ -80,6 +80,15 @@ namespace StructuredXmlEditor.Tools
 
 			if (!skipLoadAndAdd)
 			{
+				if (Parent != null)
+				{
+					var existing = Parent.Children.FirstOrDefault(e => e.Name == name);
+					if (existing != null)
+					{
+						Parent.Children.Remove(existing);
+					}
+				}
+
 				if (IsDirectory)
 				{
 					Load();

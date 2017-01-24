@@ -155,6 +155,7 @@ namespace StructuredXmlEditor.Tools
 			Uri path2 = new Uri(Workspace.Instance.ProjectRoot);
 			Uri diff = path2.MakeRelativeUri(path1);
 			string relPath = diff.OriginalString;
+			relPath = relPath.Replace("%20", " ");
 
 			var parts = relPath.Split('/');
 
@@ -165,21 +166,11 @@ namespace StructuredXmlEditor.Tools
 				{
 					if (ext != String.Empty)
 					{
-						var existing = current.Children.FirstOrDefault(e => e.Name == part);
-						if (existing == null)
-						{
-							new ProjectItem(Workspace, current, this, part);
-							current.UpdateChildFolders();
-						}
+						new ProjectItem(Workspace, current, this, part);
+						current.UpdateChildFolders();
 					}
 					else
 					{
-						if (current.ChildFolders.ContainsKey(part))
-						{
-							var folder = current.ChildFolders[part];
-							current.Children.Remove(folder);
-						}
-
 						new ProjectItem(Workspace, current, this, part);
 						current.UpdateChildFolders();
 					}
@@ -216,6 +207,7 @@ namespace StructuredXmlEditor.Tools
 			Uri path2 = new Uri(Workspace.Instance.ProjectRoot);
 			Uri diff = path2.MakeRelativeUri(path1);
 			string relPath = diff.OriginalString;
+			relPath = relPath.Replace("%20", " ");
 
 			var parts = relPath.Split('/');
 
