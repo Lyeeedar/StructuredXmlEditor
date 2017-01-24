@@ -55,17 +55,24 @@ namespace StructuredXmlEditor.View
 						}
 						else
 						{
-							var split = currentString.Split(new char[] { ',' });
+							if (currentString == "---")
+							{
+								colour.Push(colour.Peek());
+							}
+							else
+							{
+								var split = currentString.Split(new char[] { ',' });
 
-							byte r = 0;
-							byte g = 0;
-							byte b = 0;
+								byte r = 0;
+								byte g = 0;
+								byte b = 0;
 
-							byte.TryParse(split[0], out r);
-							byte.TryParse(split[1], out g);
-							byte.TryParse(split[2], out b);
+								byte.TryParse(split[0], out r);
+								byte.TryParse(split[1], out g);
+								byte.TryParse(split[2], out b);
 
-							colour.Push(Color.FromArgb(255, r, g, b));
+								colour.Push(Color.FromArgb(255, r, g, b));
+							}
 						}
 
 						tagIsClosing = false;

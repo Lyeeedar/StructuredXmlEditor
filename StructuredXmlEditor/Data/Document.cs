@@ -22,6 +22,10 @@ namespace StructuredXmlEditor.Data
 		public bool IsBackup { get; set; }
 
 		//-----------------------------------------------------------------------
+		public List<Document> MultieditDocs { get; set; }
+		public bool IsMultiediting { get { return MultieditDocs != null; } }
+
+		//-----------------------------------------------------------------------
 		public static string BackupFolder { get { return System.IO.Path.GetFullPath("Backups"); } }
 
 		//-----------------------------------------------------------------------
@@ -50,6 +54,8 @@ namespace StructuredXmlEditor.Data
 		{
 			get
 			{
+				if (IsMultiediting) return "Multiedit: " + string.Join(",", MultieditDocs.Select(e => System.IO.Path.GetFileNameWithoutExtension(e.Path)));
+
 				string name = System.IO.Path.GetFileNameWithoutExtension(Path);
 				if (IsBackup) name = "[Backup]" + name; 
 				if (UndoRedo.IsModified) name += "*";
@@ -75,6 +81,11 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		private void OpenInExplorer(string path)
 		{
+			if (IsMultiediting)
+			{
+				path = MultieditDocs[0].Path;
+			}
+
 			path = System.IO.Path.GetFullPath(path);
 
 			Process.Start("explorer.exe", string.Format("/select,\"{0}\"", path));
@@ -137,8 +148,36 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public void MultiEdit(List<Document> docs)
+		{
+			MultieditDocs = docs;
+
+			var data = new List<DataItem>();
+			foreach (var doc in docs)
+			{
+				data.Add(doc.Data.RootItems[0]);
+			}
+
+			Data.RootItems[0].MultiEdit(data, data.Count);
+
+			backupTimer.Stop();
+
+			Path = "";
+		}
+
+		//-----------------------------------------------------------------------
 		public void Save(bool isBackup = false)
 		{
+			if (IsMultiediting)
+			{
+				foreach (var doc in MultieditDocs)
+				{
+					doc.Save();
+				}
+
+				return;
+			}
+
 			var path = isBackup ? BackupPath : Path;
 
 			Workspace.DisableFileEvents = true;

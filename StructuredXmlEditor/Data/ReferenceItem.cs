@@ -189,6 +189,31 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		protected override void MultieditItemPropertyChanged(object sender, PropertyChangedEventArgs args)
+		{
+			if (args.PropertyName == "WrappedItem")
+			{
+				foreach (var child in Children)
+				{
+					child.ClearMultiEdit();
+				}
+
+				ChosenDefinition = null;
+				WrappedItem = null;
+
+				var firstItem = MultieditItems[0] as ReferenceItem;
+
+				if (firstItem.HasContent)
+				{
+					ChosenDefinition = firstItem.ChosenDefinition;
+					WrappedItem = firstItem.WrappedItem.DuplicateData();
+
+					MultiEdit(MultieditItems, MultieditCount.Value);
+				}
+			}
+		}
+
+		//-----------------------------------------------------------------------
 		public void WrappedItemPropertyChanged(object sender, PropertyChangedEventArgs args)
 		{
 			if (args.PropertyName == "Description")
@@ -226,49 +251,71 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void Create()
 		{
-			DataItem item = null;
-			var chosen = (Definition as ReferenceDefinition).Definitions[SelectedDefinition.Item1];
-			using (UndoRedo.DisableUndoScope())
+			if (IsMultiediting)
 			{
-				item = chosen.CreateData(UndoRedo);
-				if (item is StructItem && item.Children.Count == 0)
+				foreach (var item in MultieditItems)
 				{
-					(item.Definition as StructDefinition).CreateChildren(item as StructItem, UndoRedo);
+					var ri = item as ReferenceItem;
+					ri.SelectedDefinition = SelectedDefinition;
+					ri.Create();
 				}
 			}
-
-			UndoRedo.ApplyDoUndo(delegate
+			else
 			{
-				ChosenDefinition = chosen;
-				WrappedItem = item;
-			},
-			delegate
-			{
-				WrappedItem = null;
-				ChosenDefinition = null;
-			},
-			"Create Item " + item.Name);
+				DataItem item = null;
+				var chosen = (Definition as ReferenceDefinition).Definitions[SelectedDefinition.Item1];
+				using (UndoRedo.DisableUndoScope())
+				{
+					item = chosen.CreateData(UndoRedo);
+					if (item is StructItem && item.Children.Count == 0)
+					{
+						(item.Definition as StructDefinition).CreateChildren(item as StructItem, UndoRedo);
+					}
+				}
 
-			IsExpanded = true;
+				UndoRedo.ApplyDoUndo(delegate
+				{
+					ChosenDefinition = chosen;
+					WrappedItem = item;
+				},
+				delegate
+				{
+					ChosenDefinition = null;
+					WrappedItem = null;
+				},
+				"Create Item " + item.Name);
+
+				IsExpanded = true;
+			}
 		}
 
 		//-----------------------------------------------------------------------
 		public void Clear()
 		{
-			var item = WrappedItem;
-			var oldDef = ChosenDefinition;
+			if (IsMultiediting)
+			{
+				foreach (var item in MultieditItems)
+				{
+					(item as ReferenceItem).Clear();
+				}
+			}
+			else
+			{
+				var item = WrappedItem;
+				var oldDef = ChosenDefinition;
 
-			UndoRedo.ApplyDoUndo(delegate
-			{
-				WrappedItem = null;
-				ChosenDefinition = null;
-			},
-			delegate
-			{
-				WrappedItem = item;
-				ChosenDefinition = oldDef;
-			},
-			"Clear Item " + Definition.Name);
+				UndoRedo.ApplyDoUndo(delegate
+				{
+					ChosenDefinition = null;
+					WrappedItem = null;
+				},
+				delegate
+				{
+					ChosenDefinition = oldDef;
+					WrappedItem = item;
+				},
+				"Clear Item " + Definition.Name);
+			}
 		}
 	}
 }

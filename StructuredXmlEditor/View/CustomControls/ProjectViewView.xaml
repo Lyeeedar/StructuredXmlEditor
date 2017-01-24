@@ -84,6 +84,15 @@
 			HorizontalContentAlignment="Stretch"
 			Grid.Row="1"
 			ItemsSource="{Binding Items}">
+			<ListView.Resources>
+				<Style
+					TargetType="{x:Type ListViewItem}"
+					BasedOn="{StaticResource {x:Type ListViewItem}}">
+					<Setter
+						Property="IsSelected"
+						Value="{Binding IsSelected, Mode=TwoWay}" />
+				</Style>
+			</ListView.Resources>
 			<ListView.ItemTemplate>
 				<DataTemplate>
 					<ContentControl
@@ -106,6 +115,13 @@
 								<MenuItem
 									Header="Explore To"
 									Command="{Binding ExploreToCMD}" />
+
+								<Separator />
+
+								<MenuItem
+									Header="Multiedit"
+									Command="{Binding MultiEditCMD}" />
+
 							</ContextMenu>
 						</ContentControl.ContextMenu>
 						<Grid>

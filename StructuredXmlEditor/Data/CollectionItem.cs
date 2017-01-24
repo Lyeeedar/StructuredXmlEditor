@@ -33,10 +33,10 @@ namespace StructuredXmlEditor.Data
 		public bool ShowComboBox { get { return CDef.ChildDefinitions.Count > 1; } }
 
 		//-----------------------------------------------------------------------
-		public bool IsAtMax { get { return Children.Where(e => CDef.ChildDefinitions.Contains(e.Definition)).Count() >= CDef.MaxCount; } }
+		public bool IsAtMax { get { return IsMultiediting || Children.Where(e => CDef.ChildDefinitions.Contains(e.Definition)).Count() >= CDef.MaxCount; } }
 
 		//-----------------------------------------------------------------------
-		public bool IsAtMin { get { return Children.Where(e => CDef.ChildDefinitions.Contains(e.Definition)).Count() <= CDef.MinCount; } }
+		public bool IsAtMin { get { return IsMultiediting || Children.Where(e => CDef.ChildDefinitions.Contains(e.Definition)).Count() <= CDef.MinCount; } }
 
 		//-----------------------------------------------------------------------
 		public override bool CanPaste { get { return !IsAtMax; } }
@@ -57,6 +57,7 @@ namespace StructuredXmlEditor.Data
 			};
 
 			SelectedDefinition = CDef.ChildDefinitions.First();
+			IsContextMenuDynamic = true;
 		}
 
 		//-----------------------------------------------------------------------
@@ -69,6 +70,26 @@ namespace StructuredXmlEditor.Data
 			pasteItem.Command = PasteNewCMD;
 
 			menu.Items.Add(pasteItem);
+
+			if (Children.Count > 1)
+			{
+				menu.AddSeperator();
+
+				menu.AddItem("Multiedit Children", () =>
+				{
+					var firstCopy = Children[0].DuplicateData();
+
+					var otherChildren = new List<DataItem>();
+					for (int i = 0; i < Children.Count; i++)
+					{
+						otherChildren.Add(Children[i]);
+					}
+
+					firstCopy.MultiEdit(otherChildren, otherChildren.Count);
+
+					Grid.Selected = new List<DataItem>() { firstCopy };
+				});
+			}
 		}
 
 		//-----------------------------------------------------------------------

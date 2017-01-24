@@ -55,21 +55,21 @@ namespace StructuredXmlEditor.View
 
 		#region Value
 		//--------------------------------------------------------------------------
-		public float Value
+		public float? Value
 		{
-			get { return (float)GetValue(ValueProperty); }
+			get { return (float?)GetValue(ValueProperty); }
 			set { SetValue(ValueProperty, value); }
 		}
 
 		//--------------------------------------------------------------------------
-		public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(float),
+		public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(float?),
 			typeof(NumericTextBox), new FrameworkPropertyMetadata(0.0f, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, (s, a) =>
 			{
-				((NumericTextBox)s).OnValueChanged((float)a.OldValue, (float)a.NewValue);
+				((NumericTextBox)s).OnValueChanged((float?)a.OldValue, (float?)a.NewValue);
 			}));
 
 		//--------------------------------------------------------------------------
-		public void OnValueChanged(float oldVal, float newVal)
+		public void OnValueChanged(float? oldVal, float? newVal)
 		{
 			if (cameFromUs)
 			{
@@ -77,7 +77,7 @@ namespace StructuredXmlEditor.View
 			}
 			else
 			{
-				m_valueText = newVal.ToString();
+				m_valueText = newVal?.ToString() ?? "---";
 				RaisePropertyChangedEvent("ValueText");
 			}
 		}

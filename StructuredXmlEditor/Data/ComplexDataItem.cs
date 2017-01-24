@@ -135,6 +135,25 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		protected override void MultieditItemPropertyChanged(object sender, PropertyChangedEventArgs args)
+		{
+			if (args.PropertyName == "ChildrenItems")
+			{
+				foreach (var item in Children)
+				{
+					ClearMultiEdit();
+				}
+
+				Clear();
+
+				MultieditItems[0].Copy();
+				Paste();
+
+				MultiEdit(MultieditItems, MultieditCount.Value);
+			}
+		}
+
+		//-----------------------------------------------------------------------
 		void OnAttributesCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
 			switch (e.Action)
@@ -269,21 +288,31 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public virtual void Clear()
 		{
-			var prevChildren = Children.ToList();
-			UndoRedo.ApplyDoUndo(
-				delegate
+			if (IsMultiediting)
+			{
+				foreach (var item in MultieditItems)
 				{
-					Children.Clear();
-					RaisePropertyChangedEvent("HasContent");
-					RaisePropertyChangedEvent("Description");
-				},
-				delegate
-				{
-					foreach (var child in prevChildren) Children.Add(child);
-					RaisePropertyChangedEvent("HasContent");
-					RaisePropertyChangedEvent("Description");
-				},
-				Name + " cleared");
+					(item as ComplexDataItem).Clear();
+				}
+			}
+			else
+			{
+				var prevChildren = Children.ToList();
+				UndoRedo.ApplyDoUndo(
+					delegate
+					{
+						Children.Clear();
+						RaisePropertyChangedEvent("HasContent");
+						RaisePropertyChangedEvent("Description");
+					},
+					delegate
+					{
+						foreach (var child in prevChildren) Children.Add(child);
+						RaisePropertyChangedEvent("HasContent");
+						RaisePropertyChangedEvent("Description");
+					},
+					Name + " cleared");
+			}
 		}
 
 		//-----------------------------------------------------------------------

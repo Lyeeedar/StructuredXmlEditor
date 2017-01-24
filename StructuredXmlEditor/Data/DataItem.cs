@@ -12,11 +12,17 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using System.Xml.Linq;
 
 namespace StructuredXmlEditor.Data
 {
 	public abstract class DataItem : NotifyPropertyChanged, IDataGridItem
 	{
+		//-----------------------------------------------------------------------
+		public List<DataItem> MultieditItems { get; set; } = new List<DataItem>();
+		public int? MultieditCount;
+		public bool IsMultiediting { get { return MultieditCount.HasValue; } }
+
 		//-----------------------------------------------------------------------
 		public int Index
 		{
@@ -71,7 +77,8 @@ namespace StructuredXmlEditor.Data
 				}
 			}
 		}
-		private List<DataItem> m_childrenCache = new List<DataItem>();
+		protected List<DataItem> m_childrenCache = new List<DataItem>();
+		protected List<DataItem> m_oldChildrenCache = new List<DataItem>();
 
 		//-----------------------------------------------------------------------
 		public IEnumerable<DataItem> Descendants
@@ -128,6 +135,12 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public bool IsMultieditFiltered
+		{
+			get { return MultieditCount.HasValue && MultieditItems.Count != MultieditCount.Value; }
+		}
+
+		//-----------------------------------------------------------------------
 		public bool IsFilterMatched
 		{
 			get { return m_filterMatched; }
@@ -137,7 +150,7 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public bool IsVisible
 		{
-			get { return m_isVisible && !m_isSearchFiltered && !m_isMultiselectFiltered && IsVisibleFromBindings; }
+			get { return m_isVisible && !m_isSearchFiltered && !IsMultieditFiltered && IsVisibleFromBindings; }
 			set
 			{
 				if (m_isVisible != value)
@@ -520,6 +533,16 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public DataItem DuplicateData()
+		{
+			var el = new XElement("Root");
+			Definition.SaveData(el, this);
+
+			var item = Definition.LoadData(el.Elements().First(), new UndoRedoManager());
+			return item;
+		}
+
+		//-----------------------------------------------------------------------
 		public abstract void Copy();
 
 		//-----------------------------------------------------------------------
@@ -656,7 +679,6 @@ namespace StructuredXmlEditor.Data
 		{
 			foreach (var child in m_childrenCache)
 			{
-				//child.Parent = null;
 				child.PropertyChanged -= ChildPropertyChanged;
 			}
 
@@ -672,8 +694,13 @@ namespace StructuredXmlEditor.Data
 				Children[i].Index = i;
 			}
 
+			m_oldChildrenCache.Clear();
+			m_oldChildrenCache.AddRange(m_childrenCache);
+
 			m_childrenCache.Clear();
 			m_childrenCache.AddRange(Children);
+
+			RaisePropertyChangedEvent("ChildrenItems");
 		}
 
 		//-----------------------------------------------------------------------
@@ -882,11 +909,74 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public virtual void ClearMultiEdit()
+		{
+			if (MultieditItems != null)
+			{
+				foreach (var item in MultieditItems)
+				{
+					item.PropertyChanged -= MultieditItemPropertyChanged;
+				}
+			}
+
+			foreach (var child in Children)
+			{
+				child.ClearMultiEdit();
+			}
+
+			MultieditItems = null;
+			MultieditCount = null;
+
+			RaisePropertyChangedEvent("IsVisible");
+		}
+
+		//-----------------------------------------------------------------------
+		public virtual void MultiEdit(List<DataItem> items, int count)
+		{
+			MultieditItems = items;
+			MultieditCount = count;
+
+			for (int i = 0; i < Children.Count; i++)
+			{
+				var child = Children[i];
+				var childItems = new List<DataItem>();
+				foreach (var item in items)
+				{
+					if (item.Children.Count > i)
+					{
+						var itemChild = item.Children[i];
+						if (itemChild.Definition == child.Definition)
+						{
+							childItems.Add(itemChild);
+						}
+					}
+				}
+
+				child.MultiEdit(childItems, count);
+
+				if (!child.IsMultieditFiltered)
+				{
+					foreach (var item in childItems)
+					{
+						item.PropertyChanged += child.MultieditItemPropertyChanged;
+					}
+				}
+			}
+
+			RaisePropertyChangedEvent("IsVisible");
+		}
+
+		//-----------------------------------------------------------------------
+		protected virtual void MultieditItemPropertyChanged(object sender, PropertyChangedEventArgs args)
+		{
+
+		}
+
+		//-----------------------------------------------------------------------
 		Visibility m_firstItem = Visibility.Hidden;
 		int m_zindex = 0;
 		bool m_isSearchFiltered = false;
 		bool m_filterMatched = false;
-		protected bool m_isMultiselectFiltered = false;
 		string m_name;
 		bool m_isExpanded = false;
 		bool m_isVisible = true;

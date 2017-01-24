@@ -11,7 +11,7 @@ using StructuredXmlEditor.View;
 
 namespace StructuredXmlEditor.Data
 {
-	public class ColourItem : PrimitiveDataItem<Color>
+	public class ColourItem : PrimitiveDataItem<Color?>
 	{
 		public ColourItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
@@ -27,17 +27,18 @@ namespace StructuredXmlEditor.Data
 			}
 		}
 
-		public override string ValueToString(Color val)
+		public override string ValueToString(Color? val)
 		{
 			var cdef = Definition as ColourDefinition;
 
-			if (cdef.HasAlpha)
+			if (!val.HasValue) return "---";
+			else if (cdef.HasAlpha)
 			{
-				return "" + val.R + "," + val.G + "," + val.B + "," + val.A;
+				return "" + val.Value.R + "," + val.Value.G + "," + val.Value.B + "," + val.Value.A;
 			}
 			else
 			{
-				return "" + val.R + "," + val.G + "," + val.B;
+				return "" + val.Value.R + "," + val.Value.G + "," + val.Value.B;
 			}
 		}
 	}

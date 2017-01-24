@@ -7,7 +7,7 @@ using StructuredXmlEditor.Definition;
 
 namespace StructuredXmlEditor.Data
 {
-	public class NumberItem : PrimitiveDataItem<float>
+	public class NumberItem : PrimitiveDataItem<float?>
 	{
 		public NumberItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{

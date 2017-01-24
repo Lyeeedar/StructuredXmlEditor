@@ -43,6 +43,7 @@ namespace StructuredXmlEditor.Tools
 		public int Depth { get { return Parent?.Depth + 1 ?? -1; } }
 		public int Padding { get { return Depth * 10; } }
 		public bool IsVisible { get; set; } = true;
+		public bool IsSelected { get; set; }
 		private bool storedExpanded;
 		private bool isFiltering = false;
 
@@ -65,6 +66,7 @@ namespace StructuredXmlEditor.Tools
 		public Command<object> ExpandAllCMD { get { return new Command<object>((e) => Tool.Root.SetExpand(true)); } }
 		public Command<object> CollapseAllCMD { get { return new Command<object>((e) => Tool.Root.SetExpand(false)); } }
 		public Command<object> ExploreToCMD { get { return new Command<object>((e) => OpenInExplorer()); } }
+		public Command<object> MultiEditCMD { get { return new Command<object>((e) => MultiEdit()); } }
 
 		public ProjectItem(Workspace workspace, ProjectItem parent, ProjectViewTool tool, string name, bool skipLoadAndAdd = false)
 		{
@@ -113,6 +115,40 @@ namespace StructuredXmlEditor.Tools
 					Tool.DeferredRefresh();
 				}
 			};
+		}
+
+		//-----------------------------------------------------------------------
+		private void MultiEdit()
+		{
+			var paths = new List<string>();
+			foreach (var item in Tool.Items)
+			{
+				if (item.IsSelected)
+				{
+					paths.Add(item.FullPath);
+				}
+			}
+
+			if (paths.Count == 1)
+			{
+				Workspace.Open(paths[0]);
+			}
+			else
+			{
+				var first = Workspace.OpenImpl(paths[0]);
+
+				var data = new List<Document>();
+				foreach (var path in paths)
+				{
+					var doc = Workspace.OpenImpl(path);
+					data.Add(doc);
+				}
+
+				first.MultiEdit(data);
+
+				Workspace.Documents.Add(first);
+				Workspace.Current = first;
+			}
 		}
 
 		//-----------------------------------------------------------------------

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.ComponentModel;
 
 namespace StructuredXmlEditor.Data
 {
@@ -18,20 +19,43 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public virtual T Value
 		{
-			get { return m_value; }
+			get
+			{
+				if (IsMultiediting)
+				{
+					var firstVal = (MultieditItems[0] as PrimitiveDataItem<T>).Value;
+					for (int i = 1; i < MultieditItems.Count; i++)
+					{
+						if (!(MultieditItems[i] as PrimitiveDataItem<T>).Value.Equals(firstVal)) return default(T);
+					}
+					return firstVal;
+				}
+
+				return m_value;
+			}
 			set
 			{
-				if (!value.Equals(m_value))
+				if (IsMultiediting)
 				{
-					UndoRedo.DoValueChange<T>(this, m_value, null, value, null, (val, data) =>
+					foreach (var item in MultieditItems)
 					{
-						if (m_value == null || !m_value.Equals(val))
+						(item as PrimitiveDataItem<T>).Value = value;
+					}
+				}
+				else
+				{
+					if (!value.Equals(m_value))
+					{
+						UndoRedo.DoValueChange<T>(this, m_value, null, value, null, (val, data) =>
 						{
-							m_value = val;
-							RaisePropertyChangedEvent("Value");
-							RaisePropertyChangedEvent("Description");
-						}
-					}, Definition.Name);
+							if (m_value == null || !m_value.Equals(val))
+							{
+								m_value = val;
+								RaisePropertyChangedEvent("Value");
+								RaisePropertyChangedEvent("Description");
+							}
+						}, Definition.Name);
+					}
 				}
 			}
 		}
@@ -53,9 +77,18 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		protected override void MultieditItemPropertyChanged(object sender, PropertyChangedEventArgs args)
+		{
+			if (args.PropertyName == "Value")
+			{
+				RaisePropertyChangedEvent("Value");
+			}
+		}
+
+		//-----------------------------------------------------------------------
 		public virtual string ValueToString(T val)
 		{
-			return val.ToString();
+			return val?.ToString() ?? "---";
 		}
 
 		//-----------------------------------------------------------------------

@@ -70,7 +70,7 @@
 										VerticalScrollBarVisibility="Auto"
 										HorizontalScrollBarVisibility="Auto"
 										FontFamily="Courier New"
-										Text="{Binding Text, ValidatesOnExceptions=True, RelativeSource={RelativeSource TemplatedParent}}"
+										Text="{Binding Text, ValidatesOnExceptions=True, UpdateSourceTrigger=PropertyChanged, Delay=500, RelativeSource={RelativeSource TemplatedParent}}"
 										Margin="5,5,5,0" />
 									<Thumb
 										x:Name="PART_ResizeThumb"

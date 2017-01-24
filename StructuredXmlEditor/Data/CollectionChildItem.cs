@@ -17,7 +17,7 @@ namespace StructuredXmlEditor.Data
 		public override bool IsCollectionChild { get { return true; } }
 
 		//-----------------------------------------------------------------------
-		public override bool CanReorder { get { return true; } }
+		public override bool CanReorder { get { return !IsMultiediting; } }
 
 		//-----------------------------------------------------------------------
 		public DataItem WrappedItem
@@ -91,7 +91,7 @@ namespace StructuredXmlEditor.Data
 		{
 			get
 			{
-				return !(ParentCollection as ICollectionItem).IsAtMin;
+				return !IsMultiediting && ParentCollection != null && !(ParentCollection as ICollectionItem).IsAtMin;
 			}
 		}
 
@@ -105,6 +105,7 @@ namespace StructuredXmlEditor.Data
 		public CollectionChildItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
 			PropertyChanged += OnPropertyChanged;
+			IsContextMenuDynamic = true;
 		}
 
 		//-----------------------------------------------------------------------
@@ -179,6 +180,28 @@ namespace StructuredXmlEditor.Data
 							swapItem.Items.Add(doSwapItem);
 						}
 					}
+				}
+			}
+			else if (WrappedItem is CollectionItem)
+			{
+				var ci = WrappedItem as CollectionItem;
+
+				if (ci.Children.Count > 1)
+				{
+					menu.AddSeperator();
+
+					menu.AddItem("Multiedit Children", () =>
+					{
+						var otherChildren = new List<DataItem>();
+						for (int i = 1; i < Children.Count; i++)
+						{
+							otherChildren.Add(Children[i]);
+						}
+
+						Children[0].MultiEdit(otherChildren, otherChildren.Count);
+
+						Grid.Selected = new List<DataItem>() { Children[0] };
+					});
 				}
 			}
 		}

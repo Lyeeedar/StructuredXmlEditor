@@ -10,7 +10,7 @@ namespace StructuredXmlEditor.Data
 	public class VectorItem : PrimitiveDataItem<VectorN>
 	{
 		//-----------------------------------------------------------------------
-		public float X
+		public float? X
 		{
 			get { return Value.X; }
 			set
@@ -20,7 +20,7 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public float Y
+		public float? Y
 		{
 			get { return Value.Y; }
 			set
@@ -30,7 +30,7 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public float Z
+		public float? Z
 		{
 			get { return Value.Z; }
 			set
@@ -41,7 +41,7 @@ namespace StructuredXmlEditor.Data
 		public bool ShowZ { get { return ((VectorDefinition)Definition).NumComponents > 2; } }
 
 		//-----------------------------------------------------------------------
-		public float W
+		public float? W
 		{
 			get { return Value.W; }
 			set
@@ -74,12 +74,12 @@ namespace StructuredXmlEditor.Data
 	{
 		public bool Initialised;
 		public int Components { get; private set; }
-		public float X { get; set; }
-		public float Y { get; set; }
-		public float Z { get; set; }
-		public float W { get; set; }
+		public float? X { get; set; }
+		public float? Y { get; set; }
+		public float? Z { get; set; }
+		public float? W { get; set; }
 
-		public VectorN(int components, float x = 0.0f, float y = 0.0f, float z = 0.0f, float w = 0.0f)
+		public VectorN(int components, float? x = 0.0f, float? y = 0.0f, float? z = 0.0f, float? w = 0.0f)
 		{
 			if (components < 2 || components > 4) throw new Exception("Invalid number of components '" + components + "'!");
 
@@ -107,7 +107,6 @@ namespace StructuredXmlEditor.Data
 				return X + "," + Y + "," + Z + "," + W;
 			}
 			return "";
-			//throw new Exception("Invalid number of components '" + Components + "'!");
 		}
 
 		public static VectorN FromString(string data, int components = -1)

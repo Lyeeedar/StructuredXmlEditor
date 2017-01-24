@@ -111,7 +111,7 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public float GetKeyframeTime(DataItem keyframe)
 		{
-			return (keyframe.Children.First((e) => e.Definition == (Definition as TimelineDefinition).TimeDefinition) as NumberItem).Value;
+			return (keyframe.Children.First((e) => e.Definition == (Definition as TimelineDefinition).TimeDefinition) as NumberItem).Value.Value;
 		}
 
 		//-----------------------------------------------------------------------
@@ -133,7 +133,7 @@ namespace StructuredXmlEditor.Data
 		public Color GetColourData(DataItem keyframe, int index)
 		{
 			var def = (Definition as TimelineDefinition).KeyframeDefinition.Children.Where((e) => e is ColourDefinition).ElementAt(index);
-			return (keyframe.Children.First((e) => e.Definition == def) as ColourItem).Value;
+			return (keyframe.Children.First((e) => e.Definition == def) as ColourItem).Value.Value;
 		}
 
 		//-----------------------------------------------------------------------
@@ -153,7 +153,7 @@ namespace StructuredXmlEditor.Data
 		public float GetNumberData(DataItem keyframe, int index)
 		{
 			var def = (Definition as TimelineDefinition).KeyframeDefinition.Children.Where((e) => e is NumberDefinition && e != (Definition as TimelineDefinition).TimeDefinition).ElementAt(index);
-			return (keyframe.Children.First((e) => e.Definition == def) as NumberItem).Value;
+			return (keyframe.Children.First((e) => e.Definition == def) as NumberItem).Value.Value;
 		}
 
 		//-----------------------------------------------------------------------

@@ -118,6 +118,15 @@ namespace StructuredXmlEditor.Data
 			{
 				if (m_selected != value)
 				{
+					if (m_selected is List<DataItem>)
+					{
+						var item = (m_selected as List<DataItem>)[0];
+						if (item.IsMultiediting)
+						{
+							item.ClearMultiEdit();
+						}
+					}
+
 					m_selected = value;
 					RaisePropertyChangedEvent();
 					RaisePropertyChangedEvent("SelectedItems");
