@@ -1382,6 +1382,7 @@ namespace StructuredXmlEditor.Data
 
 			dlg.DefaultExt = ".xmldef";
 			dlg.Filter = "XML Definition File (*.xmldef)|*.xmldef";
+			dlg.InitialDirectory = Path.Combine(Path.GetDirectoryName(ProjectRoot), DefsFolder);
 			bool? result = dlg.ShowDialog();
 
 			if (result == true)
@@ -1409,9 +1410,11 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public void New(string dataType)
+		public void New(string dataType, string initialDirectory = null)
 		{
 			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+
+			if (initialDirectory != null) dlg.InitialDirectory = initialDirectory;
 
 			var data = SupportedResourceTypes[dataType.ToLower()];
 			var ext = data.Extension;

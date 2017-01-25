@@ -103,12 +103,25 @@
 						MouseDoubleClick="ContentControl_MouseDoubleClick">
 						<ContentControl.ContextMenu>
 							<ContextMenu>
+
 								<MenuItem
-									Header="Expand All"
-									Command="{Binding ExpandAllCMD}" />
+									Header="_New File"
+									ItemsSource="{Binding Workspace.AllResourceTypes}">
+									<MenuItem.ItemTemplate>
+										<DataTemplate>
+											<MenuItem
+												Header="{Binding}"
+												Command="{Binding DataContext.NewFileCMD, RelativeSource={RelativeSource AncestorType={x:Type ContentControl}}}"
+												CommandParameter="{Binding}"/>
+										</DataTemplate>
+									</MenuItem.ItemTemplate>
+								</MenuItem>
+
+								<Separator />
+
 								<MenuItem
-									Header="Collapse All"
-									Command="{Binding CollapseAllCMD}" />
+									Header="Multiedit"
+									Command="{Binding MultiEditCMD}" />
 
 								<Separator />
 
@@ -119,8 +132,11 @@
 								<Separator />
 
 								<MenuItem
-									Header="Multiedit"
-									Command="{Binding MultiEditCMD}" />
+									Header="Expand All"
+									Command="{Binding ExpandAllCMD}" />
+								<MenuItem
+									Header="Collapse All"
+									Command="{Binding CollapseAllCMD}" />
 
 							</ContextMenu>
 						</ContentControl.ContextMenu>

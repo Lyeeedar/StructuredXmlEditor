@@ -68,6 +68,7 @@ namespace StructuredXmlEditor.Tools
 		public Command<object> CollapseAllCMD { get { return new Command<object>((e) => Tool.Root.SetExpand(false)); } }
 		public Command<object> ExploreToCMD { get { return new Command<object>((e) => OpenInExplorer()); } }
 		public Command<object> MultiEditCMD { get { return new Command<object>((e) => MultiEdit()); } }
+		public Command<string> NewFileCMD { get { return new Command<string>((e) => NewFile(e)); } }
 
 		public ProjectItem(Workspace workspace, ProjectItem parent, ProjectViewTool tool, string name, bool skipLoadAndAdd = false)
 		{
@@ -116,6 +117,19 @@ namespace StructuredXmlEditor.Tools
 					Tool.DeferredRefresh();
 				}
 			};
+		}
+
+		//-----------------------------------------------------------------------
+		private void NewFile(string dataType)
+		{
+			if (IsDirectory)
+			{
+				Workspace.New(dataType, FullPath);
+			}
+			else
+			{
+				Workspace.New(dataType, System.IO.Path.GetDirectoryName(FullPath));
+			}
 		}
 
 		//-----------------------------------------------------------------------
