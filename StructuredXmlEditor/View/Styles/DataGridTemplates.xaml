@@ -143,7 +143,7 @@
 			<v:MultilineTextEditor
 				VerticalAlignment="Stretch"
 				VerticalContentAlignment="Stretch"
-				Text="{Binding Value, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
+				Text="{Binding Value, Mode=TwoWay, TargetNullValue=---}" />
 		</DockPanel>
 	</DataTemplate>
 
