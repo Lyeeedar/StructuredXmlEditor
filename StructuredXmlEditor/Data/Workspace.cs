@@ -734,7 +734,7 @@ namespace StructuredXmlEditor.Data
 				else if (extension == ".yaml")
 				{
 					var r = new StreamReader(path);
-					var deserializer = new Deserializer(namingConvention: new CamelCaseNamingConvention());
+					var deserializer = new Deserializer();
 					var yamlObject = deserializer.Deserialize(r);
 
 					Newtonsoft.Json.JsonSerializer js = new Newtonsoft.Json.JsonSerializer();
@@ -799,7 +799,7 @@ namespace StructuredXmlEditor.Data
 			else if (matchedDef.DataType == "yaml")
 			{
 				var r = new StreamReader(path);
-				var deserializer = new Deserializer(namingConvention: new CamelCaseNamingConvention());
+				var deserializer = new Deserializer();
 				var yamlObject = deserializer.Deserialize(r);
 
 				Newtonsoft.Json.JsonSerializer js = new Newtonsoft.Json.JsonSerializer();
@@ -906,7 +906,7 @@ namespace StructuredXmlEditor.Data
 						else if (path.EndsWith("*.yaml"))
 						{
 							var r = new StreamReader(path);
-							var deserializer = new Deserializer(namingConvention: new CamelCaseNamingConvention());
+							var deserializer = new Deserializer();
 							var yamlObject = deserializer.Deserialize(r);
 
 							Newtonsoft.Json.JsonSerializer js = new Newtonsoft.Json.JsonSerializer();
@@ -1476,13 +1476,13 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void Undo()
 		{
-			Current?.UndoRedo?.Undo();
+			Current?.Undo();
 		}
 
 		//-----------------------------------------------------------------------
 		public void Redo()
 		{
-			Current?.UndoRedo?.Redo();
+			Current?.Redo();
 		}
 
 		//-----------------------------------------------------------------------

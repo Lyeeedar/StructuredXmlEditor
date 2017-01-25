@@ -533,13 +533,16 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public DataItem DuplicateData()
+		public DataItem DuplicateData(UndoRedoManager undoRedo)
 		{
 			var el = new XElement("Root");
 			Definition.SaveData(el, this);
 
-			var item = Definition.LoadData(el.Elements().First(), new UndoRedoManager());
-			return item;
+			using (undoRedo.DisableUndoScope())
+			{
+				var item = Definition.LoadData(el.Elements().First(), undoRedo);
+				return item;
+			}
 		}
 
 		//-----------------------------------------------------------------------

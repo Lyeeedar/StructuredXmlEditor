@@ -54,9 +54,7 @@ namespace StructuredXmlEditor.Data
 		{
 			get
 			{
-				if (IsMultiediting) return "Multiedit: " + string.Join(",", MultieditDocs.Select(e => System.IO.Path.GetFileNameWithoutExtension(e.Path)));
-
-				string name = System.IO.Path.GetFileNameWithoutExtension(Path);
+				string name = !IsMultiediting ? System.IO.Path.GetFileNameWithoutExtension(Path) : "Multiedit: " + string.Join(",", MultieditDocs.Select(e => System.IO.Path.GetFileNameWithoutExtension(e.Path)));
 				if (IsBackup) name = "[Backup]" + name; 
 				if (UndoRedo.IsModified) name += "*";
 				return name;
@@ -106,9 +104,12 @@ namespace StructuredXmlEditor.Data
 
 			Workspace.Documents.Remove(this);
 
-			IsBackup = false;
-			backupTimer.Stop();
-			CleanupBackups();
+			if (!IsMultiediting)
+			{
+				IsBackup = false;
+				backupTimer.Stop();
+				CleanupBackups();
+			}
 
 			return false;
 		}
@@ -151,6 +152,9 @@ namespace StructuredXmlEditor.Data
 		public void MultiEdit(List<Document> docs)
 		{
 			MultieditDocs = docs;
+
+			UndoRedo = docs[0].UndoRedo;
+			UndoRedo.PropertyChanged += (sender, args) => { RaisePropertyChangedEvent("Title"); };
 
 			var data = new List<DataItem>();
 			foreach (var doc in docs)
@@ -210,6 +214,38 @@ namespace StructuredXmlEditor.Data
 			RaisePropertyChangedEvent("Path");
 
 			Save();
+		}
+
+		//-----------------------------------------------------------------------
+		public void Undo()
+		{
+			if (IsMultiediting)
+			{
+				foreach (var doc in MultieditDocs)
+				{
+					doc.Undo();
+				}
+			}
+			else
+			{
+				UndoRedo.Undo();
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public void Redo()
+		{
+			if (IsMultiediting)
+			{
+				foreach (var doc in MultieditDocs)
+				{
+					doc.Redo();
+				}
+			}
+			else
+			{
+				UndoRedo.Redo();
+			}
 		}
 
 		//-----------------------------------------------------------------------

@@ -1,4 +1,5 @@
 ﻿using StructuredXmlEditor.Data;
+using StructuredXmlEditor.Definition;
 using StructuredXmlEditor.View;
 using System;
 using System.Collections.Generic;
@@ -142,6 +143,17 @@ namespace StructuredXmlEditor.Tools
 				{
 					var doc = Workspace.OpenImpl(path);
 					data.Add(doc);
+
+					if (doc.Data.RootItems[0].Definition != first.Data.RootItems[0].Definition)
+					{
+						Message.Show("Cannot multi edit files of different types!", "Cannot Multiedit", "Ok");
+						return;
+					}
+					else if (doc.Data.RootItems[0].Definition is GraphNodeDefinition)
+					{
+						Message.Show("Cannot multi edit graphs!", "Cannot Multiedit", "Ok");
+						return;
+					}
 				}
 
 				first.MultiEdit(data);

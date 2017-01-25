@@ -206,7 +206,7 @@ namespace StructuredXmlEditor.Data
 				if (firstItem.HasContent)
 				{
 					ChosenDefinition = firstItem.ChosenDefinition;
-					WrappedItem = firstItem.WrappedItem.DuplicateData();
+					WrappedItem = firstItem.WrappedItem.DuplicateData(UndoRedo);
 
 					MultiEdit(MultieditItems, MultieditCount.Value);
 				}
