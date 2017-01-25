@@ -138,12 +138,21 @@ namespace StructuredXmlEditor.Definition
 			}
 
 
-			if (item.Grid.IsJson)
+			if (item.Grid.IsJson || item.Grid.IsYaml)
 			{
-				parent.Add(root);
+				if (root.Elements().Count() == 1)
+				{
+					var el = root.Elements().First();
 
-				root.SetAttributeValue(XNamespace.Xmlns + "json", JsonNS);
-				root.SetAttributeValue(JsonNS + "Array", "true");
+					el.SetAttributeValue(XNamespace.Xmlns + "json", JsonNS);
+					el.SetAttributeValue(JsonNS + "Array", "true");
+				}
+
+				foreach (var el in root.Elements())
+				{
+					el.Name = root.Name;
+					parent.Add(el);
+				}
 			}
 			else
 			{

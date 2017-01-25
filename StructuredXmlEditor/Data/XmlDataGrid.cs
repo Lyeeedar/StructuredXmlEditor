@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using StructuredXmlEditor.Definition;
 using StructuredXmlEditor.View;
 using System;
@@ -26,6 +27,7 @@ namespace StructuredXmlEditor.Data
 
 		//-----------------------------------------------------------------------
 		public bool IsJson { get { return RootItems[0].Definition.DataType == "json"; } }
+		public bool IsYaml { get { return RootItems[0].Definition.DataType == "yaml"; } }
 
 		//-----------------------------------------------------------------------
 		public string Extension { get { return RootItems[0].Definition.Extension; } }
@@ -461,7 +463,7 @@ namespace StructuredXmlEditor.Data
 			{
 				var nodeEl = new XElement(GraphNodeDefinition.NodeStoreName);
 
-				if (IsJson)
+				if (IsJson || IsYaml)
 				{
 					nodeEl.SetAttributeValue(XNamespace.Xmlns + "json", DataDefinition.JsonNS);
 					nodeEl.SetAttributeValue(DataDefinition.JsonNS + "Array", "true");
@@ -477,7 +479,21 @@ namespace StructuredXmlEditor.Data
 				doc.Elements().First().Add(nodeEl);
 			}
 
-			if (IsJson)
+			if (IsYaml)
+			{
+				string json = JsonConvert.SerializeXNode(doc, Newtonsoft.Json.Formatting.Indented);
+				var data = ConvertJTokenToObject(JsonConvert.DeserializeObject<JToken>(json)); ;
+
+				var serializer = new YamlDotNet.Serialization.Serializer();
+
+				using (var writer = new StringWriter())
+				{
+					serializer.Serialize(writer, data);
+					var yaml = writer.ToString();
+					File.WriteAllText(path, yaml);
+				}
+			}
+			else if (IsJson)
 			{
 				string json = JsonConvert.SerializeXNode(doc, Newtonsoft.Json.Formatting.Indented);
 				File.WriteAllText(path, json);
@@ -499,6 +515,17 @@ namespace StructuredXmlEditor.Data
 					doc.Save(writer);
 				}
 			}
+		}
+
+		static object ConvertJTokenToObject(JToken token)
+		{
+			if (token is JValue)
+				return ((JValue)token).Value;
+			if (token is JArray)
+				return token.AsEnumerable().Select(ConvertJTokenToObject).ToList();
+			if (token is JObject)
+				return token.AsEnumerable().Cast<JProperty>().ToDictionary(x => x.Name, x => ConvertJTokenToObject(x.Value));
+			throw new InvalidOperationException("Unexpected token: " + token);
 		}
 
 		bool m_caseSensitive = false;

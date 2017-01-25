@@ -249,7 +249,7 @@ namespace StructuredXmlEditor.Tools
 
 		public bool IsDataFile(string ext)
 		{
-			if (ext == ".xmldef" || ext == ".xml" || ext == ".json" || Workspace.SupportedExtensionMap.ContainsKey(ext)) return true;
+			if (ext == ".xmldef" || ext == ".xml" || ext == ".json" || ext == ".yaml" || Workspace.SupportedExtensionMap.ContainsKey(ext)) return true;
 			return false;
 		}
 

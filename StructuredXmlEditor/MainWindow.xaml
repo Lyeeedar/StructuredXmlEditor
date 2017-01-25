@@ -146,11 +146,6 @@
 						<Separator />
 
 						<MenuItem
-							Header="Convert _Json to Xml"
-							Command="{Binding ConvertJsonToXmlCMD}">
-						</MenuItem>
-
-						<MenuItem
 							Header="Create _Definition from Data"
 							Command="{Binding DefinitionFromDataCMD}">
 						</MenuItem>

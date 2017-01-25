@@ -18,6 +18,8 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using WPFFolderBrowser;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace StructuredXmlEditor.Data
 {
@@ -101,9 +103,6 @@ namespace StructuredXmlEditor.Data
 
 		//-----------------------------------------------------------------------
 		public Command<object> SwitchProjectCMD { get { return new Command<object>((e) => SwitchProject()); } }
-
-		//-----------------------------------------------------------------------
-		public Command<object> ConvertJsonToXmlCMD { get { return new Command<object>((e) => ConvertJsonToXml()); } }
 
 		//-----------------------------------------------------------------------
 		public Command<object> DefinitionFromDataCMD { get { return new Command<object>((e) => CreateDefinitionFromDocument()); } }
@@ -711,7 +710,7 @@ namespace StructuredXmlEditor.Data
 			{
 				matchedDef = RootDefinition;
 			}
-			else if (extension == ".xml" || extension == ".json")
+			else if (extension == ".xml" || extension == ".json" || extension == ".yaml")
 			{
 				string rootname = null;
 
@@ -730,7 +729,23 @@ namespace StructuredXmlEditor.Data
 
 					JObject firstEl = JObject.Parse(json);
 					JProperty root = firstEl.Root.First as JProperty;
-					rootname = root.Name;
+					rootname = root.Name.ToLower();
+				}
+				else if (extension == ".yaml")
+				{
+					var r = new StreamReader(path);
+					var deserializer = new Deserializer(namingConvention: new CamelCaseNamingConvention());
+					var yamlObject = deserializer.Deserialize(r);
+
+					Newtonsoft.Json.JsonSerializer js = new Newtonsoft.Json.JsonSerializer();
+
+					var w = new StringWriter();
+					js.Serialize(w, yamlObject);
+					string jsonText = w.ToString();
+
+					JObject firstEl = JObject.Parse(jsonText);
+					JProperty root = firstEl.Root.First as JProperty;
+					rootname = root.Name.ToLower();
 				}
 
 				if (!SupportedResourceTypes.ContainsKey(rootname))
@@ -762,7 +777,53 @@ namespace StructuredXmlEditor.Data
 			else if (matchedDef.DataType == "json")
 			{
 				string json = File.ReadAllText(path);
+
+				JObject firstEl = JObject.Parse(json);
+				foreach (var thing in firstEl.Descendants().ToList())
+				{
+					if (thing is JArray)
+					{
+						var oldParent = thing.Parent as JProperty;
+
+						JObject wrapper = new JObject();
+						wrapper[oldParent.Name] = thing;
+						oldParent.Value = wrapper;
+					}
+				}
+
+				json = firstEl.ToString();
+
 				var temp = JsonConvert.DeserializeXNode(json, "Root");
+				doc = new XDocument(temp.Elements().First().Elements().First());
+			}
+			else if (matchedDef.DataType == "yaml")
+			{
+				var r = new StreamReader(path);
+				var deserializer = new Deserializer(namingConvention: new CamelCaseNamingConvention());
+				var yamlObject = deserializer.Deserialize(r);
+
+				Newtonsoft.Json.JsonSerializer js = new Newtonsoft.Json.JsonSerializer();
+
+				var w = new StringWriter();
+				js.Serialize(w, yamlObject);
+				string json = w.ToString();
+
+				JObject firstEl = JObject.Parse(json);
+				foreach (var thing in firstEl.Descendants().ToList())
+				{
+					if (thing is JArray)
+					{
+						var oldParent = thing.Parent as JProperty;
+
+						JObject wrapper = new JObject();
+						wrapper[oldParent.Name] = thing;
+						oldParent.Value = wrapper;
+					}
+				}
+
+				json = firstEl.ToString();
+
+				var temp = JsonConvert.DeserializeXNode(json, "Root", true);
 				doc = new XDocument(temp.Elements().First().Elements().First());
 			}
 
@@ -808,48 +869,13 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public void ConvertJsonToXml()
-		{
-			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-
-			dlg.DefaultExt = ".json";
-			dlg.Filter = "Json Files (*.json)|*.json";
-			bool? result = dlg.ShowDialog();
-
-			if (result == true)
-			{
-				var file = dlg.FileName;
-				var outfile = file.Replace(".json", ".xml");
-
-				string json = File.ReadAllText(file);
-
-				XDocument doc = null;
-
-				var temp = JsonConvert.DeserializeXNode(json, "Root");
-				if (temp.Elements().First().Elements().Count() > 1)
-				{
-					temp.Elements().First().Name = temp.Elements().First().Elements().First().Name;
-					doc = temp;
-				}
-				else
-				{
-					doc = new XDocument(temp.Elements().First());
-				}
-
-				doc.Save(outfile);
-
-				Message.Show("Done", "Conversion Complete", "Ok");
-			}
-		}
-
-		//-----------------------------------------------------------------------
 		public void CreateDefinitionFromDocument()
 		{
 			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
 
 			dlg.Multiselect = true;
 			dlg.DefaultExt = ".xml";
-			dlg.Filter = "Data Files (*.xml, *.json)|*.xml; *.json";
+			dlg.Filter = "Data Files (*.xml, *.json, *.yaml)|*.xml; *.json; *.yaml";
 			bool? result = dlg.ShowDialog();
 
 			if (result == true)
@@ -865,6 +891,29 @@ namespace StructuredXmlEditor.Data
 						if (path.EndsWith(".json"))
 						{
 							string json = File.ReadAllText(path);
+
+							var temp = JsonConvert.DeserializeXNode(json, "Root");
+							if (temp.Elements().First().Elements().Count() > 1)
+							{
+								temp.Elements().First().Name = temp.Elements().First().Elements().First().Name;
+								doc = temp;
+							}
+							else
+							{
+								doc = new XDocument(temp.Elements().First());
+							}
+						}
+						else if (path.EndsWith("*.yaml"))
+						{
+							var r = new StreamReader(path);
+							var deserializer = new Deserializer(namingConvention: new CamelCaseNamingConvention());
+							var yamlObject = deserializer.Deserialize(r);
+
+							Newtonsoft.Json.JsonSerializer js = new Newtonsoft.Json.JsonSerializer();
+
+							var w = new StringWriter();
+							js.Serialize(w, yamlObject);
+							string json = w.ToString();
 
 							var temp = JsonConvert.DeserializeXNode(json, "Root");
 							if (temp.Elements().First().Elements().Count() > 1)
