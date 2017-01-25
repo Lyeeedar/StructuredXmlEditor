@@ -77,17 +77,7 @@ namespace StructuredXmlEditor.Data
 
 				menu.AddItem("Multiedit Children", () =>
 				{
-					var firstCopy = Children[0].DuplicateData(new UndoRedoManager());
-
-					var otherChildren = new List<DataItem>();
-					for (int i = 0; i < Children.Count; i++)
-					{
-						otherChildren.Add(Children[i]);
-					}
-
-					firstCopy.MultiEdit(otherChildren, otherChildren.Count);
-
-					Grid.Selected = new List<DataItem>() { firstCopy };
+					Grid.Selected = new List<DataItem>(Children);
 				});
 			}
 		}

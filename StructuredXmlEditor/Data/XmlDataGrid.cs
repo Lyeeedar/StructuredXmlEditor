@@ -122,7 +122,9 @@ namespace StructuredXmlEditor.Data
 				{
 					if (m_selected is List<DataItem>)
 					{
-						var item = (m_selected as List<DataItem>)[0];
+						var list = m_selected as List<DataItem>;
+
+						var item = list[0];
 						if (item.IsMultiediting)
 						{
 							item.ClearMultiEdit();
@@ -130,6 +132,33 @@ namespace StructuredXmlEditor.Data
 					}
 
 					m_selected = value;
+
+					if (m_selected is List<DataItem>)
+					{
+						var list = m_selected as List<DataItem>;
+
+						if (list.Count > 1)
+						{
+							var firstCopy = list[0].DuplicateData(new UndoRedoManager());
+							firstCopy.IsExpanded = true;
+
+							var otherChildren = new List<DataItem>();
+							for (int i = 0; i < list.Count; i++)
+							{
+								otherChildren.Add(list[i]);
+							}
+
+							firstCopy.MultiEdit(otherChildren, otherChildren.Count);
+
+							m_selected = new List<DataItem>() { firstCopy };
+						}
+						else
+						{
+							list[0].IsExpanded = true;
+							m_selected = new List<DataItem>() { list[0] };
+						}
+					}
+
 					RaisePropertyChangedEvent();
 					RaisePropertyChangedEvent("SelectedItems");
 					RaisePropertyChangedEvent("IsSelectedDataItem");
@@ -138,6 +167,31 @@ namespace StructuredXmlEditor.Data
 			}
 		}
 		private object m_selected;
+		private List<DataItem> m_selectedDataItems = new List<DataItem>();
+
+		public void AddSelected(DataItem item)
+		{
+			if (!m_selectedDataItems.Contains(item))
+			{
+				m_selectedDataItems.Add(item);
+			}
+
+			Selected = m_selectedDataItems;
+		}
+
+		public void RemoveSelected(DataItem item)
+		{
+			m_selectedDataItems.Remove(item);
+
+			if (m_selectedDataItems.Count > 0)
+			{
+				Selected = m_selectedDataItems;
+			}
+			else
+			{
+				Selected = null;
+			}
+		}
 
 		public List<DataItem> SelectedItems
 		{

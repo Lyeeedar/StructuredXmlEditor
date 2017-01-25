@@ -292,14 +292,11 @@ namespace StructuredXmlEditor.Data
 
 					if (value)
 					{
-						Grid.Selected = new List<DataItem>() { this };
+						Grid.AddSelected(this);
 					}
 					else
 					{
-						if (Grid.Selected is List<DataItem> && (Grid.Selected as List<DataItem>)[0] == this)
-						{
-							Grid.Selected = null;
-						}
+						Grid.RemoveSelected(this);
 					}
 				}
 			}
