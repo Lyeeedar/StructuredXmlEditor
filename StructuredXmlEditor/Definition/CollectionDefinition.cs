@@ -256,10 +256,10 @@ namespace StructuredXmlEditor.Definition
 			}
 		}
 
-		public override void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global)
+		public override void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global, Dictionary<string, Dictionary<string, DataDefinition>> referenceableDefinitions)
 		{
-			foreach (var def in ChildDefinitions) def.WrappedDefinition.RecursivelyResolve(local, global);
-			foreach (var def in AdditionalDefs) def.RecursivelyResolve(local, global);
+			foreach (var def in ChildDefinitions) def.WrappedDefinition.RecursivelyResolve(local, global, referenceableDefinitions);
+			foreach (var def in AdditionalDefs) def.RecursivelyResolve(local, global, referenceableDefinitions);
 		}
 	}
 }

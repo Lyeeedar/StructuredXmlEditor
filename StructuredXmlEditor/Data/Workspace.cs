@@ -440,7 +440,10 @@ namespace StructuredXmlEditor.Data
 							var scopeName = def.IsGlobal ? "" : file;
 							var scope = ReferenceableDefinitions[scopeName];
 
-							if (scope.ContainsKey(defname)) Message.Show("Duplicate definitions for type " + defname, "Duplicate Definitions", "Ok");
+							if (scope.ContainsKey(defname))
+							{
+								if (def.IsGlobal && scope[defname].IsGlobal) Message.Show("Duplicate definitions for type " + defname, "Duplicate Definitions", "Ok");
+							}
 							scope[defname] = def;
 						}
 						else
@@ -453,6 +456,13 @@ namespace StructuredXmlEditor.Data
 								var ext = "." + def.CustomExtension;
 								if (SupportedExtensionMap.ContainsKey(ext)) throw new Exception("Duplicate extension for " + ext + ". Found in " + def.Name + " and " + SupportedExtensionMap[ext].Name);
 								SupportedExtensionMap[ext] = def;
+							}
+
+							var scopeName = "";
+							var scope = ReferenceableDefinitions[scopeName];
+							if (!scope.ContainsKey(defname))
+							{
+								scope[defname] = def;
 							}
 						}
 					}
@@ -467,13 +477,13 @@ namespace StructuredXmlEditor.Data
 			{
 				foreach (var def in scope.Values)
 				{
-					def.RecursivelyResolve(ReferenceableDefinitions[def.SrcFile], ReferenceableDefinitions[""]);
+					def.RecursivelyResolve(ReferenceableDefinitions[def.SrcFile], ReferenceableDefinitions[""], ReferenceableDefinitions);
 				}
 			}
 
 			foreach (var def in SupportedResourceTypes.Values)
 			{
-				def.RecursivelyResolve(ReferenceableDefinitions[def.SrcFile], ReferenceableDefinitions[""]);
+				def.RecursivelyResolve(ReferenceableDefinitions[def.SrcFile], ReferenceableDefinitions[""], ReferenceableDefinitions);
 			}
 
 			// load xmldef definition
@@ -509,9 +519,9 @@ namespace StructuredXmlEditor.Data
 
 			foreach (var type in RootDataTypes.Values)
 			{
-				type.RecursivelyResolve(RootDataTypes, RootDataTypes);
+				type.RecursivelyResolve(RootDataTypes, RootDataTypes, null);
 			}
-			RootDefinition.RecursivelyResolve(RootDataTypes, RootDataTypes);
+			RootDefinition.RecursivelyResolve(RootDataTypes, RootDataTypes, null);
 
 			RaisePropertyChangedEvent("ReferenceableDefinitions");
 			RaisePropertyChangedEvent("SupportedResourceTypes");

@@ -153,7 +153,7 @@ namespace StructuredXmlEditor.Definition
 			return temp;
 		}
 
-		public virtual void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global)
+		public virtual void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global, Dictionary<string, Dictionary<string, DataDefinition>> referenceableDefinitions)
 		{
 
 		}

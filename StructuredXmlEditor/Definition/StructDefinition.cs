@@ -17,6 +17,8 @@ namespace StructuredXmlEditor.Definition
 		public List<DataDefinition> Children { get; set; } = new List<DataDefinition>();
 		public string Description { get; set; }
 		public bool Nullable { get; set; }
+		public string Extends { get; set; }
+		public string ExtendsAfter { get; set; }
 
 		public StructDefinition()
 		{
@@ -172,8 +174,9 @@ namespace StructuredXmlEditor.Definition
 		public override void Parse(XElement definition)
 		{
 			Nullable = TryParseBool(definition, "Nullable", true);
-
 			Description = definition.Attribute("Description")?.Value?.ToString();
+			Extends = definition.Attribute("Extends")?.Value?.ToString()?.ToLower();
+			ExtendsAfter = definition.Attribute("ExtendsAfter")?.Value?.ToString()?.ToLower();
 
 			foreach (var child in definition.Elements())
 			{
@@ -293,11 +296,92 @@ namespace StructuredXmlEditor.Definition
 			}
 		}
 
-		public override void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global)
+		public override void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global, Dictionary<string, Dictionary<string, DataDefinition>> referenceableDefinitions)
 		{
+			if (Extends != null)
+			{
+				StructDefinition def = null;
+				if (local.ContainsKey(Extends))
+				{
+					def = local[Extends] as StructDefinition;
+				}
+
+				if (def == null && global.ContainsKey(Extends))
+				{
+					def = global[Extends] as StructDefinition;
+				}
+
+				if (def == null) throw new Exception("The definition '" + Extends + "' this extends could not be found!");
+
+				Extends = null;
+				if (def.Extends != null)
+				{
+					def.RecursivelyResolve(referenceableDefinitions[def.SrcFile], global, referenceableDefinitions);
+				}
+
+				var newChildren = def.Children.ToList();
+
+				for (int i = 0; i < newChildren.Count; i++)
+				{
+					var name = newChildren[i].Name.ToLower();
+
+					// find index of name in our children
+					var existing = Children.FirstOrDefault(e => e.Name.ToLower() == name);
+					if (existing != null)
+					{
+						var ourIndex = Children.IndexOf(existing);
+						Children.Remove(existing);
+						newChildren[i] = existing;
+
+						if (ExtendsAfter == null)
+						{
+							// Add all the children in the window to the new children at this index
+							var ni = ourIndex;
+							for (; ni < Children.Count; ni++)
+							{
+								if (newChildren.Any(e => Children[ni].Name.ToLower() == e.Name.ToLower()))
+								{
+									break;
+								}
+
+								var child = Children[ni--];
+								Children.Remove(child);
+								newChildren.Insert(++i, child);
+							}
+						}
+					}
+				}
+
+				if (ExtendsAfter == null)
+				{
+					// Add the rest
+					foreach (var child in Children)
+					{
+						newChildren.Add(child);
+					}
+				}
+				else
+				{
+					var afterEl = newChildren.FirstOrDefault(e => e.Name.ToLower() == ExtendsAfter);
+					var index = newChildren.Count;
+
+					if (afterEl != null)
+					{
+						index = newChildren.IndexOf(afterEl) + 1;
+					}
+
+					foreach (var child in Children)
+					{
+						newChildren.Insert(index++, child);
+					}
+				}
+
+				Children = newChildren;
+			}
+
 			foreach (var child in Children)
 			{
-				child.RecursivelyResolve(local, global);
+				child.RecursivelyResolve(local, global, referenceableDefinitions);
 			}
 		}
 	}
