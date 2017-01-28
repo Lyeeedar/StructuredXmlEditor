@@ -267,6 +267,7 @@
 
 			<TextBox
 				Grid.Row="1"
+				IsReadOnly="True"
 				Text="{Binding Changelog}"
 				TextWrapping="Wrap"
 				Margin="5" />
