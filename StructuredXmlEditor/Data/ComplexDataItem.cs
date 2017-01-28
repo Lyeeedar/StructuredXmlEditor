@@ -141,13 +141,15 @@ namespace StructuredXmlEditor.Data
 			{
 				foreach (var item in Children)
 				{
-					ClearMultiEdit();
+					item.ClearMultiEdit();
 				}
 
-				Clear();
+				Children.Clear();
 
-				MultieditItems[0].Copy();
-				Paste();
+				foreach (var child in MultieditItems[0].Children)
+				{
+					Children.Add(child.DuplicateData(UndoRedo));
+				}
 
 				MultiEdit(MultieditItems, MultieditCount.Value);
 			}
@@ -290,6 +292,11 @@ namespace StructuredXmlEditor.Data
 		{
 			if (IsMultiediting)
 			{
+				foreach (var item in Children)
+				{
+					item.ClearMultiEdit();
+				}
+
 				foreach (var item in MultieditItems)
 				{
 					(item as ComplexDataItem).Clear();
@@ -321,7 +328,7 @@ namespace StructuredXmlEditor.Data
 			try
 			{
 				var root = new XElement("Item");
-				Definition.SaveData(root, this);
+				Definition.SaveData(root, this, true);
 
 				var flat = root.Elements().First().ToString();
 
@@ -352,6 +359,9 @@ namespace StructuredXmlEditor.Data
 				using (UndoRedo.DisableUndoScope())
 				{
 					var item = sdef.LoadData(root, UndoRedo);
+
+					if (item.Children.Count == 0) item = sdef.CreateData(UndoRedo);
+
 					newChildren = item.Children.ToList();
 					
 					if (item is ComplexDataItem)

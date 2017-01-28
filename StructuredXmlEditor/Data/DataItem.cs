@@ -21,7 +21,7 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public List<DataItem> MultieditItems { get; set; } = new List<DataItem>();
 		public int? MultieditCount;
-		public bool IsMultiediting { get { return MultieditCount.HasValue; } }
+		public bool IsMultiediting { get { return MultieditCount != null; } }
 
 		//-----------------------------------------------------------------------
 		public int Index
@@ -530,14 +530,15 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public DataItem DuplicateData(UndoRedoManager undoRedo)
+		public virtual DataItem DuplicateData(UndoRedoManager undoRedo)
 		{
 			var el = new XElement("Root");
-			Definition.SaveData(el, this);
+			Definition.SaveData(el, this, true);
+			var first = el.Elements().Count() > 0 ? el.Elements().First() : null;
 
 			using (undoRedo.DisableUndoScope())
 			{
-				var item = Definition.LoadData(el.Elements().First(), undoRedo);
+				var item = first != null ? Definition.LoadData(first, undoRedo) : Definition.CreateData(undoRedo);
 				return item;
 			}
 		}

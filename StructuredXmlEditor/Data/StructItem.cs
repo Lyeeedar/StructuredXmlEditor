@@ -54,32 +54,45 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void Create()
 		{
-			var sdef = Definition as StructDefinition;
-
-			using (UndoRedo.DisableUndoScope())
+			if (IsMultiediting)
 			{
-				sdef.CreateChildren(this, UndoRedo);
+				foreach (var item in MultieditItems)
+				{
+					var si = item as StructItem;
+					if (!si.HasContent) si.Create();
+				}
+
+				MultiEdit(MultieditItems, MultieditCount.Value);
 			}
+			else
+			{
+				var sdef = Definition as StructDefinition;
 
-			var newChildren = Children.ToList();
-			Children.Clear();
-
-			UndoRedo.ApplyDoUndo(
-				delegate
+				using (UndoRedo.DisableUndoScope())
 				{
-					foreach (var child in newChildren) Children.Add(child);
-					RaisePropertyChangedEvent("HasContent");
-					RaisePropertyChangedEvent("Description");
-				},
-				delegate
-				{
-					Children.Clear();
-					RaisePropertyChangedEvent("HasContent");
-					RaisePropertyChangedEvent("Description");
-				},
-				Name + " created");
+					sdef.CreateChildren(this, UndoRedo);
+				}
 
-			IsExpanded = true;
+				var newChildren = Children.ToList();
+				Children.Clear();
+
+				UndoRedo.ApplyDoUndo(
+					delegate
+					{
+						foreach (var child in newChildren) Children.Add(child);
+						RaisePropertyChangedEvent("HasContent");
+						RaisePropertyChangedEvent("Description");
+					},
+					delegate
+					{
+						Children.Clear();
+						RaisePropertyChangedEvent("HasContent");
+						RaisePropertyChangedEvent("Description");
+					},
+					Name + " created");
+
+				IsExpanded = true;
+			}
 		}
 	}
 }
