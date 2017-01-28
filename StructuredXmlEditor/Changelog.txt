@@ -1,4 +1,11 @@
-﻿--------- 1.4.0 ---------
+﻿--------- 1.5.0 ---------
+
+- Add support for multiediting. Either select some documents in the project view then right click -> Multiedit (this will open it as a new document), or right click on a collection and click multi edit children (this will show it in the Focus tool).
+- Add support for Yaml as a data type.
+- Add support for structs to 'Extend' from another struct, copying its contents and optionally overwriting any elements (do this by assigning an element the same name as that in the parent).
+
+
+--------- 1.4.0 ---------
 
 - Added a new AsciiGrid for editing ascii grids. This is a focus editor for the MultilineString element type.
 
