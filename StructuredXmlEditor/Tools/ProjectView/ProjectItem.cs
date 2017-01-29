@@ -77,6 +77,8 @@ namespace StructuredXmlEditor.Tools
 			this.Tool = tool;
 			this.Name = name;
 
+			if (Name == "Backups") return;
+
 			if (!tool.ExpansionMap.ContainsKey(Path))
 			{
 				tool.ExpansionMap[Path] = false;

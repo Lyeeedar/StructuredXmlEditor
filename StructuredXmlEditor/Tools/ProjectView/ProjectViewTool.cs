@@ -147,6 +147,8 @@ namespace StructuredXmlEditor.Tools
 		//-----------------------------------------------------------------------
 		public void Add(string path)
 		{
+			if (path.Contains("Backups")) return;
+
 			var ext = System.IO.Path.GetExtension(path);
 			if (ext != String.Empty && !Root.IsDataFile(ext)) return;
 
@@ -199,6 +201,8 @@ namespace StructuredXmlEditor.Tools
 		//-----------------------------------------------------------------------
 		public void Remove(string path)
 		{
+			if (path.Contains("Backups")) return;
+
 			var ext = System.IO.Path.GetExtension(path);
 			if (ext != String.Empty && !Root.IsDataFile(ext)) return;
 

@@ -25,7 +25,7 @@ namespace StructuredXmlEditor.View
 		private static Pen[] NumberTrackColours = { new Pen(Brushes.ForestGreen, 2), new Pen(Brushes.DarkCyan, 2), new Pen(Brushes.DarkViolet, 2), new Pen(Brushes.DarkOrange, 2) };
 
 		//-----------------------------------------------------------------------
-		public TimelineItem TimelineItem { get { return DataContext as TimelineItem; } }
+		public TimelineItem TimelineItem { get; set; }
 
 		//-----------------------------------------------------------------------
 		protected Brush BackgroundBrush { get { return (Application.Current.TryFindResource("BackgroundDarkBrush") as SolidColorBrush); } }
@@ -63,6 +63,8 @@ namespace StructuredXmlEditor.View
 				{
 					var newItem = args.NewValue as TimelineItem;
 					newItem.PropertyChanged += OnPropertyChange;
+
+					TimelineItem = newItem;
 				}
 
 				InvalidateVisual();
@@ -120,6 +122,8 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		protected override void OnRender(DrawingContext drawingContext)
 		{
+			if (TimelineItem == null) return;
+
 			base.OnRender(drawingContext);
 
 			drawingContext.PushClip(new RectangleGeometry(new Rect(0, 0, ActualWidth, ActualHeight)));
@@ -294,6 +298,8 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		protected override void OnMouseWheel(MouseWheelEventArgs e)
 		{
+			if (TimelineItem == null) return;
+
 			double pixelsASecond = ActualWidth / TimelineItem.TimelineRange;
 			var pos = e.GetPosition(this);
 			var valueUnderCursor = (pos.X - TimelineItem.LeftPad) / pixelsASecond;
@@ -327,10 +333,20 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
+			if (TimelineItem == null) return;
+
 			var pos = e.GetPosition(this);
 			var clickPos = pos.X - TimelineItem.LeftPad;
 
 			double pixelsASecond = ActualWidth / TimelineItem.TimelineRange;
+
+			if (TimelineItem.Grid.SelectedItems != null)
+			{
+				foreach (var selected in TimelineItem.Grid.SelectedItems.ToList())
+				{
+					selected.IsSelected = false;
+				}
+			}
 
 			foreach (var keyframe in TimelineItem.Children)
 			{
@@ -358,6 +374,8 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		protected override void OnPreviewMouseRightButtonDown(MouseButtonEventArgs e)
 		{
+			if (TimelineItem == null) return;
+
 			var pos = e.GetPosition(this);
 			var clickPos = pos.X - TimelineItem.LeftPad;
 
@@ -387,6 +405,8 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
+			if (TimelineItem == null) return;
+
 			if (e.LeftButton != MouseButtonState.Pressed && e.MiddleButton != MouseButtonState.Pressed)
 			{
 				EndDrag();
@@ -455,6 +475,8 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		protected override void OnPreviewMouseUp(MouseButtonEventArgs args)
 		{
+			if (TimelineItem == null) return;
+
 			var pos = args.GetPosition(this);
 			var clickPos = pos.X - TimelineItem.LeftPad;
 			double pixelsASecond = ActualWidth / TimelineItem.TimelineRange;

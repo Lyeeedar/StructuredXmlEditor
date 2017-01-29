@@ -775,6 +775,17 @@ namespace StructuredXmlEditor.Data
 							var value = GetValue();
 							if (value != null) stringsToCheck.Add(value);
 						}
+						if (this is ComplexDataItem)
+						{
+							var attr = (this as ComplexDataItem).Attributes;
+							foreach (var att in attr)
+							{
+								stringsToCheck.Add(att.Name);
+
+								var value = att.GetValue();
+								if (value != null) stringsToCheck.Add(value);
+							}
+						}
 					}
 					else
 					{
@@ -784,6 +795,17 @@ namespace StructuredXmlEditor.Data
 						{
 							var value = GetValue()?.ToLower();
 							if (value != null) stringsToCheck.Add(value);
+						}
+						if (this is ComplexDataItem)
+						{
+							var attr = (this as ComplexDataItem).Attributes;
+							foreach (var att in attr)
+							{
+								stringsToCheck.Add(att.Name.ToLower());
+
+								var value = att.GetValue()?.ToLower();
+								if (value != null) stringsToCheck.Add(value);
+							}
 						}
 					}
 

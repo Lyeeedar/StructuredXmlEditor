@@ -128,7 +128,7 @@ public class UndoRedoManager : NotifyPropertyChanged
 			}
 			else
 			{
-				return UndoStack.Peek() != savePoint;
+				return UndoStack.Count == 0 ? true : UndoStack.Peek() != savePoint;
 			}
 		}
 	}
