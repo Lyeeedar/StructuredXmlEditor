@@ -221,7 +221,7 @@ namespace StructuredXmlEditor.Data
 
 			if (args.PropertyName == "Description")
 			{
-				RaisePropertyChangedEvent("Description");
+				Future.Call(() => { RaisePropertyChangedEvent("Description"); }, 100, this);
 			}
 		}
 

@@ -57,7 +57,6 @@ namespace StructuredXmlEditor.Data
 			};
 
 			SelectedDefinition = CDef.ChildDefinitions.First();
-			IsContextMenuDynamic = true;
 		}
 
 		//-----------------------------------------------------------------------

@@ -371,18 +371,6 @@ namespace StructuredXmlEditor.Data
 		private XmlDataGrid m_grid;
 
 		//-----------------------------------------------------------------------
-		public bool IsContextMenuDynamic;
-		public ContextMenu ContextMenu
-		{
-			get
-			{
-				if (m_menu == null || IsContextMenuDynamic) m_menu = CreateContextMenu();
-				return m_menu;
-			}
-		}
-		private ContextMenu m_menu;
-
-		//-----------------------------------------------------------------------
 		public DataDefinition Definition { get; set; }
 
 		//-----------------------------------------------------------------------
@@ -550,7 +538,7 @@ namespace StructuredXmlEditor.Data
 		public abstract void Paste();
 
 		//-----------------------------------------------------------------------
-		private ContextMenu CreateContextMenu()
+		public ContextMenu CreateContextMenu()
 		{
 			ContextMenu menu = new ContextMenu();
 
@@ -893,7 +881,7 @@ namespace StructuredXmlEditor.Data
 				m_deferredUpdateChildren = null;
 			}
 
-			m_deferredUpdateChildren = Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+			m_deferredUpdateChildren = Application.Current.Dispatcher.BeginInvoke(priority, new Action(() =>
 			{
 				RefreshChildren();
 				m_deferredUpdateChildren = null;

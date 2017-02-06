@@ -134,6 +134,7 @@
     <Compile Include="Util\DescendantPropertyChangedEventArgs.cs" />
     <Compile Include="Util\Email.cs" />
     <Compile Include="Util\Extensions.cs" />
+    <Compile Include="Util\Future.cs" />
     <Compile Include="Util\PopupCloser.cs" />
     <Compile Include="Util\SerializableDictionary.cs" />
     <Compile Include="Util\UndoRedoManager.cs" />
@@ -170,6 +171,9 @@
     </Compile>
     <Compile Include="View\CustomControls\ZoomPan\ZoomPanCanvas.cs" />
     <Compile Include="View\CustomControls\ZoomPan\ZoomPanItemsControl.cs" />
+    <Compile Include="View\Styles\DataGridView.xaml.cs">
+      <DependentUpon>DataGridView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\ValueConverters\ActiveDocumentConverter.cs" />
     <Compile Include="View\ValueConverters\ColourMarkupConverter.cs" />
     <Compile Include="View\ValueConverters\ConverterBase.cs" />

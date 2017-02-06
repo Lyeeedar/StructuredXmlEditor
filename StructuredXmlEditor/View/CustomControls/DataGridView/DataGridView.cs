@@ -225,20 +225,15 @@ namespace StructuredXmlEditor.View
 		}
 
 		//-----------------------------------------------------------------------
-		protected override void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
-		{
-			base.OnItemsSourceChanged(oldValue, newValue);
-
-			if (newValue != m_visibleItems)
-			{
-				throw new Exception("You cannot set 'ItemsSource' on 'DataGridView', use 'HierarchicalItemsSource', you fool!");
-			}
-		}
-
-		//-----------------------------------------------------------------------
 		protected override DependencyObject GetContainerForItemOverride()
 		{
 			return new DataGridViewItem(this);
+		}
+
+		//-----------------------------------------------------------------------
+		protected override void ClearContainerForItemOverride(DependencyObject element, object item)
+		{
+			((DataGridViewItem)element).OnClearContainerForItemOverride();
 		}
 
 		//-----------------------------------------------------------------------
@@ -256,14 +251,6 @@ namespace StructuredXmlEditor.View
 				lbi.Items = source.Items;
 				lbi.Level = data.Level;
 			}
-		}
-
-		//-----------------------------------------------------------------------
-		protected override void ClearContainerForItemOverride(DependencyObject element, object item)
-		{
-			base.ClearContainerForItemOverride(element, item);
-
-			((DataGridViewItem)element).OnClearContainerForItemOverride();
 		}
 
 		//-----------------------------------------------------------------------

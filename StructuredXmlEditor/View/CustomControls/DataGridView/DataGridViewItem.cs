@@ -51,12 +51,13 @@ namespace StructuredXmlEditor.View
 		//##############################################################################################################
 		#region Properties
 
+		public DataGridView DataGrid { get; set; }
+
 		#endregion Properties
 		//##############################################################################################################
 		#region Dependecy Properties
 
-		public DataGridView DataGrid { get; set; }
-
+		//##############################################################################################################
 		#region HeaderForeground
 		//-----------------------------------------------------------------------
 		public Brush HeaderForeground
@@ -69,7 +70,7 @@ namespace StructuredXmlEditor.View
 		public static readonly DependencyProperty HeaderForegroundProperty =
 			DependencyProperty.Register("HeaderForeground", typeof(Brush), typeof(DataGridViewItem), new PropertyMetadata(Brushes.Black));
 		#endregion HeaderForeground
-
+		//##############################################################################################################
 		#region CanSelect
 		//-----------------------------------------------------------------------
 		public bool CanSelect
@@ -82,7 +83,7 @@ namespace StructuredXmlEditor.View
 		public static readonly DependencyProperty CanSelectProperty =
 			DependencyProperty.Register("CanSelect", typeof(bool), typeof(DataGridViewItem), new PropertyMetadata(true));
 		#endregion CanSelect
-
+		//##############################################################################################################
 		#region ListBox
 		//-----------------------------------------------------------------------
 		public DataGridView ListBox
@@ -95,7 +96,7 @@ namespace StructuredXmlEditor.View
 		public static readonly DependencyProperty ListBoxProperty =
 			DependencyProperty.Register("ListBox", typeof(DataGridView), typeof(DataGridViewItem), new PropertyMetadata(null));
 		#endregion ListBox
-
+		//##############################################################################################################
 		#region Items
 		//-----------------------------------------------------------------------
 		private List<IDataGridItem> storedItems = new List<IDataGridItem>();
@@ -169,7 +170,7 @@ namespace StructuredXmlEditor.View
 		}
 
 		#endregion Items
-
+		//##############################################################################################################
 		#region HasItems
 		public bool HasItems
 		{
@@ -185,7 +186,7 @@ namespace StructuredXmlEditor.View
 		}
 		private bool m_hasItems;
 		#endregion HasItems
-
+		//##############################################################################################################
 		#region Level
 		//-----------------------------------------------------------------------
 		public int Level
@@ -198,7 +199,7 @@ namespace StructuredXmlEditor.View
 		public static readonly DependencyProperty LevelProperty =
 			DependencyProperty.Register("Level", typeof(int), typeof(DataGridViewItem), new PropertyMetadata(0));
 		#endregion Level
-
+		//##############################################################################################################
 		#region IsExpandedChanged
 		//-----------------------------------------------------------------------
 		public static readonly RoutedEvent IsExpandedChangedEvent = EventManager.RegisterRoutedEvent(
@@ -217,7 +218,7 @@ namespace StructuredXmlEditor.View
 			RaiseEvent(new RoutedEventArgs(DataGridViewItem.IsExpandedChangedEvent));
 		}
 		#endregion IsExpandedChanged
-
+		//##############################################################################################################
 		#region IsExpanded
 		//-----------------------------------------------------------------------
 		public bool IsExpanded
@@ -239,6 +240,7 @@ namespace StructuredXmlEditor.View
 			RaiseIsExpandedChangedEvent();
 		}
 		#endregion IsExpanded
+		//##############################################################################################################
 
 		#endregion Dependency Properties
 		//##############################################################################################################
@@ -253,6 +255,11 @@ namespace StructuredXmlEditor.View
 				if (incc != null)
 				{
 					incc.CollectionChanged -= OnItemsCollectionChanged;
+				}
+
+				foreach (var oldItem in storedItems)
+				{
+					oldItem.PropertyChanged -= OnChildPropertyChanged;
 				}
 			}
 		}
@@ -650,6 +657,8 @@ namespace StructuredXmlEditor.View
 
 		#endregion Data
 		//##############################################################################################################
+		#region NotifyPropertyChanged
+
 		//--------------------------------------------------------------------------
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -664,6 +673,9 @@ namespace StructuredXmlEditor.View
 				PropertyChanged(this, new PropertyChangedEventArgs(i_propertyName));
 			}
 		}
+
+		#endregion NotifyPropertyChanged
+		//##############################################################################################################
 	}
 
 	//##############################################################################################################

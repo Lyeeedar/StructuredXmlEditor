@@ -105,7 +105,6 @@ namespace StructuredXmlEditor.Data
 		public CollectionChildItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
 			PropertyChanged += OnPropertyChanged;
-			IsContextMenuDynamic = true;
 		}
 
 		//-----------------------------------------------------------------------
@@ -235,7 +234,7 @@ namespace StructuredXmlEditor.Data
 		{
 			if (args.PropertyName == "Description")
 			{
-				RaisePropertyChangedEvent("Description");
+				Future.Call(() => { RaisePropertyChangedEvent("Description"); }, 100, this);
 			}
 			else if (args.PropertyName == "Name")
 			{

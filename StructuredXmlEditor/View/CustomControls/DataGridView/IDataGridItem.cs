@@ -195,8 +195,5 @@ namespace StructuredXmlEditor.View
 
 		//-----------------------------------------------------------------------
 		bool IsSelected { get; set; }
-
-		//-----------------------------------------------------------------------
-		ContextMenu ContextMenu { get; }
 	}
 }

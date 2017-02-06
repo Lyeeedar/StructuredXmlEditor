@@ -109,7 +109,6 @@ namespace StructuredXmlEditor.Data
 		public ReferenceItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
 			SelectedDefinition = (Tuple<string, string>)(definition as ReferenceDefinition).ItemsSource.GetItemAt(0);
-			IsContextMenuDynamic = true;
 
 			PropertyChanged += (e, args) =>
 			{
@@ -218,7 +217,7 @@ namespace StructuredXmlEditor.Data
 		{
 			if (args.PropertyName == "Description")
 			{
-				RaisePropertyChangedEvent("Description");
+				Future.Call(() => { RaisePropertyChangedEvent("Description"); }, 100, this);
 			}
 		}
 
