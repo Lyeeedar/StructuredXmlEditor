@@ -337,6 +337,14 @@
 	</DataTemplate>
 
 	<DataTemplate
+		DataType="{x:Type d:KeyframeItem}">
+		<ContentControl
+			VerticalAlignment="Center"
+			Margin="5,0,5,0"
+			Content="{Binding Description, Converter={v:ColourMarkupConverter}}" />
+	</DataTemplate>
+
+	<DataTemplate
 		DataType="{x:Type d:ColourItem}">
 		<Grid>
 			<ToggleButton

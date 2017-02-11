@@ -51,7 +51,7 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		public Timeline()
 		{
-			DataContextChanged += (e, args) =>
+			DataContextChanged += (src, args) =>
 			{
 				if (args.OldValue != null)
 				{
@@ -68,6 +68,14 @@ namespace StructuredXmlEditor.View
 
 					TimelineItem = newItem;
 					newItem.Timeline = this;
+
+					var other = TimelineItem.TimelineGroup.FirstOrDefault(e => e != TimelineItem);
+					if (other != null)
+					{
+						TimelineItem.TimelineRange = other.TimelineRange;
+						TimelineItem.LeftPad = other.LeftPad;
+						dirty = true;
+					}
 				}
 
 				dirty = true;
