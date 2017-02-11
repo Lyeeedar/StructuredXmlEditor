@@ -337,7 +337,7 @@
 		<Reference Name="Keyframe" Keys="Keyframe" Nullable="false" ToolTip="The keyframe. Must contain a number child with the name of the value in TimeChild." />
 	</CollectionDef>
 
-	<CollectionDef Name="Keyframe" ToolTip="A definition for a keyfrane in a timeline." TextColour="Struct">
+	<CollectionDef Name="Keyframe" ToolTip="A definition for a keyframe in a timeline." TextColour="Struct">
 		<Attributes>
 			<String Name="Name" Default="Keyframe" ToolTip="The name to be written for this element. This will be used as the key when referencing it." />
 			<String Name="Extends" ToolTip="The name of a struct or structdef this extends. Override elements in the parent by giving them the same name." />
@@ -357,8 +357,8 @@
 		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
 			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
-			<Reference Keys="Number" Name="Time" SkipIfDefault="false" ToolTip="The element to hold the time." />
-			<Reference Keys="Number" Name="Duration" SkipIfDefault="false" ToolTip="The element to hold the duration of this keyframe." VisibleIf="HasDuration==true" />
+			<Reference Keys="Number" Name="Time" SkipIfDefault="false" Nullable="false" ToolTip="The element to hold the time." />
+			<Reference Keys="Number" Name="Duration" SkipIfDefault="false" Nullable="false" ToolTip="The element to hold the duration of this keyframe." VisibleIf="HasDuration==true" />
 		</AdditionalDefs>
 	</CollectionDef>
 

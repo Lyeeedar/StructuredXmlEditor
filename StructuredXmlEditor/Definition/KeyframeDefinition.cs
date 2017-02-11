@@ -175,12 +175,14 @@ namespace StructuredXmlEditor.Definition
 				byte r = 0;
 				byte g = 0;
 				byte b = 0;
+				byte a = 0;
 
 				byte.TryParse(split[0], out r);
 				byte.TryParse(split[1], out g);
 				byte.TryParse(split[2], out b);
+				byte.TryParse(split[3], out a);
 
-				var col = Color.FromArgb(255, r, g, b);
+				var col = Color.FromArgb(a, r, g, b);
 				Background = new SolidColorBrush(col);
 				Background.Freeze();
 			}

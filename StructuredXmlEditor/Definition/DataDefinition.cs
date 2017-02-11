@@ -57,7 +57,7 @@ namespace StructuredXmlEditor.Definition
 			DoSaveData(parent, item);
 		}
 
-		public static DataDefinition LoadDefinition(XElement element)
+		public static DataDefinition LoadDefinition(XElement element, string forceLoadAs = null)
 		{
 			var name = element.Attribute(MetaNS + "RefKey")?.Value.ToString().ToUpper();
 			if (name == null) name = element.Attribute("RefKey")?.Value.ToString().ToUpper();
@@ -67,6 +67,8 @@ namespace StructuredXmlEditor.Definition
 			{
 				name = name.Substring(0, name.Length - "DEF".Length);
 			}
+
+			if (forceLoadAs != null) name = forceLoadAs.ToUpper();
 
 			DataDefinition definition = null;
 
@@ -86,6 +88,7 @@ namespace StructuredXmlEditor.Definition
 			else if (name == "GRAPHSTRUCT") definition = new GraphStructDefinition();
 			else if (name == "GRAPHCOLLECTION") definition = new GraphCollectionDefinition();
 			else if (name == "GRAPHREFERENCE") definition = new GraphReferenceDefinition();
+			else if (name == "KEYFRAME") definition = new KeyframeDefinition();
 			else throw new Exception("Unknown definition type " + name + "!");
 
 			definition.Name = element.Attribute("Name")?.Value?.ToString();

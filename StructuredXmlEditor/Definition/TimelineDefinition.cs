@@ -102,8 +102,9 @@ namespace StructuredXmlEditor.Definition
 			var childDefs = definition.Elements();
 			foreach (var childDef in childDefs)
 			{
-				var cdef = new KeyframeDefinition();
-				cdef.Parse(childDef);
+				var cdef = LoadDefinition(childDef, "Keyframe") as KeyframeDefinition;
+
+				if (cdef == null) throw new Exception("Argh!");
 
 				KeyframeDefinitions.Add(cdef);
 			}
@@ -112,6 +113,11 @@ namespace StructuredXmlEditor.Definition
 			{
 				throw new Exception("No keyframe definitions in collection '" + Name + "'!");
 			}
+		}
+
+		public override void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global, Dictionary<string, Dictionary<string, DataDefinition>> referenceableDefinitions)
+		{
+			foreach (var def in KeyframeDefinitions) def.RecursivelyResolve(local, global, referenceableDefinitions);
 		}
 	}
 }

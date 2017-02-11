@@ -152,7 +152,11 @@ namespace StructuredXmlEditor.View
 			{
 				var exp = new NCalc.Expression(ValueText);
 				var obj = exp.Evaluate();
-				value = (float)(double)obj;
+
+				if (obj is double) value = (float)(double)obj;
+				else if (obj is int) value = (float)(int)obj;
+				else if (obj is bool) value = (bool)obj ? 1 : 0;
+				else value = (float)obj;
 			}
 			catch (Exception)
 			{
