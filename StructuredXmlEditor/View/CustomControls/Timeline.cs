@@ -285,18 +285,19 @@ namespace StructuredXmlEditor.View
 				var background = keyframe.KeyframeDef.Background;
 				var thickness = keyframe == mouseOverItem ? 2 : 1;
 				var pen = keyframe.IsSelected ? new Pen(SelectedBrush, thickness) : new Pen(UnselectedBrush, thickness);
+				var width = GetKeyframeWidth(keyframe);
 
 				var preview = keyframe.GetImagePreview();
 				if (preview != null)
 				{
-					var rect = new Rect(keyframe.GetKeyframeTime() * pixelsASecond - 5 + TimelineItem.LeftPad, 5, GetKeyframeWidth(keyframe), ActualHeight - 20);
+					var rect = new Rect(keyframe.GetKeyframeTime() * pixelsASecond + TimelineItem.LeftPad, 5, width, ActualHeight - 20);
 
 					drawingContext.DrawImage(preview, rect);
 					drawingContext.DrawRectangle(background, pen, rect);
 				}
 				else
 				{
-					drawingContext.DrawRectangle(background, pen, new Rect(keyframe.GetKeyframeTime() * pixelsASecond - 5 + TimelineItem.LeftPad, 5, GetKeyframeWidth(keyframe), ActualHeight - 20));
+					drawingContext.DrawRectangle(background, pen, new Rect(keyframe.GetKeyframeTime() * pixelsASecond + TimelineItem.LeftPad, 5, width, ActualHeight - 20));
 				}
 			}
 
@@ -371,8 +372,9 @@ namespace StructuredXmlEditor.View
 			foreach (KeyframeItem keyframe in TimelineItem.Children)
 			{
 				var time = keyframe.GetKeyframeTime() * pixelsASecond;
+				var diff = clickPos - time;
 
-				if (Math.Abs(time - clickPos) < GetKeyframeWidth(keyframe))
+				if (diff >= 0 && diff < GetKeyframeWidth(keyframe))
 				{
 					draggedItem = keyframe;
 					startPos = clickPos;
@@ -421,8 +423,9 @@ namespace StructuredXmlEditor.View
 			foreach (KeyframeItem keyframe in TimelineItem.Children)
 			{
 				var time = keyframe.GetKeyframeTime() * pixelsASecond;
+				var diff = clickPos - time;
 
-				if (Math.Abs(time - clickPos) < GetKeyframeWidth(keyframe))
+				if (diff >= 0 && diff < GetKeyframeWidth(keyframe))
 				{
 					keyframe.IsSelected = true;
 
@@ -458,8 +461,9 @@ namespace StructuredXmlEditor.View
 				foreach (KeyframeItem keyframe in TimelineItem.Children)
 				{
 					var time = keyframe.Time * pixelsASecond;
+					var diff = clickPos - time;
 
-					if (Math.Abs(time - clickPos) < GetKeyframeWidth(keyframe))
+					if (diff >= 0 && diff < GetKeyframeWidth(keyframe))
 					{
 						mouseOverItem = keyframe;
 
@@ -689,6 +693,10 @@ namespace StructuredXmlEditor.View
 					menu.Items.Add(zoom);
 
 					this.ContextMenu = menu;
+
+					menu.IsOpen = true;
+
+					args.Handled = true;
 				}
 			}
 
