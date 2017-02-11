@@ -155,7 +155,7 @@ namespace StructuredXmlEditor.Data
 				Uri path1 = new Uri(chosen);
 				Uri path2 = new Uri(relativeTo);
 				Uri diff = path2.MakeRelativeUri(path1);
-				string relPath = diff.OriginalString;
+				string relPath = Uri.UnescapeDataString(diff.OriginalString);
 
 				Value = relPath;
 			}

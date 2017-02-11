@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using NCalc;
 
 namespace StructuredXmlEditor.View
 {
@@ -147,26 +148,21 @@ namespace StructuredXmlEditor.View
 		{
 			float value = 0f;
 
+			try
+			{
+				var exp = new NCalc.Expression(ValueText);
+				var obj = exp.Evaluate();
+				value = (float)(double)obj;
+			}
+			catch (Exception)
+			{
+				HasError = true;
+				return;
+			}
+
 			if (UseIntegers)
 			{
-				int val = 0;
-				bool success = int.TryParse(ValueText, out val);
-				if (!success)
-				{
-					HasError = true;
-					return;
-				}
-
-				value = val;
-			}
-			else
-			{
-				bool success = float.TryParse(ValueText, out value);
-				if (!success)
-				{
-					HasError = true;
-					return;
-				}
+				value = (int)value;
 			}
 
 			if (value < MinValue || value > MaxValue)

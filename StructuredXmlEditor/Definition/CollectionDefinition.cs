@@ -32,11 +32,14 @@ namespace StructuredXmlEditor.Definition
 				item.Children.Add(child);
 			}
 
-			//for (int i = 0; i < MinCount; i++)
-			//{
-			//	var child = ChildDefinition.CreateData(undoRedo);
-			//	item.Children.Add(child);
-			//}
+			if (ChildDefinitions.Count == 1)
+			{
+				for (int i = 0; i < MinCount; i++)
+				{
+					var child = ChildDefinitions[0].CreateData(undoRedo);
+					item.Children.Add(child);
+				}
+			}
 
 			foreach (var att in Attributes)
 			{

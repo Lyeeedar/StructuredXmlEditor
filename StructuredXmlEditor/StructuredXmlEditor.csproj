@@ -41,6 +41,10 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NCalc, Version=1.3.8.0, Culture=neutral, PublicKeyToken=973cde3f1cafed03, processorArchitecture=MSIL">
+      <HintPath>..\packages\ncalc.1.3.8\lib\NCalc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -91,6 +95,7 @@
     <Compile Include="Data\GraphNodeItem.cs" />
     <Compile Include="Data\GraphReferenceItem.cs" />
     <Compile Include="Data\ICollectionItem.cs" />
+    <Compile Include="Data\KeyframeItem.cs" />
     <Compile Include="Data\NumberItem.cs" />
     <Compile Include="Data\PairItem.cs" />
     <Compile Include="Data\PrimitiveDataItem.cs" />
@@ -103,6 +108,7 @@
     <Compile Include="Definition\GraphNodeDefinition.cs" />
     <Compile Include="Definition\GraphStructDefinition.cs" />
     <Compile Include="Definition\GraphReferenceDefinition.cs" />
+    <Compile Include="Definition\KeyframeDefinition.cs" />
     <Compile Include="Definition\TimelineDefinition.cs" />
     <Compile Include="Definition\VectorDefinition.cs" />
     <Compile Include="Data\Workspace.cs" />

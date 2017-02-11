@@ -323,10 +323,9 @@
 		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 	</StructDef>
 
-	<StructDef Name="Timeline" ToolTip="A collection of keyframes." TextColour="Struct">
+	<CollectionDef Name="Timeline" ToolTip="A collection of keyframes." TextColour="Struct">
 		<Attributes>
 			<String Name="Name" Default="Timeline" ToolTip="The name to be written for this element." />
-			<String Name="TimeChild" Default="Time" SkipIfDefault="false" ToolTip="The name of the child containing the keyframe time." />
 			<Boolean Name="Interpolate" Default="true" ToolTip="Whether the timeline should show interpolated values" />
 			<Number Name="MinCount" Min="0" ToolTip="The minimum number of keyframes this can have." />
 			<Number Name="MaxCount" Min="1" Default="99999999" ToolTip="The maximum number of keyframes this can have." />
@@ -335,8 +334,33 @@
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Struct" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 		</Attributes>
-		<Reference Name="Keyframe" Keys="Struct" Nullable="false" ToolTip="The keyframe. Must contain a number child with the name of the value in TimeChild." />
-	</StructDef>
+		<Reference Name="Keyframe" Keys="Keyframe" Nullable="false" ToolTip="The keyframe. Must contain a number child with the name of the value in TimeChild." />
+	</CollectionDef>
+
+	<CollectionDef Name="Keyframe" ToolTip="A definition for a keyfrane in a timeline." TextColour="Struct">
+		<Attributes>
+			<String Name="Name" Default="Keyframe" ToolTip="The name to be written for this element. This will be used as the key when referencing it." />
+			<String Name="Extends" ToolTip="The name of a struct or structdef this extends. Override elements in the parent by giving them the same name." />
+			<String Name="ExtendsAfter" ToolTip="The element name to insert the new elements after" VisibleIf="Extends!=null" />
+			<Colour Name="Background" Default="0,0,0,0" />
+			<Boolean Name="Nullable" Default="true" ToolTip="Whether this element can be empty." />
+			<Boolean Name="Collapse" ToolTip="If set to true the struct will be collapsed to a single line seperated by the Seperator string. Only works all the child are a primitive items." />
+			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." VisibleIf="Collapse==true" />
+			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
+			<String Name="Description" ToolTip="The description to be used. Add a child names inside {} to use the contents of it in the description." />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
+			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Struct" HasAlpha="false" />
+			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
+			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
+			<Boolean Name="HasDuration" ToolTip="Whether this keyframe has a duration." />
+		</Attributes>
+		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The defined children of the struct" />
+		<AdditionalDefs>
+			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
+			<Reference Keys="Number" Name="Time" SkipIfDefault="false" ToolTip="The element to hold the time." />
+			<Reference Keys="Number" Name="Duration" SkipIfDefault="false" ToolTip="The element to hold the duration of this keyframe." VisibleIf="HasDuration==true" />
+		</AdditionalDefs>
+	</CollectionDef>
 
 	<StructDef Name="Reference" ToolTip="An element used to allow the user to pick from a collection of valid elements.">
 		<Attributes>
