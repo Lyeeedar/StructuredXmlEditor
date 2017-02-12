@@ -82,6 +82,9 @@ namespace StructuredXmlEditor.Data
 		protected List<DataItem> m_oldChildrenCache = new List<DataItem>();
 
 		//-----------------------------------------------------------------------
+		public ObservableCollection<DataItem> Attributes { get; set; } = new ObservableCollection<DataItem>();
+
+		//-----------------------------------------------------------------------
 		public IEnumerable<DataItem> Descendants
 		{
 			get
@@ -514,6 +517,16 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void UpdateVisibleIfBinding()
 		{
+			foreach (var group in VisibleIfStatements)
+			{
+				foreach (var stmnt in group)
+				{
+					if (stmnt.Target != null)
+					{
+						stmnt.Target.PropertyChanged -= VisiblityPropertyChanged;
+					}
+				}
+			}
 			VisibleIfStatements.Clear();
 
 			if (Definition.VisibleIf != null)
@@ -564,10 +577,7 @@ namespace StructuredXmlEditor.Data
 						if (current != null)
 						{
 							stmnt.SetTarget(current);
-							current.PropertyChanged += (e, a) =>
-							{
-								if (a.PropertyName == "Value") RaisePropertyChangedEvent("IsVisible");
-							};
+							current.PropertyChanged += VisiblityPropertyChanged;
 						}
 					}
 				}
@@ -811,6 +821,15 @@ namespace StructuredXmlEditor.Data
 		public virtual void ParentPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 
+		}
+
+		//-----------------------------------------------------------------------
+		public virtual void VisiblityPropertyChanged(object sender, PropertyChangedEventArgs args)
+		{
+			if (args.PropertyName == "Value")
+			{
+				RaisePropertyChangedEvent("IsVisible");
+			}
 		}
 
 		//-----------------------------------------------------------------------

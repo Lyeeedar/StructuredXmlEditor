@@ -225,7 +225,14 @@ namespace StructuredXmlEditor.Definition
 					Children.Add(childDef);
 
 					if (child.Name == "Time") TimeDefinition = (NumberDefinition)childDef;
-					if (child.Name == "Duration") DurationDefinition = (NumberDefinition)childDef;
+					if (child.Name == "Duration")
+					{
+						DurationDefinition = (NumberDefinition)childDef;
+
+						var lockDef = new BooleanDefinition();
+						lockDef.Name = "LockDuration";
+						DurationDefinition.Attributes.Add(lockDef);
+					}
 				}
 			}
 
@@ -406,6 +413,11 @@ namespace StructuredXmlEditor.Definition
 					{
 						newChildren.Insert(index++, child);
 					}
+				}
+
+				foreach (var att in def.Attributes)
+				{
+					Attributes.Add(att);
 				}
 
 				Children = newChildren;

@@ -171,23 +171,6 @@ namespace StructuredXmlEditor.Definition
 					AdditionalDefs.Add(addDef);
 				}
 			}
-
-			var attEl = definition.Element("Attributes");
-			if (attEl != null)
-			{
-				foreach (var att in attEl.Elements())
-				{
-					var attDef = LoadDefinition(att);
-					if (attDef is PrimitiveDataDefinition)
-					{
-						Attributes.Add(attDef as PrimitiveDataDefinition);
-					}
-					else
-					{
-						throw new Exception("Cannot put a non-primitive into attributes!");
-					}
-				}
-			}
 		}
 
 		public override void DoSaveData(XElement parent, DataItem item)

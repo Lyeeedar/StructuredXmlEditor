@@ -25,6 +25,13 @@ namespace StructuredXmlEditor.Definition
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
 			var item = new VectorItem(this, undoRedo);
+
+			foreach (var att in Attributes)
+			{
+				var attItem = att.CreateData(undoRedo);
+				item.Attributes.Add(attItem);
+			}
+
 			return item;
 		}
 
@@ -41,13 +48,44 @@ namespace StructuredXmlEditor.Definition
 		public override void DoSaveData(XElement parent, DataItem item)
 		{
 			var si = item as VectorItem;
-			parent.Add(new XElement(Name, si.Value.ToString()));
+
+			var el = new XElement(Name, si.Value.ToString());
+			parent.Add(el);
+
+			foreach (var att in item.Attributes)
+			{
+				var primDef = att.Definition as PrimitiveDataDefinition;
+				var asString = primDef.WriteToString(att);
+				var defaultAsString = primDef.DefaultValueString();
+
+				if (att.Name == "Name" || !primDef.SkipIfDefault || asString != defaultAsString)
+				{
+					el.SetAttributeValue(att.Name, asString);
+				}
+			}
 		}
 
 		public override DataItem LoadData(XElement element, UndoRedoManager undoRedo)
 		{
 			var item = new VectorItem(this, undoRedo);
 			item.Value = VectorN.FromString(element.Value);
+
+			foreach (var att in Attributes)
+			{
+				var el = element.Attribute(att.Name);
+				DataItem attItem = null;
+
+				if (el != null)
+				{
+					attItem = att.LoadData(new XElement(el.Name, el.Value.ToString()), undoRedo);
+				}
+				else
+				{
+					attItem = att.CreateData(undoRedo);
+				}
+				item.Attributes.Add(attItem);
+			}
+
 			return item;
 		}
 

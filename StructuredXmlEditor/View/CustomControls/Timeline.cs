@@ -389,7 +389,7 @@ namespace StructuredXmlEditor.View
 					keyframe.IsSelected = true;
 					dragActionOffset = (clickPos / pixelsASecond) - keyframe.Time;
 
-					if (keyframe.MaxDuration > 0)
+					if (!keyframe.IsDurationLocked)
 					{
 						if (Math.Abs(keyframe.EndTime * pixelsASecond - clickPos) < 10)
 						{
@@ -475,7 +475,7 @@ namespace StructuredXmlEditor.View
 					{
 						mouseOverItem = keyframe;
 
-						if (keyframe.MaxDuration > 0)
+						if (!keyframe.IsDurationLocked)
 						{
 							if (Math.Abs(time - clickPos) < 10 || Math.Abs(keyframe.EndTime * pixelsASecond - clickPos) < 10)
 							{

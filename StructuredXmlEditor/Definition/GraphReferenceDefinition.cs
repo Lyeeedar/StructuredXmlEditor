@@ -20,12 +20,22 @@ namespace StructuredXmlEditor.Definition
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
 			var item = new GraphReferenceItem(this, undoRedo);
+
+			foreach (var att in Attributes)
+			{
+				var attItem = att.CreateData(undoRedo);
+				item.Attributes.Add(attItem);
+			}
+
 			return item;
 		}
 
 		public override void DoSaveData(XElement parent, DataItem item)
 		{
 			var si = item as GraphReferenceItem;
+
+			XElement el = null;
+
 			if (si.ChosenDefinition != null)
 			{
 				if (
@@ -34,7 +44,7 @@ namespace StructuredXmlEditor.Definition
 					(si.WrappedItem.LinkParents.Any(e => e.LinkType == LinkType.Duplicate) || si.WrappedItem.LinkParents.First() == si)
 					))
 				{
-					var el = new XElement(Name, si.WrappedItem.GUID);
+					el = new XElement(Name, si.WrappedItem.GUID);
 					el.SetAttributeValue(DataDefinition.MetaNS + "RefKey", si.ChosenDefinition.Name);
 					parent.Add(el);
 				}
@@ -44,9 +54,21 @@ namespace StructuredXmlEditor.Definition
 
 					if (parent.Elements().Count() == 0) return;
 
-					var el = parent.Elements().Last();
+					el = parent.Elements().Last();
 					if (Name != "") el.Name = Name;
 					el.SetAttributeValue(DataDefinition.MetaNS + "RefKey", si.ChosenDefinition.Name);
+				}
+			}
+
+			foreach (var att in item.Attributes)
+			{
+				var primDef = att.Definition as PrimitiveDataDefinition;
+				var asString = primDef.WriteToString(att);
+				var defaultAsString = primDef.DefaultValueString();
+
+				if (att.Name == "Name" || !primDef.SkipIfDefault || asString != defaultAsString)
+				{
+					el.SetAttributeValue(att.Name, asString);
 				}
 			}
 		}
@@ -77,6 +99,22 @@ namespace StructuredXmlEditor.Definition
 			else
 			{
 				item = CreateData(undoRedo) as GraphReferenceItem;
+			}
+
+			foreach (var att in Attributes)
+			{
+				var el = element.Attribute(att.Name);
+				DataItem attItem = null;
+
+				if (el != null)
+				{
+					attItem = att.LoadData(new XElement(el.Name, el.Value.ToString()), undoRedo);
+				}
+				else
+				{
+					attItem = att.CreateData(undoRedo);
+				}
+				item.Attributes.Add(attItem);
 			}
 
 			return item;

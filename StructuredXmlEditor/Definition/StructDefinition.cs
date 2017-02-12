@@ -183,18 +183,7 @@ namespace StructuredXmlEditor.Definition
 			{
 				if (child.Name == "Attributes")
 				{
-					foreach (var att in child.Elements())
-					{
-						var attDef = LoadDefinition(att);
-						if (attDef is PrimitiveDataDefinition)
-						{
-							Attributes.Add(attDef as PrimitiveDataDefinition);
-						}
-						else
-						{
-							throw new Exception("Cannot put a non-primitive into attributes!");
-						}
-					}
+					
 				}
 				else
 				{
@@ -375,6 +364,11 @@ namespace StructuredXmlEditor.Definition
 					{
 						newChildren.Insert(index++, child);
 					}
+				}
+
+				foreach (var att in def.Attributes)
+				{
+					Attributes.Add(att);
 				}
 
 				Children = newChildren;

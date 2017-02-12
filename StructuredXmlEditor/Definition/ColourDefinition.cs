@@ -17,12 +17,37 @@ namespace StructuredXmlEditor.Definition
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
 			var item = LoadFromString(Default, undoRedo);
+
+			foreach (var att in Attributes)
+			{
+				var attItem = att.CreateData(undoRedo);
+				item.Attributes.Add(attItem);
+			}
+
 			return item;
 		}
 
 		public override DataItem LoadData(XElement element, UndoRedoManager undoRedo)
 		{
-			return LoadFromString(element.Value, undoRedo);
+			var item = LoadFromString(element.Value, undoRedo);
+
+			foreach (var att in Attributes)
+			{
+				var el = element.Attribute(att.Name);
+				DataItem attItem = null;
+
+				if (el != null)
+				{
+					attItem = att.LoadData(new XElement(el.Name, el.Value.ToString()), undoRedo);
+				}
+				else
+				{
+					attItem = att.CreateData(undoRedo);
+				}
+				item.Attributes.Add(attItem);
+			}
+
+			return item;
 		}
 
 		public override DataItem LoadFromString(string data, UndoRedoManager undoRedo)
@@ -56,7 +81,21 @@ namespace StructuredXmlEditor.Definition
 		public override void DoSaveData(XElement parent, DataItem item)
 		{
 			var asString = WriteToString(item);
-			parent.Add(new XElement(Name, asString));
+
+			var el = new XElement(Name, asString);
+			parent.Add(el);
+
+			foreach (var att in item.Attributes)
+			{
+				var primDef = att.Definition as PrimitiveDataDefinition;
+				asString = primDef.WriteToString(att);
+				var defaultAsString = primDef.DefaultValueString();
+
+				if (att.Name == "Name" || !primDef.SkipIfDefault || asString != defaultAsString)
+				{
+					el.SetAttributeValue(att.Name, asString);
+				}
+			}
 		}
 
 		public override string WriteToString(DataItem item)

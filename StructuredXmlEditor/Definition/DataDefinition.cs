@@ -40,6 +40,8 @@ namespace StructuredXmlEditor.Definition
 		public string CustomExtension { get; set; }
 		public string Extension { get { return CustomExtension ?? DataType; } }
 
+		public List<PrimitiveDataDefinition> Attributes { get; set; } = new List<PrimitiveDataDefinition>();
+
 		public abstract void Parse(XElement definition);
 		public abstract void DoSaveData(XElement parent, DataItem item);
 		public abstract DataItem LoadData(XElement element, UndoRedoManager undoRedo);
@@ -102,6 +104,23 @@ namespace StructuredXmlEditor.Definition
 			{
 				if (Colours.ContainsKey(col)) col = Colours[col];
 				definition.TextColour = col;
+			}
+
+			var attEl = element.Element("Attributes");
+			if (attEl != null)
+			{
+				foreach (var att in attEl.Elements())
+				{
+					var attDef = LoadDefinition(att);
+					if (attDef is PrimitiveDataDefinition)
+					{
+						definition.Attributes.Add(attDef as PrimitiveDataDefinition);
+					}
+					else
+					{
+						throw new Exception("Cannot put a non-primitive into attributes!");
+					}
+				}
 			}
 
 			definition.DataType = element.Attribute("DataType")?.Value?.ToString().ToLower() ?? "xml";

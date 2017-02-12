@@ -26,6 +26,13 @@ namespace StructuredXmlEditor.Definition
 				item.ChosenDefinition = Definitions.Values.First();
 				item.Create();
 			}
+
+			foreach (var att in Attributes)
+			{
+				var attItem = att.CreateData(undoRedo);
+				item.Attributes.Add(attItem);
+			}
+
 			return item;
 		}
 
@@ -41,6 +48,18 @@ namespace StructuredXmlEditor.Definition
 				var el = parent.Elements().Last();
 				if (Name != "") el.Name = Name;
 				el.SetAttributeValue(MetaNS + "RefKey", si.ChosenDefinition.Name);
+
+				foreach (var att in item.Attributes)
+				{
+					var primDef = att.Definition as PrimitiveDataDefinition;
+					var asString = primDef.WriteToString(att);
+					var defaultAsString = primDef.DefaultValueString();
+
+					if (att.Name == "Name" || !primDef.SkipIfDefault || asString != defaultAsString)
+					{
+						el.SetAttributeValue(att.Name, asString);
+					}
+				}
 			}
 		}
 
@@ -64,6 +83,22 @@ namespace StructuredXmlEditor.Definition
 			else
 			{
 				item = CreateData(undoRedo) as ReferenceItem;
+			}
+
+			foreach (var att in Attributes)
+			{
+				var el = element.Attribute(att.Name);
+				DataItem attItem = null;
+
+				if (el != null)
+				{
+					attItem = att.LoadData(new XElement(el.Name, el.Value.ToString()), undoRedo);
+				}
+				else
+				{
+					attItem = att.CreateData(undoRedo);
+				}
+				item.Attributes.Add(attItem);
 			}
 
 			return item;

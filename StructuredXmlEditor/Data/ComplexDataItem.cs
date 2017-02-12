@@ -17,9 +17,6 @@ namespace StructuredXmlEditor.Data
 	public abstract class ComplexDataItem : DataItem
 	{
 		//-----------------------------------------------------------------------
-		public ObservableCollection<DataItem> Attributes { get; set; } = new ObservableCollection<DataItem>();
-
-		//-----------------------------------------------------------------------
 		protected virtual bool CanClear { get { return true; } }
 
 		//-----------------------------------------------------------------------

@@ -21,6 +21,13 @@ namespace StructuredXmlEditor.Definition
 		{
 			var item = new NumberItem(this, undoRedo);
 			item.Value = Default;
+
+			foreach (var att in Attributes)
+			{
+				var attItem = att.CreateData(undoRedo);
+				item.Attributes.Add(attItem);
+			}
+
 			return item;
 		}
 
@@ -34,6 +41,22 @@ namespace StructuredXmlEditor.Definition
 
 			if (item.Value < MinValue) item.Value = MinValue;
 			if (item.Value > MaxValue) item.Value = MaxValue;
+
+			foreach (var att in Attributes)
+			{
+				var el = element.Attribute(att.Name);
+				DataItem attItem = null;
+
+				if (el != null)
+				{
+					attItem = att.LoadData(new XElement(el.Name, el.Value.ToString()), undoRedo);
+				}
+				else
+				{
+					attItem = att.CreateData(undoRedo);
+				}
+				item.Attributes.Add(attItem);
+			}
 
 			return item;
 		}
@@ -58,7 +81,20 @@ namespace StructuredXmlEditor.Definition
 		public override void DoSaveData(XElement parent, DataItem item)
 		{
 			var si = item as NumberItem;
-			parent.Add(new XElement(Name, si.Value));
+			XElement el = new XElement(Name, si.Value);
+			parent.Add(el);
+
+			foreach (var att in item.Attributes)
+			{
+				var primDef = att.Definition as PrimitiveDataDefinition;
+				var asString = primDef.WriteToString(att);
+				var defaultAsString = primDef.DefaultValueString();
+
+				if (att.Name == "Name" || !primDef.SkipIfDefault || asString != defaultAsString)
+				{
+					el.SetAttributeValue(att.Name, asString);
+				}
+			}
 		}
 
 		public override string WriteToString(DataItem item)

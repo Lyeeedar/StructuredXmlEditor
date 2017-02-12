@@ -16,6 +16,13 @@ namespace StructuredXmlEditor.Definition
 		{
 			var item = new BooleanItem(this, undoRedo);
 			item.Value = Default;
+
+			foreach (var att in Attributes)
+			{
+				var attItem = att.CreateData(undoRedo);
+				item.Attributes.Add(attItem);
+			}
+
 			return item;
 		}
 
@@ -26,6 +33,22 @@ namespace StructuredXmlEditor.Definition
 			bool val = Default;
 			bool.TryParse(element.Value, out val);
 			item.Value = val;
+
+			foreach (var att in Attributes)
+			{
+				var el = element.Attribute(att.Name);
+				DataItem attItem = null;
+
+				if (el != null)
+				{
+					attItem = att.LoadData(new XElement(el.Name, el.Value.ToString()), undoRedo);
+				}
+				else
+				{
+					attItem = att.CreateData(undoRedo);
+				}
+				item.Attributes.Add(attItem);
+			}
 
 			return item;
 		}
@@ -42,7 +65,21 @@ namespace StructuredXmlEditor.Definition
 		public override void DoSaveData(XElement parent, DataItem item)
 		{
 			var i = item as BooleanItem;
-			parent.Add(new XElement(Name, i.Value));
+
+			var el = new XElement(Name, i.Value);
+			parent.Add(el);
+
+			foreach (var att in i.Attributes)
+			{
+				var primDef = att.Definition as PrimitiveDataDefinition;
+				var asString = primDef.WriteToString(att);
+				var defaultAsString = primDef.DefaultValueString();
+
+				if (att.Name == "Name" || !primDef.SkipIfDefault || asString != defaultAsString)
+				{
+					el.SetAttributeValue(att.Name, asString);
+				}
+			}
 		}
 
 		public override string WriteToString(DataItem item)

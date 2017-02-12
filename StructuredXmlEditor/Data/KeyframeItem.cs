@@ -43,6 +43,19 @@ namespace StructuredXmlEditor.Data
 		public float MaxDuration { get { return KeyframeDef.DurationDefinition?.MaxValue ?? 0f; } }
 
 		//-----------------------------------------------------------------------
+		public bool IsDurationLocked
+		{
+			get
+			{
+				if (KeyframeDef.DurationDefinition == null) return true;
+				var durDef = Children.First(e => e.Definition == KeyframeDef.DurationDefinition) as NumberItem;
+				var lockAtt = durDef.Attributes[0] as BooleanItem;
+
+				return lockAtt.Value.Value;
+			}
+		}
+
+		//-----------------------------------------------------------------------
 		public float EndTime
 		{
 			get { return Time + Duration; }

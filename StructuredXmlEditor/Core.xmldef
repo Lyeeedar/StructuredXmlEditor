@@ -241,6 +241,8 @@
 	<CollectionDef Name="GraphStruct" ToolTip="A node on a graph." TextColour="Struct">
 		<Attributes>
 			<String Name="Name" Default="GraphStruct" ToolTip="The name to be written for this element." />
+			<String Name="Extends" ToolTip="The name of a struct or structdef this extends. Override elements in the parent by giving them the same name." />
+			<String Name="ExtendsAfter" ToolTip="The element name to insert the new elements after" VisibleIf="Extends!=null" />
 			<String Name="ChildAsGUID" ToolTip="The child to use as this elements GUID." />
 			<Boolean Name="AllowReferenceLinks" Default="true" ToolTip="Whether to allow links to be by reference." />
 			<Boolean Name="AllowCircularLinks" Default="false" ToolTip="Whether circular links are allowed." VisibleIf="AllowReferenceLinks==true" />
@@ -262,6 +264,8 @@
 	<CollectionDef Name="GraphStructDef" ToolTip="A node on a graph that can be referenced." TextColour="Struct">
 		<Attributes>
 			<String Name="Name" Default="GraphStruct" ToolTip="The name to be written for this element." />
+			<String Name="Extends" ToolTip="The name of a struct or structdef this extends. Override elements in the parent by giving them the same name." />
+			<String Name="ExtendsAfter" ToolTip="The element name to insert the new elements after" VisibleIf="Extends!=null" />
 			<String Name="Description" ToolTip="The description to be used. Add a child names inside {} to use the contents of it in the description." />
 			<String Name="ChildAsGUID" ToolTip="The child to use as this elements GUID." />
 			<Colour Name="Background" Default="0,0,0,0" />
