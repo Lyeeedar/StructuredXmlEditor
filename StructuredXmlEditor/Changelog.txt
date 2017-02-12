@@ -1,4 +1,15 @@
-﻿--------- 1.5.0 ---------
+﻿--------- 1.6.0 ---------
+
+- Improve timelines.
+ -- Keyframes can now have a duration.
+ -- Timelines sequentially next to each other will share a scroll position and zoom amount.
+ -- Keyframes can snap to the start/end of keyframes on other timelines in the group.
+- Number items will now parse equations typed into them. (e.g. typing 3*4 will put 12 into the data).
+- Add support for 'comment' elements. This should help with organising your data.
+- Add a 'ReferenceDef' element that allows you to specify the Keys in a seperate element, then import those.
+
+
+--------- 1.5.0 ---------
 
 - Add support for multiediting. Either select some documents in the project view then right click -> Multiedit (this will open it as a new document), or right click on a collection and click multi edit children (this will show it in the Focus tool).
 - Add support for Yaml as a data type.
