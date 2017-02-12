@@ -38,7 +38,7 @@ namespace StructuredXmlEditor
 				var data = m_futures[key];
 				m_futures.Remove(key);
 
-				Application.Current.Dispatcher.BeginInvoke(data.Item1);
+				Application.Current?.Dispatcher?.BeginInvoke(data.Item1);
 				data.Item2.Dispose();
 			}
 		}

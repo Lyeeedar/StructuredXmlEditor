@@ -1,5 +1,8 @@
 ﻿<Definitions Extension="xmldef">
 
+	<ReferenceDef Name="Elements" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" />
+	<ReferenceDef Name="ElementsAndComment" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree),Comment(Comment)" />
+	
 	<CollectionDef Name="Attributes" ToolTip="A the attributes of this element." TextColour="Struct" SkipIfDefault="true">
 		<Reference Name="Attribute" Keys="Boolean,Colour,Enum,File,Number,String" ToolTip="The attribute" />
 	</CollectionDef>
@@ -166,7 +169,7 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The elements that can be placed in this collection" />
+		<Reference Name="Data" DefKey="Elements" ToolTip="The elements that can be placed in this collection" />
 		<AdditionalDefs>
 			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 		</AdditionalDefs>
@@ -186,7 +189,7 @@
 			<Boolean Name="IsGlobal" ToolTip="Whether this definition can be referenced from other files." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The elements that can be placed in this collection" />
+		<Reference Name="Data" DefKey="Elements" ToolTip="The elements that can be placed in this collection" />
 		<AdditionalDefs>
 			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 		</AdditionalDefs>
@@ -207,7 +210,7 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree),Comment(Comment)" ToolTip="The defined children of the struct" />
+		<Reference Name="Data" DefKey="ElementsAndComment" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
 			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 		</AdditionalDefs>
@@ -229,7 +232,7 @@
 			<Boolean Name="IsGlobal" ToolTip="Whether this definition can be referenced from other files." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree),Comment(Comment)" ToolTip="The defined children of the struct" />
+		<Reference Name="Data" DefKey="ElementsAndComment" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
 			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 		</AdditionalDefs>
@@ -249,7 +252,7 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree),Comment(Comment)" ToolTip="The defined children of the struct" />
+		<Reference Name="Data" DefKey="ElementsAndComment" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
 			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true"/>
 		</AdditionalDefs>
@@ -266,7 +269,7 @@
 			<Boolean Name="IsGlobal" ToolTip="Whether this definition can be referenced from other files." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree),Comment(Comment)" ToolTip="The defined children of the struct" />
+		<Reference Name="Data" DefKey="ElementsAndComment" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
 			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 		</AdditionalDefs>
@@ -287,7 +290,7 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The elements that can be placed in this collection" />
+		<Reference Name="Data" DefKey="Elements" ToolTip="The elements that can be placed in this collection" />
 		<AdditionalDefs>
 			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 		</AdditionalDefs>
@@ -305,7 +308,7 @@
 			<Boolean Name="IsGlobal" ToolTip="Whether this definition can be referenced from other files." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The elements that can be placed in this collection" />
+		<Reference Name="Data" DefKey="Elements" ToolTip="The elements that can be placed in this collection" />
 		<AdditionalDefs>
 			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 		</AdditionalDefs>
@@ -314,7 +317,8 @@
 	<StructDef Name="GraphReference" ToolTip="An element that links to another graphnode.">
 		<Attributes>
 			<String Name="Name" Default="Reference" ToolTip="The name to be written for this element." />
-			<String Name="Keys" ToolTip="The names of the graph nodes that this reference can contain." />
+			<String Name="Keys" ToolTip="The names of the graph nodes that this reference can contain." VisibleIf="DefKey==null" />
+			<String Name="DefKey" ToolTip="The name of the reference definition to use the keys from." VisibleIf="Keys==null" />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
@@ -354,7 +358,7 @@
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 			<Boolean Name="HasDuration" ToolTip="Whether this keyframe has a duration." />
 		</Attributes>
-		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree),Comment(Comment)" ToolTip="The defined children of the struct" />
+		<Reference Name="Data" DefKey="ElementsAndComment" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
 			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 			<Reference Keys="Number" Name="Time" SkipIfDefault="false" Nullable="false" ToolTip="The element to hold the time." />
@@ -362,10 +366,18 @@
 		</AdditionalDefs>
 	</CollectionDef>
 
-	<StructDef Name="Reference" ToolTip="An element used to allow the user to pick from a collection of valid elements.">
+	<StructDef Name="ReferenceDef" ToolTip="An element used to allow the user to pick from a collection of valid elements.">
 		<Attributes>
 			<String Name="Name" Default="Reference" ToolTip="The name to be written for this element." />
 			<String Name="Keys" ToolTip="The names of the definitions that this reference can contain." />
+		</Attributes>
+	</StructDef>
+
+	<StructDef Name="Reference" ToolTip="An element used to allow the user to pick from a collection of valid elements.">
+		<Attributes>
+			<String Name="Name" Default="Reference" ToolTip="The name to be written for this element." />
+			<String Name="Keys" ToolTip="The names of the definitions that this reference can contain." VisibleIf="DefKey==null" />
+			<String Name="DefKey" ToolTip="The name of the reference definition to use the keys from." VisibleIf="Keys==null" />
 			<Boolean Name="Nullable" Default="true" ToolTip="Whether this element can be empty." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
@@ -384,7 +396,7 @@
 			<String Name="Extension" ToolTip="The extension to use for these definitions. Leave blank to revert to the data type (.xml, .json etc)." />
 			<Enum Name="DataType" EnumValues="xml,json,yaml" ToolTip="The data type of the data." />
 		</Attributes>
-		<Reference Name="Definition" Keys="Items(Struct,Collection,GraphStruct,GraphCollection),Definitions(StructDef,EnumDef,CollectionDef,GraphStructDef,GraphCollectionDef)" ToolTip="A single definition." />
+		<Reference Name="Definition" Keys="Items(Struct,Collection,GraphStruct,GraphCollection),Definitions(StructDef,EnumDef,CollectionDef,GraphStructDef,GraphCollectionDef,ReferenceDef)" ToolTip="A single definition." />
 	</Collection>
 	
 </Definitions>

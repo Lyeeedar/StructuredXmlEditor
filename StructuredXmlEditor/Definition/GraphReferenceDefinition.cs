@@ -14,6 +14,7 @@ namespace StructuredXmlEditor.Definition
 	{
 		public ListCollectionView ItemsSource { get; set; }
 		public List<Tuple<string, string>> Keys { get; set; } = new List<Tuple<string, string>>();
+		public string DefKey { get; set; }
 		public Dictionary<string, GraphNodeDefinition> Definitions { get; set; } = new Dictionary<string, GraphNodeDefinition>();
 
 		public override DataItem CreateData(UndoRedoManager undoRedo)
@@ -83,6 +84,8 @@ namespace StructuredXmlEditor.Definition
 
 		public override void Parse(XElement definition)
 		{
+			DefKey = definition.Attribute("DefKey")?.Value?.ToString();
+
 			var keyString = definition.Attribute("Keys")?.Value?.ToString();
 
 			if (!string.IsNullOrWhiteSpace(keyString))
@@ -111,6 +114,29 @@ namespace StructuredXmlEditor.Definition
 
 		public override void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global, Dictionary<string, Dictionary<string, DataDefinition>> referenceableDefinitions)
 		{
+			if (DefKey != null)
+			{
+				var key = DefKey.ToLower();
+
+				Dictionary<string, DataDefinition> defs = null;
+				if (local.ContainsKey(key)) defs = local;
+				else if (global.ContainsKey(key)) defs = global;
+
+				if (defs != null)
+				{
+					var def = defs[key] as ReferenceDefinition;
+					Keys = def.Keys;
+
+					ListCollectionView lcv = new ListCollectionView(Keys);
+					lcv.GroupDescriptions.Add(new PropertyGroupDescription("Item2"));
+					ItemsSource = lcv;
+				}
+				else
+				{
+					Message.Show("Failed to find key " + DefKey + "!", "Reference Resolve Failed", "Ok");
+				}
+			}
+
 			foreach (var key in Keys)
 			{
 				Dictionary<string, DataDefinition> defs = null;

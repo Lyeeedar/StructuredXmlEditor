@@ -278,7 +278,14 @@
 									Height="*" />
 							</Grid.RowDefinitions>
 
-							<Grid>
+							<Grid
+								MinWidth="50">
+
+								<TextBlock
+									FontSize="12"
+									Margin="5"
+									HorizontalAlignment="Center"
+									Text="{Binding Title}" />
 
 								<Button
 									HorizontalAlignment="Right"
@@ -294,12 +301,6 @@
 										Height="10"
 										Width="10" />
 								</Button>
-
-								<TextBlock
-									FontSize="12"
-									Margin="5"
-									HorizontalAlignment="Center"
-									Text="{Binding Title}" />
 
 							</Grid>
 
