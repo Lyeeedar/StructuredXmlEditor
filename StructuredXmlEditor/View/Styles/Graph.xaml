@@ -71,6 +71,7 @@
 				Background="Transparent"
 				Text="{Binding Title}"
 				MinWidth="50"
+				MaxWidth="150"
 				VerticalAlignment="Center"
 				HorizontalAlignment="Center"
 				TextAlignment="Center"
@@ -107,6 +108,8 @@
 				<TextBlock
 					Margin="5"
 					VerticalAlignment="Center"
+					Foreground="{Binding FontBrush}"
+					ToolTip="{Binding ToolTip}"
 					Text="{Binding Title}" />
 
 				<ContentControl
@@ -159,6 +162,8 @@
 				<TextBlock
 					Margin="5"
 					VerticalAlignment="Center"
+					Foreground="{Binding FontBrush}"
+					ToolTip="{Binding ToolTip}"
 					Text="{Binding Title}" />
 
 				<Button
@@ -292,6 +297,8 @@
 									FontSize="12"
 									Margin="5"
 									HorizontalAlignment="Center"
+									Foreground="{Binding FontBrush}"
+									ToolTip="{Binding NodeToolTip}"
 									Text="{Binding Title}" />
 
 								<Button

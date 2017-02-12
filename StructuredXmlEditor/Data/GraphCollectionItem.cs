@@ -35,7 +35,7 @@ namespace StructuredXmlEditor.Data
 		public CollectionChildDefinition SelectedDefinition { get; set; }
 
 		//-----------------------------------------------------------------------
-		public bool ShowComboBox { get { return CDef.ChildDefinitions.Count > 1; } }
+		public bool ShowComboBox { get { return CDef.ChildDefinitions.Count > 1 && !IsAtMax; } }
 
 		//-----------------------------------------------------------------------
 		public override bool CanPaste { get { return !IsAtMax; } }
@@ -53,8 +53,12 @@ namespace StructuredXmlEditor.Data
 					RaisePropertyChangedEvent("IsAtMin");
 					RaisePropertyChangedEvent("IsAtMax");
 
-					Grid.RaisePropertyChangedEvent("GraphNodes");
+					Grid?.RaisePropertyChangedEvent("GraphNodes");
 					RaisePropertyChangedEvent("GraphData");
+				}
+				else if (e.PropertyName == "IsAtMax")
+				{
+					RaisePropertyChangedEvent("ShowComboBox");
 				}
 			};
 

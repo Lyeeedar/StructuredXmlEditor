@@ -39,6 +39,12 @@ namespace StructuredXmlEditor.View
 		public string Title { get { return GraphNodeItem.Name; } }
 
 		//--------------------------------------------------------------------------
+		public string NodeToolTip { get { return GraphNodeItem.ToolTip; } }
+
+		//--------------------------------------------------------------------------
+		public Brush FontBrush { get { return GraphNodeItem.TextBrush; } }
+
+		//--------------------------------------------------------------------------
 		public Graph Graph { get; set; }
 
 		//--------------------------------------------------------------------------

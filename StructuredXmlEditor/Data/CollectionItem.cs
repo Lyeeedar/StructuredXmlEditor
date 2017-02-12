@@ -30,7 +30,7 @@ namespace StructuredXmlEditor.Data
 		public CollectionChildDefinition SelectedDefinition { get; set; }
 
 		//-----------------------------------------------------------------------
-		public bool ShowComboBox { get { return CDef.ChildDefinitions.Count > 1; } }
+		public bool ShowComboBox { get { return CDef.ChildDefinitions.Count > 1 && !IsAtMax; } }
 
 		//-----------------------------------------------------------------------
 		public bool IsAtMax { get { return IsMultiediting || Children.Where(e => CDef.ChildDefinitions.Contains(e.Definition)).Count() >= CDef.MaxCount; } }
@@ -53,6 +53,10 @@ namespace StructuredXmlEditor.Data
 				{
 					RaisePropertyChangedEvent("IsAtMin");
 					RaisePropertyChangedEvent("IsAtMax");
+				}
+				else if (e.PropertyName == "IsAtMax")
+				{
+					RaisePropertyChangedEvent("ShowComboBox");
 				}
 			};
 

@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml.Linq;
 
@@ -251,10 +252,34 @@ namespace StructuredXmlEditor.Data
 				{
 					m_textColour = value;
 
+					if (!colourBrushMap.ContainsKey(value))
+					{
+						var split = TextColour.Split(new char[] { ',' });
+
+						byte r = 0;
+						byte g = 0;
+						byte b = 0;
+
+						byte.TryParse(split[0], out r);
+						byte.TryParse(split[1], out g);
+						byte.TryParse(split[2], out b);
+
+						var col = Color.FromArgb(255, r, g, b);
+						var brush = new SolidColorBrush(col);
+						brush.Freeze();
+
+						colourBrushMap[TextColour] = brush;
+					}
+
 					RaisePropertyChangedEvent();
+					RaisePropertyChangedEvent("TextBrush");
 				}
 			}
 		}
+
+		//-----------------------------------------------------------------------
+		public Brush TextBrush { get { return colourBrushMap[TextColour]; } }
+		private static Dictionary<string, Brush> colourBrushMap = new Dictionary<string, Brush>();
 
 		//-----------------------------------------------------------------------
 		public string FocusName

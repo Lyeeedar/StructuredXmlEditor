@@ -17,10 +17,12 @@ namespace StructuredXmlEditor.View
 {
 	public class ColourMarkupConverter : ConverterBase
 	{
+		private static Dictionary<string, Brush> colourBrushMap = new Dictionary<string, Brush>();
+
 		protected override object Convert(object i_value, Type i_targetType, object i_parameter, CultureInfo i_culture)
 		{
 			string input = i_value as string;
-			if (input != null)
+			if (!string.IsNullOrWhiteSpace(input))
 			{
 				var textBlock = new TextBlock();
 				textBlock.Background = Brushes.Transparent;
@@ -28,8 +30,8 @@ namespace StructuredXmlEditor.View
 
 				string currentString = "";
 				bool inTag = false;
-				Stack<Color> colour = new Stack<Color>();
-				colour.Push(Colors.White);
+				Stack<string> colour = new Stack<string>();
+				colour.Push("255,255,255");
 				bool tagIsClosing = false;
 
 				for (int i = 0; i < input.Length; i++)
@@ -47,7 +49,7 @@ namespace StructuredXmlEditor.View
 					{
 						tagIsClosing = true;
 					}
-					else if (c == '>')
+					else if (c == '>' && inTag)
 					{
 						if (tagIsClosing)
 						{
@@ -61,17 +63,7 @@ namespace StructuredXmlEditor.View
 							}
 							else
 							{
-								var split = currentString.Split(new char[] { ',' });
-
-								byte r = 0;
-								byte g = 0;
-								byte b = 0;
-
-								byte.TryParse(split[0], out r);
-								byte.TryParse(split[1], out g);
-								byte.TryParse(split[2], out b);
-
-								colour.Push(Color.FromArgb(255, r, g, b));
+								colour.Push(currentString);
 							}
 						}
 
@@ -93,11 +85,30 @@ namespace StructuredXmlEditor.View
 			return null;
 		}
 
-		private void Flush(TextBlock block, string text, Color current)
+		private void Flush(TextBlock block, string text, string current)
 		{
 			if (text == "") return;
 
-			block.Inlines.Add(new Run(text) { Foreground = new SolidColorBrush(current) });
+			if (!colourBrushMap.ContainsKey(current))
+			{
+				var split = current.Split(new char[] { ',' });
+
+				byte r = 0;
+				byte g = 0;
+				byte b = 0;
+
+				byte.TryParse(split[0], out r);
+				byte.TryParse(split[1], out g);
+				byte.TryParse(split[2], out b);
+
+				var col = Color.FromArgb(255, r, g, b);
+				var brush = new SolidColorBrush(col);
+				brush.Freeze();
+
+				colourBrushMap[current] = brush;
+			}
+
+			block.Inlines.Add(new Run(text) { Foreground = colourBrushMap[current] });
 		}
 	}
 }

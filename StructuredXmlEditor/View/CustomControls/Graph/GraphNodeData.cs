@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 
 namespace StructuredXmlEditor.View
 {
@@ -58,6 +59,10 @@ namespace StructuredXmlEditor.View
 	{
 		public override string Title { get { return data.Name; } }
 
+		public string ToolTip { get { return data.ToolTip; } }
+
+		public Brush FontBrush { get { return data.TextBrush; } }
+
 		public string Preview { get { return data.Description; } }
 
 		public Command<object> EditCMD { get { return new Command<object>((e) => { Node.Edit(data); }); } }
@@ -73,6 +78,10 @@ namespace StructuredXmlEditor.View
 				if (args.PropertyName == "Description")
 				{
 					RaisePropertyChangedEvent("Preview");
+				}
+				else if (args.PropertyName == "TextBrush")
+				{
+					RaisePropertyChangedEvent("FontBrush");
 				}
 			};
 		}
@@ -95,6 +104,10 @@ namespace StructuredXmlEditor.View
 				{
 					Node.Graph.UpdateControls();
 				}
+				else if (args.PropertyName == "TextBrush")
+				{
+					RaisePropertyChangedEvent("FontBrush");
+				}
 			};
 
 			PropertyChanged += (e, args) => 
@@ -113,9 +126,18 @@ namespace StructuredXmlEditor.View
 		{
 			get
 			{
-				return GraphReferenceItem.GetParentPath();
+				var title = GraphReferenceItem.GetParentPath();
+				if (GraphReferenceItem.WrappedItem != null)
+				{
+					title += " (" + GraphReferenceItem.Name + ")";
+				}
+				return title;
 			}
 		}
+
+		public Brush FontBrush { get { return GraphReferenceItem.TextBrush; } }
+
+		public string ToolTip { get { return GraphReferenceItem.ToolTip; } }
 
 		public GraphReferenceItem GraphReferenceItem { get; set; }
 
