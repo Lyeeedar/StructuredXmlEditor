@@ -1,4 +1,5 @@
 ﻿using StructuredXmlEditor.Data;
+using StructuredXmlEditor.Definition;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -42,6 +43,12 @@ namespace StructuredXmlEditor.View
 
 		//--------------------------------------------------------------------------
 		public List<GraphNode> ParentNodes { get; } = new List<GraphNode>();
+
+		//--------------------------------------------------------------------------
+		public Brush BackgroundBrush
+		{
+			get { return (GraphNodeItem.Definition as GraphNodeDefinition).Background; }
+		}
 
 		//--------------------------------------------------------------------------
 		public double X

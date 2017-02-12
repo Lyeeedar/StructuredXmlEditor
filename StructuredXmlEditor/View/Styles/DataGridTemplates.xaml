@@ -228,13 +228,6 @@
 	</DataTemplate>
 
 	<DataTemplate
-		DataType="{x:Type d:PairItem}">
-		<ContentControl
-			VerticalAlignment="Center"
-			Content="{Binding Description, Converter={v:ColourMarkupConverter}}" />
-	</DataTemplate>
-
-	<DataTemplate
 		DataType="{x:Type d:NumberItem}">
 		<v:NumericTextBox
 			MinValue="{Binding Definition.MinValue}"
@@ -499,7 +492,7 @@
 				<ColumnDefinition
 					Width="20" />
 				<ColumnDefinition
-					Width="Auto" />
+					Width="*" />
 			</Grid.ColumnDefinitions>
 
 			<Button
@@ -519,6 +512,7 @@
 
 			<ComboBox
 				Grid.Column="2"
+				Margin="20,0,20,0"
 				Visibility="{Binding HasContent, Converter={v:ValueTypeConverter}, ConverterParameter=Not}"
 				VerticalAlignment="Center"
 				ItemsSource="{Binding Definition.ItemsSource}"
@@ -666,7 +660,7 @@
 				<ColumnDefinition
 					Width="20" />
 				<ColumnDefinition
-					Width="Auto" />
+					Width="*" />
 			</Grid.ColumnDefinitions>
 
 			<Button
@@ -686,6 +680,7 @@
 
 			<ComboBox
 				Grid.Column="2"
+				Margin="20,0,20,0"
 				Visibility="{Binding HasContent, Converter={v:ValueTypeConverter}, ConverterParameter=Not}"
 				VerticalAlignment="Center"
 				ItemsSource="{Binding Definition.ItemsSource}"
@@ -729,8 +724,6 @@
 				<ColumnDefinition
 					Width="20" />
 				<ColumnDefinition
-					Width="Auto" />
-				<ColumnDefinition
 					Width="*" />
 			</Grid.ColumnDefinitions>
 
@@ -803,8 +796,16 @@
 					Width="16" />
 			</Button>
 
+			<ContentControl
+				Grid.Column="2"
+				VerticalAlignment="Center"
+				Margin="5,0,5,0"
+				Visibility="{Binding ShowComboBox, Converter={v:ValueTypeConverter}, ConverterParameter=Not}"
+				Content="{Binding Description, Converter={v:ColourMarkupConverter}}" />
+
 			<ComboBox
 				Grid.Column="2"
+				Margin="20,0,20,0"
 				Visibility="{Binding ShowComboBox, Converter={v:ValueTypeConverter}}"
 				ItemsSource="{Binding Definition.ChildDefinitions}"
 				SelectedItem="{Binding SelectedDefinition}">
@@ -815,12 +816,6 @@
 					</DataTemplate>
 				</ComboBox.ItemTemplate>
 			</ComboBox>
-
-			<ContentControl
-				Grid.Column="3"
-				VerticalAlignment="Center"
-				Margin="5,0,5,0"
-				Content="{Binding Description, Converter={v:ColourMarkupConverter}}" />
 
 		</Grid>
 	</DataTemplate>
@@ -835,8 +830,6 @@
 				<ColumnDefinition
 					Width="20" />
 				<ColumnDefinition
-					Width="Auto" />
-				<ColumnDefinition
 					Width="*" />
 			</Grid.ColumnDefinitions>
 
@@ -909,8 +902,16 @@
 					Width="16" />
 			</Button>
 
+			<ContentControl
+				Grid.Column="2"
+				VerticalAlignment="Center"
+				Margin="5,0,5,0"
+				Visibility="{Binding ShowComboBox, Converter={v:ValueTypeConverter}, ConverterParameter=Not}"
+				Content="{Binding Description, Converter={v:ColourMarkupConverter}}" />
+
 			<ComboBox
 				Grid.Column="2"
+				Margin="20,0,20,0"
 				Visibility="{Binding ShowComboBox, Converter={v:ValueTypeConverter}}"
 				ItemsSource="{Binding Definition.ChildDefinitions}"
 				SelectedItem="{Binding SelectedDefinition}">
@@ -921,12 +922,6 @@
 					</DataTemplate>
 				</ComboBox.ItemTemplate>
 			</ComboBox>
-			
-			<ContentControl
-				Grid.Column="3"
-				VerticalAlignment="Center"
-				Margin="5,0,5,0"
-				Content="{Binding Description, Converter={v:ColourMarkupConverter}}" />
 
 		</Grid>
 	</DataTemplate>

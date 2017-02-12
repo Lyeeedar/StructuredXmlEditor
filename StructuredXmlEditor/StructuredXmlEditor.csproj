@@ -98,7 +98,6 @@
     <Compile Include="Data\ICollectionItem.cs" />
     <Compile Include="Data\KeyframeItem.cs" />
     <Compile Include="Data\NumberItem.cs" />
-    <Compile Include="Data\PairItem.cs" />
     <Compile Include="Data\PrimitiveDataItem.cs" />
     <Compile Include="Data\MultilineStringItem.cs" />
     <Compile Include="Data\ReferenceItem.cs" />

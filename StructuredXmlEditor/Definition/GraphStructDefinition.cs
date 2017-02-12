@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Xml.Linq;
 
 namespace StructuredXmlEditor.Definition
@@ -152,6 +153,26 @@ namespace StructuredXmlEditor.Definition
 			AllowCircularLinks = TryParseBool(definition, "AllowCircularLinks", false);
 			FlattenData = TryParseBool(definition, "FlattenData", false);
 			NodeStoreName = definition.Attribute("NodeStoreName")?.Value?.ToString() ?? "Nodes";
+
+			var backgroundCol = definition.Attribute("Background")?.Value?.ToString();
+			if (backgroundCol != null)
+			{
+				var split = backgroundCol.Split(new char[] { ',' });
+
+				byte r = 0;
+				byte g = 0;
+				byte b = 0;
+				byte a = 0;
+
+				byte.TryParse(split[0], out r);
+				byte.TryParse(split[1], out g);
+				byte.TryParse(split[2], out b);
+				byte.TryParse(split[3], out a);
+
+				var col = Color.FromArgb(a, r, g, b);
+				Background = new SolidColorBrush(col);
+				Background.Freeze();
+			}
 
 			bool foundChildAsGUID = string.IsNullOrWhiteSpace(ChildAsGUID);
 

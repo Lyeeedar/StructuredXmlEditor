@@ -135,10 +135,21 @@ namespace StructuredXmlEditor.Definition
 				{
 					Definitions[key.Item1] = defs[key.Item1.ToLower()];
 				}
-				else
+				else if (key.Item1 != "---")
 				{
 					Message.Show("Failed to find key " + key.Item1 + "!", "Reference Resolve Failed", "Ok");
 				}
+			}
+
+			if (Keys.Count == 0)
+			{
+				Keys.Add(new Tuple<string, string>("---", "---"));
+
+				ListCollectionView lcv = new ListCollectionView(Keys);
+				lcv.GroupDescriptions.Add(new PropertyGroupDescription("Item2"));
+				ItemsSource = lcv;
+
+				Definitions["---"] = new DummyDefinition();
 			}
 		}
 

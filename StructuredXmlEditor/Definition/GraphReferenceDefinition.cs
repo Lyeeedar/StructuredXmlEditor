@@ -151,7 +151,7 @@ namespace StructuredXmlEditor.Definition
 					{
 						Definitions[key.Item1] = def as GraphNodeDefinition;
 					}
-					else
+					else if (key.Item1 != "---")
 					{
 						Message.Show("Tried to add definition of type " + def.GetType() + " (key = " + key.Item1 + ") to graph reference!", "Reference Resolve Failed", "Ok");
 					}
@@ -160,6 +160,17 @@ namespace StructuredXmlEditor.Definition
 				{
 					Message.Show("Failed to find key " + key.Item1 + "!", "Reference Resolve Failed", "Ok");
 				}
+			}
+
+			if (Keys.Count == 0)
+			{
+				Keys.Add(new Tuple<string, string>("---", "---"));
+
+				ListCollectionView lcv = new ListCollectionView(Keys);
+				lcv.GroupDescriptions.Add(new PropertyGroupDescription("Item2"));
+				ItemsSource = lcv;
+
+				Definitions["---"] = new GraphStructDefinition();
 			}
 		}
 
