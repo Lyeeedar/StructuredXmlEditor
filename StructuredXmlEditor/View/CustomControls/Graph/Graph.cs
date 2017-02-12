@@ -186,7 +186,7 @@ namespace StructuredXmlEditor.View
 			if (!UpdatingControls)
 			{
 				UpdatingControls = true;
-				Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Render, new Action(() =>
+				Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
 				{
 					RaisePropertyChangedEvent("Controls");
 					UpdatingControls = false;

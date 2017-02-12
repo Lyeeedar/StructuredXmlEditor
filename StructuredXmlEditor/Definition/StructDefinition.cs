@@ -67,8 +67,6 @@ namespace StructuredXmlEditor.Definition
 		{
 			var item = new StructItem(this, undoRedo);
 
-			bool hadData = false;
-
 			if (Collapse)
 			{
 				var split = element.Value.Split(new string[] { Seperator }, StringSplitOptions.None);
@@ -82,7 +80,6 @@ namespace StructuredXmlEditor.Definition
 						DataItem childItem = def.LoadFromString(data, undoRedo);
 						item.Children.Add(childItem);
 					}
-					hadData = true;
 				}
 				else
 				{
@@ -97,6 +94,8 @@ namespace StructuredXmlEditor.Definition
 			{
 				var createdChildren = new List<DataItem>();
 
+				var commentTexts = Children.Where(e => e is CommentDefinition).Select(e => (e as CommentDefinition).Text);
+
 				foreach (var def in Children)
 				{
 					var name = def.Name;
@@ -105,6 +104,13 @@ namespace StructuredXmlEditor.Definition
 
 					if (els.Count() > 0)
 					{
+						var prev = els.First().PreviousNode as XComment;
+						if (prev != null)
+						{
+							var comment = new CommentDefinition().LoadData(prev, undoRedo);
+							if (!commentTexts.Contains(comment.TextValue)) item.Children.Add(comment);
+						}
+
 						if (def is CollectionDefinition)
 						{
 							CollectionItem childItem = (CollectionItem)def.LoadData(els.First(), undoRedo);
@@ -123,14 +129,18 @@ namespace StructuredXmlEditor.Definition
 							DataItem childItem = def.LoadData(els.First(), undoRedo);
 							item.Children.Add(childItem);
 						}
-
-						hadData = true;
 					}
 					else
 					{
 						DataItem childItem = def.CreateData(undoRedo);
 						item.Children.Add(childItem);
 					}
+				}
+
+				if (element.LastNode is XComment)
+				{
+					var comment = new CommentDefinition().LoadData(element.LastNode as XComment, undoRedo);
+					if (!commentTexts.Contains(comment.TextValue)) item.Children.Add(comment);
 				}
 			}
 
@@ -142,7 +152,6 @@ namespace StructuredXmlEditor.Definition
 				if (el != null)
 				{
 					attItem = att.LoadData(new XElement(el.Name, el.Value.ToString()), undoRedo);
-					hadData = true;
 				}
 				else
 				{
@@ -150,14 +159,6 @@ namespace StructuredXmlEditor.Definition
 				}
 				item.Attributes.Add(attItem);
 			}
-
-			// if empty and nullable, then clear all the auto created stuff
-			if (!hadData && Nullable)
-			{
-				item.Children.Clear();
-			}
-
-			item.Children.OrderBy(e => Children.IndexOf(e.Definition));
 
 			foreach (var child in item.Attributes)
 			{
@@ -289,7 +290,7 @@ namespace StructuredXmlEditor.Definition
 				foreach (var child in si.Children)
 				{
 					var childDef = child.Definition;
-					if (!Children.Contains(childDef)) throw new Exception("A child has a definition that we dont have! Something broke!");
+					if (!Children.Contains(childDef) && !(childDef is CommentDefinition)) throw new Exception("A child has a definition that we dont have! Something broke!");
 
 					child.Definition.SaveData(el, child);
 				}

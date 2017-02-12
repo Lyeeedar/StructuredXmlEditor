@@ -72,6 +72,13 @@ namespace StructuredXmlEditor.Definition
 
 				foreach (var el in element.Elements())
 				{
+					var prev = el.PreviousNode as XComment;
+					if (prev != null)
+					{
+						var comment = new CommentDefinition().LoadData(prev, undoRedo);
+						item.Children.Add(comment);
+					}
+
 					var cdef = ChildDefinitions.FirstOrDefault(e => e.Name == el.Name);
 					if (cdef != null)
 					{
@@ -104,6 +111,12 @@ namespace StructuredXmlEditor.Definition
 				{
 					var child = def.CreateData(undoRedo);
 					item.Children.Insert(0, child);
+				}
+
+				if (element.LastNode is XComment)
+				{
+					var comment = new CommentDefinition().LoadData(element.LastNode as XComment, undoRedo);
+					item.Children.Add(comment);
 				}
 			}
 

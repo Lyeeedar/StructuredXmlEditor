@@ -122,7 +122,7 @@ namespace StructuredXmlEditor.Data
 			if (item is StructItem)
 			{
 				var si = item as StructItem;
-				if (!si.HasContent)
+				if (si.Children.Count == 0 && si.Attributes.Count == 0)
 				{
 					using (si.UndoRedo.DisableUndoScope())
 					{
@@ -133,7 +133,7 @@ namespace StructuredXmlEditor.Data
 			else if (item is GraphStructItem)
 			{
 				var gni = item as GraphStructItem;
-				if (!gni.HasContent)
+				if (gni.Children.Count == 0 && gni.Attributes.Count == 0)
 				{
 					using (gni.UndoRedo.DisableUndoScope())
 					{

@@ -1,4 +1,5 @@
 ﻿using StructuredXmlEditor.Data;
+using StructuredXmlEditor.Definition;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -282,6 +283,22 @@ namespace StructuredXmlEditor.View
 				thumb.DragStarted += DragStart;
 				thumb.DragCompleted += DragCompleted;
 			}
+
+			thumb = GetTemplateChild("Comment_DragThumb1") as Thumb;
+
+			if (thumb != null)
+			{
+				thumb.DragStarted += DragStart;
+				thumb.DragCompleted += DragCompleted;
+			}
+
+			thumb = GetTemplateChild("Comment_DragThumb2") as Thumb;
+
+			if (thumb != null)
+			{
+				thumb.DragStarted += DragStart;
+				thumb.DragCompleted += DragCompleted;
+			}
 		}
 
 		//-----------------------------------------------------------------------
@@ -441,6 +458,20 @@ namespace StructuredXmlEditor.View
 					DragDrop.DoDragDrop(this, dragData, DragDropEffects.Move);
 				}
 			}
+			else if (DataContext is CommentItem)
+			{
+				CommentItem itemBase = (CommentItem)DataContext;
+				DataItem collection = itemBase.Parent;
+
+				if (collection != null && itemBase.CanReorder)
+				{
+					ConvertElementToImage(this);
+
+					DataObject dragData = new DataObject("CommentItem", DataContext);
+					dragData.SetData("Element", this);
+					DragDrop.DoDragDrop(this, dragData, DragDropEffects.Move);
+				}
+			}
 		}
 
 		//-----------------------------------------------------------------------
@@ -456,18 +487,34 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		protected override void OnDragEnter(DragEventArgs e)
 		{
-			if (DataContext is CollectionChildItem)
+			if (e.Data.GetDataPresent("CommentItem"))
+			{
+				if (adorner != null)
+				{
+					adorner.Detach();
+					adorner = null;
+				}
+
+				adorner = new InsertionAdorner(true, false, this, draggedImage, e.GetPosition(this));
+
+				e.Effects = DragDropEffects.Move;
+				e.Handled = true;
+			}
+			else if (DataContext is CollectionChildItem)
 			{
 				CollectionChildItem item = e.Data.GetData("CollectionChildItem") as CollectionChildItem;
-				DataItem collection = ((CollectionChildItem)DataContext).ParentCollection;
 
-				if (collection.Children.Contains(item))
+				CollectionItem collection = (CollectionItem)((CollectionChildItem)DataContext).ParentCollection;
+
+				if (collection.CDef.ChildDefinitions.Contains(item.Definition))
 				{
 					if (adorner != null)
 					{
 						adorner.Detach();
 						adorner = null;
 					}
+
+					var dataItem = DataContext as DataItem;
 
 					adorner = new InsertionAdorner(true, false, this, draggedImage, e.GetPosition(this));
 				}
@@ -515,12 +562,25 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		protected override void OnDragOver(DragEventArgs e)
 		{
-			if (DataContext is CollectionChildItem)
+			if (e.Data.GetDataPresent("CommentItem"))
+			{
+				if (adorner != null)
+				{
+					adorner.Detach();
+					adorner = null;
+				}
+
+				adorner = new InsertionAdorner(true, false, this, draggedImage, e.GetPosition(this));
+
+				e.Effects = DragDropEffects.Move;
+				e.Handled = true;
+			}
+			else if (DataContext is CollectionChildItem)
 			{
 				CollectionChildItem item = e.Data.GetData("CollectionChildItem") as CollectionChildItem;
-				DataItem collection = ((CollectionChildItem)DataContext).ParentCollection;
+				CollectionItem collection = (CollectionItem)((CollectionChildItem)DataContext).ParentCollection;
 
-				if (collection.Children.Contains(item))
+				if (collection.CDef.ChildDefinitions.Contains(item.Definition))
 				{
 					if (adorner != null)
 					{
@@ -562,24 +622,83 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		protected override void OnDrop(DragEventArgs e)
 		{
-			if (DataContext is CollectionChildItem)
+			if (e.Data.GetDataPresent("CommentItem"))
+			{
+				DataItem dstItem = DataContext as DataItem;
+				CommentItem item = e.Data.GetData("CommentItem") as CommentItem;
+
+				var srcCollection = item.Parent;
+				var dstCollection = dstItem.Parent;
+
+				int srcIndex = srcCollection.Children.IndexOf(item);
+				int dstIndex = dstCollection.Children.IndexOf(dstItem);
+
+				if (dstCollection.Children.Contains(item))
+				{
+					if (srcIndex < dstIndex) dstIndex--;
+				}
+
+				if (adorner.InsertionState == InsertionAdorner.InsertionStateEnum.After)
+				{
+					dstIndex = dstIndex + 1;
+				}
+
+				if (dstIndex < 0) dstIndex = 0;
+				if (dstIndex >= dstCollection.Children.Count) dstIndex = dstCollection.Children.Count - 1;
+
+				item.UndoRedo.ApplyDoUndo(() => 
+				{
+					srcCollection.Children.RemoveAt(srcIndex);
+					dstCollection.Children.Insert(dstIndex, item);
+				}, () => 
+				{
+					dstCollection.Children.RemoveAt(dstIndex);
+					srcCollection.Children.Insert(srcIndex, item);
+				}, "Move comment");
+			}
+			else if (DataContext is CollectionChildItem)
 			{
 				CollectionChildItem item = e.Data.GetData("CollectionChildItem") as CollectionChildItem;
-				DataItem collection = ((CollectionChildItem)DataContext).ParentCollection;
+				CollectionChildItem droppedItem = DataContext as CollectionChildItem;
+				CollectionItem collection = (CollectionItem)droppedItem.ParentCollection;
 
-				if (collection.Children.Contains(item))
+				if (collection.CDef.ChildDefinitions.Contains(item.Definition))
 				{
-					CollectionChildItem droppedItem = DataContext as CollectionChildItem;
-
-					int srcIndex = collection.Children.IndexOf(item);
-					int dstIndex = collection.Children.IndexOf(droppedItem);
-
-					if (adorner.InsertionState == InsertionAdorner.InsertionStateEnum.After)
+					if (droppedItem.ParentCollection != item.ParentCollection)
 					{
-						dstIndex = Math.Min(dstIndex + 1, collection.Children.Count - 1);
-					}
+						int srcIndex = item.ParentCollection.Children.IndexOf(item);
+						int dstIndex = droppedItem.ParentCollection.Children.IndexOf(droppedItem);
 
-					if (srcIndex != dstIndex) (collection as ICollectionItem).MoveItem(srcIndex, dstIndex);
+						if (adorner.InsertionState == InsertionAdorner.InsertionStateEnum.After)
+						{
+							dstIndex = Math.Min(dstIndex + 1, collection.Children.Count - 1);
+						}
+
+						var srcCollection = item.ParentCollection;
+						var dstCollection = droppedItem.ParentCollection;
+
+						item.UndoRedo.ApplyDoUndo(() =>
+						{
+							srcCollection.Children.RemoveAt(srcIndex);
+							dstCollection.Children.Insert(dstIndex, item);
+						}, () =>
+						{
+							dstCollection.Children.RemoveAt(dstIndex);
+							srcCollection.Children.Insert(srcIndex, item);
+						}, "Move item");
+					}
+					else
+					{
+						int srcIndex = collection.Children.IndexOf(item);
+						int dstIndex = collection.Children.IndexOf(droppedItem);
+
+						if (adorner.InsertionState == InsertionAdorner.InsertionStateEnum.After)
+						{
+							dstIndex = Math.Min(dstIndex + 1, collection.Children.Count - 1);
+						}
+
+						if (srcIndex != dstIndex) (collection as ICollectionItem).MoveItem(srcIndex, dstIndex);
+					}
 				}
 			}
 			else if (DataContext is TreeItem)

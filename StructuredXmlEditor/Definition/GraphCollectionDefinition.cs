@@ -23,11 +23,14 @@ namespace StructuredXmlEditor.Definition
 		{
 			var item = new GraphCollectionItem(this, undoRedo);
 
-			//for (int i = 0; i < MinCount; i++)
-			//{
-			//	var child = ChildDefinition.CreateData(undoRedo);
-			//	item.Children.Add(child);
-			//}
+			if (ChildDefinitions.Count == 1)
+			{
+				for (int i = 0; i < MinCount; i++)
+				{
+					var child = ChildDefinitions[0].CreateData(undoRedo);
+					item.Children.Add(child);
+				}
+			}
 
 			foreach (var att in Attributes)
 			{
@@ -48,11 +51,24 @@ namespace StructuredXmlEditor.Definition
 
 			foreach (var el in element.Elements())
 			{
+				var prev = el.PreviousNode as XComment;
+				if (prev != null)
+				{
+					var comment = new CommentDefinition().LoadData(prev, undoRedo);
+					item.Children.Add(comment);
+				}
+
 				var cdef = ChildDefinitions.FirstOrDefault(e => e.Name == el.Name);
 				var child = cdef.LoadData(el, undoRedo);
 				item.Children.Add(child);
 
 				if (item.Children.Count == MaxCount) break;
+			}
+
+			if (element.LastNode is XComment)
+			{
+				var comment = new CommentDefinition().LoadData(element.LastNode as XComment, undoRedo);
+				item.Children.Add(comment);
 			}
 
 			foreach (var att in Attributes)

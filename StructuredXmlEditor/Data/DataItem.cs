@@ -395,6 +395,12 @@ namespace StructuredXmlEditor.Data
 		public virtual bool IsPrimitive { get { return false; } }
 
 		//-----------------------------------------------------------------------
+		public virtual bool IsComment { get { return false; } }
+
+		//-----------------------------------------------------------------------
+		public virtual string TextValue { get; set; }
+
+		//-----------------------------------------------------------------------
 		public List<List<Statement>> VisibleIfStatements = new List<List<Statement>>();
 
 		//-----------------------------------------------------------------------
@@ -420,22 +426,48 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public DataItem GetNonWrappedItem(DataItem current)
+		public int GetIndexInParent()
+		{
+			var parent = FirstComplexParent(this);
+
+			int i = 0;
+			foreach (var item in parent.Children)
+			{
+				if (item == this) return i;
+
+				var child = item;
+				while (true)
+				{
+					var nextchild = GetNonWrappedItem(child, true);
+					if (nextchild == child) break;
+					child = nextchild;
+
+					if (child == this) return i;
+				}
+
+				i++;
+			}
+
+			return -1;
+		}
+
+		//-----------------------------------------------------------------------
+		public DataItem GetNonWrappedItem(DataItem current, bool single = false)
 		{
 			if (current is ReferenceItem)
 			{
 				var item = current as ReferenceItem;
-				return GetNonWrappedItem(item.WrappedItem);
+				return single ? item : GetNonWrappedItem(item.WrappedItem);
 			}
 			else if (current is GraphReferenceItem)
 			{
 				var item = current as GraphReferenceItem;
-				return GetNonWrappedItem(item.WrappedItem);
+				return single? item : GetNonWrappedItem(item.WrappedItem);
 			}
 			else if (current is CollectionChildItem)
 			{
 				var item = current as CollectionChildItem;
-				return GetNonWrappedItem(item.WrappedItem);
+				return single ? item : GetNonWrappedItem(item.WrappedItem);
 			}
 
 			return current;
@@ -544,10 +576,57 @@ namespace StructuredXmlEditor.Data
 
 			AddContextMenuItems(menu);
 
-			if (menu.Items.Count > 0)
+			menu.AddSeperator();
+
+			if (this is ComplexDataItem)
 			{
-				menu.Items.Add(new Separator());
+				menu.AddItem("Add Comment", () =>
+				{
+					var comment = new CommentItem(new CommentDefinition(), UndoRedo);
+
+					UndoRedo.ApplyDoUndo(delegate 
+					{
+						Children.Add(comment);
+					}, delegate 
+					{
+						Children.Remove(comment);
+					}, "Add Comment");
+				});
 			}
+
+			menu.AddItem("Add Comment Above", () =>
+			{
+				var parent = FirstComplexParent(this);
+				var index = GetIndexInParent();
+
+				var comment = new CommentItem(new CommentDefinition(), UndoRedo);
+
+				UndoRedo.ApplyDoUndo(delegate
+				{
+					parent.Children.Insert(index, comment);
+				}, delegate
+				{
+					parent.Children.Remove(comment);
+				}, "Add Comment");
+			});
+
+			menu.AddItem("Add Comment Below", () =>
+			{
+				var parent = FirstComplexParent(this);
+				var index = GetIndexInParent();
+
+				var comment = new CommentItem(new CommentDefinition(), UndoRedo);
+
+				UndoRedo.ApplyDoUndo(delegate
+				{
+					parent.Children.Insert(index+1, comment);
+				}, delegate
+				{
+					parent.Children.Remove(comment);
+				}, "Add Comment");
+			});
+
+			menu.AddSeperator();
 
 			MenuItem focusItem = new MenuItem();
 			focusItem.Header = "Focus";

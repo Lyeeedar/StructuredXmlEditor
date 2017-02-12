@@ -92,6 +92,8 @@ namespace StructuredXmlEditor.Definition
 			}
 			else
 			{
+				var commentTexts = Children.Where(e => e is CommentDefinition).Select(e => (e as CommentDefinition).Text);
+
 				var createdChildren = new List<DataItem>();
 
 				foreach (var def in Children)
@@ -102,6 +104,13 @@ namespace StructuredXmlEditor.Definition
 
 					if (els.Count() > 0)
 					{
+						var prev = els.First().PreviousNode as XComment;
+						if (prev != null)
+						{
+							var comment = new CommentDefinition().LoadData(prev, undoRedo);
+							if (!commentTexts.Contains(comment.TextValue)) item.Children.Add(comment);
+						}
+
 						if (def is CollectionDefinition)
 						{
 							CollectionItem childItem = (CollectionItem)def.LoadData(els.First(), undoRedo);
@@ -126,6 +135,12 @@ namespace StructuredXmlEditor.Definition
 						DataItem childItem = def.CreateData(undoRedo);
 						item.Children.Add(childItem);
 					}
+				}
+
+				if (element.LastNode is XComment)
+				{
+					var comment = new CommentDefinition().LoadData(element.LastNode as XComment, undoRedo);
+					if (!commentTexts.Contains(comment.TextValue)) item.Children.Add(comment);
 				}
 			}
 

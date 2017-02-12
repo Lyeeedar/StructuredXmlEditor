@@ -86,6 +86,7 @@
     <Compile Include="Data\BooleanItem.cs" />
     <Compile Include="Data\CollectionChildItem.cs" />
     <Compile Include="Data\ColourItem.cs" />
+    <Compile Include="Data\CommentItem.cs" />
     <Compile Include="Data\ComplexDataItem.cs" />
     <Compile Include="Data\Document.cs" />
     <Compile Include="Data\EnumItem.cs" />
@@ -104,6 +105,7 @@
     <Compile Include="Data\TimelineItem.cs" />
     <Compile Include="Data\TreeItem.cs" />
     <Compile Include="Data\VectorItem.cs" />
+    <Compile Include="Definition\CommentDefinition.cs" />
     <Compile Include="Definition\GraphCollectionDefinition.cs" />
     <Compile Include="Definition\GraphNodeDefinition.cs" />
     <Compile Include="Definition\GraphStructDefinition.cs" />

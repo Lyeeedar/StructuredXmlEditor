@@ -34,6 +34,26 @@ namespace StructuredXmlEditor.View
 		public virtual string Title { get; } = "Data";
 	}
 
+	public class GraphNodeDataComment : GraphNodeData
+	{
+		public override string Title { get { return data.TextValue; } }
+
+		private DataItem data;
+
+		public GraphNodeDataComment(DataItem data)
+		{
+			this.data = data;
+
+			data.PropertyChanged += (e, args) =>
+			{
+				if (args.PropertyName == "TextValue")
+				{
+					RaisePropertyChangedEvent("Title");
+				}
+			};
+		}
+	}
+
 	public class GraphNodeDataPreview : GraphNodeData
 	{
 		public override string Title { get { return data.Name; } }

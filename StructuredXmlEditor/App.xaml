@@ -23,8 +23,6 @@
 				<ResourceDictionary
 					Source="View/Styles/DataGridTemplates.xaml" />
 				<ResourceDictionary
-					Source="View/Styles/DataGridView.xaml" />
-				<ResourceDictionary
 					Source="View/Styles/Menu.xaml" />
 				<ResourceDictionary
 					Source="View/Styles/MultilineTextEditor.xaml" />
@@ -44,6 +42,8 @@
 					Source="View/Styles/Graph.xaml" />
 				<ResourceDictionary
 					Source="View/Styles/ListView.xaml" />
+				<ResourceDictionary
+					Source="View/Styles/DataGridView.xaml" />
 
 				<ResourceDictionary
 					Source="View/Styles/AvalonDock.xaml" />

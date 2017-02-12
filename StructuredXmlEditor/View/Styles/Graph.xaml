@@ -20,9 +20,9 @@
 					<Border
 						Background="LawnGreen"
 						BorderThickness="2"
-						Width="16"
-						Height="16"
-						CornerRadius="8">
+						Width="14"
+						Height="14"
+						CornerRadius="7">
 						<Border.Style>
 							<Style>
 								<Setter
@@ -46,9 +46,52 @@
 	</Style>
 
 	<DataTemplate
+		DataType="{x:Type local:GraphNodeDataComment}">
+		<Grid
+			Margin="5,10,5,10">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition
+					Width="*" />
+				<ColumnDefinition
+					Width="Auto" />
+				<ColumnDefinition
+					Width="*" />
+			</Grid.ColumnDefinitions>
+
+			<Border
+				Grid.Column="0"
+				BorderThickness="1"
+				Height="1"
+				MinWidth="10"
+				Margin="10,0,10,0"
+				BorderBrush="{StaticResource BorderNormalBrush}" />
+
+			<TextBlock
+				Grid.Column="1"
+				Background="Transparent"
+				Text="{Binding Title}"
+				MinWidth="50"
+				VerticalAlignment="Center"
+				HorizontalAlignment="Center"
+				TextAlignment="Center"
+				TextWrapping="Wrap" />
+
+			<Border
+				Grid.Column="2"
+				BorderThickness="1"
+				Height="1"
+				MinWidth="10"
+				Margin="10,0,10,0"
+				BorderBrush="{StaticResource BorderNormalBrush}" />
+
+		</Grid>
+	</DataTemplate>
+	
+	<DataTemplate
 		DataType="{x:Type local:GraphNodeDataPreview}">
 		<Grid
-			Margin="5,0,5,0">
+			Background="{StaticResource BackgroundNormalBrush}"
+			Margin="5,1,5,1">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition
 					Width="*" />
@@ -93,7 +136,8 @@
 	<DataTemplate
 		DataType="{x:Type local:GraphNodeDataLink}">
 		<Grid
-			Margin="5,0,5,0">
+			Background="{StaticResource BackgroundNormalBrush}"
+			Margin="5,1,5,1">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition
 					Width="*" />
@@ -112,7 +156,6 @@
 
 			<Button
 				Grid.Column="1"
-				Margin="5"
 				VerticalAlignment="Center"
 				Background="Transparent"
 				BorderBrush="Transparent"
@@ -202,7 +245,7 @@
 
 			<local:Connection
 				Grid.Column="3"
-				Margin="0,0,-15,0"
+				Margin="0,0,-13,0"
 				HorizontalAlignment="Right"
 				VerticalAlignment="Center"
 				Position="{Binding Position, Mode=OneWayToSource}" />
@@ -230,16 +273,16 @@
 								<RowDefinition
 									Height="Auto" />
 								<RowDefinition
-									Height="5" />
+									Height="11" />
 								<RowDefinition
 									Height="*" />
 							</Grid.RowDefinitions>
 
-							<DockPanel>
+							<Grid>
 
 								<Button
-									DockPanel.Dock="Right"
-									Margin="5,5,10,5"
+									HorizontalAlignment="Right"
+									Margin="5"
 									Opacity="0.5"
 									Background="Transparent"
 									BorderBrush="Transparent"
@@ -255,17 +298,19 @@
 								<TextBlock
 									FontSize="12"
 									Margin="5"
+									HorizontalAlignment="Center"
 									Text="{Binding Title}" />
 
-							</DockPanel>
+							</Grid>
 
 							<Border
 								Grid.Row="1"
 								Height="1"
-								Margin="2"
+								Margin="5"
 								Background="{StaticResource BorderLightBrush}" />
 
 							<ItemsControl
+								Margin="0,0,0,5"
 								Grid.Row="2"
 								ItemsSource="{Binding Datas}" />
 

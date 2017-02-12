@@ -203,6 +203,15 @@ namespace StructuredXmlEditor.View
 					var link = data as GraphReferenceItem;
 					Datas.Add(link.Link);
 				}
+				else if (data is CommentItem)
+				{
+					if (!CachedNodeData.ContainsKey(data))
+					{
+						CachedNodeData[data] = new GraphNodeDataComment(data);
+					}
+
+					Datas.Add(CachedNodeData[data]);
+				}
 				else
 				{
 					if (!CachedNodeData.ContainsKey(data))

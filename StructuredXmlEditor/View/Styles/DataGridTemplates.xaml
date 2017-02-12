@@ -36,7 +36,6 @@
 							x:Name="border1"
 							BorderThickness="0.5"
 							ToolTip="{Binding ToolTip}"
-							ContextMenu="{Binding ContextMenu}"
 							Background="{StaticResource BackgroundNormalBrush}">
 							<TextBlock
 								x:Name="name"

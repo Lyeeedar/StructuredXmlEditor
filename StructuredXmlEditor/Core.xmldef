@@ -207,7 +207,7 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The defined children of the struct" />
+		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree),Comment(Comment)" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
 			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 		</AdditionalDefs>
@@ -229,7 +229,7 @@
 			<Boolean Name="IsGlobal" ToolTip="Whether this definition can be referenced from other files." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The defined children of the struct" />
+		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree),Comment(Comment)" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
 			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 		</AdditionalDefs>
@@ -249,7 +249,7 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The defined children of the struct" />
+		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree),Comment(Comment)" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
 			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true"/>
 		</AdditionalDefs>
@@ -266,7 +266,7 @@
 			<Boolean Name="IsGlobal" ToolTip="Whether this definition can be referenced from other files." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The defined children of the struct" />
+		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree),Comment(Comment)" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
 			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 		</AdditionalDefs>
@@ -354,7 +354,7 @@
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 			<Boolean Name="HasDuration" ToolTip="Whether this keyframe has a duration." />
 		</Attributes>
-		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" ToolTip="The defined children of the struct" />
+		<Reference Name="Data" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree),Comment(Comment)" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
 			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 			<Reference Keys="Number" Name="Time" SkipIfDefault="false" Nullable="false" ToolTip="The element to hold the time." />
@@ -373,6 +373,12 @@
 		</Attributes>
 	</StructDef>
 
+	<StructDef Name="Comment" ToolTip="An comment element.">
+		<Attributes>
+			<String Name="Text" ToolTip="The text in this comment." />
+		</Attributes>
+	</StructDef>
+	
 	<Collection Name="Definitions" ToolTip="The definitions stored in this file. Can contain only a single non-def element.">
 		<Attributes>
 			<String Name="Extension" ToolTip="The extension to use for these definitions. Leave blank to revert to the data type (.xml, .json etc)." />
