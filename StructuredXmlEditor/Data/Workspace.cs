@@ -1401,11 +1401,6 @@ namespace StructuredXmlEditor.Data
 				Documents.Add(document);
 
 				Current = document;
-
-				RecentFiles.Remove(path);
-				RecentFiles.Insert(0, path);
-
-				StoreSetting("RecentFiles", RecentFiles.ToArray());
 			}
 		}
 
@@ -1440,11 +1435,6 @@ namespace StructuredXmlEditor.Data
 				Current = document;
 
 				path = document.Path;
-
-				RecentFiles.Remove(path);
-				RecentFiles.Insert(0, path);
-
-				StoreSetting("RecentFiles", RecentFiles.ToArray());
 			}
 		}
 
@@ -1473,7 +1463,15 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void Save()
 		{
-			Current?.Save();
+			if (Current != null)
+			{
+				Current.Save();
+
+				RecentFiles.Remove(Current.Path);
+				RecentFiles.Insert(0, Current.Path);
+
+				StoreSetting("RecentFiles", RecentFiles.ToArray());
+			}
 		}
 
 		//-----------------------------------------------------------------------
