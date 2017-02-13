@@ -106,6 +106,9 @@ namespace StructuredXmlEditor.Data
 		public Command<DataDefinition> SwapCMD { get { return new Command<DataDefinition>((e) => Swap(e)); } }
 
 		//-----------------------------------------------------------------------
+		public ReferenceDefinition ReferenceDef { get { return Definition as ReferenceDefinition; } }
+
+		//-----------------------------------------------------------------------
 		public ReferenceItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
 			SelectedDefinition = (Tuple<string, string>)(definition as ReferenceDefinition).ItemsSource.GetItemAt(0);
@@ -158,7 +161,8 @@ namespace StructuredXmlEditor.Data
 
 			MenuItem pasteItem = new MenuItem();
 			pasteItem.Header = "Paste";
-			pasteItem.Command = PasteCMD;
+			pasteItem.Click += (e, args) => { Paste(); };
+			pasteItem.IsEnabled = ReferenceDef.Definitions.Any(e => Clipboard.ContainsData(e.Value.CopyKey));
 
 			menu.Items.Add(pasteItem);
 
@@ -244,7 +248,54 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public override void Paste()
 		{
-			WrappedItem.Paste();
+			if (WrappedItem != null)
+			{
+				WrappedItem.Paste();
+			}
+			else
+			{
+				DataDefinition chosen = null;
+				foreach (var def in ReferenceDef.Definitions.Values)
+				{
+					if (Clipboard.ContainsData(def.CopyKey))
+					{
+						var flat = Clipboard.GetData(def.CopyKey) as string;
+						var root = XElement.Parse(flat);
+
+						if (root.Name == def.Name)
+						{
+							chosen = def;
+							break;
+						}
+					}
+				}
+
+				if (chosen == null) return;
+
+				DataItem item = null;
+				using (UndoRedo.DisableUndoScope())
+				{
+					item = chosen.CreateData(UndoRedo);
+					if (item is StructItem && item.Children.Count == 0)
+					{
+						(item.Definition as StructDefinition).CreateChildren(item as StructItem, UndoRedo);
+					}
+
+					item.Paste();
+				}
+
+				UndoRedo.ApplyDoUndo(delegate
+				{
+					ChosenDefinition = chosen;
+					WrappedItem = item;
+				},
+				delegate
+				{
+					ChosenDefinition = null;
+					WrappedItem = null;
+				},
+				"Paste Item " + item.Name);
+			}
 		}
 
 		//-----------------------------------------------------------------------

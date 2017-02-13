@@ -8,6 +8,7 @@ using StructuredXmlEditor.View;
 using System.ComponentModel;
 using System.Windows.Controls;
 using System.Xml.Linq;
+using System.Windows;
 
 namespace StructuredXmlEditor.Data
 {
@@ -149,15 +150,16 @@ namespace StructuredXmlEditor.Data
 
 			menu.Items.Add(CopyItem);
 
-			MenuItem pasteItem = new MenuItem();
-			pasteItem.Header = "Paste";
-			pasteItem.Command = PasteCMD;
-
-			menu.Items.Add(pasteItem);
-
 			if (WrappedItem is ReferenceItem)
 			{
 				var ri = WrappedItem as ReferenceItem;
+
+				MenuItem pasteItem = new MenuItem();
+				pasteItem.Header = "Paste";
+				pasteItem.Click += (e, args) => { Paste(); };
+				pasteItem.IsEnabled = ri.ReferenceDef.Definitions.Any(e => Clipboard.ContainsData(e.Value.CopyKey));
+
+				menu.Items.Add(pasteItem);
 
 				if ((ri.Definition as ReferenceDefinition).Definitions.Count > 1)
 				{
@@ -181,7 +183,27 @@ namespace StructuredXmlEditor.Data
 					}
 				}
 			}
-			else if (WrappedItem is CollectionItem)
+			else if (WrappedItem is GraphReferenceItem)
+			{
+				var ri = WrappedItem as GraphReferenceItem;
+
+				MenuItem pasteItem = new MenuItem();
+				pasteItem.Header = "Paste";
+				pasteItem.Click += (e, args) => { Paste(); };
+				pasteItem.IsEnabled = ri.ReferenceDef.Definitions.Any(e => Clipboard.ContainsData(e.Value.CopyKey));
+
+				menu.Items.Add(pasteItem);
+			}
+			else
+			{
+				MenuItem pasteItem = new MenuItem();
+				pasteItem.Header = "Paste";
+				pasteItem.Command = PasteCMD;
+
+				menu.Items.Add(pasteItem);
+			}
+
+			if (WrappedItem is CollectionItem)
 			{
 				var ci = WrappedItem as CollectionItem;
 

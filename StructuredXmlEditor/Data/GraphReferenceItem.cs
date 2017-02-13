@@ -8,6 +8,8 @@ using StructuredXmlEditor.View;
 using System.Windows.Controls;
 using System.ComponentModel;
 using System.Collections.Specialized;
+using System.Windows;
+using System.Xml.Linq;
 
 namespace StructuredXmlEditor.Data
 {
@@ -154,6 +156,9 @@ namespace StructuredXmlEditor.Data
 
 		//-----------------------------------------------------------------------
 		public string GuidToResolve { get; set; }
+
+		//-----------------------------------------------------------------------
+		public GraphReferenceDefinition ReferenceDef { get { return Definition as GraphReferenceDefinition; } }
 
 		//-----------------------------------------------------------------------
 		public GraphReferenceItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
@@ -324,7 +329,54 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public override void Paste()
 		{
-			WrappedItem.Paste();
+			if (WrappedItem != null)
+			{
+				WrappedItem.Paste();
+			}
+			else
+			{
+				GraphNodeDefinition chosen = null;
+				foreach (var def in ReferenceDef.Definitions.Values)
+				{
+					if (Clipboard.ContainsData(def.CopyKey))
+					{
+						var flat = Clipboard.GetData(def.CopyKey) as string;
+						var root = XElement.Parse(flat);
+
+						if (root.Name == def.Name)
+						{
+							chosen = def;
+							break;
+						}
+					}
+				}
+
+				if (chosen == null) return;
+
+				GraphNodeItem item = null;
+				using (UndoRedo.DisableUndoScope())
+				{
+					item = chosen.CreateData(UndoRedo) as GraphNodeItem;
+					if (item is GraphStructItem && item.Children.Count == 0)
+					{
+						(item.Definition as GraphStructDefinition).CreateChildren(item as GraphStructItem, UndoRedo);
+					}
+
+					item.Paste();
+				}
+
+				UndoRedo.ApplyDoUndo(delegate
+				{
+					ChosenDefinition = chosen;
+					WrappedItem = item;
+				},
+				delegate
+				{
+					ChosenDefinition = null;
+					WrappedItem = null;
+				},
+				"Paste Item " + item.Name);
+			}
 		}
 
 		//-----------------------------------------------------------------------

@@ -357,7 +357,7 @@ namespace StructuredXmlEditor.Data
 				{
 					var item = sdef.LoadData(root, UndoRedo);
 
-					if (item.Children.Count == 0) item = sdef.CreateData(UndoRedo);
+					if (item.Children.Count == 0 && item.Attributes.Count == 0) item = sdef.CreateData(UndoRedo);
 
 					newChildren = item.Children.ToList();
 					

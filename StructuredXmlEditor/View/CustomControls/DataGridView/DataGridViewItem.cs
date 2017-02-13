@@ -504,19 +504,37 @@ namespace StructuredXmlEditor.View
 			{
 				CollectionChildItem item = e.Data.GetData("CollectionChildItem") as CollectionChildItem;
 
-				CollectionItem collection = (CollectionItem)((CollectionChildItem)DataContext).ParentCollection;
+				DataItem collection = ((CollectionChildItem)DataContext).ParentCollection;
 
-				if (collection.CDef.ChildDefinitions.Contains(item.Definition))
+				if (collection is CollectionItem)
 				{
-					if (adorner != null)
+					if ((collection as CollectionItem).CDef.ChildDefinitions.Contains(item.Definition))
 					{
-						adorner.Detach();
-						adorner = null;
+						if (adorner != null)
+						{
+							adorner.Detach();
+							adorner = null;
+						}
+
+						var dataItem = DataContext as DataItem;
+
+						adorner = new InsertionAdorner(true, false, this, draggedImage, e.GetPosition(this));
 					}
+				}
+				else if (collection is GraphCollectionItem)
+				{
+					if ((collection as GraphCollectionItem).CDef.ChildDefinitions.Contains(item.Definition))
+					{
+						if (adorner != null)
+						{
+							adorner.Detach();
+							adorner = null;
+						}
 
-					var dataItem = DataContext as DataItem;
+						var dataItem = DataContext as DataItem;
 
-					adorner = new InsertionAdorner(true, false, this, draggedImage, e.GetPosition(this));
+						adorner = new InsertionAdorner(true, false, this, draggedImage, e.GetPosition(this));
+					}
 				}
 
 				e.Effects = DragDropEffects.Move;
@@ -578,17 +596,38 @@ namespace StructuredXmlEditor.View
 			else if (DataContext is CollectionChildItem)
 			{
 				CollectionChildItem item = e.Data.GetData("CollectionChildItem") as CollectionChildItem;
-				CollectionItem collection = (CollectionItem)((CollectionChildItem)DataContext).ParentCollection;
 
-				if (collection.CDef.ChildDefinitions.Contains(item.Definition))
+				DataItem collection = ((CollectionChildItem)DataContext).ParentCollection;
+
+				if (collection is CollectionItem)
 				{
-					if (adorner != null)
+					if ((collection as CollectionItem).CDef.ChildDefinitions.Contains(item.Definition))
 					{
-						adorner.Detach();
-						adorner = null;
-					}
+						if (adorner != null)
+						{
+							adorner.Detach();
+							adorner = null;
+						}
 
-					adorner = new InsertionAdorner(true, false, this, draggedImage, e.GetPosition(this));
+						var dataItem = DataContext as DataItem;
+
+						adorner = new InsertionAdorner(true, false, this, draggedImage, e.GetPosition(this));
+					}
+				}
+				else if (collection is GraphCollectionItem)
+				{
+					if ((collection as GraphCollectionItem).CDef.ChildDefinitions.Contains(item.Definition))
+					{
+						if (adorner != null)
+						{
+							adorner.Detach();
+							adorner = null;
+						}
+
+						var dataItem = DataContext as DataItem;
+
+						adorner = new InsertionAdorner(true, false, this, draggedImage, e.GetPosition(this));
+					}
 				}
 
 				e.Effects = DragDropEffects.Move;
@@ -660,44 +699,89 @@ namespace StructuredXmlEditor.View
 			{
 				CollectionChildItem item = e.Data.GetData("CollectionChildItem") as CollectionChildItem;
 				CollectionChildItem droppedItem = DataContext as CollectionChildItem;
-				CollectionItem collection = (CollectionItem)droppedItem.ParentCollection;
 
-				if (collection.CDef.ChildDefinitions.Contains(item.Definition))
+				DataItem collection = droppedItem.ParentCollection;
+
+				if (collection is CollectionItem)
 				{
-					if (droppedItem.ParentCollection != item.ParentCollection)
+					if ((collection as CollectionItem).CDef.ChildDefinitions.Contains(item.Definition))
 					{
-						int srcIndex = item.ParentCollection.Children.IndexOf(item);
-						int dstIndex = droppedItem.ParentCollection.Children.IndexOf(droppedItem);
-
-						if (adorner.InsertionState == InsertionAdorner.InsertionStateEnum.After)
+						if (droppedItem.ParentCollection != item.ParentCollection)
 						{
-							dstIndex = Math.Min(dstIndex + 1, collection.Children.Count - 1);
+							int srcIndex = item.ParentCollection.Children.IndexOf(item);
+							int dstIndex = droppedItem.ParentCollection.Children.IndexOf(droppedItem);
+
+							if (adorner.InsertionState == InsertionAdorner.InsertionStateEnum.After)
+							{
+								dstIndex = Math.Min(dstIndex + 1, collection.Children.Count - 1);
+							}
+
+							var srcCollection = item.ParentCollection;
+							var dstCollection = droppedItem.ParentCollection;
+
+							item.UndoRedo.ApplyDoUndo(() =>
+							{
+								srcCollection.Children.RemoveAt(srcIndex);
+								dstCollection.Children.Insert(dstIndex, item);
+							}, () =>
+							{
+								dstCollection.Children.RemoveAt(dstIndex);
+								srcCollection.Children.Insert(srcIndex, item);
+							}, "Move item");
 						}
-
-						var srcCollection = item.ParentCollection;
-						var dstCollection = droppedItem.ParentCollection;
-
-						item.UndoRedo.ApplyDoUndo(() =>
+						else
 						{
-							srcCollection.Children.RemoveAt(srcIndex);
-							dstCollection.Children.Insert(dstIndex, item);
-						}, () =>
-						{
-							dstCollection.Children.RemoveAt(dstIndex);
-							srcCollection.Children.Insert(srcIndex, item);
-						}, "Move item");
+							int srcIndex = collection.Children.IndexOf(item);
+							int dstIndex = collection.Children.IndexOf(droppedItem);
+
+							if (adorner.InsertionState == InsertionAdorner.InsertionStateEnum.After)
+							{
+								dstIndex = Math.Min(dstIndex + 1, collection.Children.Count - 1);
+							}
+
+							if (srcIndex != dstIndex) (collection as ICollectionItem).MoveItem(srcIndex, dstIndex);
+						}
 					}
-					else
+				}
+				else if (collection is GraphCollectionItem)
+				{
+					if ((collection as GraphCollectionItem).CDef.ChildDefinitions.Contains(item.Definition))
 					{
-						int srcIndex = collection.Children.IndexOf(item);
-						int dstIndex = collection.Children.IndexOf(droppedItem);
-
-						if (adorner.InsertionState == InsertionAdorner.InsertionStateEnum.After)
+						if (droppedItem.ParentCollection != item.ParentCollection)
 						{
-							dstIndex = Math.Min(dstIndex + 1, collection.Children.Count - 1);
-						}
+							int srcIndex = item.ParentCollection.Children.IndexOf(item);
+							int dstIndex = droppedItem.ParentCollection.Children.IndexOf(droppedItem);
 
-						if (srcIndex != dstIndex) (collection as ICollectionItem).MoveItem(srcIndex, dstIndex);
+							if (adorner.InsertionState == InsertionAdorner.InsertionStateEnum.After)
+							{
+								dstIndex = Math.Min(dstIndex + 1, collection.Children.Count - 1);
+							}
+
+							var srcCollection = item.ParentCollection;
+							var dstCollection = droppedItem.ParentCollection;
+
+							item.UndoRedo.ApplyDoUndo(() =>
+							{
+								srcCollection.Children.RemoveAt(srcIndex);
+								dstCollection.Children.Insert(dstIndex, item);
+							}, () =>
+							{
+								dstCollection.Children.RemoveAt(dstIndex);
+								srcCollection.Children.Insert(srcIndex, item);
+							}, "Move item");
+						}
+						else
+						{
+							int srcIndex = collection.Children.IndexOf(item);
+							int dstIndex = collection.Children.IndexOf(droppedItem);
+
+							if (adorner.InsertionState == InsertionAdorner.InsertionStateEnum.After)
+							{
+								dstIndex = Math.Min(dstIndex + 1, collection.Children.Count - 1);
+							}
+
+							if (srcIndex != dstIndex) (collection as ICollectionItem).MoveItem(srcIndex, dstIndex);
+						}
 					}
 				}
 			}
