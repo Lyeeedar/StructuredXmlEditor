@@ -104,7 +104,7 @@ namespace StructuredXmlEditor.Data
 		public LinkType m_LinkType = LinkType.Duplicate;
 
 		//-----------------------------------------------------------------------
-		public bool HasContent { get { return ChosenDefinition != null; } }
+		public bool HasContent { get { return WrappedItem != null; } }
 
 		//-----------------------------------------------------------------------
 		public override string Description

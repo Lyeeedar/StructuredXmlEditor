@@ -762,11 +762,13 @@
 				</ComboBox.ItemTemplate>
 			</ComboBox>
 
-			<ContentPresenter
+			<ContentControl
 				Grid.Column="1"
 				Grid.ColumnSpan="3"
 				VerticalAlignment="Center"
-				Content="{Binding WrappedItem}" />
+				Margin="5,0,5,0"
+				Visibility="{Binding HasContent, Converter={v:ValueTypeConverter}}"
+				Content="{Binding WrappedItem.Description, Converter={v:ColourMarkupConverter}}" />
 
 		</Grid>
 	</DataTemplate>
