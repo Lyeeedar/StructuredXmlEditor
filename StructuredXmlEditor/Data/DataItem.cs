@@ -417,6 +417,9 @@ namespace StructuredXmlEditor.Data
 		public virtual bool CanRemove { get { return true; } }
 
 		//-----------------------------------------------------------------------
+		public Command<object> FocusAttributesCMD { get { return new Command<object>((e) => FocusAttributes()); } }
+
+		//-----------------------------------------------------------------------
 		public virtual Command<object> PasteCMD { get { return new Command<object>((e) => Paste(), (e) => CanPaste && Clipboard.ContainsData(CopyKey)); } }
 
 		//-----------------------------------------------------------------------
@@ -451,6 +454,32 @@ namespace StructuredXmlEditor.Data
 
 				Parent?.DescendantPropertyChanged(e, new DescendantPropertyChangedEventArgs() { PropertyName = a.PropertyName } );
 			};
+		}
+
+		//-----------------------------------------------------------------------
+		public void FocusAttributes()
+		{
+			if (Grid.IsSelectedDataItem)
+			{
+				foreach (var item in Grid.SelectedItems)
+				{
+					if (item == this) return;
+					foreach (var child in item.Descendants)
+					{
+						if (child == this) return;
+						else if (GetNonWrappedItem(child) == this) return;
+					}
+				}
+			}
+
+			var container = new DummyItem("Attributes", Grid);
+			
+			foreach (var att in Attributes)
+			{
+				container.Children.Add(att);
+			}
+
+			Grid.Selected = new List<DataItem>() { container };
 		}
 
 		//-----------------------------------------------------------------------

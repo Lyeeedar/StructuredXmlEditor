@@ -118,6 +118,7 @@
 				Background="Transparent"
 				BorderBrush="Transparent"
 				ToolTip="Attributes"
+				Command="{Binding FocusAttributesCMD}"
 				Visibility="{Binding Attributes.Count, Converter={v:NullOrZeroConverter}, ConverterParameter=Not}"
 				IsHitTestVisible="{Binding ElementName=AttributesPopup, Path=IsOpen, Converter={v:ValueTypeConverter}, ConverterParameter=Not}">
 				<Image
@@ -167,6 +168,13 @@
 			</Popup>
 		</Grid>
 	</ControlTemplate>
+
+	<DataTemplate
+		DataType="{x:Type d:DummyItem}">
+		<Grid>
+			
+		</Grid>
+	</DataTemplate>
 
 	<DataTemplate
 		DataType="{x:Type d:TimelineItem}">

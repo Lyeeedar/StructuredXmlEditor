@@ -26,17 +26,17 @@ namespace StructuredXmlEditor.Data
 
 		public override void Copy()
 		{
-			throw new NotImplementedException();
+			//throw new NotImplementedException();
 		}
 
 		public override void Paste()
 		{
-			throw new NotImplementedException();
+			//throw new NotImplementedException();
 		}
 
 		public override void ResetToDefault()
 		{
-			throw new NotImplementedException();
+			//throw new NotImplementedException();
 		}
 	}
 }
