@@ -666,6 +666,8 @@ namespace StructuredXmlEditor.View
 				DataItem dstItem = DataContext as DataItem;
 				CommentItem item = e.Data.GetData("CommentItem") as CommentItem;
 
+				if (item == dstItem) return;
+
 				var srcCollection = item.Parent;
 				var dstCollection = dstItem.Parent;
 
@@ -685,6 +687,8 @@ namespace StructuredXmlEditor.View
 				if (dstIndex < 0) dstIndex = 0;
 				if (dstIndex >= dstCollection.Children.Count) dstIndex = dstCollection.Children.Count - 1;
 
+				if (srcCollection == dstCollection && srcIndex == dstIndex) return;
+
 				item.UndoRedo.ApplyDoUndo(() => 
 				{
 					srcCollection.Children.RemoveAt(srcIndex);
@@ -699,6 +703,8 @@ namespace StructuredXmlEditor.View
 			{
 				CollectionChildItem item = e.Data.GetData("CollectionChildItem") as CollectionChildItem;
 				CollectionChildItem droppedItem = DataContext as CollectionChildItem;
+
+				if (item == droppedItem) return;
 
 				DataItem collection = droppedItem.ParentCollection;
 
@@ -733,6 +739,8 @@ namespace StructuredXmlEditor.View
 						{
 							int srcIndex = collection.Children.IndexOf(item);
 							int dstIndex = collection.Children.IndexOf(droppedItem);
+
+							if (srcIndex < dstIndex) dstIndex--;
 
 							if (adorner.InsertionState == InsertionAdorner.InsertionStateEnum.After)
 							{
@@ -774,6 +782,8 @@ namespace StructuredXmlEditor.View
 						{
 							int srcIndex = collection.Children.IndexOf(item);
 							int dstIndex = collection.Children.IndexOf(droppedItem);
+
+							if (srcIndex < dstIndex) dstIndex--;
 
 							if (adorner.InsertionState == InsertionAdorner.InsertionStateEnum.After)
 							{

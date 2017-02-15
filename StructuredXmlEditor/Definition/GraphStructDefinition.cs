@@ -263,26 +263,46 @@ namespace StructuredXmlEditor.Definition
 		{
 			if (Extends != null)
 			{
-				StructDefinition def = null;
+				ComplexDataDefinition def = null;
 				if (local.ContainsKey(Extends))
 				{
-					def = local[Extends] as StructDefinition;
+					def = local[Extends] as ComplexDataDefinition;
+
+					if (!(def is StructDefinition) && !(def is GraphStructDefinition)) def = null;
 				}
 
 				if (def == null && global.ContainsKey(Extends))
 				{
-					def = global[Extends] as StructDefinition;
+					def = global[Extends] as ComplexDataDefinition;
+
+					if (!(def is StructDefinition) && !(def is GraphStructDefinition)) def = null;
 				}
 
 				if (def == null) throw new Exception("The definition '" + Extends + "' this extends could not be found!");
 
 				Extends = null;
-				if (def.Extends != null)
-				{
-					def.RecursivelyResolve(referenceableDefinitions[def.SrcFile], global, referenceableDefinitions);
-				}
+				List<DataDefinition> newChildren = null;
 
-				var newChildren = def.Children.ToList();
+				if (def is StructDefinition)
+				{
+					var sdef = def as StructDefinition;
+					if (sdef.Extends != null)
+					{
+						sdef.RecursivelyResolve(referenceableDefinitions[def.SrcFile], global, referenceableDefinitions);
+					}
+
+					newChildren = sdef.Children.ToList();
+				}
+				else if (def is GraphStructDefinition)
+				{
+					var sdef = def as GraphStructDefinition;
+					if (sdef.Extends != null)
+					{
+						sdef.RecursivelyResolve(referenceableDefinitions[def.SrcFile], global, referenceableDefinitions);
+					}
+
+					newChildren = sdef.Children.ToList();
+				}
 
 				for (int i = 0; i < newChildren.Count; i++)
 				{

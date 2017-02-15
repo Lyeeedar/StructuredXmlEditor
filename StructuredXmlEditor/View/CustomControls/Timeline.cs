@@ -372,9 +372,12 @@ namespace StructuredXmlEditor.View
 				}
 			}
 
-			foreach (var keyframe in TimelineItem.Children)
+			foreach (var timeline in TimelineItem.TimelineGroup)
 			{
-				keyframe.IsSelected = false;
+				foreach (var keyframe in timeline.Children)
+				{
+					keyframe.IsSelected = false;
+				}
 			}
 
 			foreach (KeyframeItem keyframe in TimelineItem.Children)

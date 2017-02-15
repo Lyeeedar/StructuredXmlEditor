@@ -83,8 +83,6 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
-			e.Handled = true;
-
 			if (Data.Parent is CollectionChildItem && Data.Parent.Parent is GraphCollectionItem)
 			{
 				draggedImage = InsertionAdorner.ConvertElementToImage(this);
@@ -92,6 +90,8 @@ namespace StructuredXmlEditor.View
 				DataObject dragData = new DataObject("GraphNodeData", Data.Parent);
 				dragData.SetData("Element", this);
 				DragDrop.DoDragDrop(this, dragData, DragDropEffects.Move);
+
+				e.Handled = true;
 			}
 			else if (Data is CommentItem && Data.Parent is GraphCollectionItem)
 			{
@@ -100,6 +100,8 @@ namespace StructuredXmlEditor.View
 				DataObject dragData = new DataObject("GraphNodeData", Data);
 				dragData.SetData("Element", this);
 				DragDrop.DoDragDrop(this, dragData, DragDropEffects.Move);
+
+				e.Handled = true;
 			}
 		}
 

@@ -5,6 +5,7 @@ using StructuredXmlEditor.View;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,7 @@ namespace StructuredXmlEditor.Data
 		{
 			m_proxyRootItem = new DummyItem("   ⌂ ", this);
 			GraphNodeItems = new ObservableCollection<GraphNodeItem>();
+			RootItems = new ObservableCollection<DataItem>();
 		}
 
 		//-----------------------------------------------------------------------
@@ -93,8 +95,18 @@ namespace StructuredXmlEditor.Data
 			get { return m_rootItems; }
 			set
 			{
+				if (m_rootItems != null)
+				{
+					m_rootItems.CollectionChanged -= RootItemCollectionChanged;
+				}
+
 				m_rootItems = value;
 				RaisePropertyChangedEvent("RootItems");
+
+				if (m_rootItems != null)
+				{
+					m_rootItems.CollectionChanged += RootItemCollectionChanged;
+				}
 
 				if (RootItems.Any(e => !(e is GraphNodeItem)))
 				{
@@ -110,6 +122,22 @@ namespace StructuredXmlEditor.Data
 				RaisePropertyChangedEvent("ShowAsGraph");
 				RaisePropertyChangedEvent("ShowAsDataGrid");
 			}
+		}
+		private void RootItemCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
+		{
+			if (RootItems.Any(e => !(e is GraphNodeItem)))
+			{
+				ShowAsGraph = false;
+				ShowAsDataGrid = true;
+			}
+			else
+			{
+				ShowAsGraph = true;
+				ShowAsDataGrid = false;
+			}
+
+			RaisePropertyChangedEvent("ShowAsGraph");
+			RaisePropertyChangedEvent("ShowAsDataGrid");
 		}
 
 		//-----------------------------------------------------------------------
@@ -174,6 +202,14 @@ namespace StructuredXmlEditor.Data
 			if (!m_selectedDataItems.Contains(item))
 			{
 				m_selectedDataItems.Add(item);
+			}
+
+			foreach (var i in m_selectedDataItems.ToList())
+			{
+				if (i.GetType() != item.GetType())
+				{
+					i.IsSelected = false;
+				}
 			}
 
 			Selected = m_selectedDataItems;
@@ -590,7 +626,7 @@ namespace StructuredXmlEditor.Data
 		DataItem m_lastFocusedItem;
 		DataItem m_proxyRootItem;
 		List<DataItem> m_storedRootItems = new List<DataItem>();
-		ObservableCollection<DataItem> m_rootItems = new ObservableCollection<DataItem>();
+		ObservableCollection<DataItem> m_rootItems;
 		ObservableCollection<DataItem> m_focusedItemsPath = new ObservableCollection<DataItem>();
 		Dictionary<DataItem, bool> m_lastNullFilterState = new Dictionary<DataItem, bool>();
 	}

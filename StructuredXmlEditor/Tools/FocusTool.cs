@@ -9,6 +9,8 @@ namespace StructuredXmlEditor.Tools
 {
 	public class FocusTool : ToolBase
 	{
+		public static bool IsMouseInFocusTool;
+
 		public FocusTool(Workspace workspace) : base(workspace, "FocusTool")
 		{
 			VisibleByDefault = false;

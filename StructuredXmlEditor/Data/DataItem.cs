@@ -1,4 +1,5 @@
 ﻿using StructuredXmlEditor.Definition;
+using StructuredXmlEditor.Tools;
 using StructuredXmlEditor.View;
 using System;
 using System.Collections.Generic;
@@ -318,13 +319,16 @@ namespace StructuredXmlEditor.Data
 					m_isSelected = value;
 					RaisePropertyChangedEvent();
 
-					if (value)
+					if (!IsInFocus())
 					{
-						Grid.AddSelected(this);
-					}
-					else
-					{
-						Grid.RemoveSelected(this);
+						if (value)
+						{
+							Grid.AddSelected(this);
+						}
+						else
+						{
+							Grid.RemoveSelected(this);
+						}
 					}
 				}
 			}
@@ -459,20 +463,10 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void FocusAttributes()
 		{
-			if (Grid.IsSelectedDataItem)
-			{
-				foreach (var item in Grid.SelectedItems)
-				{
-					if (item == this) return;
-					foreach (var child in item.Descendants)
-					{
-						if (child == this) return;
-						else if (GetNonWrappedItem(child) == this) return;
-					}
-				}
-			}
+			if (IsInFocus()) return;
 
 			var container = new DummyItem("Attributes", Grid);
+			container.Parent = this;
 			
 			foreach (var att in Attributes)
 			{
@@ -480,6 +474,27 @@ namespace StructuredXmlEditor.Data
 			}
 
 			Grid.Selected = new List<DataItem>() { container };
+		}
+
+		//-----------------------------------------------------------------------
+		public bool IsInFocus()
+		{
+			return FocusTool.IsMouseInFocusTool;
+
+			//if (Grid.IsSelectedDataItem)
+			//{
+			//	foreach (var item in Grid.SelectedItems)
+			//	{
+			//		if (item == this) return true;
+			//		foreach (var child in item.Descendants)
+			//		{
+			//			if (child == this) return true;
+			//			else if (GetNonWrappedItem(child) == this) return true;
+			//		}
+			//	}
+			//}
+
+			//return false;
 		}
 
 		//-----------------------------------------------------------------------

@@ -305,6 +305,16 @@ namespace StructuredXmlEditor.View
 			}
 			else if (!Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl) && !m_isMarqueeSelecting)
 			{
+				var items = Nodes.FirstOrDefault()?.GraphNodeItem?.Grid?.SelectedItems;
+
+				if (items != null)
+				{
+					foreach (var item in items.ToList())
+					{
+						item.IsSelected = false;
+					}
+				}
+				
 				foreach (var node in Nodes)
 				{
 					node.IsSelected = false;
