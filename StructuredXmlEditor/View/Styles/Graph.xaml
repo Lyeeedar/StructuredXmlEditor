@@ -45,224 +45,249 @@
 		</Setter>
 	</Style>
 
-	<DataTemplate
-		DataType="{x:Type local:GraphNodeDataComment}">
-		<Grid
-			Margin="5,10,5,10">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition
-					Width="*" />
-				<ColumnDefinition
-					Width="Auto" />
-				<ColumnDefinition
-					Width="*" />
-			</Grid.ColumnDefinitions>
+	<Style
+		TargetType="{x:Type local:GraphNodeDataPreview}">
+		<Setter
+			Property="Template">
+			<Setter.Value>
+				<ControlTemplate
+					TargetType="{x:Type local:GraphNodeDataPreview}">
+					<Border
+						BorderBrush="{StaticResource WindowBackgroundBrush}"
+						BorderThickness="1"
+						Background="{StaticResource BackgroundNormalBrush}"
+						Margin="2,1,2,1">
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition
+									Width="*" />
+								<ColumnDefinition
+									Width="*" />
+								<ColumnDefinition
+									Width="Auto" />
+							</Grid.ColumnDefinitions>
 
-			<Border
-				Grid.Column="0"
-				BorderThickness="1"
-				Height="1"
-				MinWidth="10"
-				Margin="10,0,10,0"
-				BorderBrush="{StaticResource BorderNormalBrush}" />
+							<TextBlock
+								Margin="5"
+								VerticalAlignment="Center"
+								Foreground="{Binding FontBrush}"
+								ToolTip="{Binding ToolTipText}"
+								Text="{Binding Title}" />
 
-			<TextBlock
-				Grid.Column="1"
-				Background="Transparent"
-				Text="{Binding Title}"
-				MinWidth="50"
-				MaxWidth="150"
-				VerticalAlignment="Center"
-				HorizontalAlignment="Center"
-				TextAlignment="Center"
-				TextWrapping="Wrap" />
+							<ContentControl
+								Margin="5"
+								Grid.Column="1"
+								VerticalAlignment="Center"
+								MaxWidth="100"
+								ToolTip="{Binding Preview, Converter={local:ColourMarkupConverter}}"
+								Content="{Binding Preview, Converter={local:ColourMarkupConverter}}" />
 
-			<Border
-				Grid.Column="2"
-				BorderThickness="1"
-				Height="1"
-				MinWidth="10"
-				Margin="10,0,10,0"
-				BorderBrush="{StaticResource BorderNormalBrush}" />
+							<Button
+								Grid.Column="2"
+								Margin="5"
+								Opacity="0.5"
+								Background="Transparent"
+								BorderBrush="Transparent"
+								VerticalAlignment="Center"
+								ToolTip="Edit"
+								Command="{Binding EditCMD}">
+								<Image
+									Source="/Resources/Edit.png"
+									RenderOptions.BitmapScalingMode="NearestNeighbor"
+									Height="10"
+									Width="10" />
+							</Button>
 
-		</Grid>
-	</DataTemplate>
-	
-	<DataTemplate
-		DataType="{x:Type local:GraphNodeDataPreview}">
-		<Border
-			BorderBrush="{StaticResource WindowBackgroundBrush}"
-			BorderThickness="1"
-			Background="{StaticResource BackgroundNormalBrush}"
-			Margin="2,1,2,1">
-			<Grid>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition
-						Width="*" />
-					<ColumnDefinition
-						Width="*" />
-					<ColumnDefinition
-						Width="Auto" />
-				</Grid.ColumnDefinitions>
+						</Grid>
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
 
-				<TextBlock
-					Margin="5"
-					VerticalAlignment="Center"
-					Foreground="{Binding FontBrush}"
-					ToolTip="{Binding ToolTip}"
-					Text="{Binding Title}" />
+	<Style
+		TargetType="{x:Type local:GraphNodeDataComment}">
+		<Setter
+			Property="Template">
+			<Setter.Value>
+				<ControlTemplate
+					TargetType="{x:Type local:GraphNodeDataComment}">
+					<Grid
+						Background="Transparent"
+						Margin="5,10,5,10">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition
+								Width="*" />
+							<ColumnDefinition
+								Width="Auto" />
+							<ColumnDefinition
+								Width="*" />
+						</Grid.ColumnDefinitions>
 
-				<ContentControl
-					Margin="5"
-					Grid.Column="1"
-					VerticalAlignment="Center"
-					MaxWidth="100"
-					ToolTip="{Binding Preview, Converter={local:ColourMarkupConverter}}"
-					Content="{Binding Preview, Converter={local:ColourMarkupConverter}}" />
+						<Border
+							Grid.Column="0"
+							BorderThickness="1"
+							Height="1"
+							MinWidth="10"
+							Margin="10,0,10,0"
+							BorderBrush="{StaticResource BorderNormalBrush}" />
 
-				<Button
-					Grid.Column="2"
-					Margin="5"
-					Opacity="0.5"
-					Background="Transparent"
-					BorderBrush="Transparent"
-					VerticalAlignment="Center"
-					ToolTip="Edit"
-					Command="{Binding EditCMD}">
-					<Image
-						Source="/Resources/Edit.png"
-						RenderOptions.BitmapScalingMode="NearestNeighbor"
-						Height="10"
-						Width="10" />
-				</Button>
+						<TextBlock
+							Grid.Column="1"
+							Background="Transparent"
+							Text="{Binding Title}"
+							MinWidth="50"
+							MaxWidth="150"
+							VerticalAlignment="Center"
+							HorizontalAlignment="Center"
+							TextAlignment="Center"
+							TextWrapping="Wrap" />
 
-			</Grid>
-		</Border>
-	</DataTemplate>
+						<Border
+							Grid.Column="2"
+							BorderThickness="1"
+							Height="1"
+							MinWidth="10"
+							Margin="10,0,10,0"
+							BorderBrush="{StaticResource BorderNormalBrush}" />
 
-	<DataTemplate
-		DataType="{x:Type local:GraphNodeDataLink}">
-		<Border
-			BorderBrush="{StaticResource WindowBackgroundBrush}"
-			BorderThickness="1"
-			Background="{StaticResource BackgroundNormalBrush}"
-			Margin="2,1,2,1">
-			<Grid>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition
-						Width="*" />
-					<ColumnDefinition
-						Width="*" />
-					<ColumnDefinition
-						Width="Auto" />
-					<ColumnDefinition
-						Width="Auto" />
-				</Grid.ColumnDefinitions>
+					</Grid>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
 
-				<TextBlock
-					Margin="5"
-					VerticalAlignment="Center"
-					Foreground="{Binding FontBrush}"
-					ToolTip="{Binding ToolTip}"
-					Text="{Binding Title}" />
+	<Style
+		TargetType="{x:Type local:GraphNodeDataLink}">
+		<Setter
+			Property="Template">
+			<Setter.Value>
+				<ControlTemplate
+					TargetType="{x:Type local:GraphNodeDataLink}">
+					<Border
+						BorderBrush="{StaticResource WindowBackgroundBrush}"
+						BorderThickness="1"
+						Background="{StaticResource BackgroundNormalBrush}"
+						Margin="2,1,2,1">
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition
+									Width="*" />
+								<ColumnDefinition
+									Width="*" />
+								<ColumnDefinition
+									Width="Auto" />
+								<ColumnDefinition
+									Width="Auto" />
+							</Grid.ColumnDefinitions>
 
-				<Button
-					Grid.Column="1"
-					VerticalAlignment="Center"
-					Background="Transparent"
-					BorderBrush="Transparent"
-					ToolTip="Clear"
-					Visibility="{Binding Link, Converter={local:NullOrZeroConverter}, ConverterParameter=Not}"
-					Command="{Binding ClearCMD}">
-					<Image
-						Source="/Resources/Remove.png"
-						RenderOptions.BitmapScalingMode="NearestNeighbor"
-						Height="16"
-						Width="16" />
-				</Button>
+							<TextBlock
+								Margin="5"
+								VerticalAlignment="Center"
+								Foreground="{Binding FontBrush}"
+								ToolTip="{Binding ToolTipText}"
+								Text="{Binding Title}" />
 
-				<local:PopupButton
-					Grid.Column="1"
-					ShowArrow="False"
-					Background="Transparent"
-					BorderBrush="Transparent"
-					VerticalAlignment="Center"
-					ToolTip="Create"
-					Visibility="{Binding Link, Converter={local:NullOrZeroConverter}}"
-					x:Name="button">
-					<Image
-						Source="/Resources/Add.png"
-						RenderOptions.BitmapScalingMode="NearestNeighbor"
-						Height="16"
-						Width="16" />
-					<local:PopupButton.PopupContent>
-						<ItemsControl
-							Margin="3"
-							ItemsSource="{Binding GraphReferenceItem.Definition.ItemsSource}">
-							<ItemsControl.GroupStyle>
-								<GroupStyle>
-									<GroupStyle.HeaderTemplate>
-										<DataTemplate>
-											<TextBlock
-												FontWeight="Bold"
-												Foreground="{StaticResource FontDarkBlueBrush}"
-												Text="{Binding Name}" />
-										</DataTemplate>
-									</GroupStyle.HeaderTemplate>
-								</GroupStyle>
-							</ItemsControl.GroupStyle>
-							<ItemsControl.ItemTemplate>
-								<DataTemplate>
-									<Button
-										Content="{Binding Item1}"
-										Command="{Binding DataContext.CreateCMD, ElementName=button}"
-										CommandParameter="{Binding Item1}" />
-								</DataTemplate>
-							</ItemsControl.ItemTemplate>
-						</ItemsControl>
-					</local:PopupButton.PopupContent>
-				</local:PopupButton>
+							<Button
+								Grid.Column="1"
+								VerticalAlignment="Center"
+								Background="Transparent"
+								BorderBrush="Transparent"
+								ToolTip="Clear"
+								Visibility="{Binding Link, Converter={local:NullOrZeroConverter}, ConverterParameter=Not}"
+								Command="{Binding ClearCMD}">
+								<Image
+									Source="/Resources/Remove.png"
+									RenderOptions.BitmapScalingMode="NearestNeighbor"
+									Height="16"
+									Width="16" />
+							</Button>
 
-				<local:PopupButton
-					Grid.Column="2"
-					ShowArrow="False"
-					Background="Transparent"
-					BorderBrush="Transparent"
-					VerticalAlignment="Center"
-					Opacity="0.5"
-					ToolTip="Link Type"
-					Visibility="{Binding Graph.AllowReferenceLinks, Converter={local:ValueTypeConverter}}"
-					x:Name="button2">
-					<Image
-						Source="/Resources/Edit.png"
-						RenderOptions.BitmapScalingMode="NearestNeighbor"
-						Height="10"
-						Width="10" />
-					<local:PopupButton.PopupContent>
-						<ItemsControl
-							ItemsSource="{Binding LinkTypes}">
-							<ItemsControl.ItemTemplate>
-								<DataTemplate>
-									<Button
-										Content="{Binding}"
-										Command="{Binding DataContext.ChangeLinkTypeCMD, ElementName=button2}"
-										CommandParameter="{Binding}" />
-								</DataTemplate>
-							</ItemsControl.ItemTemplate>
-						</ItemsControl>
-					</local:PopupButton.PopupContent>
-				</local:PopupButton>
+							<local:PopupButton
+								Grid.Column="1"
+								ShowArrow="False"
+								Background="Transparent"
+								BorderBrush="Transparent"
+								VerticalAlignment="Center"
+								ToolTip="Create"
+								Visibility="{Binding Link, Converter={local:NullOrZeroConverter}}"
+								x:Name="button">
+								<Image
+									Source="/Resources/Add.png"
+									RenderOptions.BitmapScalingMode="NearestNeighbor"
+									Height="16"
+									Width="16" />
+								<local:PopupButton.PopupContent>
+									<ItemsControl
+										Margin="3"
+										ItemsSource="{Binding GraphReferenceItem.Definition.ItemsSource}">
+										<ItemsControl.GroupStyle>
+											<GroupStyle>
+												<GroupStyle.HeaderTemplate>
+													<DataTemplate>
+														<TextBlock
+															FontWeight="Bold"
+															Foreground="{StaticResource FontDarkBlueBrush}"
+															Text="{Binding Name}" />
+													</DataTemplate>
+												</GroupStyle.HeaderTemplate>
+											</GroupStyle>
+										</ItemsControl.GroupStyle>
+										<ItemsControl.ItemTemplate>
+											<DataTemplate>
+												<Button
+													Content="{Binding Item1}"
+													Command="{Binding DataContext.CreateCMD, ElementName=button}"
+													CommandParameter="{Binding Item1}" />
+											</DataTemplate>
+										</ItemsControl.ItemTemplate>
+									</ItemsControl>
+								</local:PopupButton.PopupContent>
+							</local:PopupButton>
 
-				<local:Connection
-					Grid.Column="3"
-					Margin="0,0,-10,0"
-					HorizontalAlignment="Right"
-					VerticalAlignment="Center"
-					Position="{Binding Position, Mode=OneWayToSource}" />
+							<local:PopupButton
+								Grid.Column="2"
+								ShowArrow="False"
+								Background="Transparent"
+								BorderBrush="Transparent"
+								VerticalAlignment="Center"
+								Opacity="0.5"
+								ToolTip="Link Type"
+								Visibility="{Binding Graph.AllowReferenceLinks, Converter={local:ValueTypeConverter}}"
+								x:Name="button2">
+								<Image
+									Source="/Resources/Edit.png"
+									RenderOptions.BitmapScalingMode="NearestNeighbor"
+									Height="10"
+									Width="10" />
+								<local:PopupButton.PopupContent>
+									<ItemsControl
+										ItemsSource="{Binding LinkTypes}">
+										<ItemsControl.ItemTemplate>
+											<DataTemplate>
+												<Button
+													Content="{Binding}"
+													Command="{Binding DataContext.ChangeLinkTypeCMD, ElementName=button2}"
+													CommandParameter="{Binding}" />
+											</DataTemplate>
+										</ItemsControl.ItemTemplate>
+									</ItemsControl>
+								</local:PopupButton.PopupContent>
+							</local:PopupButton>
 
-			</Grid>
-		</Border>
-	</DataTemplate>
+							<local:Connection
+								Grid.Column="3"
+								Margin="0,0,-10,0"
+								HorizontalAlignment="Right"
+								VerticalAlignment="Center"
+								Position="{Binding Position, Mode=OneWayToSource}" />
+
+						</Grid>
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
 
 	<Style
 		TargetType="{x:Type local:GraphNode}">

@@ -161,6 +161,7 @@
     <Compile Include="View\CustomControls\Graph\Graph.cs" />
     <Compile Include="View\CustomControls\Graph\GraphNode.cs" />
     <Compile Include="View\CustomControls\Graph\GraphNodeData.cs" />
+    <Compile Include="View\CustomControls\InsertionAdorner.cs" />
     <Compile Include="View\CustomControls\Message.xaml.cs">
       <DependentUpon>Message.xaml</DependentUpon>
     </Compile>

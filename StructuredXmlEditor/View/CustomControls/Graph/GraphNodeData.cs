@@ -3,23 +3,47 @@ using StructuredXmlEditor.Definition;
 using StructuredXmlEditor.View;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace StructuredXmlEditor.View
 {
-	public abstract class GraphNodeData : NotifyPropertyChanged
+	public abstract class GraphNodeData : Control, INotifyPropertyChanged
 	{
+		//#############################################################################################
+		#region Constructor
+
+		//--------------------------------------------------------------------------
+		public GraphNodeData(DataItem data)
+		{
+			this.Data = data;
+			DataContext = this;
+			AllowDrop = true;
+		}
+
+		#endregion Constructor
+		//#############################################################################################
+		#region Properties
+
+		//--------------------------------------------------------------------------
+		public DataItem Data;
+
+		//--------------------------------------------------------------------------
 		public Graph Graph
 		{
 			get { return Node?.Graph; }
 		}
 
+		//--------------------------------------------------------------------------
 		public GraphNode Node
 		{
 			get { return m_node; }
@@ -32,19 +56,265 @@ namespace StructuredXmlEditor.View
 		}
 		private GraphNode m_node;
 
+		//--------------------------------------------------------------------------
 		public virtual string Title { get; } = "Data";
+
+		//--------------------------------------------------------------------------
+		public bool IsSelected
+		{
+			get { return m_isSelected; }
+			set
+			{
+				if (m_isSelected != value)
+				{
+					m_isSelected = value;
+					RaisePropertyChangedEvent();
+
+					Data.IsSelected = value;
+				}
+			}
+		}
+		private bool m_isSelected;
+
+		#endregion Properties
+		//#############################################################################################
+		#region Mouse Events
+
+		//-----------------------------------------------------------------------
+		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+		{
+			e.Handled = true;
+
+			if (Data.Parent is CollectionChildItem && Data.Parent.Parent is GraphCollectionItem)
+			{
+				draggedImage = InsertionAdorner.ConvertElementToImage(this);
+
+				DataObject dragData = new DataObject("GraphNodeData", Data.Parent);
+				dragData.SetData("Element", this);
+				DragDrop.DoDragDrop(this, dragData, DragDropEffects.Move);
+			}
+			else if (Data is CommentItem && Data.Parent is GraphCollectionItem)
+			{
+				draggedImage = InsertionAdorner.ConvertElementToImage(this);
+
+				DataObject dragData = new DataObject("GraphNodeData", Data);
+				dragData.SetData("Element", this);
+				DragDrop.DoDragDrop(this, dragData, DragDropEffects.Move);
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		protected override void OnDragEnter(DragEventArgs e)
+		{
+			if (e.Data.GetDataPresent("GraphNodeData") && (Data.Parent is GraphCollectionItem || Data.Parent.Parent is GraphCollectionItem))
+			{
+				if (adorner != null)
+				{
+					adorner.Detach();
+					adorner = null;
+				}
+
+				adorner = new InsertionAdorner(true, false, this, draggedImage, e.GetPosition(this));
+
+				e.Effects = DragDropEffects.Move;
+				e.Handled = true;
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		protected override void OnDragOver(DragEventArgs e)
+		{
+			if (e.Data.GetDataPresent("GraphNodeData") && (Data.Parent is GraphCollectionItem || Data.Parent.Parent is GraphCollectionItem))
+			{
+				if (adorner != null)
+				{
+					adorner.Detach();
+					adorner = null;
+				}
+
+				adorner = new InsertionAdorner(true, false, this, draggedImage, e.GetPosition(this));
+
+				e.Effects = DragDropEffects.Move;
+				e.Handled = true;
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		protected override void OnDragLeave(DragEventArgs e)
+		{
+			base.OnDragLeave(e);
+
+			if (adorner != null)
+			{
+				adorner.Detach();
+				adorner = null;
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		protected override void OnMouseMove(MouseEventArgs e)
+		{
+			if (e.LeftButton != MouseButtonState.Pressed)
+			{
+				if (adorner != null)
+				{
+					adorner.Detach();
+					adorner = null;
+				}
+			}
+
+			base.OnMouseMove(e);
+		}
+
+		//-----------------------------------------------------------------------
+		protected override void OnDrop(DragEventArgs e)
+		{
+			if (e.Data.GetDataPresent("GraphNodeData") && (Data.Parent is GraphCollectionItem || Data.Parent.Parent is GraphCollectionItem))
+			{
+				DataItem item = e.Data.GetData("GraphNodeData") as DataItem;
+				DataItem droppedItem = Data.Parent is CollectionChildItem ? Data.Parent as DataItem : Data;
+
+				if (item == droppedItem) return;
+
+				GraphCollectionItem collection = droppedItem.Parent as GraphCollectionItem;
+
+				bool isValid = false;
+
+				if (item is CommentItem)
+				{
+					isValid = true;
+				}
+				else
+				{
+					var wrapped = (item as CollectionChildItem).WrappedItem;
+
+					var droppedDef = wrapped.Definition;
+					if (droppedDef is ReferenceDefinition) droppedDef = (wrapped as ReferenceItem).WrappedItem.Definition;
+					else if (droppedDef is GraphReferenceDefinition) droppedDef = (wrapped as GraphReferenceItem).WrappedItem.Definition;
+
+					var cdef = (collection as GraphCollectionItem).CDef;
+
+					foreach (var def in cdef.ChildDefinitions)
+					{
+						var wrappeddef = def.WrappedDefinition;
+						if (wrappeddef == droppedDef)
+						{
+							isValid = true;
+							break;
+						}
+
+						if (wrappeddef is ReferenceDefinition)
+						{
+							if ((wrappeddef as ReferenceDefinition).Definitions.Values.Contains(droppedDef))
+							{
+								isValid = true;
+								break;
+							}
+						}
+						else if (wrappeddef is GraphReferenceDefinition)
+						{
+							if ((wrappeddef as GraphReferenceDefinition).Definitions.Values.Contains(droppedDef))
+							{
+								isValid = true;
+								break;
+							}
+						}
+					}
+				}
+
+				if (isValid)
+				{
+					if (droppedItem.Parent != item.Parent)
+					{
+						int srcIndex = item.Parent.Children.IndexOf(item);
+						int dstIndex = droppedItem.Parent.Children.IndexOf(droppedItem);
+
+						if (adorner.InsertionState == InsertionAdorner.InsertionStateEnum.After)
+						{
+							dstIndex = Math.Min(dstIndex + 1, collection.Children.Count - 1);
+						}
+
+						var srcCollection = item.Parent;
+						var dstCollection = droppedItem.Parent;
+
+						item.UndoRedo.ApplyDoUndo(() =>
+						{
+							srcCollection.Children.RemoveAt(srcIndex);
+							dstCollection.Children.Insert(dstIndex, item);
+						}, () =>
+						{
+							dstCollection.Children.RemoveAt(dstIndex);
+							srcCollection.Children.Insert(srcIndex, item);
+						}, "Move item");
+					}
+					else
+					{
+						int srcIndex = collection.Children.IndexOf(item);
+						int dstIndex = collection.Children.IndexOf(droppedItem);
+
+						if (srcIndex < dstIndex) dstIndex--;
+
+						if (adorner.InsertionState == InsertionAdorner.InsertionStateEnum.After)
+						{
+							dstIndex = Math.Min(dstIndex + 1, collection.Children.Count - 1);
+						}
+
+						if (srcIndex != dstIndex) (collection as ICollectionItem).MoveItem(srcIndex, dstIndex);
+					}
+				}
+			}
+
+			if (adorner != null)
+			{
+				adorner.Detach();
+				adorner = null;
+			}
+		}
+
+		#endregion Mouse Events
+		//#############################################################################################
+		#region INotifyPropertyChanged
+
+		//--------------------------------------------------------------------------
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		//-----------------------------------------------------------------------
+		public void RaisePropertyChangedEvent
+		(
+			[CallerMemberName] string i_propertyName = ""
+		)
+		{
+			if (PropertyChanged != null)
+			{
+				PropertyChanged(this, new PropertyChangedEventArgs(i_propertyName));
+			}
+		}
+
+		#endregion INotifyPropertyChanged
+		//#############################################################################################
+		#region Data
+
+		public static RenderTargetBitmap draggedImage;
+		public static InsertionAdorner adorner;
+
+		#endregion Data
+		//#############################################################################################
 	}
 
 	public class GraphNodeDataComment : GraphNodeData
 	{
-		public override string Title { get { return data.TextValue; } }
-
-		private DataItem data;
-
-		public GraphNodeDataComment(DataItem data)
+		//--------------------------------------------------------------------------
+		static GraphNodeDataComment()
 		{
-			this.data = data;
+			DefaultStyleKeyProperty.OverrideMetadata(typeof(GraphNodeDataComment), new FrameworkPropertyMetadata(typeof(GraphNodeDataComment)));
+		}
 
+		//--------------------------------------------------------------------------
+		public override string Title { get { return Data.TextValue; } }
+
+		//--------------------------------------------------------------------------
+		public GraphNodeDataComment(DataItem data) : base(data)
+		{
 			data.PropertyChanged += (e, args) =>
 			{
 				if (args.PropertyName == "TextValue")
@@ -57,22 +327,30 @@ namespace StructuredXmlEditor.View
 
 	public class GraphNodeDataPreview : GraphNodeData
 	{
-		public override string Title { get { return data.Name; } }
-
-		public string ToolTip { get { return data.ToolTip; } }
-
-		public Brush FontBrush { get { return data.TextBrush; } }
-
-		public string Preview { get { return data.Description; } }
-
-		public Command<object> EditCMD { get { return new Command<object>((e) => { Node.Edit(data); }); } }
-
-		private DataItem data;
-
-		public GraphNodeDataPreview(DataItem data)
+		//--------------------------------------------------------------------------
+		static GraphNodeDataPreview()
 		{
-			this.data = data;
+			DefaultStyleKeyProperty.OverrideMetadata(typeof(GraphNodeDataPreview), new FrameworkPropertyMetadata(typeof(GraphNodeDataPreview)));
+		}
 
+		//--------------------------------------------------------------------------
+		public override string Title { get { return Data.Name; } }
+
+		//--------------------------------------------------------------------------
+		public string ToolTipText { get { return Data.ToolTip; } }
+
+		//--------------------------------------------------------------------------
+		public Brush FontBrush { get { return Data.TextBrush; } }
+
+		//--------------------------------------------------------------------------
+		public string Preview { get { return Data.Description; } }
+
+		//--------------------------------------------------------------------------
+		public Command<object> EditCMD { get { return new Command<object>((e) => { Node.Edit(Data); }); } }
+
+		//--------------------------------------------------------------------------
+		public GraphNodeDataPreview(DataItem data) : base(data)
+		{
 			data.PropertyChanged += (e, args) =>
 			{
 				if (args.PropertyName == "Description")
@@ -89,9 +367,15 @@ namespace StructuredXmlEditor.View
 
 	public class GraphNodeDataLink : GraphNodeData
 	{
-		public GraphNodeDataLink(GraphReferenceItem item)
+		//--------------------------------------------------------------------------
+		static GraphNodeDataLink()
 		{
-			GraphReferenceItem = item;
+			DefaultStyleKeyProperty.OverrideMetadata(typeof(GraphNodeDataLink), new FrameworkPropertyMetadata(typeof(GraphNodeDataLink)));
+		}
+
+		//--------------------------------------------------------------------------
+		public GraphNodeDataLink(GraphReferenceItem item) : base(item)
+		{
 			LinkNoEvent = GraphReferenceItem.WrappedItem?.GraphNode;
 
 			GraphReferenceItem.PropertyChanged += (e, args) => 
@@ -122,6 +406,7 @@ namespace StructuredXmlEditor.View
 			};
 		}
 
+		//--------------------------------------------------------------------------
 		public override string Title
 		{
 			get
@@ -135,14 +420,19 @@ namespace StructuredXmlEditor.View
 			}
 		}
 
+		//--------------------------------------------------------------------------
 		public Brush FontBrush { get { return GraphReferenceItem.TextBrush; } }
 
-		public string ToolTip { get { return GraphReferenceItem.ToolTip; } }
+		//--------------------------------------------------------------------------
+		public string ToolTipText { get { return GraphReferenceItem.ToolTip; } }
 
-		public GraphReferenceItem GraphReferenceItem { get; set; }
+		//--------------------------------------------------------------------------
+		public GraphReferenceItem GraphReferenceItem { get { return Data as GraphReferenceItem; } }
 
+		//--------------------------------------------------------------------------
 		public Connection Connection { get; set; }
 
+		//--------------------------------------------------------------------------
 		public IEnumerable<string> AllowedTypes
 		{
 			get
@@ -155,6 +445,7 @@ namespace StructuredXmlEditor.View
 			}
 		}
 
+		//--------------------------------------------------------------------------
 		public IEnumerable<LinkType> LinkTypes
 		{
 			get
@@ -164,6 +455,7 @@ namespace StructuredXmlEditor.View
 			}
 		}
 
+		//--------------------------------------------------------------------------
 		public GraphNode LinkNoEvent
 		{
 			get { return m_link; }
@@ -186,6 +478,7 @@ namespace StructuredXmlEditor.View
 			}
 		}
 
+		//--------------------------------------------------------------------------
 		public GraphNode Link
 		{
 			get { return m_link; }
@@ -212,6 +505,7 @@ namespace StructuredXmlEditor.View
 		}
 		private GraphNode m_link;
 
+		//--------------------------------------------------------------------------
 		public Point Position
 		{
 			get { return m_position; }
@@ -226,6 +520,7 @@ namespace StructuredXmlEditor.View
 		}
 		private Point m_position;
 
+		//--------------------------------------------------------------------------
 		public Command<string> ClearCMD { get { return new Command<string>((type) => { GraphReferenceItem.Clear(); }); } }
 		public Command<string> CreateCMD { get { return new Command<string>((type) => { GraphReferenceItem.Create(type); }); } }
 		public Command<LinkType> ChangeLinkTypeCMD { get { return new Command<LinkType>((type) => { GraphReferenceItem.LinkType = type; }); } }

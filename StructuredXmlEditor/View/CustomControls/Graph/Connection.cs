@@ -39,7 +39,7 @@ namespace StructuredXmlEditor.View
 		{
 			get
 			{
-				return GraphNodeDataLink?.Node.Graph;
+				return GraphNodeDataLink?.Node?.Graph;
 			}
 		}
 
