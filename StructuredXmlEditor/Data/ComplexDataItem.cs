@@ -96,12 +96,15 @@ namespace StructuredXmlEditor.Data
 					var builder = new StringBuilder();
 					foreach (var child in Children.Where(e => e.IsVisibleFromBindings))
 					{
+						var desc = child.Description;
+						if (string.IsNullOrWhiteSpace(desc)) continue;
+
 						if (builder.Length > 0) builder.Append(", ");
 
 						builder.Append("<");
 						builder.Append(child.TextColour);
 						builder.Append(">");
-						builder.Append(child.Description);
+						builder.Append(desc);
 						builder.Append("</>");
 
 						if (builder.Length > 500)

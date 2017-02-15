@@ -735,9 +735,18 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		public void ZoomToBestFit()
 		{
-			TimelineItem.Children.Sort((e) => (e as KeyframeItem).Time);
-			var min = (TimelineItem.Children.First() as KeyframeItem).Time;
-			var max = (TimelineItem.Children.Last() as KeyframeItem).EndTime;
+			var min = double.MaxValue;
+			var max = -double.MaxValue;
+
+			foreach (var timeline in TimelineItem.TimelineGroup)
+			{
+				timeline.Children.Sort((e) => (e as KeyframeItem).Time);
+				var tmin = (timeline.Children.First() as KeyframeItem).Time;
+				var tmax = (timeline.Children.Last() as KeyframeItem).EndTime;
+
+				if (tmin < min) min = tmin;
+				if (tmax > max) max = tmax;
+			}
 
 			var diff = max - min;
 			if (diff < 1) diff = 1;

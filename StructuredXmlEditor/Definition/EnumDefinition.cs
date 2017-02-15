@@ -114,7 +114,7 @@ namespace StructuredXmlEditor.Definition
 				{
 					var def = defs[key] as EnumDefinition;
 					EnumValues = def.EnumValues;
-					if (Default == null) Default = EnumValues[0];
+					if (!EnumValues.Contains(Default)) Default = EnumValues[0];
 				}
 				else
 				{
