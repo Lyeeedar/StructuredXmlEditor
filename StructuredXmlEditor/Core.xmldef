@@ -14,7 +14,7 @@
 			<Number Name="Min" Default="-9999999" ToolTip="The minimum value this element can contain." />
 			<Number Name="Max" Default="9999999" ToolTip="The maximum value this element can contain." />
 			<Number Name="Default" ToolTip="The default value for this element." />
-			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="false" />
+			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
@@ -35,7 +35,7 @@
 			<Number Name="Max" Default="9999999" ToolTip="The maximum value this element can contain." />
 			<String Name="Default" Default="0,0,0,0" ToolTip="The comma seperated default values" />
 			<Enum Name="Type" Default="Float" EnumValues="Float,Int" ToolTip="The value type." />
-			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="false" />
+			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
@@ -48,7 +48,7 @@
 		<Attributes>
 			<String Name="Name" Default="String" ToolTip="The name to be written for this element." />
 			<String Name="Default" ToolTip="The default value for this element." />
-			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="false" />
+			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
@@ -64,7 +64,7 @@
 			<Boolean Name="StripExtension" ToolTip="Whether to strip the extension from the chosen path" />
 			<String Name="AllowedFileTypes" ToolTip="A comma seperated list of allowed extensions." />
 			<String Name="Default" ToolTip="The default value for this element." />
-			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="false" />
+			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
@@ -77,7 +77,7 @@
 		<Attributes>
 			<String Name="Name" Default="Boolean" ToolTip="The name to be written for this element." />
 			<Boolean Name="Default" ToolTip="The default value for this element." />
-			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="false" />
+			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
@@ -91,7 +91,7 @@
 			<String Name="Name" Default="Colour" ToolTip="The name to be written for this element." />
 			<Boolean Name="HasAlpha" ToolTip="Whether this colour has an alpha value that isnt 255. If set to false then the colour will only write RGB, instead of RGBA." />
 			<Colour Name="Default" ToolTip="The default colour." />
-			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="false" />
+			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
@@ -104,7 +104,7 @@
 		<Attributes>
 			<String Name="Name" Default="MultilineString" ToolTip="The name to be written for this element." />
 			<String Name="Default" ToolTip="The default value for this element." />
-			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="false" />
+			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<Boolean Name="ElementPerLine" ToolTip="If true then the string will be split line by line into child elements." />
 			<String Name="LineElementName" ToolTip="The name of the element that holds each line of the string" Default="Line" VisibleIf="ElementPerLine==true" />
 			<Boolean Name="IsAsciiGrid" ToolTip="If true then the option to use the ascii grid editor will be present for this element." />
@@ -122,7 +122,7 @@
 			<String Name="EnumValues" ToolTip="A comma seperated list of enum values that can be picked." VisibleIf="Key==null" />
 			<String Name="Key" ToolTip="The key of the EnumDef to load the EnumValues from." VisibleIf="EnumValues==null" />
 			<String Name="Default" ToolTip="The default value for this element. If not set it defaults to the first EnumValue." />
-			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="false" />
+			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
