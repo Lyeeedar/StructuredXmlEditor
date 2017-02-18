@@ -11,6 +11,7 @@ namespace StructuredXmlEditor.Definition
 	public class StringDefinition : PrimitiveDataDefinition
 	{
 		public string Default { get; set; }
+		public int MaxLength { get; set; }
 
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
@@ -54,6 +55,7 @@ namespace StructuredXmlEditor.Definition
 		public override void Parse(XElement definition)
 		{
 			Default = definition.Attribute("Default")?.Value?.ToString();
+			MaxLength = TryParseInt(definition, "MaxLength", 999999999);
 			if (Default == null) Default = "";
 		}
 

@@ -15,7 +15,35 @@ namespace StructuredXmlEditor.Data
 	public class StructItem : ComplexDataItem
 	{
 		//-----------------------------------------------------------------------
-		public bool ShowClearButton { get { return HasContent && (Definition as StructDefinition).Nullable && !(Parent is CollectionChildItem || Parent is ReferenceItem); } }
+		public bool ShowClearButton
+		{
+			get
+			{
+				
+
+				return HasContent && (Definition as StructDefinition).Nullable && !IsWrappedItem;
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public bool IsWrappedItem
+		{
+			get
+			{
+				if (Parent is CollectionChildItem)
+				{
+					var pi = Parent as CollectionChildItem;
+					if (pi.WrappedItem == this) return true;
+				}
+				else if (Parent is ReferenceItem)
+				{
+					var pi = Parent as ReferenceItem;
+					if (pi.WrappedItem == this) return true;
+				}
+
+				return false;
+			}
+		}
 
 		//-----------------------------------------------------------------------
 		public Command<object> ClearCMD { get { return new Command<object>((e) => Clear()); } }
@@ -40,7 +68,7 @@ namespace StructuredXmlEditor.Data
 				}
 				else if (a.PropertyName == "Parent")
 				{
-					if (!HasContent && (Parent is CollectionChildItem || Parent is ReferenceItem))
+					if (!HasContent && IsWrappedItem)
 					{
 						using (UndoRedo.DisableUndoScope())
 						{

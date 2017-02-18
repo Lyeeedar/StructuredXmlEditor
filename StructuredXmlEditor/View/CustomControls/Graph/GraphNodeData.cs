@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -363,6 +364,10 @@ namespace StructuredXmlEditor.View
 				{
 					RaisePropertyChangedEvent("FontBrush");
 				}
+				else if (args.PropertyName == "Name")
+				{
+					RaisePropertyChangedEvent("Title");
+				}
 			};
 		}
 	}
@@ -394,7 +399,26 @@ namespace StructuredXmlEditor.View
 				{
 					RaisePropertyChangedEvent("FontBrush");
 				}
+				else if (args.PropertyName == "Name")
+				{
+					RaisePropertyChangedEvent("Title");
+				}
 			};
+
+			if (GraphReferenceItem.Parent is StructItem)
+			{
+				GraphReferenceItem.Parent.PropertyChanged += (e, args) =>
+				{
+					if (args.PropertyName == "Description")
+					{
+						RaisePropertyChangedEvent("Title");
+					}
+					else if (args.PropertyName == "TextBrush")
+					{
+						RaisePropertyChangedEvent("FontBrush");
+					}
+				};
+			}
 
 			PropertyChanged += (e, args) => 
 			{
@@ -413,7 +437,22 @@ namespace StructuredXmlEditor.View
 		{
 			get
 			{
-				var title = GraphReferenceItem.GetParentPath();
+				string title = "";
+
+				if (GraphReferenceItem.Parent is StructItem)
+				{
+					title = GraphReferenceItem.Parent.Description;
+
+					if (title.Contains("<"))
+					{
+						title = Regex.Replace(title, "<[^>]+>", string.Empty);
+					}
+				}
+				else
+				{
+					title = GraphReferenceItem.GetParentPath();
+				}
+
 				if (GraphReferenceItem.WrappedItem != null)
 				{
 					title += " (" + GraphReferenceItem.Name + ")";
@@ -423,7 +462,20 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		public Brush FontBrush { get { return GraphReferenceItem.TextBrush; } }
+		public Brush FontBrush
+		{
+			get
+			{
+				if (GraphReferenceItem.Parent is StructItem)
+				{
+					return GraphReferenceItem.Parent.TextBrush;
+				}
+				else
+				{
+					return GraphReferenceItem.TextBrush;
+				}
+			}
+		}
 
 		//--------------------------------------------------------------------------
 		public string ToolTipText { get { return GraphReferenceItem.ToolTip; } }

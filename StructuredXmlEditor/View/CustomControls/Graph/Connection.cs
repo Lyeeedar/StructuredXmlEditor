@@ -97,6 +97,9 @@ namespace StructuredXmlEditor.View
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
 			Graph.CreatingLink = GraphNodeDataLink;
+
+			e.Handled = true;
+
 			base.OnMouseLeftButtonDown(e);
 		}
 

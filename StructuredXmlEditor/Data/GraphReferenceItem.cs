@@ -140,6 +140,9 @@ namespace StructuredXmlEditor.Data
 		public override Command<object> RemoveCMD { get { return new Command<object>((e) => Clear()); } }
 
 		//-----------------------------------------------------------------------
+		public Command<object> FocusWrappedCMD { get { return new Command<object>((e) => FocusWrapped()); } }
+
+		//-----------------------------------------------------------------------
 		public GraphNodeDataLink Link
 		{
 			get
@@ -318,6 +321,16 @@ namespace StructuredXmlEditor.Data
 			}
 
 			return false;
+		}
+
+		//-----------------------------------------------------------------------
+		public void FocusWrapped()
+		{
+			if (WrappedItem != null)
+			{
+				WrappedItem.GraphNode.IsSelected = true;
+				Grid.Selected = new List<DataItem> { WrappedItem };
+			}
 		}
 
 		//-----------------------------------------------------------------------

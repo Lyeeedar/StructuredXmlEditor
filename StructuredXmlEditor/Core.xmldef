@@ -47,6 +47,7 @@
 	<StructDef Name="String" ToolTip="A string." TextColour="Primitive" >
 		<Attributes>
 			<String Name="Name" Default="String" ToolTip="The name to be written for this element." />
+			<Number Name="MaxLength" Default="9999999" Type="Int" Min="1" ToolTip="The max number of characters in this element" />
 			<String Name="Default" ToolTip="The default value for this element." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
