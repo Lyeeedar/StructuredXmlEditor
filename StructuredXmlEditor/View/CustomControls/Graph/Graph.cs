@@ -1,4 +1,5 @@
 ﻿using StructuredXmlEditor.Data;
+using StructuredXmlEditor.Definition;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -354,6 +355,67 @@ namespace StructuredXmlEditor.View
 			ReleaseMouseCapture();
 
 			base.OnMouseLeftButtonUp(e);
+		}
+
+		//--------------------------------------------------------------------------
+		protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
+		{
+			var pos = e.GetPosition(this);
+
+			ContextMenu menu = new ContextMenu();
+
+			var create = menu.AddItem("Create");
+			var validTypes = new HashSet<GraphNodeDefinition>();
+			foreach (var node in Nodes)
+			{
+				foreach (var data in node.Datas)
+				{
+					if (data is GraphNodeDataLink)
+					{
+						var link = data as GraphNodeDataLink;
+						var def = link.GraphReferenceItem.Definition as GraphReferenceDefinition;
+						foreach (var d in def.Definitions.Values)
+						{
+							validTypes.Add(d);
+						}
+					}
+				}
+			}
+
+			foreach (var def in validTypes.OrderBy(d => d.Name))
+			{
+				create.AddItem(def.Name, () => 
+				{
+					var grid = Nodes.First().GraphNodeItem.Grid;
+					var undo = grid.RootItems[0].UndoRedo;
+
+					GraphNodeItem item = null;
+
+					using (undo.DisableUndoScope())
+					{
+						item = def.CreateData(undo) as GraphNodeItem;
+
+						item.Grid = Nodes.First().GraphNodeItem.Grid;
+						item.X = pos.X;
+						item.Y = pos.Y;
+					}
+
+					undo.ApplyDoUndo(
+						delegate 
+						{
+							grid.GraphNodeItems.Add(item);
+						},
+						delegate
+						{
+							grid.GraphNodeItems.Remove(item);
+						},
+						"Create " + item.Name);
+				});
+			}
+
+			menu.IsOpen = true;
+
+			base.OnMouseRightButtonDown(e);
 		}
 
 		//--------------------------------------------------------------------------
