@@ -12,17 +12,11 @@ using System.Globalization;
 namespace StructuredXmlEditor.View
 {
 	//--------------------------------------------------------------------------
-	// @ brief ZoomPanItemsControl
-	//--------------------------------------------------------------------------
 	public partial class ZoomPanItemsControl : ItemsControl
 	{
 		//--------------------------------------------------------------------------
-		// @ brief
-		//--------------------------------------------------------------------------
 		public ZoomPanCanvas PART_Canvas { get; private set; }
 
-		//--------------------------------------------------------------------------
-		// @ brief
 		//--------------------------------------------------------------------------
 		public int TransformTrigger
 		{
@@ -31,13 +25,9 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		// @ brief
-		//--------------------------------------------------------------------------
 		public static readonly DependencyProperty TransformTriggerProperty =
 			DependencyProperty.Register("TransformTrigger", typeof(int), typeof(ZoomPanItemsControl), new PropertyMetadata(0));
 
-		//--------------------------------------------------------------------------
-		// @ brief
 		//--------------------------------------------------------------------------
 		public double Scale
 		{
@@ -45,8 +35,6 @@ namespace StructuredXmlEditor.View
 			set { SetValue(ScaleProperty, value); }
 		}
 
-		//--------------------------------------------------------------------------
-		// @ brief
 		//--------------------------------------------------------------------------
 		public static readonly DependencyProperty ScaleProperty =
 			DependencyProperty.Register("Scale", typeof(double), typeof(ZoomPanItemsControl), new PropertyMetadata(1.0, (s, a) =>
@@ -58,8 +46,6 @@ namespace StructuredXmlEditor.View
 					}
 				}));
 
-		//--------------------------------------------------------------------------
-		// @ brief
 		//--------------------------------------------------------------------------
 		void OnScaleChanged(double _oldValue, double _newValue)
 		{
@@ -74,16 +60,12 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		// @ brief
-		//--------------------------------------------------------------------------
 		public Point Offset
 		{
 			get { return (Point)GetValue(OffsetProperty); }
 			set { SetValue(OffsetProperty, value); }
 		}
 
-		//--------------------------------------------------------------------------
-		// @ brief
 		//--------------------------------------------------------------------------
 		public static readonly DependencyProperty OffsetProperty =
 			DependencyProperty.Register("Offset", typeof(Point), typeof(ZoomPanItemsControl), new PropertyMetadata(new Point(), (s, a) =>
@@ -95,8 +77,6 @@ namespace StructuredXmlEditor.View
 				}
 			}));
 
-		//--------------------------------------------------------------------------
-		// @ brief
 		//--------------------------------------------------------------------------
 		void OnOffsetChanged(Point _oldValue, Point _newValue)
 		{
@@ -110,8 +90,6 @@ namespace StructuredXmlEditor.View
 			}
 		}
 
-		//--------------------------------------------------------------------------
-		// @ brief
 		//--------------------------------------------------------------------------
 		void DeferFitToView()
 		{
@@ -127,8 +105,6 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		// @ brief
-		//--------------------------------------------------------------------------
 		public double MinScale
 		{
 			get { return (double)GetValue(MinScaleProperty); }
@@ -136,14 +112,10 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		// @ brief
-		//--------------------------------------------------------------------------
 		public static readonly DependencyProperty MinScaleProperty =
 			DependencyProperty.Register("MinScale", typeof(double), typeof(ZoomPanItemsControl),
 			new UIPropertyMetadata(0.1, (s, a) => { }));
 
-		//--------------------------------------------------------------------------
-		// @ brief
 		//--------------------------------------------------------------------------
 		public double MaxScale
 		{
@@ -152,14 +124,10 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		// @ brief
-		//--------------------------------------------------------------------------
 		public static readonly DependencyProperty MaxScaleProperty =
 			DependencyProperty.Register("MaxScale", typeof(double), typeof(ZoomPanItemsControl),
 			new UIPropertyMetadata(1.0, (s, a) => { }));
 
-		//--------------------------------------------------------------------------
-		// @ brief
 		//--------------------------------------------------------------------------
 		public ZoomPanItemsControl()
 		{
@@ -167,16 +135,12 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		// @ brief
-		//--------------------------------------------------------------------------
 		void OnLoaded(object sender, RoutedEventArgs e)
 		{
 			PART_Canvas = (ZoomPanCanvas)Template.FindName("PART_Canvas", this);
 			Loaded -= OnLoaded;
 		}
 
-		//--------------------------------------------------------------------------
-		// @ brief
 		//--------------------------------------------------------------------------
 		protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
 		{
@@ -220,8 +184,6 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		// @ brief
-		//--------------------------------------------------------------------------
 		void OnDragMouseMove(object sender, MouseEventArgs e)
 		{
 			if (m_lastDragPosition != null)
@@ -256,8 +218,6 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		// @ brief
-		//--------------------------------------------------------------------------
 		void OnDragMouseUp(object sender, MouseButtonEventArgs e)
 		{
 			if(e.ChangedButton == MouseButton.Right)
@@ -269,8 +229,6 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		// @ brief
-		//--------------------------------------------------------------------------
 		protected override void OnLostMouseCapture(MouseEventArgs e)
 		{
 			base.OnLostMouseCapture(e);
@@ -280,8 +238,6 @@ namespace StructuredXmlEditor.View
 			Cursor = null;
 		}
 
-		//--------------------------------------------------------------------------
-		// @ brief
 		//--------------------------------------------------------------------------
 		protected override void OnPreviewMouseWheel(MouseWheelEventArgs e)
 		{
@@ -297,8 +253,6 @@ namespace StructuredXmlEditor.View
 			}
 		}
 
-		//--------------------------------------------------------------------------
-		// @ brief
 		//--------------------------------------------------------------------------
 		public void FitToView()
 		{
@@ -323,8 +277,6 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		// @ brief
-		//--------------------------------------------------------------------------
 		public void BringIntoFocus(params object[] _items)
 		{
 			foreach (var item in _items)
@@ -338,15 +290,11 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		// @ brief
-		//--------------------------------------------------------------------------
 		public FrameworkElement GetContainer(object _context)
 		{
 			return (FrameworkElement)ItemContainerGenerator.ContainerFromItem(_context);
 		}
 
-		//--------------------------------------------------------------------------
-		// @ brief
 		//--------------------------------------------------------------------------
 		public Rect GetTransformedViewRect(object _context)
 		{
@@ -361,16 +309,12 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		// @ brief
-		//--------------------------------------------------------------------------
 		public bool ItemViewContainsPoint(object _context, Point pos)
 		{
 			FrameworkElement view = null;
 			return ItemViewContainsPoint(_context, pos, out view);
 		}
 
-		//--------------------------------------------------------------------------
-		// @ brief
 		//--------------------------------------------------------------------------
 		public bool ItemViewContainsPoint(object _context, Point pos, out FrameworkElement _container)
 		{
@@ -387,8 +331,6 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		// @ brief
-		//--------------------------------------------------------------------------
 		public Point GetCanvasLocalMousePosition()
 		{
 			Point p = Mouse.GetPosition(this);
@@ -399,8 +341,6 @@ namespace StructuredXmlEditor.View
 			return p;
 		}
 
-		//--------------------------------------------------------------------------
-		// @ brief
 		//--------------------------------------------------------------------------
 		public Point GetCanvasLocalMousePosition(DragEventArgs e)
 		{
@@ -426,12 +366,8 @@ namespace StructuredXmlEditor.View
 	}
 
 	//--------------------------------------------------------------------------
-	// @ brief
-	//--------------------------------------------------------------------------
 	public class CenterOffset : IMultiValueConverter
 	{
-		//--------------------------------------------------------------------------
-		// @ brief
 		//--------------------------------------------------------------------------
 		public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
 		{
@@ -446,8 +382,6 @@ namespace StructuredXmlEditor.View
 			return pos - 0.5 * size;
 		}
 
-		//--------------------------------------------------------------------------
-		// @ brief
 		//--------------------------------------------------------------------------
 		public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
 		{

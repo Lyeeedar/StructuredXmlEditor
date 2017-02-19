@@ -27,6 +27,7 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		public Graph()
 		{
+			CreatePool();
 		}
 
 		//-----------------------------------------------------------------------
@@ -64,21 +65,7 @@ namespace StructuredXmlEditor.View
 			DependencyProperty.Register("AllowReferenceLinks", typeof(bool), typeof(Graph), new PropertyMetadata(false, null));
 
 		//-----------------------------------------------------------------------
-		public IEnumerable<object> Controls
-		{
-			get
-			{
-				foreach (var path in Lines)
-				{
-					yield return path;
-				}
-
-				foreach (var node in Nodes)
-				{
-					yield return node;
-				}
-			}
-		}
+		public DeferableObservableCollection<object> Controls { get; } = new DeferableObservableCollection<object>();
 
 		//-----------------------------------------------------------------------
 		public IEnumerable<GraphNode> Nodes
@@ -116,6 +103,8 @@ namespace StructuredXmlEditor.View
 		{
 			get
 			{
+				pathPool.FreeAllAcquired();
+
 				foreach (var node in Nodes)
 				{
 					foreach (var data in node.Datas)
@@ -187,9 +176,24 @@ namespace StructuredXmlEditor.View
 			if (!UpdatingControls)
 			{
 				UpdatingControls = true;
-				Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
+				Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Send, new Action(() =>
 				{
-					RaisePropertyChangedEvent("Controls");
+					Controls.BeginChange();
+
+					Controls.Clear();
+
+					foreach (var path in Lines)
+					{
+						Controls.Add(path);
+					}
+
+					foreach (var node in Nodes)
+					{
+						Controls.Add(node);
+					}
+
+					Controls.EndChange();
+
 					UpdatingControls = false;
 				}));
 			}
@@ -197,13 +201,14 @@ namespace StructuredXmlEditor.View
 		private bool UpdatingControls = false;
 
 		//--------------------------------------------------------------------------
-		private object MakePath(Point src, Point dst, double opacity, Brush brush)
+		private Pool<Path> pathPool;
+		private void CreatePool()
 		{
-			src = new Point(src.X / Scale - Offset.X, src.Y / Scale - Offset.Y);
+			pathPool = new Pool<Path>(CreateNewPath, true);
+		}
 
-			var yDiff = dst.Y - src.Y;
-			var xDiff = dst.X - src.X;
-
+		private Path CreateNewPath()
+		{
 			var geometry = new PathGeometry();
 
 			var figure = new PathFigure();
@@ -214,16 +219,32 @@ namespace StructuredXmlEditor.View
 
 			var segment = new BezierSegment();
 
+			figure.Segments.Add(segment);
+
+			var path = new Path();
+			path.Data = geometry;
+
+			return path;
+		}
+
+		private object MakePath(Point src, Point dst, double opacity, Brush brush)
+		{
+			src = new Point(src.X / Scale - Offset.X, src.Y / Scale - Offset.Y);
+
+			var yDiff = dst.Y - src.Y;
+			var xDiff = dst.X - src.X;
+
+			var path = pathPool.Acquire();
+
+			var geometry = path.Data as PathGeometry;
+			var figure = geometry.Figures[0];
+			var segment = figure.Segments[0] as BezierSegment;
+
 			var offset = Math.Min(Math.Abs(yDiff), 100);
 
 			segment.Point1 = new Point(offset, yDiff * 0.05);
 			segment.Point2 = new Point(xDiff - offset, yDiff - yDiff * 0.05);
 			segment.Point3 = new Point(xDiff, yDiff);
-
-			figure.Segments.Add(segment);
-
-			var path = new Path();
-			path.Data = geometry;
 
 			path.SetValue(Canvas.LeftProperty, src.X);
 			path.SetValue(Canvas.TopProperty, src.Y);
@@ -473,12 +494,12 @@ namespace StructuredXmlEditor.View
 			}
 			else
 			{
-				if (CreatingLink != null)
+				if (CreatingLink != null && ConnectedLinkTo != null)
 				{
 					ConnectedLinkTo = null;
-				}
 
-				UpdateControls();
+					UpdateControls();
+				}
 			}
 
 			if ((m_mightBeMarqueeSelecting || m_isMarqueeSelecting) && CreatingLink == null)
