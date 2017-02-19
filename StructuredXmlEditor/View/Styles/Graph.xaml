@@ -174,7 +174,7 @@
 								<ColumnDefinition
 									Width="*" />
 								<ColumnDefinition
-									Width="*" />
+									Width="Auto" />
 								<ColumnDefinition
 									Width="Auto" />
 								<ColumnDefinition
