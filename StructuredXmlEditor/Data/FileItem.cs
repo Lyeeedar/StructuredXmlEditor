@@ -56,7 +56,26 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public BitmapImage Preview { get; set; }
+		public BitmapImage Preview
+		{
+			get
+			{
+				if (loadedPath == Value) return m_preview;
+
+				LoadPreview();
+
+				return null;
+			}
+			set
+			{
+				m_preview = value;
+				loadedPath = Value;
+
+				RaisePropertyChangedEvent("Preview");
+			}
+		}
+		private BitmapImage m_preview;
+		private string loadedPath;
 
 		//-----------------------------------------------------------------------
 		public virtual Command<object> BrowseCMD { get { return new Command<object>((e) => Browse()); } }
@@ -69,7 +88,10 @@ namespace StructuredXmlEditor.Data
 		{
 			PropertyChanged += (e, args) => 
 			{
-				if (args.PropertyName == "Value") LoadPreview();
+				if (args.PropertyName == "Value")
+				{
+					RaisePropertyChangedEvent("Preview");
+				}
 			};
 		}
 
@@ -95,7 +117,6 @@ namespace StructuredXmlEditor.Data
 						Application.Current.Dispatcher.BeginInvoke(new Action(delegate
 						{
 							Preview = image;
-							RaisePropertyChangedEvent("Preview");
 						}));
 					}
 					catch (Exception)
@@ -103,7 +124,6 @@ namespace StructuredXmlEditor.Data
 						Application.Current.Dispatcher.BeginInvoke(new Action(delegate
 						{
 							Preview = null;
-							RaisePropertyChangedEvent("Preview");
 						}));
 					}
 				}
@@ -112,7 +132,6 @@ namespace StructuredXmlEditor.Data
 					Application.Current.Dispatcher.BeginInvoke(new Action(delegate
 					{
 						Preview = null;
-						RaisePropertyChangedEvent("Preview");
 					}));
 				}
 			});

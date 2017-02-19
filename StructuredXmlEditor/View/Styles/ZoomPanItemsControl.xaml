@@ -19,24 +19,6 @@
 			Property="ClipToBounds"
 			Value="True" />
 		<Setter
-			Property="Background">
-			<Setter.Value>
-				<VisualBrush
-					TileMode="Tile"
-					Viewport="0,0,100,100"
-					ViewportUnits="Absolute"
-					AlignmentX="Left"
-					AlignmentY="Bottom">
-					<VisualBrush.Visual>
-						<Image
-							Source="/Frontier;component/Media/Images/Graph/ZoomPanCanvasGrid.png"
-							RenderOptions.BitmapScalingMode="Fant"
-							Opacity="0.5" />
-					</VisualBrush.Visual>
-				</VisualBrush>
-			</Setter.Value>
-		</Setter>
-		<Setter
 			Property="Template">
 			<Setter.Value>
 				<ControlTemplate>
