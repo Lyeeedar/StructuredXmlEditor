@@ -391,10 +391,6 @@ namespace StructuredXmlEditor.View
 				{
 					Link = GraphReferenceItem.WrappedItem?.GraphNode;
 				}
-				else if (args.PropertyName == "LinkType")
-				{
-					Node.Graph.UpdateControls();
-				}
 				else if (args.PropertyName == "TextBrush")
 				{
 					RaisePropertyChangedEvent("FontBrush");

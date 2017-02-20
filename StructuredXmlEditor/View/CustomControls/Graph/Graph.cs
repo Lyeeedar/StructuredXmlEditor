@@ -119,7 +119,7 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		private void ChildPropertyChangedHandler(object e, PropertyChangedEventArgs args)
 		{
-			if (args.PropertyName == "Child Link" || args.PropertyName == "Child Node" || args.PropertyName == "Opacity")
+			if (args.PropertyName == "Child Link" || args.PropertyName == "Child Node")
 			{
 				UpdateControls();
 			}
@@ -509,7 +509,6 @@ namespace StructuredXmlEditor.View
 				if (m_graphNode != value)
 				{
 					m_graphNode = value;
-					UpdateControls();
 				}
 			}
 		}

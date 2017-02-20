@@ -55,6 +55,9 @@
 			Property="Canvas.Top"
 			Value="{Binding Link.Position.Y}" />
 		<Setter
+			Property="Opacity"
+			Value="{Binding Link.Node.Opacity}" />
+		<Setter
 			Property="Template">
 			<Setter.Value>
 				<ControlTemplate

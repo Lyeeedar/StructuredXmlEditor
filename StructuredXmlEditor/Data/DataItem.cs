@@ -1009,7 +1009,7 @@ namespace StructuredXmlEditor.Data
 			if (this is GraphReferenceItem)
 			{
 				var gri = this as GraphReferenceItem;
-				if (gri.WrappedItem != null)
+				if (gri.WrappedItem != null && !gri.IsCircular())
 				{
 					gri.WrappedItem.Filter(filter, regex, caseSensitive, showMatchesOnly);
 				}
