@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Xml.Linq;
+using System.Collections.Specialized;
 
 namespace StructuredXmlEditor.Data
 {
@@ -30,10 +31,32 @@ namespace StructuredXmlEditor.Data
 		public CollectionChildDefinition SelectedDefinition { get; set; }
 
 		//-----------------------------------------------------------------------
+		public IEnumerable<CollectionChildDefinition> AllowedChildren
+		{
+			get
+			{
+				if (!CDef.ChildrenAreUnique)
+				{
+					foreach (var child in CDef.ChildDefinitions)
+					{
+						yield return child;
+					}
+				}
+				else
+				{
+					foreach (var child in CDef.ChildDefinitions)
+					{
+						if (!Children.Any(e => e.Definition == child)) yield return child;
+					}
+				}
+			}
+		}
+
+		//-----------------------------------------------------------------------
 		public bool ShowComboBox { get { return CDef.ChildDefinitions.Count > 1 && !IsAtMax; } }
 
 		//-----------------------------------------------------------------------
-		public bool IsAtMax { get { return IsMultiediting || Children.Where(e => CDef.ChildDefinitions.Contains(e.Definition)).Count() >= CDef.MaxCount; } }
+		public bool IsAtMax { get { return IsMultiediting || Children.Where(e => CDef.ChildDefinitions.Contains(e.Definition)).Count() >= CDef.MaxCount || AllowedChildren.Count() == 0 ; } }
 
 		//-----------------------------------------------------------------------
 		public bool IsAtMin { get { return IsMultiediting || Children.Where(e => CDef.ChildDefinitions.Contains(e.Definition)).Count() <= CDef.MinCount; } }
@@ -61,6 +84,22 @@ namespace StructuredXmlEditor.Data
 			};
 
 			SelectedDefinition = CDef.ChildDefinitions.First();
+		}
+
+		//-----------------------------------------------------------------------
+		protected override void OnChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			base.OnChildrenCollectionChanged(sender, e);
+
+			RaisePropertyChangedEvent("AllowedChildren");
+
+			if (CDef.ChildrenAreUnique)
+			{
+				if (!AllowedChildren.Contains(SelectedDefinition))
+				{
+					SelectedDefinition = AllowedChildren.FirstOrDefault();
+				}
+			}
 		}
 
 		//-----------------------------------------------------------------------

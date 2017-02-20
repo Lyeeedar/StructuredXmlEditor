@@ -2,6 +2,7 @@
 using StructuredXmlEditor.View;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,13 +27,35 @@ namespace StructuredXmlEditor.Data
 		public GraphCollectionDefinition CDef { get { return Definition as GraphCollectionDefinition; } }
 
 		//-----------------------------------------------------------------------
-		public bool IsAtMax { get { return Children.Count >= (Definition as GraphCollectionDefinition).MaxCount; } }
+		public bool IsAtMax { get { return Children.Count >= (Definition as GraphCollectionDefinition).MaxCount || AllowedChildren.Count() == 0; } }
 
 		//-----------------------------------------------------------------------
 		public bool IsAtMin { get { return Children.Count <= (Definition as GraphCollectionDefinition).MinCount; } }
 
 		//-----------------------------------------------------------------------
 		public CollectionChildDefinition SelectedDefinition { get; set; }
+
+		//-----------------------------------------------------------------------
+		public IEnumerable<CollectionChildDefinition> AllowedChildren
+		{
+			get
+			{
+				if (!CDef.ChildrenAreUnique)
+				{
+					foreach (var child in CDef.ChildDefinitions)
+					{
+						yield return child;
+					}
+				}
+				else
+				{
+					foreach (var child in CDef.ChildDefinitions)
+					{
+						if (!Children.Any(e => e.Definition == child)) yield return child;
+					}
+				}
+			}
+		}
 
 		//-----------------------------------------------------------------------
 		public bool ShowComboBox { get { return CDef.ChildDefinitions.Count > 1 && !IsAtMax; } }
@@ -63,6 +86,22 @@ namespace StructuredXmlEditor.Data
 			};
 
 			SelectedDefinition = CDef.ChildDefinitions.First();
+		}
+
+		//-----------------------------------------------------------------------
+		protected override void OnChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			base.OnChildrenCollectionChanged(sender, e);
+
+			RaisePropertyChangedEvent("AllowedChildren");
+
+			if (CDef.ChildrenAreUnique)
+			{
+				if (!AllowedChildren.Contains(SelectedDefinition))
+				{
+					SelectedDefinition = AllowedChildren.FirstOrDefault();
+				}
+			}
 		}
 
 		//-----------------------------------------------------------------------

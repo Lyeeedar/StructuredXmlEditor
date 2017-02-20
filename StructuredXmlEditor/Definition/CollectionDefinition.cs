@@ -10,6 +10,7 @@ namespace StructuredXmlEditor.Definition
 {
 	public class CollectionDefinition : ComplexDataDefinition
 	{
+		public bool ChildrenAreUnique { get; set; }
 		public bool Collapse { get; set; }
 		public string Seperator { get; set; }
 		public List<CollectionChildDefinition> ChildDefinitions { get; } = new List<CollectionChildDefinition>();
@@ -141,6 +142,7 @@ namespace StructuredXmlEditor.Definition
 
 		public override void Parse(XElement definition)
 		{
+			ChildrenAreUnique = TryParseBool(definition, "ChildrenAreUnique");
 			Collapse = TryParseBool(definition, "Collapse");
 			Seperator = definition.Attribute("Seperator")?.Value;
 			if (Seperator == null) Seperator = ",";

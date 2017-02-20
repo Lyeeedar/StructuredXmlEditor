@@ -11,6 +11,7 @@ namespace StructuredXmlEditor.Definition
 {
 	public class GraphCollectionDefinition : GraphNodeDefinition
 	{
+		public bool ChildrenAreUnique { get; set; }
 		public List<CollectionChildDefinition> ChildDefinitions { get; } = new List<CollectionChildDefinition>();
 		public int MinCount { get; set; } = 0;
 		public int MaxCount { get; set; } = int.MaxValue;
@@ -93,6 +94,8 @@ namespace StructuredXmlEditor.Definition
 
 		public override void Parse(XElement definition)
 		{
+			ChildrenAreUnique = TryParseBool(definition, "ChildrenAreUnique");
+
 			MinCount = TryParseInt(definition, "MinCount", 0);
 			MaxCount = TryParseInt(definition, "MaxCount", int.MaxValue);
 

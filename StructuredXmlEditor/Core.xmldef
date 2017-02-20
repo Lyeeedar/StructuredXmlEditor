@@ -1,7 +1,6 @@
 ﻿<Definitions Extension="xmldef">
 
-	<ReferenceDef Name="Elements" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree)" />
-	<ReferenceDef Name="ElementsAndComment" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree),Comment(Comment)" />
+	<ReferenceDef Name="Elements" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree),Comment(Comment)" />
 	
 	<CollectionDef Name="Attributes" ToolTip="A the attributes of this element." TextColour="Struct" SkipIfDefault="true">
 		<Reference Name="Attribute" Keys="Boolean,Colour,Enum,File,Number,String" ToolTip="The attribute" />
@@ -160,6 +159,7 @@
 	<CollectionDef Name="Collection" ToolTip="A collection containing multiple elements of the specified child." TextColour="Collection">
 		<Attributes>
 			<String Name="Name" Default="Collection" ToolTip="The name to be written for this element." />
+			<Boolean Name="ChildrenAreUnique" ToolTip="If set then each child can only be added once" />
 			<Boolean Name="Collapse" ToolTip="If set to true the collection will be collapsed to a single line seperated by the Seperator string. Only works if the child is a primitive item." />
 			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." VisibleIf="Collapse==true" />
 			<Number Name="MinCount" Min="0" ToolTip="The minimum number of child elements this can have." />
@@ -179,6 +179,7 @@
 	<CollectionDef Name="CollectionDef" ToolTip="A definition for a collection that can be referenced." TextColour="Collection">
 		<Attributes>
 			<String Name="Name" Default="CollectionDef" ToolTip="The name to be written for this element. This will be used as the key when referencing it." />
+			<Boolean Name="ChildrenAreUnique" ToolTip="If set then each child can only be added once" />
 			<Boolean Name="Collapse" ToolTip="If set to true the collection will be collapsed to a single line seperated by the Seperator string. Only works if the child is a primitive item." />
 			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." VisibleIf="Collapse==true" />
 			<Number Name="MinCount" Min="0" ToolTip="The minimum number of child elements this can have." />
@@ -211,7 +212,7 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Data" DefKey="ElementsAndComment" ToolTip="The defined children of the struct" />
+		<Reference Name="Data" DefKey="Elements" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
 			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 		</AdditionalDefs>
@@ -233,7 +234,7 @@
 			<Boolean Name="IsGlobal" ToolTip="Whether this definition can be referenced from other files." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Data" DefKey="ElementsAndComment" ToolTip="The defined children of the struct" />
+		<Reference Name="Data" DefKey="Elements" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
 			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 		</AdditionalDefs>
@@ -256,7 +257,7 @@
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Data" DefKey="ElementsAndComment" ToolTip="The defined children of the struct" />
+		<Reference Name="Data" DefKey="Elements" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
 			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true"/>
 		</AdditionalDefs>
@@ -276,7 +277,7 @@
 			<Boolean Name="IsGlobal" ToolTip="Whether this definition can be referenced from other files." />
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 		</Attributes>
-		<Reference Name="Data" DefKey="ElementsAndComment" ToolTip="The defined children of the struct" />
+		<Reference Name="Data" DefKey="Elements" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
 			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 		</AdditionalDefs>
@@ -285,6 +286,7 @@
 	<CollectionDef Name="GraphCollection" ToolTip="A node on a graph that can be referenced." TextColour="Collection">
 		<Attributes>
 			<String Name="Name" Default="GraphCollection" ToolTip="The name to be written for this element." />
+			<Boolean Name="ChildrenAreUnique" ToolTip="If set then each child can only be added once" />
 			<Boolean Name="AllowReferenceLinks" Default="true" ToolTip="Whether to allow links to be by reference." />
 			<Boolean Name="AllowCircularLinks" Default="false" ToolTip="Whether circular links are allowed." VisibleIf="AllowReferenceLinks==true" />
 			<Boolean Name="FlattenData" Default="false" ToolTip="If true each graph node will be placed in a flat list within this element." VisibleIf="AllowReferenceLinks==true" />
@@ -307,6 +309,7 @@
 	<CollectionDef Name="GraphCollectionDef" ToolTip="A node on a graph that can be referenced." TextColour="Collection">
 		<Attributes>
 			<String Name="Name" Default="GraphCollection" ToolTip="The name to be written for this element. This will be used as the key when referencing it." />
+			<Boolean Name="ChildrenAreUnique" ToolTip="If set then each child can only be added once" />
 			<Number Name="MinCount" Min="0" ToolTip="The minimum number of child elements this can have." />
 			<Number Name="MaxCount" Min="1" Default="99999999" ToolTip="The maximum number of child elements this can have." />
 			<Colour Name="Background" Default="0,0,0,0" />
@@ -367,7 +370,7 @@
 			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
 			<Boolean Name="HasDuration" ToolTip="Whether this keyframe has a duration." />
 		</Attributes>
-		<Reference Name="Data" DefKey="ElementsAndComment" ToolTip="The defined children of the struct" />
+		<Reference Name="Data" DefKey="Elements" ToolTip="The defined children of the struct" />
 		<AdditionalDefs>
 			<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
 			<Reference Keys="Number" Name="Time" SkipIfDefault="false" Nullable="false" ToolTip="The element to hold the time." />

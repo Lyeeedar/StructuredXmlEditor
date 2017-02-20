@@ -503,12 +503,16 @@ namespace StructuredXmlEditor.View
 			else if (DataContext is CollectionChildItem)
 			{
 				CollectionChildItem item = e.Data.GetData("CollectionChildItem") as CollectionChildItem;
+				var wrappedItem = item.GetNonWrappedItem(item);
 
 				DataItem collection = ((CollectionChildItem)DataContext).ParentCollection;
 
 				if (collection is CollectionItem)
 				{
-					if ((collection as CollectionItem).CDef.ChildDefinitions.Contains(item.Definition))
+					var allowedDefs = (collection as CollectionItem).CDef.ChildDefinitions.Select(o => o.WrappedDefinition);
+
+					if (allowedDefs.Contains(item.WrappedItem.Definition) || allowedDefs.Contains(wrappedItem.Definition)
+						|| allowedDefs.Where(o => o is ReferenceDefinition).Any(o => (o as ReferenceDefinition).Definitions.Values.Contains(wrappedItem.Definition)))
 					{
 						if (adorner != null)
 						{
@@ -596,12 +600,16 @@ namespace StructuredXmlEditor.View
 			else if (DataContext is CollectionChildItem)
 			{
 				CollectionChildItem item = e.Data.GetData("CollectionChildItem") as CollectionChildItem;
+				var wrappedItem = item.GetNonWrappedItem(item);
 
 				DataItem collection = ((CollectionChildItem)DataContext).ParentCollection;
 
 				if (collection is CollectionItem)
 				{
-					if ((collection as CollectionItem).CDef.ChildDefinitions.Contains(item.Definition))
+					var allowedDefs = (collection as CollectionItem).CDef.ChildDefinitions.Select(o => o.WrappedDefinition);
+
+					if (allowedDefs.Contains(item.WrappedItem.Definition) || allowedDefs.Contains(wrappedItem.Definition)
+						|| allowedDefs.Where(o => o is ReferenceDefinition).Any(o => (o as ReferenceDefinition).Definitions.Values.Contains(wrappedItem.Definition)))
 					{
 						if (adorner != null)
 						{
@@ -616,7 +624,7 @@ namespace StructuredXmlEditor.View
 				}
 				else if (collection is GraphCollectionItem)
 				{
-					if ((collection as GraphCollectionItem).CDef.ChildDefinitions.Contains(item.Definition))
+					if ((collection as GraphCollectionItem).CDef.ChildDefinitions.Select(o => o.WrappedDefinition).Contains((item.Definition as CollectionChildDefinition).WrappedDefinition))
 					{
 						if (adorner != null)
 						{
@@ -706,11 +714,16 @@ namespace StructuredXmlEditor.View
 
 				if (item == droppedItem) return;
 
+				var wrappedItem = item.GetNonWrappedItem(item);
+
 				DataItem collection = droppedItem.ParentCollection;
 
 				if (collection is CollectionItem)
 				{
-					if ((collection as CollectionItem).CDef.ChildDefinitions.Contains(item.Definition))
+					var allowedDefs = (collection as CollectionItem).CDef.ChildDefinitions.Select(o => o.WrappedDefinition);
+
+					if (allowedDefs.Contains(item.WrappedItem.Definition) || allowedDefs.Contains(wrappedItem.Definition)
+						|| allowedDefs.Where(o => o is ReferenceDefinition).Any(o => (o as ReferenceDefinition).Definitions.Values.Contains(wrappedItem.Definition)))
 					{
 						if (droppedItem.ParentCollection != item.ParentCollection)
 						{
