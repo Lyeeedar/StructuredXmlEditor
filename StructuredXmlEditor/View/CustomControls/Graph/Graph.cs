@@ -27,7 +27,6 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		public Graph()
 		{
-			CreatePool();
 		}
 
 		//-----------------------------------------------------------------------
@@ -65,9 +64,6 @@ namespace StructuredXmlEditor.View
 			DependencyProperty.Register("AllowReferenceLinks", typeof(bool), typeof(Graph), new PropertyMetadata(false, null));
 
 		//-----------------------------------------------------------------------
-		public DeferableObservableCollection<object> Controls { get; } = new DeferableObservableCollection<object>();
-
-		//-----------------------------------------------------------------------
 		public IEnumerable<GraphNode> Nodes
 		{
 			get { return (IEnumerable<GraphNode>)GetValue(NodesProperty); }
@@ -99,51 +95,23 @@ namespace StructuredXmlEditor.View
 			}));
 
 		//-----------------------------------------------------------------------
-		public IEnumerable<object> Lines
+		public IEnumerable<Control> Controls
 		{
 			get
 			{
-				pathPool.FreeAllAcquired();
-
 				foreach (var node in Nodes)
 				{
 					foreach (var data in node.Datas)
 					{
-						if (data is GraphNodeDataLink)
-						{
-							var link = data as GraphNodeDataLink;
-
-							if (link.Link != null)
-							{
-								var src = link.Position;
-								var dst = new Point(link.Link.X + 10, link.Link.Y + 10);
-
-								Brush brush = Brushes.MediumSpringGreen;
-								if (link.GraphReferenceItem.LinkType == LinkType.Reference || link.GraphReferenceItem.Grid.FlattenData)
-								{
-									brush = Brushes.MediumPurple;
-								}
-
-								yield return MakePath(src, dst, node.Opacity, brush);
-							}
-						}
+						if (data is GraphNodeDataLink) yield return new LinkWrapper(data as GraphNodeDataLink);
 					}
 				}
 
-				if (CreatingLink != null)
+				if (m_inProgressLink != null) yield return m_inProgressLink;
+
+				foreach (var node in Nodes)
 				{
-					if (ConnectedLinkTo != null)
-					{
-						var dst = new Point(ConnectedLinkTo.X + 10, ConnectedLinkTo.Y + 10);
-
-						yield return MakePath(CreatingLink.Position, dst, CreatingLink.Node.Opacity, Brushes.MediumSpringGreen);
-					}
-					else
-					{
-						var point = new Point(m_mousePoint.X / Scale - Offset.X, m_mousePoint.Y / Scale - Offset.Y);
-
-						yield return MakePath(CreatingLink.Position, point, CreatingLink.Node.Opacity, Brushes.Olive);
-					}
+					yield return node;
 				}
 			}
 		}
@@ -151,7 +119,7 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		private void ChildPropertyChangedHandler(object e, PropertyChangedEventArgs args)
 		{
-			if (args.PropertyName == "X" || args.PropertyName == "Y" || args.PropertyName == "Child Link" || args.PropertyName == "Child Position" || args.PropertyName == "Opacity")
+			if (args.PropertyName == "Child Link" || args.PropertyName == "Child Node" || args.PropertyName == "Opacity")
 			{
 				UpdateControls();
 			}
@@ -176,86 +144,15 @@ namespace StructuredXmlEditor.View
 			if (!UpdatingControls)
 			{
 				UpdatingControls = true;
-				Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Send, new Action(() =>
+				Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
 				{
-					Controls.BeginChange();
-
-					Controls.Clear();
-
-					foreach (var path in Lines)
-					{
-						Controls.Add(path);
-					}
-
-					foreach (var node in Nodes)
-					{
-						Controls.Add(node);
-					}
-
-					Controls.EndChange();
+					RaisePropertyChangedEvent("Controls");
 
 					UpdatingControls = false;
 				}));
 			}
 		}
 		private bool UpdatingControls = false;
-
-		//--------------------------------------------------------------------------
-		private Pool<Path> pathPool;
-		private void CreatePool()
-		{
-			pathPool = new Pool<Path>(CreateNewPath, true);
-		}
-
-		private Path CreateNewPath()
-		{
-			var geometry = new PathGeometry();
-
-			var figure = new PathFigure();
-			figure.IsClosed = false;
-			geometry.Figures.Add(figure);
-
-			figure.StartPoint = new Point(0, 0);
-
-			var segment = new BezierSegment();
-
-			figure.Segments.Add(segment);
-
-			var path = new Path();
-			path.Data = geometry;
-
-			return path;
-		}
-
-		private object MakePath(Point src, Point dst, double opacity, Brush brush)
-		{
-			src = new Point(src.X / Scale - Offset.X, src.Y / Scale - Offset.Y);
-
-			var yDiff = dst.Y - src.Y;
-			var xDiff = dst.X - src.X;
-
-			var path = pathPool.Acquire();
-
-			var geometry = path.Data as PathGeometry;
-			var figure = geometry.Figures[0];
-			var segment = figure.Segments[0] as BezierSegment;
-
-			var offset = Math.Min(Math.Abs(yDiff), 100);
-
-			segment.Point1 = new Point(offset, yDiff * 0.05);
-			segment.Point2 = new Point(xDiff - offset, yDiff - yDiff * 0.05);
-			segment.Point3 = new Point(xDiff, yDiff);
-
-			path.SetValue(Canvas.LeftProperty, src.X);
-			path.SetValue(Canvas.TopProperty, src.Y);
-
-			path.Stroke = brush;
-			path.StrokeThickness = 2;
-
-			path.Opacity = opacity;
-
-			return path;
-		}
 
 		//--------------------------------------------------------------------------
 		public object MouseOverItem
@@ -296,8 +193,22 @@ namespace StructuredXmlEditor.View
 		private object m_MouseOverItem;
 
 		//--------------------------------------------------------------------------
+		protected override void OnMouseDown(MouseButtonEventArgs e)
+		{
+			base.OnMouseDown(e);
+
+			if (e.ChangedButton == MouseButton.Middle)
+			{
+				lastPanPos = e.GetPosition(this);
+				isPanning = true;
+			}
+		}
+
+		//--------------------------------------------------------------------------
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
+			Keyboard.Focus(this);
+
 			if (!Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl) && CreatingLink == null)
 			{
 				m_mightBeMarqueeSelecting = true;
@@ -382,6 +293,7 @@ namespace StructuredXmlEditor.View
 		protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
 		{
 			var pos = e.GetPosition(this);
+			var scaled = new Point((pos.X - Offset.X) / Scale, (pos.Y - Offset.Y) / Scale);
 
 			ContextMenu menu = new ContextMenu();
 
@@ -417,8 +329,8 @@ namespace StructuredXmlEditor.View
 						item = def.CreateData(undo) as GraphNodeItem;
 
 						item.Grid = Nodes.First().GraphNodeItem.Grid;
-						item.X = pos.X;
-						item.Y = pos.Y;
+						item.X = scaled.X;
+						item.Y = scaled.Y;
 					}
 
 					undo.ApplyDoUndo(
@@ -440,12 +352,26 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
+		protected override void OnMouseWheel(MouseWheelEventArgs e)
+		{
+			base.OnMouseWheel(e);
+
+			var pos = e.GetPosition(this);
+			var scaled = new Point((pos.X - Offset.X) / Scale, (pos.Y - Offset.Y) / Scale);
+
+			Scale += (e.Delta / 120.0) * 0.1 * Scale;
+
+			var newPos = new Point(scaled.X * Scale + Offset.X, scaled.Y * Scale + Offset.Y);
+			Offset += pos - newPos;
+		}
+
+		//--------------------------------------------------------------------------
 		private Rect GetRectOfObject(GraphNode node)
 		{
 			Rect rectangleBounds = new Rect();
 
-			rectangleBounds.X = (node.X + Offset.X) * Scale;
-			rectangleBounds.Y = (node.Y + Offset.Y) * Scale;
+			rectangleBounds.X = node.CanvasX;
+			rectangleBounds.Y = node.CanvasY;
 			rectangleBounds.Width = node.ActualWidth * Scale;
 			rectangleBounds.Height = node.ActualHeight * Scale;
 
@@ -494,12 +420,28 @@ namespace StructuredXmlEditor.View
 			}
 			else
 			{
-				if (CreatingLink != null && ConnectedLinkTo != null)
+				if (CreatingLink != null)
 				{
-					ConnectedLinkTo = null;
+					var scaled = new Point((m_mousePoint.X - Offset.X) / Scale, (m_mousePoint.Y - Offset.Y) / Scale);
 
-					UpdateControls();
+					m_inProgressLink.Dest = scaled;
+
+					ConnectedLinkTo = null;
 				}
+			}
+
+			if (e.MiddleButton != MouseButtonState.Pressed)
+			{
+				isPanning = false;
+			}
+			else
+			{
+				var pos = e.GetPosition(this);
+				var diff = pos - lastPanPos;
+
+				Offset += diff;
+
+				lastPanPos = pos;
 			}
 
 			if ((m_mightBeMarqueeSelecting || m_isMarqueeSelecting) && CreatingLink == null)
@@ -528,7 +470,6 @@ namespace StructuredXmlEditor.View
 		//--------------------------------------------------------------------------
 		public override void OnApplyTemplate()
 		{
-			m_panCanvas = GetTemplateChild("PanCanvas") as ZoomPanItemsControl;
 			m_selectionBox = GetTemplateChild("SelectionBox") as Rectangle;
 
 			base.OnApplyTemplate();
@@ -543,13 +484,23 @@ namespace StructuredXmlEditor.View
 				if (m_creatingLink != value)
 				{
 					m_creatingLink = value;
+
+					if (m_creatingLink != null)
+					{
+						m_inProgressLink = new InProgressLinkWrapper(m_creatingLink);
+						var scaled = new Point((m_mousePoint.X - Offset.X) / Scale, (m_mousePoint.Y - Offset.Y) / Scale);
+						m_inProgressLink.Dest = scaled;
+					}
+					else
+					{
+						m_inProgressLink = null;
+					}
+
 					UpdateControls();
 				}
 			}
 		}
 		private GraphNodeDataLink m_creatingLink;
-
-		//-----------------------------------------------------------------------
 		public GraphNode ConnectedLinkTo
 		{
 			get { return m_graphNode; }
@@ -563,6 +514,7 @@ namespace StructuredXmlEditor.View
 			}
 		}
 		private GraphNode m_graphNode;
+		public InProgressLinkWrapper m_inProgressLink;
 
 		//-----------------------------------------------------------------------
 		private bool m_mightBeMarqueeSelecting;
@@ -572,20 +524,33 @@ namespace StructuredXmlEditor.View
 
 		//-----------------------------------------------------------------------
 		private Point m_mousePoint;
-		private ZoomPanItemsControl m_panCanvas;
 		private Rectangle m_selectionBox;
 
 		//-----------------------------------------------------------------------
 		public Point Offset
 		{
-			get { return m_panCanvas?.Offset ?? new Point(); }
+			get { return m_offset; }
+			set
+			{
+				m_offset = value;
+				RaisePropertyChangedEvent();
+			}
 		}
+		private Point m_offset;
+		private bool isPanning = false;
+		private Point lastPanPos;
 
 		//-----------------------------------------------------------------------
 		public double Scale
 		{
-			get { return m_panCanvas?.Scale ?? 1; }
+			get { return m_scale; }
+			set
+			{
+				m_scale = value;
+				RaisePropertyChangedEvent();
+			}
 		}
+		private double m_scale = 01;
 
 		//--------------------------------------------------------------------------
 		public event PropertyChangedEventHandler PropertyChanged;

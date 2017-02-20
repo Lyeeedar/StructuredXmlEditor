@@ -14,15 +14,18 @@ namespace StructuredXmlEditor.View
 {
 	public class Connection : Control, INotifyPropertyChanged
 	{
+		//--------------------------------------------------------------------------
 		public static readonly DependencyProperty PositionProperty =
 		   DependencyProperty.Register("Position", typeof(Point), typeof(Connection));
 
+		//--------------------------------------------------------------------------
 		public Point Position
 		{
 			get { return (Point)GetValue(PositionProperty); }
 			set { SetValue(PositionProperty, value); }
 		}
 
+		//--------------------------------------------------------------------------
 		public void UpdatePosition()
 		{
 			if (Graph == null) return;
@@ -35,6 +38,7 @@ namespace StructuredXmlEditor.View
 			Position = TransformToAncestor(Graph).Transform(centerPoint);
 		}
 
+		//--------------------------------------------------------------------------
 		public Graph Graph
 		{
 			get
@@ -43,11 +47,13 @@ namespace StructuredXmlEditor.View
 			}
 		}
 
+		//--------------------------------------------------------------------------
 		private GraphNodeDataLink GraphNodeDataLink
 		{
 			get { return DataContext as GraphNodeDataLink; }
 		}
 
+		//--------------------------------------------------------------------------
 		public bool MouseOver
 		{
 			get { return m_MouseOver; }
@@ -62,9 +68,15 @@ namespace StructuredXmlEditor.View
 		}
 		private bool m_MouseOver;
 
+		//--------------------------------------------------------------------------
 		public Connection()
 		{
-			DataContextChanged += (e, args) => { GraphNodeDataLink.Connection = this; GraphNodeDataLink.RaisePropertyChangedEvent("Connection"); };
+			DataContextChanged += (e, args) =>
+			{
+				GraphNodeDataLink.Connection = this;
+				GraphNodeDataLink.RaisePropertyChangedEvent("Connection");
+				RaisePropertyChangedEvent("GraphNodeDataLink");
+			};
 
 			this.LayoutUpdated += (e, args) =>
 			{

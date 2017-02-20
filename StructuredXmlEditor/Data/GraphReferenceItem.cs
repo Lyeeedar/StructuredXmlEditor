@@ -80,7 +80,7 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public LinkType LinkType
 		{
-			get { return m_LinkType; }
+			get { return Grid.FlattenData ? LinkType.Reference : m_LinkType; }
 			set
 			{
 				if (m_LinkType != value)

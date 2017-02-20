@@ -37,8 +37,6 @@
 				<ResourceDictionary
 					Source="View/Styles/TextBox.xaml" />
 				<ResourceDictionary
-					Source="View/Styles/ZoomPanItemsControl.xaml" />
-				<ResourceDictionary
 					Source="View/Styles/Graph.xaml" />
 				<ResourceDictionary
 					Source="View/Styles/ListView.xaml" />

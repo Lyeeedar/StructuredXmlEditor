@@ -45,7 +45,34 @@ namespace StructuredXmlEditor.View
 		public Brush FontBrush { get { return GraphNodeItem.TextBrush; } }
 
 		//--------------------------------------------------------------------------
-		public Graph Graph { get; set; }
+		public Graph Graph
+		{
+			get { return m_graph; }
+			set
+			{
+				if (m_graph != value)
+				{
+					if (m_graph != null) m_graph.PropertyChanged -= OnGraphPropertyChanged;
+
+					m_graph = value;
+
+					if (m_graph != null) m_graph.PropertyChanged += OnGraphPropertyChanged;
+
+					RaisePropertyChangedEvent("Position");
+				}
+			}
+		}
+		private Graph m_graph;
+		private void OnGraphPropertyChanged(object sender, PropertyChangedEventArgs args)
+		{
+			if (args.PropertyName == "Offset" || args.PropertyName == "Scale")
+			{
+				RaisePropertyChangedEvent("CanvasX");
+				RaisePropertyChangedEvent("CanvasY");
+
+				RaisePropertyChangedEvent("Position");
+			}
+		}
 
 		//--------------------------------------------------------------------------
 		public List<GraphNode> ParentNodes { get; } = new List<GraphNode>();
@@ -55,6 +82,16 @@ namespace StructuredXmlEditor.View
 		{
 			get { return (GraphNodeItem.Definition as GraphNodeDefinition).Background; }
 		}
+
+		//--------------------------------------------------------------------------
+		public Point Position
+		{
+			get { return new Point(X + 10, Y + 10); }
+		}
+
+		//--------------------------------------------------------------------------
+		public double CanvasX { get { return X * Graph.Scale + Graph.Offset.X; } }
+		public double CanvasY { get { return Y * Graph.Scale + Graph.Offset.Y; } }
 
 		//--------------------------------------------------------------------------
 		public double X
@@ -136,6 +173,11 @@ namespace StructuredXmlEditor.View
 				{
 					RaisePropertyChangedEvent("X");
 					RaisePropertyChangedEvent("Y");
+
+					RaisePropertyChangedEvent("CanvasX");
+					RaisePropertyChangedEvent("CanvasY");
+
+					RaisePropertyChangedEvent("Position");
 				}
 				else if (args.PropertyName == "GraphData")
 				{
@@ -250,7 +292,7 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		protected override void OnMouseDown(MouseButtonEventArgs e)
+		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
 			if (Graph.MouseOverItem is Connection) return;
 
@@ -263,13 +305,15 @@ namespace StructuredXmlEditor.View
 				IsSelected = true;
 			}
 
+			Keyboard.Focus(Graph);
+
 			m_inDrag = true;
 			m_mouseDragLast = e.GetPosition(Parent as IInputElement);
 			this.CaptureMouse();
 
 			e.Handled = true;
 
-			base.OnMouseDown(e);
+			base.OnMouseLeftButtonDown(e);
 		}
 
 		//-----------------------------------------------------------------------
@@ -307,6 +351,9 @@ namespace StructuredXmlEditor.View
 				{
 					Graph.ConnectedLinkTo = this;
 					if (!(Graph.MouseOverItem is Connection)) Graph.MouseOverItem = this;
+
+					Graph.m_inProgressLink.Dest = Position;
+
 					e.Handled = true;
 				}
 			}
