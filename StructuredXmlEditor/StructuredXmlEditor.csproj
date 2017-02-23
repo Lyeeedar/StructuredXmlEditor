@@ -193,8 +193,8 @@
     <Compile Include="View\ValueConverters\NullOrZeroConverter.cs" />
     <Compile Include="Util\Command.cs" />
     <Compile Include="View\ValueConverters\ValueTypeConverter.cs" />
-    <Compile Include="View\XmlDataView\XmlDataView.cs" />
-    <Compile Include="View\XmlDataView\XmlDataViewItem.cs" />
+    <Compile Include="View\CustomControls\XmlDataView\XmlDataView.cs" />
+    <Compile Include="View\CustomControls\XmlDataView\XmlDataViewItem.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

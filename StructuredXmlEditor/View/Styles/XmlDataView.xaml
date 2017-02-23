@@ -8,11 +8,6 @@
 		x:Key="DepthConverter"
 		Scale="14" />
 
-	<Pen
-		Thickness="1"
-		Brush="#666"
-		x:Key="linePen" />
-
 	<Style
 		TargetType="{x:Type l:XmlDataViewItem}">
 		<Setter
@@ -30,9 +25,6 @@
 		<Setter
 			Property="Margin"
 			Value="1" />
-		<Setter
-			Property="KeyboardNavigation.IsTabStop"
-			Value="False" />
 		<Setter
 			Property="Background"
 			Value="{StaticResource BackgroundNormalBrush}" />
@@ -325,23 +317,11 @@
 	<Style
 		TargetType="{x:Type l:XmlDataView}">
 		<Setter
-			Property="KeyboardNavigation.TabNavigation"
-			Value="Cycle" />
-		<Setter
 			Property="BorderThickness"
 			Value="1" />
 		<Setter
 			Property="SnapsToDevicePixels"
 			Value="true" />
-		<Setter
-			Property="ScrollViewer.VerticalScrollBarVisibility"
-			Value="Auto" />
-		<Setter
-			Property="ScrollViewer.HorizontalScrollBarVisibility"
-			Value="Disabled" />
-		<Setter
-			Property="ScrollViewer.CanContentScroll"
-			Value="True" />
 		<Setter
 			Property="VirtualizingPanel.IsVirtualizing"
 			Value="True" />
