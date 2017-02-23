@@ -132,7 +132,7 @@ namespace StructuredXmlEditor.Data
 			{
 				if (args.PropertyName == "HasContent")
 				{
-					Grid?.RaisePropertyChangedEvent("GraphNodes");
+					DataModel?.RaisePropertyChangedEvent("GraphNodes");
 					RaisePropertyChangedEvent("GraphData");
 				}
 

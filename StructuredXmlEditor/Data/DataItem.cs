@@ -18,7 +18,7 @@ using System.Xml.Linq;
 
 namespace StructuredXmlEditor.Data
 {
-	public abstract class DataItem : NotifyPropertyChanged, IDataGridItem
+	public abstract class DataItem : NotifyPropertyChanged
 	{
 		//-----------------------------------------------------------------------
 		public List<DataItem> MultieditItems { get; set; } = new List<DataItem>();
@@ -40,22 +40,7 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		IEnumerable<IDataGridItem> IDataGridItem.Items { get { return Children; } }
-
-		//-----------------------------------------------------------------------
-		IDataGridItem IDataGridItem.Parent
-		{
-			get { return Parent; }
-		}
-
-		//-----------------------------------------------------------------------
-		public DataItem Root { get { return Grid?.RootItems[0]; } }
-
-		//-----------------------------------------------------------------------
-		bool IDataGridItem.IsVisible { get { return IsVisible; } }
-
-		//-----------------------------------------------------------------------
-		bool IDataGridItem.IsSelected { get; set; }
+		public DataItem Root { get { return DataModel?.RootItems[0]; } }
 
 		//-----------------------------------------------------------------------
 		public Command<object> FocusCMD { get { return new Command<object>((x) => FocusItem()); } }
@@ -114,7 +99,7 @@ namespace StructuredXmlEditor.Data
 
 					if (m_parent != null)
 					{
-						Grid = m_parent.Grid;
+						DataModel = m_parent.DataModel;
 					}
 
 					RaisePropertyChangedEvent();
@@ -323,11 +308,11 @@ namespace StructuredXmlEditor.Data
 					{
 						if (value)
 						{
-							Grid.AddSelected(this);
+							DataModel.AddSelected(this);
 						}
 						else
 						{
-							Grid.RemoveSelected(this);
+							DataModel.RemoveSelected(this);
 						}
 					}
 				}
@@ -370,22 +355,22 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public XmlDataGrid Grid
+		public XmlDataModel DataModel
 		{
 			get
 			{
-				if (m_grid == null && Parent?.Grid != null)
+				if (m_dataModel == null && Parent?.DataModel != null)
 				{
-					Grid = Parent.Grid;
+					DataModel = Parent.DataModel;
 				}
 
-				return m_grid;
+				return m_dataModel;
 			}
 			set
 			{
-				if (m_grid != value)
+				if (m_dataModel != value)
 				{
-					m_grid = value;
+					m_dataModel = value;
 					RaisePropertyChangedEvent();
 
 					UpdateVisibleIfBinding();
@@ -400,7 +385,7 @@ namespace StructuredXmlEditor.Data
 				}
 			}
 		}
-		private XmlDataGrid m_grid;
+		private XmlDataModel m_dataModel;
 
 		//-----------------------------------------------------------------------
 		public DataDefinition Definition { get; set; }
@@ -465,7 +450,7 @@ namespace StructuredXmlEditor.Data
 		{
 			if (IsInFocus()) return;
 
-			var container = new DummyItem("Attributes", Grid);
+			var container = new DummyItem("Attributes", DataModel);
 			container.Parent = this;
 			
 			foreach (var att in Attributes)
@@ -473,7 +458,7 @@ namespace StructuredXmlEditor.Data
 				container.Children.Add(att);
 			}
 
-			Grid.Selected = new List<DataItem>() { container };
+			DataModel.Selected = new List<DataItem>() { container };
 		}
 
 		//-----------------------------------------------------------------------
@@ -481,9 +466,9 @@ namespace StructuredXmlEditor.Data
 		{
 			return FocusTool.IsMouseInFocusTool;
 
-			//if (Grid.IsSelectedDataItem)
+			//if (DataModel.IsSelectedDataItem)
 			//{
-			//	foreach (var item in Grid.SelectedItems)
+			//	foreach (var item in DataModel.SelectedItems)
 			//	{
 			//		if (item == this) return true;
 			//		foreach (var child in item.Descendants)
@@ -712,7 +697,7 @@ namespace StructuredXmlEditor.Data
 
 			focusItem.Click += delegate
 			{
-				Grid.FocusItem(this);
+				DataModel.FocusItem(this);
 			};
 
 			menu.Items.Add(focusItem);
@@ -736,7 +721,7 @@ namespace StructuredXmlEditor.Data
 
 			collapseAllItem.Click += delegate
 			{
-				foreach (var item in this.GetRootItem().GetAllBreadthFirst())
+				foreach (var item in Root.Descendants)
 				{
 					item.IsExpanded = false;
 				}
@@ -749,7 +734,7 @@ namespace StructuredXmlEditor.Data
 
 			expandAllItem.Click += delegate
 			{
-				foreach (var item in this.GetRootItem().GetAllBreadthFirst())
+				foreach (var item in Root.Descendants)
 				{
 					item.IsExpanded = true;
 				}
@@ -762,7 +747,7 @@ namespace StructuredXmlEditor.Data
 
 			collapseLevelItem.Click += delegate
 			{
-				foreach (var item in this.GetAllSiblings())
+				foreach (var item in Parent.Children)
 				{
 					item.IsExpanded = false;
 				}
@@ -775,7 +760,7 @@ namespace StructuredXmlEditor.Data
 
 			expandLevelItem.Click += delegate
 			{
-				foreach (var item in this.GetAllSiblings())
+				foreach (var item in Parent.Children)
 				{
 					item.IsExpanded = true;
 				}
@@ -788,7 +773,7 @@ namespace StructuredXmlEditor.Data
 
 			collapseChildrenItem.Click += delegate
 			{
-				foreach (var item in this.GetChildrenBreadthFirst())
+				foreach (var item in Descendants)
 				{
 					item.IsExpanded = false;
 				}
@@ -801,7 +786,7 @@ namespace StructuredXmlEditor.Data
 
 			expandChildrenItem.Click += delegate
 			{
-				foreach (var item in this.GetChildrenBreadthFirst())
+				foreach (var item in Descendants)
 				{
 					item.IsExpanded = true;
 				}
@@ -832,7 +817,7 @@ namespace StructuredXmlEditor.Data
 			foreach (var child in Children)
 			{
 				child.Parent = this;
-				child.Grid = Grid;
+				child.DataModel = DataModel;
 				child.PropertyChanged += ChildPropertyChanged;
 			}
 
@@ -1058,7 +1043,7 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		protected void FocusItem()
 		{
-			Grid.FocusItem(this);
+			DataModel.FocusItem(this);
 		}
 
 		//-----------------------------------------------------------------------

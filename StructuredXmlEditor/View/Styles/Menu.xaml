@@ -77,8 +77,7 @@
 
 	<Style
 		x:Key="MenuScrollButton"
-		TargetType="{x:Type RepeatButton}"
-		BasedOn="{x:Null}">
+		TargetType="{x:Type RepeatButton}">
 		<Setter
 			Property="ClickMode"
 			Value="Hover" />
@@ -390,17 +389,6 @@
 					Property="Fill"
 					Value="{StaticResource MouseOverBackgroundBrush}" />
 			</Trigger>
-			<Trigger
-				Property="IsEnabled"
-				Value="false">
-				<Setter
-					Property="Opacity"
-					Value="0.6" />
-				<Setter
-					TargetName="GlyphPanel"
-					Property="Fill"
-					Value="#848589" />
-			</Trigger>
 		</ControlTemplate.Triggers>
 	</ControlTemplate>
 
@@ -507,17 +495,6 @@
 					Property="Fill"
 					Value="{StaticResource MouseOverBackgroundBrush}" />
 			</Trigger>
-			<Trigger
-				Property="IsEnabled"
-				Value="false">
-				<Setter
-					Property="Opacity"
-					Value="0.6" />
-				<Setter
-					TargetName="GlyphPanel"
-					Property="Fill"
-					Value="#848589" />
-			</Trigger>
 		</ControlTemplate.Triggers>
 	</ControlTemplate>
 
@@ -609,17 +586,6 @@
 					TargetName="Bg"
 					Property="Fill"
 					Value="{StaticResource MouseOverBackgroundBrush}" />
-			</Trigger>
-			<Trigger
-				Property="IsEnabled"
-				Value="false">
-				<Setter
-					Property="Opacity"
-					Value="0.6" />
-				<Setter
-					TargetName="Glyph"
-					Property="Fill"
-					Value="#848589" />
 			</Trigger>
 		</ControlTemplate.Triggers>
 	</ControlTemplate>
@@ -759,17 +725,6 @@
 					TargetName="Bg"
 					Property="Fill"
 					Value="{StaticResource MouseOverBackgroundBrush}" />
-			</Trigger>
-			<Trigger
-				Property="IsEnabled"
-				Value="false">
-				<Setter
-					Property="Opacity"
-					Value="0.6" />
-				<Setter
-					TargetName="Glyph"
-					Property="Fill"
-					Value="#848589" />
 			</Trigger>
 		</ControlTemplate.Triggers>
 	</ControlTemplate>

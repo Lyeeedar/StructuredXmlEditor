@@ -18,9 +18,9 @@ using System.Xml.Linq;
 
 namespace StructuredXmlEditor.Data
 {
-	public class XmlDataGrid : NotifyPropertyChanged
+	public class XmlDataModel : NotifyPropertyChanged
 	{
-		public XmlDataGrid()
+		public XmlDataModel()
 		{
 			m_proxyRootItem = new DummyItem("   ⌂ ", this);
 			GraphNodeItems = new ObservableCollection<GraphNodeItem>();
@@ -111,16 +111,16 @@ namespace StructuredXmlEditor.Data
 				if (RootItems.Any(e => !(e is GraphNodeItem)))
 				{
 					ShowAsGraph = false;
-					ShowAsDataGrid = true;
+					ShowAsDataModel = true;
 				}
 				else
 				{
 					ShowAsGraph = true;
-					ShowAsDataGrid = false;
+					ShowAsDataModel = false;
 				}
 
 				RaisePropertyChangedEvent("ShowAsGraph");
-				RaisePropertyChangedEvent("ShowAsDataGrid");
+				RaisePropertyChangedEvent("ShowAsDataModel");
 			}
 		}
 		private void RootItemCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
@@ -128,16 +128,16 @@ namespace StructuredXmlEditor.Data
 			if (RootItems.Any(e => !(e is GraphNodeItem)))
 			{
 				ShowAsGraph = false;
-				ShowAsDataGrid = true;
+				ShowAsDataModel = true;
 			}
 			else
 			{
 				ShowAsGraph = true;
-				ShowAsDataGrid = false;
+				ShowAsDataModel = false;
 			}
 
 			RaisePropertyChangedEvent("ShowAsGraph");
-			RaisePropertyChangedEvent("ShowAsDataGrid");
+			RaisePropertyChangedEvent("ShowAsDataModel");
 		}
 
 		//-----------------------------------------------------------------------
@@ -244,11 +244,11 @@ namespace StructuredXmlEditor.Data
 			{
 				foreach (var item in GraphNodeItems.ToList())
 				{
-					if (item.Grid != this)
+					if (item.DataModel != this)
 					{
 						foreach (var i in item.Descendants)
 						{
-							i.Grid = this;
+							i.DataModel = this;
 						}
 					}
 
@@ -275,7 +275,7 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public bool ShowAsDataGrid { get; set; } = true;
+		public bool ShowAsDataModel { get; set; } = true;
 		public bool ShowAsGraph { get; set; }
 
 		//##############################################################################################################
@@ -505,7 +505,7 @@ namespace StructuredXmlEditor.Data
 
 			foreach (var i in Descendants)
 			{
-				i.Grid = this;
+				i.DataModel = this;
 
 				if (item is GraphNodeItem && !GraphNodeItems.Contains(item))
 				{
@@ -516,16 +516,16 @@ namespace StructuredXmlEditor.Data
 			if (RootItems.Any(e => !(e is GraphNodeItem)))
 			{
 				ShowAsGraph = false;
-				ShowAsDataGrid = true;
+				ShowAsDataModel = true;
 			}
 			else
 			{
 				ShowAsGraph = true;
-				ShowAsDataGrid = false;
+				ShowAsDataModel = false;
 			}
 
 			RaisePropertyChangedEvent("ShowAsGraph");
-			RaisePropertyChangedEvent("ShowAsDataGrid");
+			RaisePropertyChangedEvent("ShowAsDataModel");
 		}
 
 		//-----------------------------------------------------------------------
@@ -620,7 +620,7 @@ namespace StructuredXmlEditor.Data
 
 		bool m_caseSensitive = false;
 		bool m_useRegex = false;
-		bool m_showMatchesOnly = false;
+		bool m_showMatchesOnly = true;
 		string m_filter;
 		bool m_isFocusing = true;
 		DataItem m_lastFocusedItem;

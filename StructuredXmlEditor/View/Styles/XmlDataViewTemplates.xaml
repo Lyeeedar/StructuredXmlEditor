@@ -12,7 +12,7 @@
 	</ResourceDictionary.MergedDictionaries>
 
 	<Style
-		x:Key="FlatDataGrid"
+		x:Key="FlatData"
 		TargetType="{x:Type ItemsControl}"
 		BasedOn="{StaticResource {x:Type ItemsControl}}">
 		<Setter
@@ -25,7 +25,7 @@
 						Visibility="{Binding IsVisible, Converter={v:ValueTypeConverter}}">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition
-								SharedSizeGroup="FlatDataGridHeader"
+								SharedSizeGroup="FlatDataHeader"
 								Width="Auto" />
 							<ColumnDefinition
 								Width="3" />
@@ -163,7 +163,7 @@
 						Grid.IsSharedSizeScope="True"
 						Margin="1"
 						ItemsSource="{Binding Attributes}"
-						Style="{StaticResource FlatDataGrid}" />
+						Style="{StaticResource FlatData}" />
 				</Border>
 			</Popup>
 		</Grid>

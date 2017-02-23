@@ -118,13 +118,6 @@
 								Property="BorderBrush"
 								Value="{StaticResource BorderDarkBrush}" />
 						</Trigger>
-						<Trigger
-							Property="IsEnabled"
-							Value="false">
-							<Setter
-								Property="Opacity"
-								Value="0.6" />
-						</Trigger>
 					</ControlTemplate.Triggers>
 
 				</ControlTemplate>
@@ -178,6 +171,7 @@
 				</Style>
 			</Setter.Value>
 		</Setter>
+		
 		<Setter
 			Property="Template">
 			<Setter.Value>
@@ -240,13 +234,6 @@
 								TargetName="Border"
 								Property="BorderBrush"
 								Value="{StaticResource SelectionBorderBrush}" />
-						</Trigger>
-						<Trigger
-							Property="IsEnabled"
-							Value="false">
-							<Setter
-								Property="Opacity"
-								Value="0.6" />
 						</Trigger>
 					</ControlTemplate.Triggers>
 
@@ -327,27 +314,11 @@
 								Property="BorderBrush"
 								Value="{StaticResource BorderDarkBrush}" />
 						</Trigger>
-						<Trigger
-							Property="IsEnabled"
-							Value="false">
-							<Setter
-								Property="Opacity"
-								Value="0.6" />
-						</Trigger>
 					</ControlTemplate.Triggers>
 
 				</ControlTemplate>
 			</Setter.Value>
 		</Setter>
-	</Style>
-
-	<Style
-		x:Key="{x:Type RepeatButton}"
-		BasedOn="{StaticResource BaseButtonStyle}"
-		TargetType="{x:Type RepeatButton}">
-		<Setter
-			Property="Stylus.IsPressAndHoldEnabled"
-			Value="false" />
 	</Style>
 
 	<Style

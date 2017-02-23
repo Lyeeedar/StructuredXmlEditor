@@ -554,7 +554,7 @@ namespace StructuredXmlEditor.View
 						if (Node != null) m_link.ParentNodes.Add(Node); 
 					}
 
-					GraphReferenceItem.Grid.RaisePropertyChangedEvent("GraphNodes");
+					GraphReferenceItem.DataModel.RaisePropertyChangedEvent("GraphNodes");
 					RaisePropertyChangedEvent();
 				}
 			}

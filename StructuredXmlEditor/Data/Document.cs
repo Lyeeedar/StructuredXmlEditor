@@ -16,7 +16,7 @@ namespace StructuredXmlEditor.Data
 	{
 		//-----------------------------------------------------------------------
 		public string Path { get; set; }
-		public XmlDataGrid Data { get; set; }
+		public XmlDataModel Data { get; set; }
 		public UndoRedoManager UndoRedo { get; set; } = new UndoRedoManager();
 		public Workspace Workspace { get; set; }
 		public bool IsBackup { get; set; }
@@ -142,7 +142,7 @@ namespace StructuredXmlEditor.Data
 				}
 			}
 
-			Data = new XmlDataGrid();
+			Data = new XmlDataModel();
 			Data.SetRootItem(item);
 
 			item.IsExpanded = true;

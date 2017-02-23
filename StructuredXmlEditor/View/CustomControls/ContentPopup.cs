@@ -9,7 +9,7 @@ using System.Windows.Controls.Primitives;
 
 namespace StructuredXmlEditor.View
 {
-	public class PopupButton : Button
+	public class ContentPopup : Button
 	{
 		//-----------------------------------------------------------------------
 		public PlacementMode Placement
@@ -20,18 +20,7 @@ namespace StructuredXmlEditor.View
 
 		//-----------------------------------------------------------------------
 		public static readonly DependencyProperty PlacementProperty =
-			DependencyProperty.Register("Placement", typeof(PlacementMode), typeof(PopupButton), new PropertyMetadata(PlacementMode.Bottom));
-
-		//-----------------------------------------------------------------------
-		public bool ShowArrow
-		{
-			get { return (bool)GetValue(ShowArrowProperty); }
-			set { SetValue(ShowArrowProperty, value); }
-		}
-
-		//-----------------------------------------------------------------------
-		public static readonly DependencyProperty ShowArrowProperty =
-			DependencyProperty.Register("ShowArrow", typeof(bool), typeof(PopupButton), new PropertyMetadata(true));
+			DependencyProperty.Register("Placement", typeof(PlacementMode), typeof(ContentPopup), new PropertyMetadata(PlacementMode.Bottom));
 
 		//-----------------------------------------------------------------------
 		public object PopupContent
@@ -42,7 +31,7 @@ namespace StructuredXmlEditor.View
 
 		//-----------------------------------------------------------------------
 		public static readonly DependencyProperty PopupContentProperty =
-			DependencyProperty.Register("PopupContent", typeof(object), typeof(PopupButton), new PropertyMetadata(null));
+			DependencyProperty.Register("PopupContent", typeof(object), typeof(ContentPopup), new PropertyMetadata(null));
 
 
 		//-----------------------------------------------------------------------
@@ -54,17 +43,17 @@ namespace StructuredXmlEditor.View
 
 		//-----------------------------------------------------------------------
 		public static readonly DependencyProperty PopupContentTemplateProperty =
-			DependencyProperty.Register("PopupContentTemplate", typeof(DataTemplate), typeof(PopupButton), new PropertyMetadata(null));
+			DependencyProperty.Register("PopupContentTemplate", typeof(DataTemplate), typeof(ContentPopup), new PropertyMetadata(null));
 
 		//-----------------------------------------------------------------------
-		static PopupButton()
+		static ContentPopup()
 		{
-			DefaultStyleKeyProperty.OverrideMetadata(typeof(PopupButton),
-				new FrameworkPropertyMetadata(typeof(PopupButton)));
+			DefaultStyleKeyProperty.OverrideMetadata(typeof(ContentPopup),
+				new FrameworkPropertyMetadata(typeof(ContentPopup)));
 		}
 
 		//-----------------------------------------------------------------------
-		public PopupButton()
+		public ContentPopup()
 		{
 			IsEnabledChanged += OnIsEnabledChanged;
 		}

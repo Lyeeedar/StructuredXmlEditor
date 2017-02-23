@@ -47,10 +47,10 @@ namespace StructuredXmlEditor.Data
 
 				if (m_wrappedItem != null)
 				{
-					m_wrappedItem.Grid = Grid;
+					m_wrappedItem.DataModel = DataModel;
 					foreach (var i in m_wrappedItem.Descendants)
 					{
-						i.Grid = Grid;
+						i.DataModel = DataModel;
 					}
 
 					m_wrappedItem.LinkParents.Add(this);
@@ -80,7 +80,7 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public LinkType LinkType
 		{
-			get { return Grid.FlattenData ? LinkType.Reference : m_LinkType; }
+			get { return DataModel.FlattenData ? LinkType.Reference : m_LinkType; }
 			set
 			{
 				if (m_LinkType != value)
@@ -113,7 +113,7 @@ namespace StructuredXmlEditor.Data
 			{
 				if (WrappedItem == null) return "Unset";
 				else if (IsCircular()) return "Circular";
-				else if (Grid.AllowCircularLinks || Grid.FlattenData) return WrappedItem.Definition.Name;
+				else if (DataModel.AllowCircularLinks || DataModel.FlattenData) return WrappedItem.Definition.Name;
 				else return WrappedItem.Description;
 			}
 		}
@@ -170,11 +170,11 @@ namespace StructuredXmlEditor.Data
 
 			PropertyChanged += (s, args) => 
 			{
-				if (args.PropertyName == "Grid")
+				if (args.PropertyName == "DataModel")
 				{
-					if (Grid != null && GuidToResolve != null)
+					if (DataModel != null && GuidToResolve != null)
 					{
-						var existing = Grid.GraphNodeItems.FirstOrDefault(e => e.GUID == GuidToResolve);
+						var existing = DataModel.GraphNodeItems.FirstOrDefault(e => e.GUID == GuidToResolve);
 						if (existing != null)
 						{
 							WrappedItem = existing;
@@ -185,45 +185,45 @@ namespace StructuredXmlEditor.Data
 							NotifyCollectionChangedEventHandler handler = null;
 							handler = (e2, args2) =>
 							{
-								var found = Grid.GraphNodeItems.FirstOrDefault(e => e.GUID == GuidToResolve);
+								var found = DataModel.GraphNodeItems.FirstOrDefault(e => e.GUID == GuidToResolve);
 								if (found != null)
 								{
 									WrappedItem = found;
 									GuidToResolve = null;
 
-									Grid.GraphNodeItems.CollectionChanged -= handler;
+									DataModel.GraphNodeItems.CollectionChanged -= handler;
 								}
 							};
 
-							Grid.GraphNodeItems.CollectionChanged += handler;
+							DataModel.GraphNodeItems.CollectionChanged += handler;
 						}
 					}
-					else if (m_wrappedItem != null && Grid != null && !Grid.GraphNodeItems.Contains(m_wrappedItem))
+					else if (m_wrappedItem != null && DataModel != null && !DataModel.GraphNodeItems.Contains(m_wrappedItem))
 					{
 						if (!string.IsNullOrWhiteSpace(m_wrappedItem.GUID))
 						{
-							var existing = Grid.GraphNodeItems.FirstOrDefault(e => e.GUID == m_wrappedItem.GUID);
+							var existing = DataModel.GraphNodeItems.FirstOrDefault(e => e.GUID == m_wrappedItem.GUID);
 							if (existing != null)
 							{
 								WrappedItem = existing;
 							}
 							else
 							{
-								if (!Grid.GraphNodeItems.Contains(m_wrappedItem)) Grid.GraphNodeItems.Add(m_wrappedItem);
+								if (!DataModel.GraphNodeItems.Contains(m_wrappedItem)) DataModel.GraphNodeItems.Add(m_wrappedItem);
 							}
 						}
 						else
 						{
-							if (!Grid.GraphNodeItems.Contains(m_wrappedItem)) Grid.GraphNodeItems.Add(m_wrappedItem);
+							if (!DataModel.GraphNodeItems.Contains(m_wrappedItem)) DataModel.GraphNodeItems.Add(m_wrappedItem);
 						}
 					}
 
 					if (m_wrappedItem != null)
 					{
-						m_wrappedItem.Grid = Grid;
+						m_wrappedItem.DataModel = DataModel;
 						foreach (var i in m_wrappedItem.Descendants)
 						{
-							i.Grid = Grid;
+							i.DataModel = DataModel;
 						}
 					}
 				}
@@ -269,7 +269,7 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void WrappedItemPropertyChanged(object sender, PropertyChangedEventArgs args)
 		{
-			if (!Grid.AllowCircularLinks)
+			if (!DataModel.AllowCircularLinks)
 			{
 				if (args.PropertyName == "Description")
 				{
@@ -329,7 +329,7 @@ namespace StructuredXmlEditor.Data
 			if (WrappedItem != null)
 			{
 				WrappedItem.GraphNode.IsSelected = true;
-				Grid.Selected = new List<DataItem> { WrappedItem };
+				DataModel.Selected = new List<DataItem> { WrappedItem };
 			}
 		}
 
@@ -480,12 +480,12 @@ namespace StructuredXmlEditor.Data
 			UndoRedo.ApplyDoUndo(delegate
 			{
 				WrappedItem = item;
-				if (!Grid.GraphNodeItems.Contains(item)) Grid.GraphNodeItems.Add(item);
+				if (!DataModel.GraphNodeItems.Contains(item)) DataModel.GraphNodeItems.Add(item);
 			},
 			delegate
 			{
 				WrappedItem = null;
-				Grid.GraphNodeItems.Remove(item);
+				DataModel.GraphNodeItems.Remove(item);
 			},
 			"Create Item " + item.Name);
 

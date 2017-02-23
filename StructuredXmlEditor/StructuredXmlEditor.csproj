@@ -115,7 +115,7 @@
     <Compile Include="Data\Workspace.cs" />
     <Compile Include="Definition\BooleanDefinition.cs" />
     <Compile Include="Definition\CollectionChildDefinition.cs" />
-    <Compile Include="Data\XmlDataGrid.cs" />
+    <Compile Include="Data\XmlDataModel.cs" />
     <Compile Include="Data\CollectionItem.cs" />
     <Compile Include="Data\DummyItem.cs" />
     <Compile Include="Definition\CollectionDefinition.cs" />
@@ -168,7 +168,7 @@
       <DependentUpon>Message.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\CustomControls\NumericTextBox.cs" />
-    <Compile Include="View\CustomControls\PopupButton.cs" />
+    <Compile Include="View\CustomControls\ContentPopup.cs" />
     <Compile Include="View\CustomControls\ProjectViewView.xaml.cs">
       <DependentUpon>ProjectViewView.xaml</DependentUpon>
     </Compile>
@@ -179,23 +179,22 @@
     <Compile Include="View\CustomControls\UndoHistoryView.xaml.cs">
       <DependentUpon>UndoHistoryView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\Styles\DataGridView.xaml.cs">
-      <DependentUpon>DataGridView.xaml</DependentUpon>
+    <Compile Include="View\Styles\XmlDataView.xaml.cs">
+      <DependentUpon>XmlDataView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\ValueConverters\ActiveDocumentConverter.cs" />
     <Compile Include="View\ValueConverters\ColourMarkupConverter.cs" />
     <Compile Include="View\ValueConverters\ConverterBase.cs" />
     <Compile Include="Util\DeferableObservableCollection.cs" />
-    <Compile Include="View\CustomControls\DataGridView\DataGridView.cs" />
-    <Compile Include="View\CustomControls\DataGridView\DataGridViewItem.cs" />
-    <Compile Include="View\CustomControls\DataGridView\IDataGridItem.cs" />
     <Compile Include="View\CustomControls\MultilineTextEditor.cs" />
     <Compile Include="Util\NotifyPropertyChanged.cs" />
-    <Compile Include="View\ValueConverters\LevelToIndentationConverter.cs" />
+    <Compile Include="View\ValueConverters\DepthToIndentationConverter.cs" />
     <Compile Include="View\ValueConverters\NullImageConverter.cs" />
     <Compile Include="View\ValueConverters\NullOrZeroConverter.cs" />
     <Compile Include="Util\Command.cs" />
     <Compile Include="View\ValueConverters\ValueTypeConverter.cs" />
+    <Compile Include="View\XmlDataView\XmlDataView.cs" />
+    <Compile Include="View\XmlDataView\XmlDataViewItem.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -259,11 +258,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\Styles\DataGridTemplates.xaml">
+    <Page Include="View\Styles\XmlDataViewTemplates.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\Styles\DataGridView.xaml">
+    <Page Include="View\Styles\XmlDataView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -291,7 +290,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\Styles\PopupButton.xaml">
+    <Page Include="View\Styles\ContentPopup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

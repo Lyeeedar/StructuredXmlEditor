@@ -165,7 +165,7 @@ namespace StructuredXmlEditor.Data
 						foreach (var i in e.NewItems.OfType<DataItem>())
 						{
 							i.Parent = this;
-							i.Grid = Grid;
+							i.DataModel = DataModel;
 							i.PropertyChanged += ChildPropertyChanged;
 						}
 
@@ -176,7 +176,7 @@ namespace StructuredXmlEditor.Data
 						foreach (var i in e.NewItems.OfType<DataItem>())
 						{
 							i.Parent = this;
-							i.Grid = Grid;
+							i.DataModel = DataModel;
 							i.PropertyChanged += ChildPropertyChanged;
 						}
 

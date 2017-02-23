@@ -62,13 +62,6 @@
 								Property="Background"
 								Value="{StaticResource MouseOverBorderBrush}" />
 						</Trigger>
-						<Trigger
-							Property="IsEnabled"
-							Value="false">
-							<Setter
-								Property="Opacity"
-								Value="0.6" />
-						</Trigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
 			</Setter.Value>
@@ -186,13 +179,6 @@
 								Property="Background"
 								Value="{StaticResource MouseOverBorderBrush}" />
 						</Trigger>
-						<Trigger
-							Property="IsEnabled"
-							Value="false">
-							<Setter
-								Property="Opacity"
-								Value="0.6" />
-						</Trigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
 			</Setter.Value>
@@ -275,15 +261,6 @@
 								Content="M 0 0 L 3.5 4 L 7 0 Z" />
 						</Viewbox>
 					</Grid>
-					<ControlTemplate.Triggers>
-						<Trigger
-							Property="IsEnabled"
-							Value="false">
-							<Setter
-								Property="Opacity"
-								Value="0.6" />
-						</Trigger>
-					</ControlTemplate.Triggers>
 				</ControlTemplate>
 			</Setter.Value>
 		</Setter>
@@ -361,15 +338,6 @@
 										Content="M 0 0 L 0 8 L 4 4 Z" />
 								</Viewbox>
 							</Grid>
-							<ControlTemplate.Triggers>
-								<Trigger
-									Property="IsEnabled"
-									Value="false">
-									<Setter
-										Property="Opacity"
-										Value="0.6" />
-								</Trigger>
-							</ControlTemplate.Triggers>
 						</ControlTemplate>
 					</Setter.Value>
 				</Setter>

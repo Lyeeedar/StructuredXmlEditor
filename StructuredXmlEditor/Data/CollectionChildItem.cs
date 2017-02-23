@@ -221,7 +221,7 @@ namespace StructuredXmlEditor.Data
 
 						Children[0].MultiEdit(otherChildren, otherChildren.Count);
 
-						Grid.Selected = new List<DataItem>() { Children[0] };
+						DataModel.Selected = new List<DataItem>() { Children[0] };
 					});
 				}
 			}
@@ -242,11 +242,11 @@ namespace StructuredXmlEditor.Data
 					Name += WrappedItem.Name;
 				}
 			}
-			else if (e.PropertyName == "Grid")
+			else if (e.PropertyName == "DataModel")
 			{
 				if (WrappedItem != null)
 				{
-					WrappedItem.Grid = Grid;
+					WrappedItem.DataModel = DataModel;
 				}
 			}
 		}

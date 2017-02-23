@@ -5,14 +5,9 @@ using System.Windows.Media;
 
 namespace StructuredXmlEditor.View
 {
-	//============================================================================
-	//! @brief Class that converts a value type to another value type.
-	//============================================================================
 	public class ValueTypeConverter :
 		ConverterBase
 	{
-		//--------------------------------------------------------------------------
-		//! @brief Change the type of the object.
 		//--------------------------------------------------------------------------
 		protected override object Convert
 		(
@@ -26,8 +21,6 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		//! @brief Change the type of the object back.
-		//--------------------------------------------------------------------------
 		protected override object ConvertBack
 		(
 			object i_value,
@@ -39,8 +32,6 @@ namespace StructuredXmlEditor.View
 			return ChangeType(i_value, i_targetType, i_parameter, i_culture);
 		}
 
-		//--------------------------------------------------------------------------
-		//! @brief Perform the type change.
 		//--------------------------------------------------------------------------
 		internal static Object ChangeType
 		(
@@ -82,9 +73,7 @@ namespace StructuredXmlEditor.View
 				return new SolidColorBrush(col);
 			}
 
-			//Special case handling for Nullable value types.
-			if (i_targetType.IsGenericType &&
-				i_targetType.GetGenericTypeDefinition() == typeof(Nullable<>))
+			if (i_targetType.IsGenericType && i_targetType.GetGenericTypeDefinition() == typeof(Nullable<>))
 			{
 				i_targetType = i_targetType.GetGenericArguments()[0];
 			}
@@ -98,7 +87,7 @@ namespace StructuredXmlEditor.View
 			{
 				return System.Convert.ChangeType(i_value, i_targetType, i_culture);
 			}
-			catch (FormatException)
+			catch (Exception)
 			{
 				return DependencyProperty.UnsetValue;
 			}

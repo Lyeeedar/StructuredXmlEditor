@@ -9,7 +9,7 @@
 	<UserControl.Resources>
 		
 		<Style
-			x:Key="breadcrumbButtonStyle"
+			x:Key="focusStyle"
 			TargetType="{x:Type ButtonBase}">
 			<Setter
 				Property="SnapsToDevicePixels"
@@ -28,28 +28,27 @@
 							SnapsToDevicePixels="True"
 							Orientation="Horizontal">
 							<Border
-								x:Name="padBorder"
+								x:Name="part1"
 								Width="30"
 								Background="{StaticResource BackgroundNormalBrush}"
 								Visibility="{Binding FirstItem}" />
 							<Border
-								x:Name="buttonTextBorder"
+								x:Name="part2"
 								Background="{StaticResource BackgroundNormalBrush}"
 								Padding="0,0,1,0">
 								<TextBlock
-									x:Name="buttonText"
+									x:Name="part3"
 									FontWeight="Bold"
 									VerticalAlignment="Center"
 									Foreground="{StaticResource FontDarkBrush}"
 									Text="{Binding FocusName}" />
 							</Border>
 							<Border
-								x:Name="seperator"
 								Margin="-1,0,0,0"
 								Width="30"
 								Height="30">
 								<Path
-									x:Name="PART_Arrow"
+									x:Name="arrow"
 									HorizontalAlignment="Center"
 									VerticalAlignment="Center"
 									StrokeThickness="3"
@@ -87,19 +86,19 @@
 								Property="IsMouseOver"
 								Value="true">
 								<Setter
-									TargetName="padBorder"
+									TargetName="part1"
 									Property="Background"
 									Value="{StaticResource MouseOverBackgroundBrush}" />
 								<Setter
-									TargetName="buttonTextBorder"
+									TargetName="part2"
 									Property="Background"
 									Value="{StaticResource MouseOverBackgroundBrush}" />
 								<Setter
-									TargetName="PART_Arrow"
+									TargetName="arrow"
 									Property="Fill"
 									Value="{StaticResource MouseOverBackgroundBrush}" />
 								<Setter
-									TargetName="buttonText"
+									TargetName="part3"
 									Property="Foreground"
 									Value="Black" />
 							</Trigger>
@@ -123,51 +122,40 @@
 				<DockPanel
 					Margin="2,5,2,5">
 
-					<ToggleButton
+					<v:ContentPopup
 						x:Name="FilterPopupToggle"
 						VerticalAlignment="Center"
 						DockPanel.Dock="Right"
 						Background="Transparent"
 						BorderBrush="Transparent"
-						ToolTip="Filter Settings"
-						IsHitTestVisible="{Binding ElementName=FilterPopup, Path=IsOpen, Converter={v:ValueTypeConverter}, ConverterParameter=Not}">
+						ToolTip="Filter Settings">
 						<Image
 							Source="/Resources/Settings.png"
 							RenderOptions.BitmapScalingMode="NearestNeighbor"
 							Height="16"
 							Width="16" />
-					</ToggleButton>
-					<Popup
-						x:Name="FilterPopup"
-						AllowsTransparency="True"
-						Focusable="False"
-						DockPanel.Dock="Right"
-						HorizontalOffset="1"
-						VerticalOffset="1"
-						PopupAnimation="Slide"
-						StaysOpen="False"
-						IsOpen="{Binding ElementName=FilterPopupToggle, Path=IsChecked, Mode=TwoWay}"
-						PlacementTarget="{Binding ElementName=FilterPopupToggle}"
-						Placement="Mouse">
-						<Border
-							x:Name="brd"
-							BorderThickness="1"
-							Padding="10"
-							BorderBrush="{StaticResource SelectionBorderBrush}"
-							Background="{StaticResource WindowBackgroundBrush}">
-							<StackPanel>
-								<CheckBox
-									Content="Match Case"
-									IsChecked="{Binding CaseSensitiveFilter}" />
-								<CheckBox
-									Content="Use Regex"
-									IsChecked="{Binding UseRegex}" />
-								<CheckBox
-									Content="Show Matched Elements Only"
-									IsChecked="{Binding ShowMatchElementsOnly}" />
-							</StackPanel>
-						</Border>
-					</Popup>
+
+						<v:ContentPopup.PopupContent>
+							<Border
+								x:Name="brd"
+								BorderThickness="1"
+								Padding="10"
+								BorderBrush="{StaticResource SelectionBorderBrush}"
+								Background="{StaticResource WindowBackgroundBrush}">
+								<StackPanel>
+									<CheckBox
+										Content="Match Case"
+										IsChecked="{Binding CaseSensitiveFilter}" />
+									<CheckBox
+										Content="Use Regex"
+										IsChecked="{Binding UseRegex}" />
+									<CheckBox
+										Content="Show Matched Elements Only"
+										IsChecked="{Binding ShowMatchElementsOnly}" />
+								</StackPanel>
+							</Border>
+						</v:ContentPopup.PopupContent>
+					</v:ContentPopup>
 
 					<Button
 						DockPanel.Dock="Right"
@@ -218,10 +206,10 @@
 						x:Name="button"
 						Margin="-30,0,0,0"
 						Padding="0"
-						Style="{StaticResource breadcrumbButtonStyle}"
+						Style="{StaticResource focusStyle}"
 						BorderThickness="0"
 						Content="{Binding}"
-						Command="{Binding Grid.FocusCMD}"
+						Command="{Binding DataModel.FocusCMD}"
 						Background="Transparent"
 						CommandParameter="{Binding}" />
 				</DataTemplate>
@@ -237,23 +225,11 @@
 				Nodes="{Binding GraphNodes}">
 				
 			</v:Graph>
-			
-			<v:DataGridView
-				Visibility="{Binding ShowAsDataGrid, Converter={v:ValueTypeConverter}}"
-				HierarchicalItemsSource="{Binding RootItems}">
-				<v:DataGridView.ItemContainerStyle>
-					<Style
-						TargetType="{x:Type v:DataGridViewItem}"
-						BasedOn="{StaticResource {x:Type v:DataGridViewItem}}">
-						<Setter
-							Property="HorizontalContentAlignment"
-							Value="Stretch" />
-						<Setter
-							Property="IsExpanded"
-							Value="{Binding IsExpanded, Mode=TwoWay}" />
-					</Style>
-				</v:DataGridView.ItemContainerStyle>
-			</v:DataGridView>
+
+			<v:XmlDataView
+				Visibility="{Binding ShowAsDataModel, Converter={v:ValueTypeConverter}}"
+				RootItems="{Binding RootItems}">
+			</v:XmlDataView>
 
 		</Grid>
 		

@@ -13,7 +13,7 @@
 				<ResourceDictionary
 					Source="View/Styles/Button.xaml" />
 				<ResourceDictionary
-					Source="View/Styles/PopupButton.xaml" />
+					Source="View/Styles/ContentPopup.xaml" />
 				<ResourceDictionary
 					Source="View/Styles/CheckBox.xaml" />
 				<ResourceDictionary
@@ -21,7 +21,7 @@
 				<ResourceDictionary
 					Source="View/Styles/ComboBox.xaml" />
 				<ResourceDictionary
-					Source="View/Styles/DataGridTemplates.xaml" />
+					Source="View/Styles/XmlDataViewTemplates.xaml" />
 				<ResourceDictionary
 					Source="View/Styles/Menu.xaml" />
 				<ResourceDictionary
@@ -41,7 +41,7 @@
 				<ResourceDictionary
 					Source="View/Styles/ListView.xaml" />
 				<ResourceDictionary
-					Source="View/Styles/DataGridView.xaml" />
+					Source="View/Styles/XmlDataView.xaml" />
 
 				<ResourceDictionary
 					Source="View/Styles/AvalonDock.xaml" />

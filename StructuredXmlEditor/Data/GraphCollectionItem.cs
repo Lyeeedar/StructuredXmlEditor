@@ -76,7 +76,7 @@ namespace StructuredXmlEditor.Data
 					RaisePropertyChangedEvent("IsAtMin");
 					RaisePropertyChangedEvent("IsAtMax");
 
-					Grid?.RaisePropertyChangedEvent("GraphNodes");
+					DataModel?.RaisePropertyChangedEvent("GraphNodes");
 					RaisePropertyChangedEvent("GraphData");
 				}
 				else if (e.PropertyName == "IsAtMax")

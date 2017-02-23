@@ -24,7 +24,7 @@ namespace StructuredXmlEditor.Data
 			{
 				var countDict = new Dictionary<string, int>();
 
-				foreach (DataItem item in this.GetRootItem().GetChildrenBreadthFirst())
+				foreach (DataItem item in Root.Descendants)
 				{
 					var e = item as EnumItem;
 

@@ -866,7 +866,7 @@ namespace StructuredXmlEditor.Data
 						if (!document.Data.GraphNodeItems.Contains(node as GraphNodeItem))
 						{
 							document.Data.GraphNodeItems.Add(node as GraphNodeItem);
-							node.Grid = document.Data;
+							node.DataModel = document.Data;
 						}
 					}
 				}

@@ -143,9 +143,9 @@ namespace StructuredXmlEditor.Definition
 			root.Add(new XAttribute(MetaNS + "X", ci.X));
 			root.Add(new XAttribute(MetaNS + "Y", ci.Y));
 
-			if (ci.LinkParents.Count > 1 || ci.Grid.FlattenData)
+			if (ci.LinkParents.Count > 1 || ci.DataModel.FlattenData)
 			{
-				if (item.Grid.GraphNodeItems.Where(e => e != item).Any(e => e.GUID == ci.GUID)) throw new Exception("Duplicate GUID '" + ci.GUID + "' in items!");
+				if (item.DataModel.GraphNodeItems.Where(e => e != item).Any(e => e.GUID == ci.GUID)) throw new Exception("Duplicate GUID '" + ci.GUID + "' in items!");
 				root.Add(new XAttribute("GUID", ci.GUID));
 			}
 
@@ -161,7 +161,7 @@ namespace StructuredXmlEditor.Definition
 			}
 
 
-			if (item.Grid.IsJson || item.Grid.IsYaml)
+			if (item.DataModel.IsJson || item.DataModel.IsYaml)
 			{
 				if (root.Elements().Count() == 1)
 				{

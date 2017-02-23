@@ -243,7 +243,7 @@ namespace StructuredXmlEditor.View
 			}
 			else if (!Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl) && !m_isMarqueeSelecting)
 			{
-				var items = Nodes.FirstOrDefault()?.GraphNodeItem?.Grid?.SelectedItems;
+				var items = Nodes.FirstOrDefault()?.GraphNodeItem?.DataModel?.SelectedItems;
 
 				if (items != null)
 				{
@@ -324,8 +324,8 @@ namespace StructuredXmlEditor.View
 			{
 				create.AddItem(def.Name, () => 
 				{
-					var grid = Nodes.First().GraphNodeItem.Grid;
-					var undo = grid.RootItems[0].UndoRedo;
+					var dataModel = Nodes.First().GraphNodeItem.DataModel;
+					var undo = dataModel.RootItems[0].UndoRedo;
 
 					GraphNodeItem item = null;
 
@@ -333,7 +333,7 @@ namespace StructuredXmlEditor.View
 					{
 						item = def.CreateData(undo) as GraphNodeItem;
 
-						item.Grid = Nodes.First().GraphNodeItem.Grid;
+						item.DataModel = Nodes.First().GraphNodeItem.DataModel;
 						item.X = scaled.X;
 						item.Y = scaled.Y;
 					}
@@ -341,11 +341,11 @@ namespace StructuredXmlEditor.View
 					undo.ApplyDoUndo(
 						delegate 
 						{
-							grid.GraphNodeItems.Add(item);
+							dataModel.GraphNodeItems.Add(item);
 						},
 						delegate
 						{
-							grid.GraphNodeItems.Remove(item);
+							dataModel.GraphNodeItems.Remove(item);
 						},
 						"Create " + item.Name);
 				});
@@ -392,7 +392,7 @@ namespace StructuredXmlEditor.View
 			{
 				foreach (var node in Selected.ToList())
 				{
-					if (node.GraphNodeItem.Grid.RootItems.Contains(node.GraphNodeItem)) continue;
+					if (node.GraphNodeItem.DataModel.RootItems.Contains(node.GraphNodeItem)) continue;
 
 					foreach (var parent in node.GraphNodeItem.LinkParents.ToList())
 					{
@@ -402,11 +402,11 @@ namespace StructuredXmlEditor.View
 					node.GraphNodeItem.UndoRedo.ApplyDoUndo(
 						delegate
 						{
-							node.GraphNodeItem.Grid.GraphNodeItems.Remove(node.GraphNodeItem);
+							node.GraphNodeItem.DataModel.GraphNodeItems.Remove(node.GraphNodeItem);
 						},
 						delegate
 						{
-							if (!node.GraphNodeItem.Grid.GraphNodeItems.Contains(node.GraphNodeItem)) node.GraphNodeItem.Grid.GraphNodeItems.Add(node.GraphNodeItem);
+							if (!node.GraphNodeItem.DataModel.GraphNodeItems.Contains(node.GraphNodeItem)) node.GraphNodeItem.DataModel.GraphNodeItems.Add(node.GraphNodeItem);
 						},
 						"Delete " + node.GraphNodeItem.Name);
 				}

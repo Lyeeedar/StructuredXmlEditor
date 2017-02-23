@@ -17,11 +17,11 @@ namespace StructuredXmlEditor.Data
 			}
 		}
 
-		public DummyItem(string name, XmlDataGrid grid)
+		public DummyItem(string name, XmlDataModel dataModel)
 			: base (new DummyDefinition(), null)
 		{
 			Name = name;
-			Grid = grid;
+			DataModel = dataModel;
 		}
 
 		public override void Copy()

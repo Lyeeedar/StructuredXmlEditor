@@ -194,13 +194,6 @@
 								Value="0,2,2,2"
 								TargetName="HeaderPanel" />
 						</Trigger>
-						<Trigger
-							Property="IsEnabled"
-							Value="false">
-							<Setter
-								Property="Opacity"
-								Value="0.6" />
-						</Trigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
 			</Setter.Value>
@@ -339,13 +332,6 @@
 								Property="Margin"
 								Value="-2" />
 						</MultiTrigger>
-						<Trigger
-							Property="IsEnabled"
-							Value="false">
-							<Setter
-								Property="Opacity"
-								Value="0.6" />
-						</Trigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
 			</Setter.Value>

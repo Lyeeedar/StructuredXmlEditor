@@ -8,7 +8,7 @@ using System.Windows.Data;
 namespace StructuredXmlEditor.View
 {
 	//-----------------------------------------------------------------------
-	public class LevelToIndentationConverter : IValueConverter
+	public class DepthToIndentationConverter : IValueConverter
 	{
 		//-----------------------------------------------------------------------
 		public double Scale { get; set; }

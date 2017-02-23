@@ -316,9 +316,8 @@
 									Width="16" />
 							</Button>
 
-							<local:PopupButton
+							<local:ContentPopup
 								Grid.Column="1"
-								ShowArrow="False"
 								Background="Transparent"
 								BorderBrush="Transparent"
 								VerticalAlignment="Center"
@@ -330,7 +329,7 @@
 									RenderOptions.BitmapScalingMode="NearestNeighbor"
 									Height="16"
 									Width="16" />
-								<local:PopupButton.PopupContent>
+								<local:ContentPopup.PopupContent>
 									<ItemsControl
 										Margin="3"
 										ItemsSource="{Binding GraphReferenceItem.Definition.ItemsSource}">
@@ -355,12 +354,11 @@
 											</DataTemplate>
 										</ItemsControl.ItemTemplate>
 									</ItemsControl>
-								</local:PopupButton.PopupContent>
-							</local:PopupButton>
+								</local:ContentPopup.PopupContent>
+							</local:ContentPopup>
 
-							<local:PopupButton
+							<local:ContentPopup
 								Grid.Column="2"
-								ShowArrow="False"
 								Background="Transparent"
 								BorderBrush="Transparent"
 								VerticalAlignment="Center"
@@ -373,7 +371,7 @@
 									RenderOptions.BitmapScalingMode="NearestNeighbor"
 									Height="10"
 									Width="10" />
-								<local:PopupButton.PopupContent>
+								<local:ContentPopup.PopupContent>
 									<ItemsControl
 										ItemsSource="{Binding LinkTypes}">
 										<ItemsControl.ItemTemplate>
@@ -385,8 +383,8 @@
 											</DataTemplate>
 										</ItemsControl.ItemTemplate>
 									</ItemsControl>
-								</local:PopupButton.PopupContent>
-							</local:PopupButton>
+								</local:ContentPopup.PopupContent>
+							</local:ContentPopup>
 
 							<local:Connection
 								Grid.Column="3"

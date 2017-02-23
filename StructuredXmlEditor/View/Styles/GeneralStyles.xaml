@@ -10,47 +10,6 @@
 	</ResourceDictionary.MergedDictionaries>
 
 	<!--**************************************************************-->
-	<!-- Focus Visual Styles                                          -->
-	<!--**************************************************************-->
-
-	<Style
-		x:Key="FocusVisualStyle">
-		<Setter
-			Property="Control.Template">
-			<Setter.Value>
-				<ControlTemplate>
-					<Border>
-						<Rectangle
-							Margin="0"
-							StrokeThickness="1"
-							Stroke="{StaticResource BackgroundLightBrush}" />
-					</Border>
-				</ControlTemplate>
-			</Setter.Value>
-		</Setter>
-	</Style>
-
-	<Style
-		x:Key="DashFocusVisualStyle">
-		<Setter
-			Property="Control.Template">
-			<Setter.Value>
-				<ControlTemplate>
-					<Border>
-						<Rectangle
-							Margin="0"
-							StrokeDashArray="3 5"
-							StrokeThickness="1"
-							Stroke="{StaticResource BackgroundNormalBrush}" />
-					</Border>
-				</ControlTemplate>
-			</Setter.Value>
-		</Setter>
-	</Style>
-
-	<!--**************************************************************-->
-	<!-- Base Style                                                   -->
-	<!--**************************************************************-->
 
 	<Style
 		x:Key="BaseElementStyle">
@@ -66,13 +25,8 @@
 		<Setter
 			Property="Control.BorderThickness"
 			Value="1" />
-		<Setter
-			Property="Control.FocusVisualStyle"
-			Value="{StaticResource FocusVisualStyle}" />
 	</Style>
 
-	<!--**************************************************************-->
-	<!-- Styles for common things                                     -->
 	<!--**************************************************************-->
 	
 	<Style
@@ -142,29 +96,6 @@
 		<Setter
 			Property="Foreground"
 			Value="{StaticResource FontBrush}" />
-		<Style.Triggers>
-			<Trigger
-				Property="IsEnabled"
-				Value="False">
-				<Setter
-					Property="Opacity"
-					Value="0.5" />
-			</Trigger>
-		</Style.Triggers>
-	</Style>
-
-	<!--**************************************************************-->
-	<Style
-		TargetType="{x:Type Image}">
-		<Style.Triggers>
-			<Trigger
-				Property="IsEnabled"
-				Value="False">
-				<Setter
-					Property="Opacity"
-					Value="0.3" />
-			</Trigger>
-		</Style.Triggers>
 	</Style>
 
 	<!--**************************************************************-->

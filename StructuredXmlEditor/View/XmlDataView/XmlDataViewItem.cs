@@ -1,269 +1,97 @@
 ﻿using StructuredXmlEditor.Data;
 using StructuredXmlEditor.Definition;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Windows.Threading;
 
 namespace StructuredXmlEditor.View
 {
-	//-----------------------------------------------------------------------
-	public class DataGridViewItem : ListBoxItem, INotifyPropertyChanged
+	public class XmlDataViewItem : Control, INotifyPropertyChanged
 	{
 		//##############################################################################################################
 		#region Constructor
 
 		//-----------------------------------------------------------------------
-		static DataGridViewItem()
+		static XmlDataViewItem()
 		{
-			DefaultStyleKeyProperty.OverrideMetadata(typeof(DataGridViewItem),
-				new FrameworkPropertyMetadata(typeof(DataGridViewItem)));
+			DefaultStyleKeyProperty.OverrideMetadata(typeof(XmlDataViewItem), new FrameworkPropertyMetadata(typeof(XmlDataViewItem)));
 		}
 
 		//-----------------------------------------------------------------------
-		public DataGridViewItem(DataGridView DataGrid)
+		public XmlDataViewItem(DataItem item, XmlDataView view)
 		{
-			GotFocus += (e, args) => 
-			{
-				this.IsSelected = true;
-				args.Handled = true;
-			};
+			this.DataItem = item;
+			this.View = view;
 
 			AllowDrop = true;
 
-			this.DataGrid = DataGrid;
+			DataContext = this;
+
+			DataItem.PropertyChanged += (obj, args) =>
+			{
+				if (args.PropertyName == "Children")
+				{
+					RaisePropertyChangedEvent("HasChildren");
+
+					View.DeferRefresh();
+				}
+				else if (args.PropertyName == "IsVisible")
+				{
+					if (HasChildren)
+					{
+						View.DeferRefresh();
+					}
+					else if (DataItem.Parent != null && DataItem.Parent.Children.All(e => !e.IsVisible))
+					{
+						View.DeferRefresh();
+					}
+				}
+				else if (args.PropertyName == "IsExpanded")
+				{
+					View.DeferRefresh();
+				}
+			};
+
+			DataItem.Children.CollectionChanged += (obj, args) =>
+			{
+				View.DeferRefresh();
+			};
 		}
 
 		#endregion Constructor
 		//##############################################################################################################
 		#region Properties
 
-		public DataGridView DataGrid { get; set; }
+		//-----------------------------------------------------------------------
+		public int Depth { get; set; }
+
+		//-----------------------------------------------------------------------
+		public bool HasChildren { get { return DataItem.Children.Any(e => e.IsVisible); } }
+
+		//-----------------------------------------------------------------------
+		public DataItem DataItem { get; private set; }
+
+		//-----------------------------------------------------------------------
+		public XmlDataView View { get; private set; }
 
 		#endregion Properties
 		//##############################################################################################################
-		#region Dependecy Properties
-
-		//##############################################################################################################
-		#region HeaderForeground
-		//-----------------------------------------------------------------------
-		public Brush HeaderForeground
-		{
-			get { return (Brush)GetValue(HeaderForegroundProperty); }
-			set { SetValue(HeaderForegroundProperty, value); }
-		}
-
-		//-----------------------------------------------------------------------
-		public static readonly DependencyProperty HeaderForegroundProperty =
-			DependencyProperty.Register("HeaderForeground", typeof(Brush), typeof(DataGridViewItem), new PropertyMetadata(Brushes.Black));
-		#endregion HeaderForeground
-		//##############################################################################################################
-		#region CanSelect
-		//-----------------------------------------------------------------------
-		public bool CanSelect
-		{
-			get { return (bool)GetValue(CanSelectProperty); }
-			set { SetValue(CanSelectProperty, value); }
-		}
-
-		//-----------------------------------------------------------------------
-		public static readonly DependencyProperty CanSelectProperty =
-			DependencyProperty.Register("CanSelect", typeof(bool), typeof(DataGridViewItem), new PropertyMetadata(true));
-		#endregion CanSelect
-		//##############################################################################################################
-		#region ListBox
-		//-----------------------------------------------------------------------
-		public DataGridView ListBox
-		{
-			get { return (DataGridView)GetValue(ListBoxProperty); }
-			set { SetValue(ListBoxProperty, value); }
-		}
-
-		//-----------------------------------------------------------------------
-		public static readonly DependencyProperty ListBoxProperty =
-			DependencyProperty.Register("ListBox", typeof(DataGridView), typeof(DataGridViewItem), new PropertyMetadata(null));
-		#endregion ListBox
-		//##############################################################################################################
-		#region Items
-		//-----------------------------------------------------------------------
-		private List<IDataGridItem> storedItems = new List<IDataGridItem>();
-		public IEnumerable<IDataGridItem> Items
-		{
-			get { return (IEnumerable<IDataGridItem>)GetValue(ItemsProperty); }
-			set { SetValue(ItemsProperty, value); }
-		}
-
-		//-----------------------------------------------------------------------
-		public static readonly DependencyProperty ItemsProperty =
-			DependencyProperty.Register("Items", typeof(IEnumerable<IDataGridItem>), typeof(DataGridViewItem), new PropertyMetadata(null, (s, a) =>
-			{
-				((DataGridViewItem)s).OnItemsChanged((IEnumerable<IDataGridItem>)a.OldValue, (IEnumerable<IDataGridItem>)a.NewValue);
-			}));
-
-		//-----------------------------------------------------------------------
-		void OnItemsChanged(IEnumerable<IDataGridItem> oldValue, IEnumerable<IDataGridItem> newValue)
-		{
-			if (oldValue != null)
-			{
-				var incc = oldValue as INotifyCollectionChanged;
-				if (incc != null)
-				{
-					incc.CollectionChanged -= OnItemsCollectionChanged;
-				}
-			}
-
-			if (newValue != null)
-			{
-				var incc = newValue as INotifyCollectionChanged;
-				if (incc != null)
-				{
-					incc.CollectionChanged += OnItemsCollectionChanged;
-				}
-
-				HasItems = newValue.Any(e => e.IsVisible);
-			}
-		}
-
-		//-----------------------------------------------------------------------
-		void OnItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
-		{
-			if (Items != null)
-			{
-				HasItems = Items.Any(e => e.IsVisible);
-			}
-
-			foreach (var oldItem in storedItems)
-			{
-				oldItem.PropertyChanged -= OnChildPropertyChanged;
-			}
-
-			storedItems = Items.ToList();
-
-			foreach (var newItem in storedItems)
-			{
-				newItem.PropertyChanged += OnChildPropertyChanged;
-			}
-		}
-		//-----------------------------------------------------------------------
-		void OnChildPropertyChanged(object sender, PropertyChangedEventArgs args)
-		{
-			if (args.PropertyName == "IsVisible")
-			{
-				var oldVal = HasItems;
-				HasItems = Items.Any(e => e.IsVisible);
-
-				if (HasItems != oldVal) DataGrid.DeferRefresh();
-			}
-		}
-
-		#endregion Items
-		//##############################################################################################################
-		#region HasItems
-		public bool HasItems
-		{
-			get { return m_hasItems; }
-			set
-			{
-				if (m_hasItems != value)
-				{
-					m_hasItems = value;
-					RaisePropertyChangedEvent();
-				}
-			}
-		}
-		private bool m_hasItems;
-		#endregion HasItems
-		//##############################################################################################################
-		#region Level
-		//-----------------------------------------------------------------------
-		public int Level
-		{
-			get { return (int)GetValue(LevelProperty); }
-			set { SetValue(LevelProperty, value); }
-		}
-
-		//-----------------------------------------------------------------------
-		public static readonly DependencyProperty LevelProperty =
-			DependencyProperty.Register("Level", typeof(int), typeof(DataGridViewItem), new PropertyMetadata(0));
-		#endregion Level
-		//##############################################################################################################
-		#region IsExpandedChanged
-		//-----------------------------------------------------------------------
-		public static readonly RoutedEvent IsExpandedChangedEvent = EventManager.RegisterRoutedEvent(
-			"IsExpandedChanged", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(DataGridViewItem));
-
-		//-----------------------------------------------------------------------
-		public event RoutedEventHandler IsExpandedChanged
-		{
-			add { AddHandler(IsExpandedChangedEvent, value); }
-			remove { RemoveHandler(IsExpandedChangedEvent, value); }
-		}
-
-		//-----------------------------------------------------------------------
-		void RaiseIsExpandedChangedEvent()
-		{
-			RaiseEvent(new RoutedEventArgs(DataGridViewItem.IsExpandedChangedEvent));
-		}
-		#endregion IsExpandedChanged
-		//##############################################################################################################
-		#region IsExpanded
-		//-----------------------------------------------------------------------
-		public bool IsExpanded
-		{
-			get { return (bool)GetValue(IsExpandedProperty); }
-			set { SetValue(IsExpandedProperty, value); }
-		}
-
-		//-----------------------------------------------------------------------
-		public static readonly DependencyProperty IsExpandedProperty = DependencyProperty.Register("IsExpanded",
-			typeof(bool), typeof(DataGridViewItem), new PropertyMetadata(false, (s, a) =>
-			{
-				((DataGridViewItem)s).OnIsExpandedChanged((bool)a.OldValue, (bool)a.NewValue);
-			}));
-
-		//-----------------------------------------------------------------------
-		void OnIsExpandedChanged(bool oldValue, bool newValue)
-		{
-			RaiseIsExpandedChangedEvent();
-		}
-		#endregion IsExpanded
-		//##############################################################################################################
-
-		#endregion Dependency Properties
-		//##############################################################################################################
 		#region Methods
-
-		//-----------------------------------------------------------------------
-		public void OnClearContainerForItemOverride()
-		{
-			if (Items != null)
-			{
-				var incc = Items as INotifyCollectionChanged;
-				if (incc != null)
-				{
-					incc.CollectionChanged -= OnItemsCollectionChanged;
-				}
-
-				foreach (var oldItem in storedItems)
-				{
-					oldItem.PropertyChanged -= OnChildPropertyChanged;
-				}
-			}
-		}
 
 		//-----------------------------------------------------------------------
 		public override void OnApplyTemplate()
@@ -304,9 +132,9 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		void OnPART_CollapserBoxMouseLeftButtonDown(object sender, RoutedEventArgs e)
 		{
-			if (HasItems)
+			if (HasChildren)
 			{
-				SetCurrentValue(IsExpandedProperty, !IsExpanded);
+				DataItem.IsExpanded = !DataItem.IsExpanded;
 				e.Handled = true;
 			}
 
@@ -316,9 +144,9 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
-			if (HasItems)
+			if (HasChildren)
 			{
-				SetCurrentValue(IsExpandedProperty, !IsExpanded);
+				DataItem.IsExpanded = !DataItem.IsExpanded;
 				e.Handled = true;
 			}
 		}
@@ -339,135 +167,46 @@ namespace StructuredXmlEditor.View
 		}
 
 		//-----------------------------------------------------------------------
-		protected override void OnKeyDown(KeyEventArgs e)
-		{
-			base.OnKeyDown(e);
-
-			var source = DataContext as IDataGridItem;
-			if (source == null)
-			{
-				return;
-			}
-
-			if (e.Key == Key.Left)
-			{
-				if (IsExpanded && HasItems)
-				{
-					SetCurrentValue(IsExpandedProperty, false);
-
-					if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
-					{
-						foreach (var i in ListBox.Descendants(source))
-						{
-							i.IsExpanded = false;
-						}
-					}
-				}
-				else
-				{
-					IDataGridItem parent = null;
-					int index = ListBox.Items.IndexOf(source);
-					if (index != -1)
-					{
-						for (int i = index - 1; i != -1; --i)
-						{
-							var item = (IDataGridItem)ListBox.Items[i];
-							if (item.Items.Contains(source))
-							{
-								parent = item;
-								break;
-							}
-						}
-					}
-
-					if (parent != null)
-					{
-						ListBox.SelectAndFocusItem(parent);
-					}
-				}
-
-				e.Handled = true;
-			}
-			else if (e.Key == Key.Right)
-			{
-				if (HasItems)
-				{
-					if (!IsExpanded)
-					{
-						SetCurrentValue(IsExpandedProperty, true);
-
-						if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
-						{
-							foreach (var i in ListBox.Descendants(source))
-							{
-								i.IsExpanded = true;
-							}
-						}
-					}
-					else
-					{
-						IDataGridItem firstChild = source.Items.FirstOrDefault();
-						if (firstChild != null)
-						{
-							ListBox.SelectAndFocusItem(firstChild);
-						}
-					}
-				}
-
-				e.Handled = true;
-			}
-			else if (e.Key == Key.Space)
-			{
-				if (HasItems)
-				{
-					SetCurrentValue(IsExpandedProperty, !IsExpanded);
-				}
-
-				e.Handled = true;
-			}
-		}
-
-		//-----------------------------------------------------------------------
 		public void DragStart(object sender, DragStartedEventArgs e)
 		{
-			if (DataContext is CollectionChildItem)
+			if (DataItem is CollectionChildItem)
 			{
-				CollectionChildItem itemBase = (CollectionChildItem)DataContext;
+				CollectionChildItem itemBase = (CollectionChildItem)DataItem;
 				DataItem collection = itemBase.ParentCollection;
 
 				if (collection != null)
 				{
 					draggedImage = InsertionAdorner.ConvertElementToImage(this);
 
-					DataObject dragData = new DataObject("CollectionChildItem", DataContext);
+					DataObject dragData = new DataObject("CollectionChildItem", DataItem);
 					dragData.SetData("Element", this);
 					DragDrop.DoDragDrop(this, dragData, DragDropEffects.Move);
 				}
 			}
-			else if (DataContext is TreeItem)
+			else if (DataItem is TreeItem)
 			{
-				TreeItem itemBase = (TreeItem)DataContext;
+				TreeItem itemBase = (TreeItem)DataItem;
 				TreeItem collection = (TreeItem)itemBase.Parent;
 
 				if (collection != null)
 				{
 					draggedImage = InsertionAdorner.ConvertElementToImage(this);
 
-					DataObject dragData = new DataObject("TreeItem", DataContext);
+					DataObject dragData = new DataObject("TreeItem", DataItem);
 					dragData.SetData("Element", this);
 					DragDrop.DoDragDrop(this, dragData, DragDropEffects.Move);
 				}
 			}
-			else if (DataContext is CommentItem)
+			else if (DataItem is CommentItem)
 			{
-				CommentItem itemBase = (CommentItem)DataContext;
+				CommentItem itemBase = (CommentItem)DataItem;
 				DataItem collection = itemBase.Parent;
 
 				if (collection != null && itemBase.CanReorder)
 				{
 					draggedImage = InsertionAdorner.ConvertElementToImage(this);
 
-					DataObject dragData = new DataObject("CommentItem", DataContext);
+					DataObject dragData = new DataObject("CommentItem", DataItem);
 					dragData.SetData("Element", this);
 					DragDrop.DoDragDrop(this, dragData, DragDropEffects.Move);
 				}
@@ -500,14 +239,14 @@ namespace StructuredXmlEditor.View
 				e.Effects = DragDropEffects.Move;
 				e.Handled = true;
 			}
-			else if (DataContext is CollectionChildItem)
+			else if (DataItem is CollectionChildItem)
 			{
 				CollectionChildItem item = e.Data.GetData("CollectionChildItem") as CollectionChildItem;
 				var wrappedItem = item.GetNonWrappedItem(item);
 
 				if (wrappedItem == null) return;
 
-				DataItem collection = ((CollectionChildItem)DataContext).ParentCollection;
+				DataItem collection = ((CollectionChildItem)DataItem).ParentCollection;
 
 				if (collection is CollectionItem)
 				{
@@ -522,7 +261,7 @@ namespace StructuredXmlEditor.View
 							adorner = null;
 						}
 
-						var dataItem = DataContext as DataItem;
+						var dataItem = DataItem as DataItem;
 
 						adorner = new InsertionAdorner(true, false, this, draggedImage, e.GetPosition(this));
 					}
@@ -537,7 +276,7 @@ namespace StructuredXmlEditor.View
 							adorner = null;
 						}
 
-						var dataItem = DataContext as DataItem;
+						var dataItem = DataItem as DataItem;
 
 						adorner = new InsertionAdorner(true, false, this, draggedImage, e.GetPosition(this));
 					}
@@ -546,12 +285,12 @@ namespace StructuredXmlEditor.View
 				e.Effects = DragDropEffects.Move;
 				e.Handled = true;
 			}
-			else if (DataContext is TreeItem)
+			else if (DataItem is TreeItem)
 			{
 				TreeItem item = e.Data.GetData("TreeItem") as TreeItem;
-				TreeItem collection = (TreeItem)DataContext;
+				TreeItem collection = (TreeItem)DataItem;
 
-				if (!item.GetChildrenBreadthFirst().Contains(collection))
+				if (!item.Descendants.Contains(collection))
 				{
 					if (adorner != null)
 					{
@@ -599,14 +338,14 @@ namespace StructuredXmlEditor.View
 				e.Effects = DragDropEffects.Move;
 				e.Handled = true;
 			}
-			else if (DataContext is CollectionChildItem)
+			else if (DataItem is CollectionChildItem)
 			{
 				CollectionChildItem item = e.Data.GetData("CollectionChildItem") as CollectionChildItem;
 				var wrappedItem = item.GetNonWrappedItem(item);
 
 				if (wrappedItem == null) return;
 
-				DataItem collection = ((CollectionChildItem)DataContext).ParentCollection;
+				DataItem collection = ((CollectionChildItem)DataItem).ParentCollection;
 
 				if (collection is CollectionItem)
 				{
@@ -621,7 +360,7 @@ namespace StructuredXmlEditor.View
 							adorner = null;
 						}
 
-						var dataItem = DataContext as DataItem;
+						var dataItem = DataItem as DataItem;
 
 						adorner = new InsertionAdorner(true, false, this, draggedImage, e.GetPosition(this));
 					}
@@ -636,7 +375,7 @@ namespace StructuredXmlEditor.View
 							adorner = null;
 						}
 
-						var dataItem = DataContext as DataItem;
+						var dataItem = DataItem as DataItem;
 
 						adorner = new InsertionAdorner(true, false, this, draggedImage, e.GetPosition(this));
 					}
@@ -645,12 +384,12 @@ namespace StructuredXmlEditor.View
 				e.Effects = DragDropEffects.Move;
 				e.Handled = true;
 			}
-			else if (DataContext is TreeItem)
+			else if (DataItem is TreeItem)
 			{
 				TreeItem item = e.Data.GetData("TreeItem") as TreeItem;
-				TreeItem collection = (TreeItem)DataContext;
+				TreeItem collection = (TreeItem)DataItem;
 
-				if (!item.GetChildrenBreadthFirst().Contains(collection))
+				if (!item.Descendants.Contains(collection))
 				{
 					if (adorner != null)
 					{
@@ -675,7 +414,7 @@ namespace StructuredXmlEditor.View
 		{
 			if (e.Data.GetDataPresent("CommentItem"))
 			{
-				DataItem dstItem = DataContext as DataItem;
+				DataItem dstItem = DataItem as DataItem;
 				CommentItem item = e.Data.GetData("CommentItem") as CommentItem;
 
 				if (item == dstItem) return;
@@ -701,20 +440,20 @@ namespace StructuredXmlEditor.View
 
 				if (srcCollection == dstCollection && srcIndex == dstIndex) return;
 
-				item.UndoRedo.ApplyDoUndo(() => 
+				item.UndoRedo.ApplyDoUndo(() =>
 				{
 					srcCollection.Children.RemoveAt(srcIndex);
 					dstCollection.Children.Insert(dstIndex, item);
-				}, () => 
+				}, () =>
 				{
 					dstCollection.Children.RemoveAt(dstIndex);
 					srcCollection.Children.Insert(srcIndex, item);
 				}, "Move comment");
 			}
-			else if (DataContext is CollectionChildItem)
+			else if (DataItem is CollectionChildItem)
 			{
 				CollectionChildItem item = e.Data.GetData("CollectionChildItem") as CollectionChildItem;
-				CollectionChildItem droppedItem = DataContext as CollectionChildItem;
+				CollectionChildItem droppedItem = DataItem as CollectionChildItem;
 
 				if (item == droppedItem) return;
 
@@ -814,14 +553,14 @@ namespace StructuredXmlEditor.View
 					}
 				}
 			}
-			else if (DataContext is TreeItem)
+			else if (DataItem is TreeItem)
 			{
 				TreeItem item = e.Data.GetData("TreeItem") as TreeItem;
-				TreeItem collection = (TreeItem)DataContext;
+				TreeItem collection = (TreeItem)DataItem;
 
-				if (!item.GetChildrenBreadthFirst().Contains(collection))
+				if (!item.Descendants.Contains(collection))
 				{
-					TreeItem droppedItem = DataContext as TreeItem;
+					TreeItem droppedItem = DataItem as TreeItem;
 
 					TreeItem srcCollection = item.Parent as TreeItem;
 					TreeItem dstCollection = droppedItem.Parent as TreeItem;

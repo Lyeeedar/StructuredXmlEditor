@@ -231,7 +231,7 @@ namespace StructuredXmlEditor.Definition
 					child.Definition.SaveData(root, child);
 				}
 
-				if (item.Grid.IsJson || item.Grid.IsYaml)
+				if (item.DataModel.IsJson || item.DataModel.IsYaml)
 				{
 					if (root.Elements().Count() == 1)
 					{

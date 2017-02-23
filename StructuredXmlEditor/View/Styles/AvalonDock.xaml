@@ -46,22 +46,6 @@
 	<avalonDockConverters:ActivateCommandLayoutItemFromLayoutModelConverter
 		x:Key="ActivateCommandLayoutItemFromLayoutModelConverter" />
 
-	<GradientStopCollection
-		x:Key="SemiTransparentStops">
-		<GradientStop
-			Offset="0"
-			Color="#C0FFBB1C" />
-		<GradientStop
-			Offset="0.2"
-			Color="#C0FFBB1C" />
-		<GradientStop
-			Offset="0.8"
-			Color="#C0E99F1C" />
-		<GradientStop
-			Offset="1"
-			Color="#C0E99F1C" />
-	</GradientStopCollection>
-
 	<Style
 		x:Key="ToolBarButtonStyle"
 		TargetType="{x:Type ButtonBase}">
@@ -109,48 +93,12 @@
 								Value="1.0" />
 							<Setter
 								Property="Background"
-								Value="#80FFBB1C" />
-							<Setter
-								Property="BorderBrush">
-								<Setter.Value>
-									<LinearGradientBrush
-										StartPoint="0,0"
-										EndPoint="0,1"
-										GradientStops="{StaticResource SemiTransparentStops}" />
-								</Setter.Value>
-							</Setter>
+								Value="{StaticResource MouseOverBackgroundBrush}" />
 							<Setter
 								Property="BorderThickness"
 								Value="1" />
-							<Setter
-								Property="Border.CornerRadius"
-								Value="2" />
 						</Trigger>
 
-						<Trigger
-							Property="IsPressed"
-							Value="True">
-							<Setter
-								Property="Background">
-								<Setter.Value>
-									<LinearGradientBrush
-										StartPoint="0,1"
-										EndPoint="0,0"
-										GradientStops="{StaticResource SemiTransparentStops}" />
-								</Setter.Value>
-							</Setter>
-							<Setter
-								Property="BorderBrush"
-								Value="#80FFBB1C" />
-						</Trigger>
-						<Trigger
-							Property="IsEnabled"
-							Value="false">
-							<Setter
-								TargetName="content"
-								Property="Opacity"
-								Value="0.4" />
-						</Trigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
 			</Setter.Value>
@@ -222,10 +170,10 @@
 								Value="1" />
 							<Setter
 								Property="BorderBrush"
-								Value="#555" />
+								Value="#444" />
 							<Setter
 								Property="Background"
-								Value="#555" />
+								Value="#444" />
 						</Trigger>
 
 						<DataTrigger
@@ -266,7 +214,6 @@
 							<RowDefinition
 								Height="*" />
 						</Grid.RowDefinitions>
-						<!--Following border is required to catch mouse events-->
 						<Border
 							Background="Transparent"
 							Grid.RowSpan="2" />
@@ -433,7 +380,6 @@
 							<RowDefinition
 								Height="Auto" />
 						</Grid.RowDefinitions>
-						<!--Following border is required to catch mouse events-->
 						<Border
 							Background="Transparent"
 							Grid.RowSpan="2" />
@@ -675,7 +621,7 @@
 						Opacity="0.9">
 						<Path
 							x:Name="PART_PreviewBox"
-							Fill="#353535"
+							Fill="#333"
 							StrokeThickness="2"
 							Stroke="Lime" />
 						<Grid
@@ -684,25 +630,25 @@
 								x:Name="PART_DockingManagerDropTargetLeft"
 								VerticalAlignment="Center"
 								HorizontalAlignment="Left"
-								Source="/Resources/AvalonDock/DockLeft.PNG"
+								Source="/Resources/AvalonDock/DockLeft.png"
 								Stretch="None" />
 							<Image
 								x:Name="PART_DockingManagerDropTargetRight"
 								VerticalAlignment="Center"
 								HorizontalAlignment="Right"
-								Source="/Resources/AvalonDock/DockRight.PNG"
+								Source="/Resources/AvalonDock/DockRight.png"
 								Stretch="None" />
 							<Image
 								x:Name="PART_DockingManagerDropTargetBottom"
 								VerticalAlignment="Bottom"
 								HorizontalAlignment="Center"
-								Source="/Resources/AvalonDock/DockBottom.PNG"
+								Source="/Resources/AvalonDock/DockBottom.png"
 								Stretch="None" />
 							<Image
 								x:Name="PART_DockingManagerDropTargetTop"
 								VerticalAlignment="Top"
 								HorizontalAlignment="Center"
-								Source="/Resources/AvalonDock/DockTop.PNG"
+								Source="/Resources/AvalonDock/DockTop.png"
 								Stretch="None" />
 						</Grid>
 						<Grid
@@ -725,7 +671,7 @@
 								<Image
 									Grid.ColumnSpan="3"
 									Grid.RowSpan="3"
-									Source="/Resources/AvalonDock/DockPaneEmpty.PNG"
+									Source="/Resources/AvalonDock/DockPaneEmpty.png"
 									Stretch="Uniform" />
 								<Border
 									Name="PART_AnchorablePaneDropTargetTop"
@@ -789,7 +735,7 @@
 								<Image
 									Grid.ColumnSpan="3"
 									Grid.RowSpan="3"
-									Source="/Resources/AvalonDock/DockPaneEmpty.PNG"
+									Source="/Resources/AvalonDock/DockPaneEmpty.png"
 									Stretch="Uniform" />
 								<Border
 									Name="PART_DocumentPaneDropTargetTop"
@@ -1190,7 +1136,6 @@
 									Content="{Binding Model, RelativeSource={RelativeSource TemplatedParent}}"
 									ContentTemplate="{Binding DocumentHeaderTemplate, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}"
 									ContentTemplateSelector="{Binding DocumentHeaderTemplateSelector, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}" />
-								<!-- Close button should be moved out to the container style -->
 								<Button
 									x:Name="DocumentCloseButton"
 									Style="{StaticResource ToolBarButtonStyle}"
@@ -1458,7 +1403,6 @@
 								</Grid>
 								<ContentPresenter
 									Content="{TemplateBinding Content}"
-									x:Name="fred"
 									Grid.Row="1" />
 							</Grid>
 						</Border>

@@ -8,22 +8,10 @@
 	xmlns:v="clr-namespace:StructuredXmlEditor.View">
 	<Grid x:Name="Root">
 
-		<v:DataGridView
+		<v:XmlDataView
 			Visibility="{Binding Workspace.Current.Data.IsSelectedDataItem, Converter={v:ValueTypeConverter}}"
-			HierarchicalItemsSource="{Binding Workspace.Current.Data.SelectedItems}">
-			<v:DataGridView.ItemContainerStyle>
-				<Style
-					TargetType="{x:Type v:DataGridViewItem}"
-					BasedOn="{StaticResource {x:Type v:DataGridViewItem}}">
-					<Setter
-						Property="HorizontalContentAlignment"
-						Value="Stretch" />
-					<Setter
-						Property="IsExpanded"
-						Value="{Binding IsExpanded, Mode=TwoWay}" />
-				</Style>
-			</v:DataGridView.ItemContainerStyle>
-		</v:DataGridView>
+			RootItems="{Binding Workspace.Current.Data.SelectedItems}">
+		</v:XmlDataView>
 
 		<Grid
 			Visibility="{Binding DataContext.Workspace.Current.Data.IsSelectedAsciiGrid, Converter={v:ValueTypeConverter}, ElementName=Root, FallbackValue=Collapsed}"

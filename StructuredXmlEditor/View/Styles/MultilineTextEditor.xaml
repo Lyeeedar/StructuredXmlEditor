@@ -70,23 +70,28 @@
 										VerticalScrollBarVisibility="Auto"
 										HorizontalScrollBarVisibility="Auto"
 										FontFamily="Courier New"
-										Text="{Binding Text, ValidatesOnExceptions=True, UpdateSourceTrigger=PropertyChanged, Delay=500, RelativeSource={RelativeSource TemplatedParent}}"
-										Margin="5,5,5,0" />
+										Text="{Binding Text, ValidatesOnExceptions=True, UpdateSourceTrigger=PropertyChanged, Delay=100, RelativeSource={RelativeSource TemplatedParent}}"
+										Margin="2" />
 									<Thumb
 										x:Name="PART_ResizeThumb"
 										HorizontalAlignment="Right"
 										VerticalAlignment="Bottom"
-										Cursor="SizeNWSE"
-										Padding="2">
+										Cursor="SizeNWSE">
 										<Thumb.Template>
 											<ControlTemplate
 												TargetType="{x:Type Thumb}">
 												<Grid
 													Background="Transparent">
 													<Path
-														Data="M0.5,6.5 L6.5,0.5 M6.5,3.5 L3.5,6.5"
-														Stroke="Black"
-														StrokeThickness="1" />
+														Data="M 0 0 L 4 4 L 8 0 Z"
+														Stroke="{StaticResource FontDarkBrush}"
+														Fill="{StaticResource FontDarkBrush}"
+														RenderTransformOrigin="0.5,0.5">
+														<Path.RenderTransform>
+															<RotateTransform
+																Angle="-45" />
+														</Path.RenderTransform>
+													</Path>
 												</Grid>
 											</ControlTemplate>
 										</Thumb.Template>

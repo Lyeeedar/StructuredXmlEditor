@@ -139,21 +139,14 @@ namespace StructuredXmlEditor
 
 		public void SaveLayout()
 		{
-			// serialize to a stream
 			MemoryStream stream = new MemoryStream();
-			XmlLayoutSerializer layoutSerializer = new XmlLayoutSerializer(DockingManager);
-			layoutSerializer.Serialize(stream);
+			new XmlLayoutSerializer(DockingManager).Serialize(stream);
 			stream.Position = 0;
 
 			var doc = XDocument.Load(stream);
-			RemoveDocumentsFromLayout(doc);
 
-			doc.Save("Layout.xml");
-		}
-
-		private void RemoveDocumentsFromLayout(XDocument doc)
-		{
 			doc.Descendants("LayoutDocument").Remove();
+
 			XNamespace xsi = "http://www.w3.org/2001/XMLSchema-instance";
 
 			var floatingWindows = doc.Root.Element("FloatingWindows");
@@ -167,6 +160,8 @@ namespace StructuredXmlEditor
 					}
 				}
 			}
+
+			doc.Save("Layout.xml");
 		}
 
 		public XDocument GenerateDefaultLayout()
@@ -179,7 +174,6 @@ namespace StructuredXmlEditor
 			var rootPanel = new XElement("RootPanel", new XAttribute("Orientation", "Horizontal"));
 			layoutRoot.Add(rootPanel);
 
-			// Root level panels
 			var leftPanel = new XElement("LayoutAnchorablePane", new XAttribute("Id", "ProjectViewPanel"), new XAttribute("DockWidth", "200"));
 			var middlePanel = new XElement("LayoutDocumentPane", new XAttribute("Id", "DocumentPanel"));
 			var rightPanel = new XElement("LayoutAnchorablePane", new XAttribute("Id", "ToolPanel"), new XAttribute("DockWidth", "250"));
@@ -188,7 +182,6 @@ namespace StructuredXmlEditor
 			rootPanel.Add(middlePanel);
 			rootPanel.Add(rightPanel);
 
-			// Setup up the other unused stuff
 			layoutRoot.Add(new XElement("TopSide"));
 			layoutRoot.Add(new XElement("RightSide"));
 			layoutRoot.Add(new XElement("LeftSide"));
@@ -198,7 +191,6 @@ namespace StructuredXmlEditor
 			var hiddenPanel = new XElement("Hidden");
 			layoutRoot.Add(hiddenPanel);
 
-			// Add all tools to the relevant locations
 			foreach (var tool in Workspace.Tools)
 			{
 				var defaultPos = "ToolPanel";
@@ -251,62 +243,43 @@ namespace StructuredXmlEditor
 		{
 			try
 			{
-				// Remove any stored documents
-				RemoveDocumentsFromLayout(layout);
+				layout.Descendants("LayoutDocument").Remove();
 
-				// Remove any invalid tools
-				foreach (XElement el in layout.Root.Element("RootPanel").Descendants().ToArray())
+				XNamespace xsi = "http://www.w3.org/2001/XMLSchema-instance";
+
+				var floatingWindows = layout.Root.Element("FloatingWindows");
+				if (floatingWindows != null)
 				{
-					string contentId = (string)el.Attribute("ContentId");
-					if (contentId != null)
+					foreach (var el in floatingWindows.Elements().ToArray())
 					{
-						if (!Workspace.Tools.Any(e => e.Title == contentId))
+						if ((string)el.Attribute(xsi + "type") == "LayoutDocumentFloatingWindow")
 						{
 							el.Remove();
 						}
 					}
 				}
 
-				// hide all by default
 				foreach (var tool in Workspace.Tools)
 				{
 					tool.IsVisible = false;
 				}
 
-				// retrieve visible tools in main panel
-				string[] visibleTools = layout.Root.Element("RootPanel")
-					.Descendants()
-					.Select(e => (string)e.Attribute("ContentId"))
-					.ToArray();
+				List<String> visible = layout.Root.Element("RootPanel").Descendants().Select(e => (string)e.Attribute("ContentId")).ToList();
+				visible.AddRange(layout.Root.Element("FloatingWindows").Descendants().Select(e => (string)e.Attribute("ContentId")));
 
 				foreach (var tool in Workspace.Tools)
 				{
-					if (visibleTools.Contains(tool.Title))
+					if (visible.Contains(tool.Title))
 					{
 						tool.IsVisible = true;
 					}
 				}
 
-				// retrieve visible floating tools
-				visibleTools = layout.Root.Element("FloatingWindows")
-					.Descendants()
-					.Select(e => (string)e.Attribute("ContentId"))
-					.ToArray();
-
-				foreach (var tool in Workspace.Tools)
-				{
-					if (visibleTools.Contains(tool.Title))
-					{
-						tool.IsVisible = true;
-					}
-				}
-
-				// now load the stream
 				var stream = new MemoryStream();
 				layout.Save(stream);
 				stream.Position = 0;
-				var layoutSerializer = new XmlLayoutSerializer(DockingManager);
-				layoutSerializer.Deserialize(stream);
+
+				new XmlLayoutSerializer(DockingManager).Deserialize(stream);
 			}
 			catch (Exception e)
 			{

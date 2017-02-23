@@ -70,7 +70,7 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public Command<object> EditCMD { get { return new Command<object>((e) => Grid.Selected = this); } }
+		public Command<object> EditCMD { get { return new Command<object>((e) => DataModel.Selected = this); } }
 
 		//-----------------------------------------------------------------------
 		public MultilineStringItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)

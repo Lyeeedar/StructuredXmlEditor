@@ -239,8 +239,8 @@ namespace StructuredXmlEditor.View
 			contentBorder.Background = PopupBackgroundBrush;
 			popup.Child = contentBorder;
 
-			var content = new DataGridView();
-			content.HierarchicalItemsSource = new List<DataItem>() { data };
+			var content = new XmlDataView();
+			content.RootItems = new List<DataItem>() { data };
 
 			content.Margin = new Thickness(5);
 			contentBorder.Child = content;

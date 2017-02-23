@@ -119,7 +119,7 @@ namespace StructuredXmlEditor.Data
 
 				menu.AddItem("Multiedit Children", () =>
 				{
-					Grid.Selected = new List<DataItem>(Children);
+					DataModel.Selected = new List<DataItem>(Children);
 				});
 			}
 		}

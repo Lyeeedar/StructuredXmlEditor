@@ -115,11 +115,11 @@ namespace StructuredXmlEditor.Data
 
 			PropertyChanged += (e, args) =>
 			{
-				if (args.PropertyName == "Grid")
+				if (args.PropertyName == "DataModel")
 				{
 					if (WrappedItem != null)
 					{
-						WrappedItem.Grid = Grid;
+						WrappedItem.DataModel = DataModel;
 					}
 				}
 				else if (args.PropertyName == "Parent")

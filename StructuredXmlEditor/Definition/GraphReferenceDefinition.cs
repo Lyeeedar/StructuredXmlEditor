@@ -40,7 +40,7 @@ namespace StructuredXmlEditor.Definition
 			if (si.ChosenDefinition != null)
 			{
 				if (
-					si.Grid.FlattenData || 
+					si.DataModel.FlattenData || 
 					((si.LinkType == LinkType.Reference || si.IsCircular()) && si.WrappedItem != null && 
 					(si.WrappedItem.LinkParents.Any(e => e.LinkType == LinkType.Duplicate) || si.WrappedItem.LinkParents.First() == si)
 					))

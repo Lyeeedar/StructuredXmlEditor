@@ -22,11 +22,10 @@
 
 			<DockPanel
 				DockPanel.Dock="Top">
-				<v:PopupButton
+				<v:ContentPopup
 					DockPanel.Dock="Right"
-					ShowArrow="False"
 					Content="Feedback">
-					<v:PopupButton.PopupContent>
+					<v:ContentPopup.PopupContent>
 						<Grid
 							Width="450"
 							Height="300">
@@ -44,8 +43,8 @@
 								Content="Send"
 								Command="{Binding FeedbackCMD}" />
 						</Grid>
-					</v:PopupButton.PopupContent>
-				</v:PopupButton>
+					</v:ContentPopup.PopupContent>
+				</v:ContentPopup>
 				
 				<Menu>
 					<MenuItem

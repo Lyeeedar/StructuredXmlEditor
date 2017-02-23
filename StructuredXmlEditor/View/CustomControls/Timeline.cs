@@ -364,9 +364,9 @@ namespace StructuredXmlEditor.View
 
 			double pixelsASecond = ActualWidth / TimelineItem.TimelineRange;
 
-			if (TimelineItem.Grid.SelectedItems != null)
+			if (TimelineItem.DataModel.SelectedItems != null)
 			{
-				foreach (var selected in TimelineItem.Grid.SelectedItems.ToList())
+				foreach (var selected in TimelineItem.DataModel.SelectedItems.ToList())
 				{
 					selected.IsSelected = false;
 				}
