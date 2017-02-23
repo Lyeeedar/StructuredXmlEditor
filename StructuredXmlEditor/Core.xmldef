@@ -331,6 +331,7 @@
 			<String Name="Name" Default="Reference" ToolTip="The name to be written for this element." />
 			<String Name="Keys" ToolTip="The names of the graph nodes that this reference can contain." VisibleIf="DefKey==null" />
 			<String Name="DefKey" ToolTip="The name of the reference definition to use the keys from." VisibleIf="Keys==null" />
+			<Boolean Name="UseParentDescription" ToolTip="Whether to use the parent description when displayed in the graph" />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />

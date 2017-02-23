@@ -16,6 +16,7 @@ namespace StructuredXmlEditor.Definition
 		public List<Tuple<string, string>> Keys { get; set; } = new List<Tuple<string, string>>();
 		public string DefKey { get; set; }
 		public Dictionary<string, GraphNodeDefinition> Definitions { get; set; } = new Dictionary<string, GraphNodeDefinition>();
+		public bool UseParentDescription { get; set; }
 
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
@@ -122,6 +123,8 @@ namespace StructuredXmlEditor.Definition
 
 		public override void Parse(XElement definition)
 		{
+			UseParentDescription = TryParseBool(definition, "UseParentDescription");
+
 			DefKey = definition.Attribute("DefKey")?.Value?.ToString();
 
 			var keyString = definition.Attribute("Keys")?.Value?.ToString();

@@ -401,7 +401,7 @@ namespace StructuredXmlEditor.View
 				}
 			};
 
-			if (GraphReferenceItem.Parent is StructItem)
+			if (GraphReferenceItem.Parent is StructItem && GraphReferenceItem.ReferenceDef.UseParentDescription)
 			{
 				GraphReferenceItem.Parent.PropertyChanged += (e, args) =>
 				{
@@ -435,7 +435,7 @@ namespace StructuredXmlEditor.View
 			{
 				string title = "";
 
-				if (GraphReferenceItem.Parent is StructItem)
+				if (GraphReferenceItem.Parent is StructItem && GraphReferenceItem.ReferenceDef.UseParentDescription)
 				{
 					title = GraphReferenceItem.Parent.Description;
 
@@ -443,16 +443,22 @@ namespace StructuredXmlEditor.View
 					{
 						title = Regex.Replace(title, "<[^>]+>", string.Empty);
 					}
+
+					if (GraphReferenceItem.WrappedItem != null)
+					{
+						title += " (" + GraphReferenceItem.Name.Split('(')[1];
+					}
 				}
 				else
 				{
 					title = GraphReferenceItem.GetParentPath();
+
+					if (GraphReferenceItem.WrappedItem != null)
+					{
+						title = GraphReferenceItem.Name;
+					}
 				}
 
-				if (GraphReferenceItem.WrappedItem != null)
-				{
-					title = GraphReferenceItem.Name;
-				}
 				return title;
 			}
 		}
@@ -462,7 +468,7 @@ namespace StructuredXmlEditor.View
 		{
 			get
 			{
-				if (GraphReferenceItem.Parent is StructItem)
+				if (GraphReferenceItem.Parent is StructItem && GraphReferenceItem.ReferenceDef.UseParentDescription)
 				{
 					return GraphReferenceItem.Parent.TextBrush;
 				}

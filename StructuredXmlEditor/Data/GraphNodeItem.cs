@@ -136,6 +136,12 @@ namespace StructuredXmlEditor.Data
 					RaisePropertyChangedEvent("GraphData");
 				}
 
+				if (args.PropertyName == "IsVisible")
+				{
+					RaisePropertyChangedEvent("GraphData");
+					RaisePropertyChangedEvent("Datas");
+				}
+
 				args.Data["ProcessedByGraph"] = "YES";
 			}
 
