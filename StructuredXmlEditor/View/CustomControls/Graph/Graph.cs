@@ -27,6 +27,11 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		public Graph()
 		{
+			Future.Call(() => 
+			{
+				Offset = new Point(ActualWidth / 3, ActualHeight / 3);
+
+			}, 10);
 		}
 
 		//-----------------------------------------------------------------------
@@ -433,6 +438,7 @@ namespace StructuredXmlEditor.View
 			if (e.MiddleButton != MouseButtonState.Pressed)
 			{
 				isPanning = false;
+				lastPanPos = e.GetPosition(this);
 			}
 			else
 			{

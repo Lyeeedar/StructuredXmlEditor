@@ -152,6 +152,9 @@
 	<Style
 		TargetType="{x:Type local:GraphNodeDataPreview}">
 		<Setter
+			Property="Visibility"
+			Value="{Binding Data.IsVisible, Converter={local:ValueTypeConverter}}" />
+		<Setter
 			Property="Template">
 			<Setter.Value>
 				<ControlTemplate
@@ -212,6 +215,9 @@
 	<Style
 		TargetType="{x:Type local:GraphNodeDataComment}">
 		<Setter
+			Property="Visibility"
+			Value="{Binding Data.IsVisible, Converter={local:ValueTypeConverter}}" />
+		<Setter
 			Property="Template">
 			<Setter.Value>
 				<ControlTemplate
@@ -263,6 +269,9 @@
 
 	<Style
 		TargetType="{x:Type local:GraphNodeDataLink}">
+		<Setter
+			Property="Visibility"
+			Value="{Binding Data.IsVisible, Converter={local:ValueTypeConverter}}" />
 		<Setter
 			Property="Template">
 			<Setter.Value>

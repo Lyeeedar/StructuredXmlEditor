@@ -36,7 +36,7 @@ namespace StructuredXmlEditor.View
 		#region Properties
 
 		//--------------------------------------------------------------------------
-		public DataItem Data;
+		public DataItem Data { get; set; }
 
 		//--------------------------------------------------------------------------
 		public Graph Graph
@@ -451,7 +451,7 @@ namespace StructuredXmlEditor.View
 
 				if (GraphReferenceItem.WrappedItem != null)
 				{
-					title += " (" + GraphReferenceItem.Name + ")";
+					title = GraphReferenceItem.Name;
 				}
 				return title;
 			}
