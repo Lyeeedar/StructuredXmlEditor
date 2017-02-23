@@ -188,6 +188,7 @@ namespace StructuredXmlEditor.View
 			var viewItem = cachedItems[current];
 			viewItem.Depth = depth;
 			viewItem.RaisePropertyChangedEvent("Depth");
+			viewItem.RaisePropertyChangedEvent("HasChildren");
 
 			Items.Add(viewItem);
 

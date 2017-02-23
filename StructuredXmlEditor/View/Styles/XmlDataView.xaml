@@ -345,6 +345,7 @@
 								Margin="0"
 								Focusable="false">
 								<ItemsControl
+									Padding="0,0,0,100"
 									ItemsSource="{Binding Items, RelativeSource={RelativeSource TemplatedParent}}" />
 							</ScrollViewer>
 						</Border>
