@@ -9,6 +9,7 @@
 	xmlns:dock="http://schemas.xceed.com/wpf/xaml/avalondock"
 	xmlns:dockctrl="clr-namespace:Xceed.Wpf.AvalonDock.Controls;assembly=Xceed.Wpf.AvalonDock"
 	WindowStartupLocation="CenterScreen"
+	TextOptions.TextFormattingMode="Display"
 	Icon="pack://application:,,,/StructuredXmlEditor;component/Resources/Icon.png"
 	WindowState="Maximized">
 

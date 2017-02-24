@@ -17,6 +17,9 @@
 			<Setter
 				Property="Foreground"
 				Value="SteelBlue" />
+			<Setter
+				Property="TextBlock.TextDecorations"
+				Value="{x:Null}" />
 			<Style.Triggers>
 				<Trigger
 					Property="IsMouseOver"
