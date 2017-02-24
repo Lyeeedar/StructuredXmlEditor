@@ -25,9 +25,7 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		public Command<object> EditCMD { get { return new Command<object>((e) => { Edit(GraphNodeItem); }); } }
-
-		//--------------------------------------------------------------------------
+		public IEnumerable<GraphNodeItem> GraphNodeItems { get { yield return GraphNodeItem; } }
 		public GraphNodeItem GraphNodeItem { get { return m_nodeItem; } }
 		private GraphNodeItem m_nodeItem;
 
@@ -219,34 +217,6 @@ namespace StructuredXmlEditor.View
 
 		//-----------------------------------------------------------------------
 		public Brush PopupBorderBrush { get { return (Application.Current.TryFindResource("SelectionBorderBrush") as SolidColorBrush); } }
-
-		//--------------------------------------------------------------------------
-		public void Edit(DataItem data)
-		{
-			Popup popup = new Popup();
-			popup.DataContext = data;
-			popup.StaysOpen = true;
-			popup.Focusable = false;
-			popup.PopupAnimation = PopupAnimation.Slide;
-			popup.Width = 400;
-
-			popup.PlacementTarget = this;
-			popup.Placement = PlacementMode.Mouse;
-
-			Border contentBorder = new Border();
-			contentBorder.BorderThickness = new Thickness(1);
-			contentBorder.BorderBrush = PopupBorderBrush;
-			contentBorder.Background = PopupBackgroundBrush;
-			popup.Child = contentBorder;
-
-			var content = new XmlDataView();
-			content.RootItems = new List<DataItem>() { data };
-
-			content.Margin = new Thickness(5);
-			contentBorder.Child = content;
-
-			popup.IsOpen = true;
-		}
 
 		//--------------------------------------------------------------------------
 		private void UpdateGraphData()

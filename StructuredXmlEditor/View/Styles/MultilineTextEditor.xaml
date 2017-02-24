@@ -23,19 +23,68 @@
 					<Grid
 						x:Name="Root">
 						<DockPanel>
-							<ToggleButton
+
+							<l:ContentPopup
 								x:Name="PART_DropDownButton"
 								DockPanel.Dock="Left"
 								Margin="1"
-								KeyboardNavigation.TabNavigation="Continue"
-								IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
-								IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource  TemplatedParent}, Converter={l:ValueTypeConverter}, ConverterParameter=Not}">
+								KeyboardNavigation.TabNavigation="Continue">
 								<Image
 									Source="/Resources/New.png"
 									Width="16"
 									Height="16"
 									RenderOptions.BitmapScalingMode="NearestNeighbor" />
-							</ToggleButton>
+
+								<l:ContentPopup.PopupContent>
+									<Border
+										MinWidth="100"
+										MinHeight="100"
+										BorderThickness="1"
+										Background="{StaticResource BackgroundDarkBrush}"
+										BorderBrush="{StaticResource SelectionBorderBrush}"
+										Margin="10">
+										<Border.Effect>
+											<DropShadowEffect
+												Color="Gray" />
+										</Border.Effect>
+										<Grid>
+											<TextBox
+												x:Name="PART_TextBox"
+												AcceptsReturn="true"
+												VerticalScrollBarVisibility="Auto"
+												HorizontalScrollBarVisibility="Auto"
+												FontFamily="Courier New"
+												Text="{Binding Text, ValidatesOnExceptions=True, UpdateSourceTrigger=PropertyChanged, Delay=100, RelativeSource={RelativeSource TemplatedParent}}"
+												Margin="2" />
+											<Thumb
+												x:Name="PART_ResizeThumb"
+												HorizontalAlignment="Right"
+												VerticalAlignment="Bottom"
+												Cursor="SizeNWSE">
+												<Thumb.Template>
+													<ControlTemplate
+														TargetType="{x:Type Thumb}">
+														<Grid
+															Background="Transparent">
+															<Path
+																Data="M 0 0 L 4 4 L 8 0 Z"
+																Stroke="{StaticResource FontDarkBrush}"
+																Fill="{StaticResource FontDarkBrush}"
+																RenderTransformOrigin="0.5,0.5">
+																<Path.RenderTransform>
+																	<RotateTransform
+																		Angle="-45" />
+																</Path.RenderTransform>
+															</Path>
+														</Grid>
+													</ControlTemplate>
+												</Thumb.Template>
+											</Thumb>
+										</Grid>
+									</Border>
+								</l:ContentPopup.PopupContent>
+							</l:ContentPopup>
+
 							<TextBlock
 								Text="{Binding CollapsedText, RelativeSource={RelativeSource TemplatedParent}}"
 								VerticalAlignment="Center"
@@ -43,62 +92,6 @@
 								Margin="3,0,0,0" />
 						</DockPanel>
 
-						<Popup
-							IsOpen="{Binding IsChecked, ElementName=PART_DropDownButton}"
-							StaysOpen="False"
-							Placement="Relative"
-							SnapsToDevicePixels="True"
-							AllowsTransparency="True"
-							Focusable="False"
-							PopupAnimation="Fade"
-							x:Name="PART_Popup">
-							<Border
-								MinWidth="100"
-								MinHeight="100"
-								BorderThickness="1"
-								Background="{StaticResource BackgroundDarkBrush}"
-								BorderBrush="{StaticResource SelectionBorderBrush}"
-								Margin="10">
-								<Border.Effect>
-									<DropShadowEffect
-										Color="Gray" />
-								</Border.Effect>
-								<Grid>
-									<TextBox
-										x:Name="PART_TextBox"
-										AcceptsReturn="true"
-										VerticalScrollBarVisibility="Auto"
-										HorizontalScrollBarVisibility="Auto"
-										FontFamily="Courier New"
-										Text="{Binding Text, ValidatesOnExceptions=True, UpdateSourceTrigger=PropertyChanged, Delay=100, RelativeSource={RelativeSource TemplatedParent}}"
-										Margin="2" />
-									<Thumb
-										x:Name="PART_ResizeThumb"
-										HorizontalAlignment="Right"
-										VerticalAlignment="Bottom"
-										Cursor="SizeNWSE">
-										<Thumb.Template>
-											<ControlTemplate
-												TargetType="{x:Type Thumb}">
-												<Grid
-													Background="Transparent">
-													<Path
-														Data="M 0 0 L 4 4 L 8 0 Z"
-														Stroke="{StaticResource FontDarkBrush}"
-														Fill="{StaticResource FontDarkBrush}"
-														RenderTransformOrigin="0.5,0.5">
-														<Path.RenderTransform>
-															<RotateTransform
-																Angle="-45" />
-														</Path.RenderTransform>
-													</Path>
-												</Grid>
-											</ControlTemplate>
-										</Thumb.Template>
-									</Thumb>
-								</Grid>
-							</Border>
-						</Popup>
 					</Grid>
 				</ControlTemplate>
 			</Setter.Value>

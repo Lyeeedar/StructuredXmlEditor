@@ -223,8 +223,6 @@ namespace StructuredXmlEditor.View
 				e.Handled = true;
 			}
 
-			PopupCloser.CloseAllPopups();
-
 			base.OnMouseLeftButtonDown(e);
 		}
 

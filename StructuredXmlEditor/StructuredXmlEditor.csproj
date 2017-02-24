@@ -143,7 +143,6 @@
     <Compile Include="Util\Extensions.cs" />
     <Compile Include="Util\Future.cs" />
     <Compile Include="Util\Pool.cs" />
-    <Compile Include="Util\PopupCloser.cs" />
     <Compile Include="Util\SerializableDictionary.cs" />
     <Compile Include="Util\UndoRedoManager.cs" />
     <Compile Include="Util\VersionInfo.cs" />

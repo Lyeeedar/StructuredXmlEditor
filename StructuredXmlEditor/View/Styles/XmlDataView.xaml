@@ -341,6 +341,7 @@
 							BorderThickness="1"
 							SnapsToDevicePixels="true">
 							<ListView
+								ScrollViewer.HorizontalScrollBarVisibility="Disabled"
 								ItemsSource="{Binding Items, RelativeSource={RelativeSource TemplatedParent}}">
 								<ListBox.ItemContainerStyle>
 									<Style

@@ -189,21 +189,26 @@
 								ToolTip="{Binding Preview, Converter={local:ColourMarkupConverter}}"
 								Content="{Binding Preview, Converter={local:ColourMarkupConverter}}" />
 
-							<Button
+							<local:ContentPopup
 								Grid.Column="2"
 								Margin="5"
 								Opacity="0.5"
 								Background="Transparent"
 								BorderBrush="Transparent"
-								VerticalAlignment="Center"
-								ToolTip="Edit"
-								Command="{Binding EditCMD}">
+								ToolTip="Edit">
 								<Image
 									Source="/Resources/Edit.png"
 									RenderOptions.BitmapScalingMode="NearestNeighbor"
 									Height="10"
 									Width="10" />
-							</Button>
+
+								<local:ContentPopup.PopupContent>
+									<local:XmlDataView
+										Width="400"
+										Margin="5"
+										RootItems="{Binding Datas}" />
+								</local:ContentPopup.PopupContent>
+							</local:ContentPopup>
 
 						</Grid>
 					</Border>
@@ -445,20 +450,26 @@
 									ToolTip="{Binding NodeToolTip}"
 									Text="{Binding Title}" />
 
-								<Button
+								<local:ContentPopup
 									HorizontalAlignment="Right"
 									Margin="5"
 									Opacity="0.5"
 									Background="Transparent"
 									BorderBrush="Transparent"
-									ToolTip="Edit"
-									Command="{Binding EditCMD}">
+									ToolTip="Edit">
 									<Image
 										Source="/Resources/Edit.png"
 										RenderOptions.BitmapScalingMode="NearestNeighbor"
 										Height="10"
 										Width="10" />
-								</Button>
+
+									<local:ContentPopup.PopupContent>
+										<local:XmlDataView
+											Width="400"
+											Margin="5"
+											RootItems="{Binding GraphNodeItems}" />
+									</local:ContentPopup.PopupContent>
+								</local:ContentPopup>
 
 							</Grid>
 

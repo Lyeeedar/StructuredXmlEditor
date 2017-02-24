@@ -16,48 +16,37 @@
 		<DockPanel
 			Margin="2,5,2,5">
 
-			<ToggleButton
+			<v:ContentPopup
 				x:Name="FilterPopupToggle"
 				VerticalAlignment="Center"
 				DockPanel.Dock="Right"
 				Background="Transparent"
 				BorderBrush="Transparent"
-				ToolTip="Filter Settings"
-				IsHitTestVisible="{Binding ElementName=FilterPopup, Path=IsOpen, Converter={v:ValueTypeConverter}, ConverterParameter=Not}">
+				ToolTip="Filter Settings">
 				<Image
 					Source="/Resources/Settings.png"
 					RenderOptions.BitmapScalingMode="NearestNeighbor"
 					Height="16"
 					Width="16" />
-			</ToggleButton>
-			<Popup
-				x:Name="FilterPopup"
-				AllowsTransparency="True"
-				Focusable="False"
-				DockPanel.Dock="Right"
-				HorizontalOffset="1"
-				VerticalOffset="1"
-				PopupAnimation="Slide"
-				StaysOpen="False"
-				IsOpen="{Binding ElementName=FilterPopupToggle, Path=IsChecked, Mode=TwoWay}"
-				PlacementTarget="{Binding ElementName=FilterPopupToggle}"
-				Placement="Mouse">
-				<Border
-					x:Name="brd"
-					BorderThickness="1"
-					Padding="10"
-					BorderBrush="{StaticResource SelectionBorderBrush}"
-					Background="{StaticResource WindowBackgroundBrush}">
-					<StackPanel>
-						<CheckBox
-							Content="Use Regex"
-							IsChecked="{Binding UseRegex}" />
-						<CheckBox
-							Content="Search File Contents"
-							IsChecked="{Binding SearchContents}" />
-					</StackPanel>
-				</Border>
-			</Popup>
+
+				<v:ContentPopup.PopupContent>
+					<Border
+						x:Name="brd"
+						BorderThickness="1"
+						Padding="10"
+						BorderBrush="{StaticResource SelectionBorderBrush}"
+						Background="{StaticResource WindowBackgroundBrush}">
+						<StackPanel>
+							<CheckBox
+								Content="Use Regex"
+								IsChecked="{Binding UseRegex}" />
+							<CheckBox
+								Content="Search File Contents"
+								IsChecked="{Binding SearchContents}" />
+						</StackPanel>
+					</Border>
+				</v:ContentPopup.PopupContent>
+			</v:ContentPopup>
 
 			<Button
 				DockPanel.Dock="Right"

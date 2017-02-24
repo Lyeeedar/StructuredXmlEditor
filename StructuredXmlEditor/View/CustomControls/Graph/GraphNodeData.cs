@@ -36,6 +36,7 @@ namespace StructuredXmlEditor.View
 		#region Properties
 
 		//--------------------------------------------------------------------------
+		public IEnumerable<DataItem> Datas { get { yield return Data; } }
 		public DataItem Data { get; set; }
 
 		//--------------------------------------------------------------------------
@@ -347,9 +348,6 @@ namespace StructuredXmlEditor.View
 
 		//--------------------------------------------------------------------------
 		public string Preview { get { return Data.Description; } }
-
-		//--------------------------------------------------------------------------
-		public Command<object> EditCMD { get { return new Command<object>((e) => { Node.Edit(Data); }); } }
 
 		//--------------------------------------------------------------------------
 		public GraphNodeDataPreview(DataItem data) : base(data)

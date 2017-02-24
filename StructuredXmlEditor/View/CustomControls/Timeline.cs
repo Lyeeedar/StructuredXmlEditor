@@ -351,6 +351,8 @@ namespace StructuredXmlEditor.View
 			{
 				panPos = pos.X;
 				isPanning = true;
+
+				e.Handled = true;
 			}
 		}
 
@@ -516,6 +518,7 @@ namespace StructuredXmlEditor.View
 
 					panPos = pos.X;
 				}
+
 			}
 			else
 			{
@@ -568,6 +571,7 @@ namespace StructuredXmlEditor.View
 
 			if (!setCursor) Mouse.OverrideCursor = null;
 
+			e.Handled = true;
 			dirty = true;
 		}
 

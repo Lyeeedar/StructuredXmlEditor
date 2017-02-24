@@ -135,14 +135,6 @@ namespace StructuredXmlEditor.View
 		#region Methods
 
 		//-----------------------------------------------------------------------
-		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-		{
-			base.OnMouseLeftButtonDown(e);
-
-			if (!PopupCloser.IsMouseOverPopup()) PopupCloser.CloseAllPopups();
-		}
-
-		//-----------------------------------------------------------------------
 		public void DeferRefresh()
 		{
 			if (!isRefreshing)

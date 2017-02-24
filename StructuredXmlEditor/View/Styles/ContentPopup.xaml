@@ -104,4 +104,97 @@
 			</Setter.Value>
 		</Setter>
 	</Style>
+
+	<Style
+		x:Key="EmptyContentPopupStyle"
+		BasedOn="{StaticResource BaseElementStyle}"
+		TargetType="{x:Type l:ContentPopup}">
+		<Setter
+			Property="Background"
+			Value="Transparent" />
+		<Setter
+			Property="SnapsToDevicePixels"
+			Value="true" />
+		<Setter
+			Property="OverridesDefaultStyle"
+			Value="true" />
+		<Setter
+			Property="MinHeight"
+			Value="10" />
+		<Setter
+			Property="MinWidth"
+			Value="10" />
+		<Setter
+			Property="HorizontalContentAlignment"
+			Value="Center" />
+		<Setter
+			Property="VerticalContentAlignment"
+			Value="Center" />
+		<Setter
+			Property="Template">
+			<Setter.Value>
+				<ControlTemplate
+					TargetType="{x:Type l:ContentPopup}">
+					<Grid
+						Background="Transparent"
+						Name="PART_Grid">
+						<DockPanel>
+							<Border
+								x:Name="Border"
+								CornerRadius="0"
+								BorderThickness="{TemplateBinding BorderThickness}"
+								BorderBrush="{TemplateBinding BorderBrush}">
+
+								<ContentPresenter
+									HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+									VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+									RecognizesAccessKey="True" />
+
+							</Border>
+						</DockPanel>
+
+						<Popup
+							SnapsToDevicePixels="True"
+							MinWidth="200"
+							AllowsTransparency="True"
+							PopupAnimation="Fade"
+							x:Name="PART_Popup">
+							<Border
+								BorderThickness="1"
+								BorderBrush="{StaticResource BorderNormalBrush}"
+								Background="{StaticResource WindowBackgroundBrush}"
+								Margin="0,0,10,10">
+								<Border.Effect>
+									<DropShadowEffect
+										Color="Gray" />
+								</Border.Effect>
+								<ContentPresenter
+									ContentSource="PopupContent" />
+							</Border>
+						</Popup>
+					</Grid>
+
+					<ControlTemplate.Triggers>
+						<Trigger
+							Property="IsMouseOver"
+							Value="true">
+							<Setter
+								TargetName="Border"
+								Property="BorderBrush"
+								Value="{StaticResource MouseOverBorderBrush}" />
+						</Trigger>
+						<Trigger
+							Property="IsPressed"
+							Value="true">
+							<Setter
+								TargetName="Border"
+								Property="BorderBrush"
+								Value="{StaticResource SelectionBorderBrush}" />
+						</Trigger>
+					</ControlTemplate.Triggers>
+
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
 </ResourceDictionary>
