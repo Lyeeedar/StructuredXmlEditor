@@ -1,4 +1,12 @@
-﻿--------- 1.6.0 ---------
+﻿--------- 1.7.0 ---------
+
+- Mode for collections that only allow a single instance of each of their children.
+- Max length parameter on strings.
+- Many optimisations.
+- Improvements to the theme.
+
+
+--------- 1.6.0 ---------
 
 - Improve timelines.
  -- Keyframes can now have a duration.
