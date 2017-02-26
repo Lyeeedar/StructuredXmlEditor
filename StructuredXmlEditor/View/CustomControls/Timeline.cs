@@ -725,6 +725,7 @@ namespace StructuredXmlEditor.View
 			isDragging = false;
 			draggedItem = null;
 			isPanning = false;
+			isResizing = false;
 
 			ReleaseMouseCapture();
 
