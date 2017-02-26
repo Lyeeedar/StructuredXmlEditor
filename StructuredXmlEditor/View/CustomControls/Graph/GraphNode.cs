@@ -251,6 +251,8 @@ namespace StructuredXmlEditor.View
 
 		private Point m_mouseDragLast;
 		private bool m_inDrag;
+		private double m_startX;
+		private double m_startY;
 
 		//--------------------------------------------------------------------------
 		protected override void OnMouseLeave(MouseEventArgs e)
@@ -268,7 +270,7 @@ namespace StructuredXmlEditor.View
 
 			if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
 			{
-				IsSelected = !IsSelected;
+				//IsSelected = !IsSelected;
 			}
 			else
 			{
@@ -279,11 +281,36 @@ namespace StructuredXmlEditor.View
 
 			m_inDrag = true;
 			m_mouseDragLast = e.GetPosition(Parent as IInputElement);
+			foreach (var node in Graph.Selected)
+			{
+				node.m_startX = node.X;
+				node.m_startY = node.Y;
+			}
+
 			this.CaptureMouse();
+
+			Graph.UpdateSnapLines();
 
 			e.Handled = true;
 
 			base.OnMouseLeftButtonDown(e);
+		}
+
+		//--------------------------------------------------------------------------
+		protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
+		{
+			var current = e.GetPosition(Parent as IInputElement);
+			var diff = current - m_mouseDragLast;
+
+			if (Math.Abs(diff.X) < 10 && Math.Abs(diff.Y) < 10)
+			{
+				if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+				{
+					IsSelected = !IsSelected;
+				}
+			}
+
+			base.OnPreviewMouseLeftButtonUp(e);
 		}
 
 		//-----------------------------------------------------------------------
@@ -333,13 +360,59 @@ namespace StructuredXmlEditor.View
 				var current = e.GetPosition(Parent as IInputElement);
 				var diff = current - m_mouseDragLast;
 
-				foreach (var node in Graph.Selected)
+				if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
 				{
-					node.X += diff.X / Graph.Scale;
-					node.Y += diff.Y / Graph.Scale;
+					var x = m_startX + diff.X / Graph.Scale;
+					var y = m_startY + diff.Y / Graph.Scale;
+
+					double? chosenSnapX = null;
+					foreach (var snapline in Graph.SnapLinesX)
+					{
+						if (Math.Abs(x - snapline) < 10)
+						{
+							chosenSnapX = snapline;
+							break;
+						}
+						else if (Math.Abs((x + ActualWidth) - snapline) < 10)
+						{
+							chosenSnapX = snapline - ActualWidth;
+							break;
+						}
+					}
+
+					double? chosenSnapY = null;
+					foreach (var snapline in Graph.SnapLinesY)
+					{
+						if (Math.Abs(y - snapline) < 10)
+						{
+							chosenSnapY = snapline;
+							break;
+						}
+						else if (Math.Abs((y + ActualHeight) - snapline) < 10)
+						{
+							chosenSnapY = snapline - ActualHeight;
+							break;
+						}
+					}
+
+					if (chosenSnapX.HasValue)
+					{
+						x = chosenSnapX.Value;
+					}
+					if (chosenSnapY.HasValue)
+					{
+						y = chosenSnapY.Value;
+					}
+
+					diff.X = (x - m_startX) * Graph.Scale;
+					diff.Y = (y - m_startY) * Graph.Scale;
 				}
 
-				m_mouseDragLast = current;
+				foreach (var node in Graph.Selected)
+				{
+					node.X = node.m_startX + diff.X / Graph.Scale;
+					node.Y = node.m_startY + diff.Y / Graph.Scale;
+				}
 			}
 
 			base.OnMouseMove(e);

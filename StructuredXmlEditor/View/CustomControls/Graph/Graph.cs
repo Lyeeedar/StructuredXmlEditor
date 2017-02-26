@@ -480,6 +480,30 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
+		public void UpdateSnapLines()
+		{
+			SnapLinesX.Clear();
+			SnapLinesY.Clear();
+
+			foreach (var node in Nodes)
+			{
+				if (!node.IsSelected)
+				{
+					var left = node.X;
+					var right = node.X + node.ActualWidth;
+					var top = node.Y;
+					var bottom = node.Y + node.ActualHeight;
+
+					if (!SnapLinesX.Contains(left)) SnapLinesX.Add(left);
+					if (!SnapLinesX.Contains(right)) SnapLinesX.Add(right);
+
+					if (!SnapLinesY.Contains(top)) SnapLinesY.Add(top);
+					if (!SnapLinesY.Contains(bottom)) SnapLinesY.Add(bottom);
+				}
+			}
+		}
+
+		//--------------------------------------------------------------------------
 		public GraphNodeDataLink CreatingLink
 		{
 			get { return m_creatingLink; }
@@ -524,6 +548,10 @@ namespace StructuredXmlEditor.View
 		private bool m_isMarqueeSelecting;
 		private Point m_marqueeStart;
 		private Rect m_marquee;
+
+		//--------------------------------------------------------------------------
+		public List<double> SnapLinesX = new List<double>();
+		public List<double> SnapLinesY = new List<double>();
 
 		//-----------------------------------------------------------------------
 		private Point m_mousePoint;
