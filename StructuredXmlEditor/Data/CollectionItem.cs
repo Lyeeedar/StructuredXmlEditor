@@ -98,7 +98,13 @@ namespace StructuredXmlEditor.Data
 				if (!AllowedChildren.Contains(SelectedDefinition))
 				{
 					SelectedDefinition = AllowedChildren.FirstOrDefault();
+					RaisePropertyChangedEvent("SelectedDefinition");
 				}
+			}
+
+			foreach (var child in Children)
+			{
+				child.RaisePropertyChangedEvent("CanRemove");
 			}
 		}
 

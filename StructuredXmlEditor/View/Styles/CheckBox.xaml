@@ -156,6 +156,13 @@
 								Property="BorderBrush"
 								Value="{StaticResource BorderDarkBrush}" />
 						</Trigger>
+						<Trigger
+							Property="IsEnabled"
+							Value="false">
+							<Setter
+								Property="Opacity"
+								Value="0.6" />
+						</Trigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
 			</Setter.Value>

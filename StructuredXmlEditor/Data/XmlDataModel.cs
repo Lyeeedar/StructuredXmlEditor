@@ -159,6 +159,11 @@ namespace StructuredXmlEditor.Data
 						}
 					}
 
+					if (value == null)
+					{
+						m_selectedDataItems.Clear();
+					}
+
 					m_selected = value;
 
 					if (m_selected is List<DataItem>)

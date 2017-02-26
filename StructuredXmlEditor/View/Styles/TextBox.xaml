@@ -73,6 +73,13 @@
 							x:Name="PART_ContentHost" />
 					</Border>
 					<ControlTemplate.Triggers>
+						<Trigger
+							Property="IsEnabled"
+							Value="false">
+							<Setter
+								Property="Opacity"
+								Value="0.6" />
+						</Trigger>
 
 						<Trigger
 							Property="Validation.HasError"

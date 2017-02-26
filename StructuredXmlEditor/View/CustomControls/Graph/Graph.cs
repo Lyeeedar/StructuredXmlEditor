@@ -255,6 +255,8 @@ namespace StructuredXmlEditor.View
 				{
 					node.IsSelected = false;
 				}
+
+				Nodes.First().GraphNodeItem.DataModel.Selected = null;
 			}
 
 			if (m_isMarqueeSelecting)

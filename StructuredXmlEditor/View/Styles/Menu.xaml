@@ -389,6 +389,13 @@
 					Property="Fill"
 					Value="{StaticResource MouseOverBackgroundBrush}" />
 			</Trigger>
+			<Trigger
+				Property="IsEnabled"
+				Value="false">
+				<Setter
+					Property="Opacity"
+					Value="0.6" />
+			</Trigger>
 		</ControlTemplate.Triggers>
 	</ControlTemplate>
 
@@ -495,6 +502,13 @@
 					Property="Fill"
 					Value="{StaticResource MouseOverBackgroundBrush}" />
 			</Trigger>
+			<Trigger
+				Property="IsEnabled"
+				Value="false">
+				<Setter
+					Property="Opacity"
+					Value="0.6" />
+			</Trigger>
 		</ControlTemplate.Triggers>
 	</ControlTemplate>
 
@@ -586,6 +600,13 @@
 					TargetName="Bg"
 					Property="Fill"
 					Value="{StaticResource MouseOverBackgroundBrush}" />
+			</Trigger>
+			<Trigger
+				Property="IsEnabled"
+				Value="false">
+				<Setter
+					Property="Opacity"
+					Value="0.6" />
 			</Trigger>
 		</ControlTemplate.Triggers>
 	</ControlTemplate>
@@ -725,6 +746,13 @@
 					TargetName="Bg"
 					Property="Fill"
 					Value="{StaticResource MouseOverBackgroundBrush}" />
+			</Trigger>
+			<Trigger
+				Property="IsEnabled"
+				Value="false">
+				<Setter
+					Property="Opacity"
+					Value="0.6" />
 			</Trigger>
 		</ControlTemplate.Triggers>
 	</ControlTemplate>

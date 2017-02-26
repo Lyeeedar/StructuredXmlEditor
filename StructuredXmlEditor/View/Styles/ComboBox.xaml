@@ -70,10 +70,26 @@
 								Property="BorderBrush"
 								Value="{StaticResource MouseOverBorderBrush}" />
 						</Trigger>
+						<Trigger
+							Property="IsEnabled"
+							Value="false">
+							<Setter
+								Property="Opacity"
+								Value="0.6" />
+						</Trigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
 			</Setter.Value>
 		</Setter>
+		<Style.Triggers>
+			<Trigger
+				Property="IsEnabled"
+				Value="false">
+				<Setter
+					Property="Opacity"
+					Value="0.6" />
+			</Trigger>
+		</Style.Triggers>
 	</Style>
 
 	<Style
@@ -195,6 +211,13 @@
 								Value="95" />
 						</Trigger>
 						<Trigger
+							Property="IsEnabled"
+							Value="false">
+							<Setter
+								Property="Opacity"
+								Value="0.6" />
+						</Trigger>
+						<Trigger
 							Property="IsGrouping"
 							Value="true">
 							<Setter
@@ -278,6 +301,13 @@
 								Value="{StaticResource MouseOverBackgroundBrush}" />
 						</Trigger>
 
+						<Trigger
+							Property="IsEnabled"
+							Value="false">
+							<Setter
+								Property="Opacity"
+								Value="0.6" />
+						</Trigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
 			</Setter.Value>

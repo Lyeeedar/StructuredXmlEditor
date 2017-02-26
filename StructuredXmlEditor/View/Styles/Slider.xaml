@@ -111,6 +111,14 @@
 								Property="BorderBrush"
 								Value="{StaticResource BorderDarkBrush}" />
 						</Trigger>
+						<Trigger
+							Property="IsEnabled"
+							Value="false">
+							<Setter
+								TargetName="Border"
+								Property="Opacity"
+								Value="0.6" />
+						</Trigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
 			</Setter.Value>
@@ -167,6 +175,14 @@
 								TargetName="Border"
 								Property="BorderBrush"
 								Value="{StaticResource BorderDarkBrush}" />
+						</Trigger>
+						<Trigger
+							Property="IsEnabled"
+							Value="false">
+							<Setter
+								TargetName="Border"
+								Property="Opacity"
+								Value="0.6" />
 						</Trigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
@@ -259,6 +275,22 @@
 					Property="Visibility"
 					Value="Visible" />
 			</Trigger>
+			<Trigger
+				Property="IsEnabled"
+				Value="False">
+				<Setter
+					TargetName="TopTick"
+					Property="Opacity"
+					Value="0.6" />
+				<Setter
+					TargetName="BottomTick"
+					Property="Opacity"
+					Value="0.6" />
+				<Setter
+					TargetName="TrackBackground"
+					Property="Opacity"
+					Value="0.6" />
+			</Trigger>
 		</ControlTemplate.Triggers>
 	</ControlTemplate>
 
@@ -346,6 +378,22 @@
 					TargetName="BottomTick"
 					Property="Visibility"
 					Value="Visible" />
+			</Trigger>
+			<Trigger
+				Property="IsEnabled"
+				Value="False">
+				<Setter
+					TargetName="TopTick"
+					Property="Opacity"
+					Value="0.6" />
+				<Setter
+					TargetName="BottomTick"
+					Property="Opacity"
+					Value="0.6" />
+				<Setter
+					TargetName="TrackBackground"
+					Property="Opacity"
+					Value="0.6" />
 			</Trigger>
 		</ControlTemplate.Triggers>
 	</ControlTemplate>

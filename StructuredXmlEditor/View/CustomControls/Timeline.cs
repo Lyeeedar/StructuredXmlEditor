@@ -576,6 +576,14 @@ namespace StructuredXmlEditor.View
 		}
 
 		//-----------------------------------------------------------------------
+		protected override void OnMouseLeave(MouseEventArgs e)
+		{
+			Mouse.OverrideCursor = null;
+
+			base.OnMouseLeave(e);
+		}
+
+		//-----------------------------------------------------------------------
 		private void GenerateSnapList(KeyframeItem dragged)
 		{
 			snapLines.Clear();
