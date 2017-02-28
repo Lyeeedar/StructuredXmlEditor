@@ -69,7 +69,17 @@ namespace StructuredXmlEditor.View
 
 			DataItem.Children.CollectionChanged += (obj, args) =>
 			{
+				RaisePropertyChangedEvent("HasChildren");
+
 				View.DeferRefresh();
+			};
+
+			DataItem.ChildPropertyChangedEvent += (obj, args) =>
+			{
+				if (args.PropertyName == "IsVisible")
+				{
+					View.DeferRefresh();
+				}
 			};
 		}
 

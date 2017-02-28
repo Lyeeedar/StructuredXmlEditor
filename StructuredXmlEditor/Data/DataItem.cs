@@ -21,6 +21,9 @@ namespace StructuredXmlEditor.Data
 	public abstract class DataItem : NotifyPropertyChanged
 	{
 		//-----------------------------------------------------------------------
+		public event PropertyChangedEventHandler ChildPropertyChangedEvent;
+
+		//-----------------------------------------------------------------------
 		public List<DataItem> MultieditItems { get; set; } = new List<DataItem>();
 		public int? MultieditCount;
 		public bool IsMultiediting { get { return MultieditCount != null; } }
@@ -844,6 +847,7 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public virtual void ChildPropertyChanged(object sender, PropertyChangedEventArgs args)
 		{
+			ChildPropertyChangedEvent?.Invoke(sender, args);
 		}
 
 		//-----------------------------------------------------------------------
