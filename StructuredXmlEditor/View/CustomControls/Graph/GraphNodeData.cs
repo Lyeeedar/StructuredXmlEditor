@@ -193,8 +193,8 @@ namespace StructuredXmlEditor.View
 					var wrapped = (item as CollectionChildItem).WrappedItem;
 
 					var droppedDef = wrapped.Definition;
-					if (droppedDef is ReferenceDefinition) droppedDef = (wrapped as ReferenceItem).WrappedItem.Definition;
-					else if (droppedDef is GraphReferenceDefinition) droppedDef = (wrapped as GraphReferenceItem).WrappedItem.Definition;
+					if (droppedDef is ReferenceDefinition) droppedDef = (wrapped as ReferenceItem).WrappedItem?.Definition ?? wrapped.Definition;
+					else if (droppedDef is GraphReferenceDefinition) droppedDef = (wrapped as GraphReferenceItem).WrappedItem?.Definition ?? wrapped.Definition;
 
 					var cdef = (collection as GraphCollectionItem).CDef;
 

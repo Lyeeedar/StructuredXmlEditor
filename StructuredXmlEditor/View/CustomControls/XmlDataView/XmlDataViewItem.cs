@@ -252,9 +252,7 @@ namespace StructuredXmlEditor.View
 			else if (DataItem is CollectionChildItem)
 			{
 				CollectionChildItem item = e.Data.GetData("CollectionChildItem") as CollectionChildItem;
-				var wrappedItem = item.GetNonWrappedItem(item);
-
-				if (wrappedItem == null) return;
+				var wrappedItem = item.GetNonWrappedItem(item) ?? item.WrappedItem;
 
 				DataItem collection = ((CollectionChildItem)DataItem).ParentCollection;
 
@@ -351,9 +349,7 @@ namespace StructuredXmlEditor.View
 			else if (DataItem is CollectionChildItem)
 			{
 				CollectionChildItem item = e.Data.GetData("CollectionChildItem") as CollectionChildItem;
-				var wrappedItem = item.GetNonWrappedItem(item);
-
-				if (wrappedItem == null) return;
+				var wrappedItem = item.GetNonWrappedItem(item) ?? item.WrappedItem;
 
 				DataItem collection = ((CollectionChildItem)DataItem).ParentCollection;
 
@@ -467,7 +463,7 @@ namespace StructuredXmlEditor.View
 
 				if (item == droppedItem) return;
 
-				var wrappedItem = item.GetNonWrappedItem(item);
+				var wrappedItem = item.GetNonWrappedItem(item) ?? item.WrappedItem;
 
 				if (wrappedItem == null) return;
 
