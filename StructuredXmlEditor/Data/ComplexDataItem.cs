@@ -66,11 +66,18 @@ namespace StructuredXmlEditor.Data
 
 							if (child != null)
 							{
-								builder.Append("<");
-								builder.Append(child.TextColour);
-								builder.Append(">");
-								builder.Append(child.Description);
-								builder.Append("</>");
+								if (child.IsVisibleFromBindings)
+								{
+									builder.Append("<");
+									builder.Append(child.TextColour);
+									builder.Append(">");
+									builder.Append(child.Description);
+									builder.Append("</>");
+								}
+								else
+								{
+
+								}
 							}
 							else
 							{

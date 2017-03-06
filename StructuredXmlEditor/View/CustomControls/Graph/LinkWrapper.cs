@@ -76,8 +76,8 @@ namespace StructuredXmlEditor.View
 			var src = (Point)values[1];
 			var dst = (Point)values[2];
 
-			var Offset = link.Graph.Offset;
-			var Scale = link.Graph.Scale;
+			var Offset = link.Graph?.Offset ?? new Point();
+			var Scale = link.Graph?.Scale ?? 1;
 
 			src = new Point((src.X - Offset.X) / Scale, (src.Y - Offset.Y) / Scale);
 

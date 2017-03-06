@@ -410,6 +410,23 @@ namespace StructuredXmlEditor.View
 						},
 						"Delete " + node.GraphNodeItem.Name);
 				}
+
+				var items = Nodes.FirstOrDefault()?.GraphNodeItem?.DataModel?.SelectedItems;
+
+				if (items != null)
+				{
+					foreach (var item in items.ToList())
+					{
+						item.IsSelected = false;
+					}
+				}
+
+				foreach (var node in Nodes)
+				{
+					node.IsSelected = false;
+				}
+
+				Nodes.First().GraphNodeItem.DataModel.Selected = null;
 			}
 		}
 
