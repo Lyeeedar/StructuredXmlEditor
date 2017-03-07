@@ -6,7 +6,8 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:data="clr-namespace:StructuredXmlEditor.Data"
 	xmlns:v="clr-namespace:StructuredXmlEditor.View">
-	<Grid x:Name="Root">
+	<Grid x:Name="Root"
+		  Background="Transparent">
 
 		<v:XmlDataView
 			Visibility="{Binding Workspace.Current.Data.IsSelectedDataItem, Converter={v:ValueTypeConverter}}"
