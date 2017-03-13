@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StructuredXmlEditor.View;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -179,6 +180,18 @@ namespace StructuredXmlEditor
 		public static void AddSeperator(this MenuItem menu)
 		{
 			if (menu.Items.Count > 0 && !(menu.Items.GetItemAt(menu.Items.Count - 1) is Separator)) menu.Items.Add(new Separator());
+		}
+
+		//-----------------------------------------------------------------------
+		public static void AddGroupHeader(this ContextMenu menu, string name)
+		{
+			menu.Items.Add(new MenuItemGroupHeader(name));
+		}
+
+		//-----------------------------------------------------------------------
+		public static void AddGroupHeader(this MenuItem menu, string name)
+		{
+			menu.Items.Add(new MenuItemGroupHeader(name));
 		}
 
 		//-----------------------------------------------------------------------

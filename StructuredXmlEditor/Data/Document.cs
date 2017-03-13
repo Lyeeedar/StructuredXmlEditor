@@ -251,6 +251,9 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void DoBackup()
 		{
+			// Dont backup files that dont exist for real yet
+			if (!File.Exists(Path)) return;
+
 			var undoPoint = UndoRedo.UndoStack.Count;
 
 			if (UndoRedo.IsModified)

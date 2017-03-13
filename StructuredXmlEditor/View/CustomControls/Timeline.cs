@@ -672,7 +672,7 @@ namespace StructuredXmlEditor.View
 						if (TimelineItem.TimelineDef.KeyframeDefinitions.Count == 1)
 						{
 							MenuItem add = new MenuItem();
-							add.Header = "Add";
+							add.Header = "Add " + TimelineItem.TimelineDef.KeyframeDefinitions[0].Name;
 							add.Click += delegate
 							{
 								var newTime = clickPos / pixelsASecond;
@@ -692,14 +692,21 @@ namespace StructuredXmlEditor.View
 
 							if (!TimelineItem.IsAtMax)
 							{
-								foreach (var def in TimelineItem.TimelineDef.KeyframeDefinitions)
+								var currentGroup = "";
+								foreach (var def in TimelineItem.TimelineDef.Keys)
 								{
-									add.AddItem(def.Name, () =>
+									if (def.Item2 != currentGroup)
+									{
+										currentGroup = def.Item2;
+										add.AddGroupHeader(currentGroup);
+									}
+
+									add.AddItem(def.Item1.Name, () =>
 									{
 										var newTime = clickPos / pixelsASecond;
 										var roundedTime = Snap(newTime);
 
-										TimelineItem.Add(def, (float)roundedTime);
+										TimelineItem.Add(def.Item1, (float)roundedTime);
 
 										dirty = true;
 									});
@@ -708,7 +715,27 @@ namespace StructuredXmlEditor.View
 						}
 					}
 
-					menu.Items.Add(new Separator());
+					menu.AddSeperator();
+
+					menu.AddItem("Auto Position Keyframes", delegate 
+					{
+						var firstTime = TimelineItem.Children.Select(e => (e as KeyframeItem).Time).Min();
+						var lastTime = TimelineItem.Children.Select(e => (e as KeyframeItem).Time).Max();
+
+						var count = TimelineItem.Children.Count;
+
+						var step = (lastTime - firstTime) / (count - 1);
+
+						var current = firstTime;
+						foreach (var keyframe in TimelineItem.Children.Select(e => e as KeyframeItem).OrderBy(e => e.Time).ToList())
+						{
+							keyframe.Time = current;
+
+							current += step;
+						}
+					});
+
+					menu.AddSeperator();
 
 					MenuItem zoom = new MenuItem();
 					zoom.Header = "Zoom To Best Fit";

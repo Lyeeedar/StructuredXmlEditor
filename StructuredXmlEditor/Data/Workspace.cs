@@ -639,7 +639,16 @@ namespace StructuredXmlEditor.Data
 
 							BackupDocuments.Add(file);
 						}
-						catch (Exception) { }
+						catch (Exception)
+						{
+							// Backup failed to open, so is garbage, delete it
+
+							try
+							{
+								File.Delete(file);
+							}
+							catch (Exception) { }
+						}
 					}
 				}
 			}

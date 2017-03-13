@@ -163,6 +163,7 @@
     <Compile Include="View\CustomControls\Graph\GraphNodeData.cs" />
     <Compile Include="View\CustomControls\Graph\LinkWrapper.cs" />
     <Compile Include="View\CustomControls\InsertionAdorner.cs" />
+    <Compile Include="View\CustomControls\MenuItemGroupHeader.cs" />
     <Compile Include="View\CustomControls\Message.xaml.cs">
       <DependentUpon>Message.xaml</DependentUpon>
     </Compile>

@@ -50,7 +50,7 @@ namespace StructuredXmlEditor.Data
 
 				if (WrappedItem != null)
 				{
-					Name = Parent is CollectionChildItem ? WrappedItem.Name : Definition.Name + " (" + WrappedItem.Name + ")";
+					Name = Parent is CollectionChildItem && !(((Parent as CollectionChildItem).ParentCollection.Definition as CollectionDefinition)?.ChildrenAreUnique ?? false) ? WrappedItem.Name : Definition.Name + " (" + WrappedItem.Name + ")";
 					ToolTip = WrappedItem.ToolTip;
 					TextColour = WrappedItem.TextColour;
 				}
@@ -126,7 +126,10 @@ namespace StructuredXmlEditor.Data
 				{
 					if (WrappedItem != null)
 					{
-						Name = Parent is CollectionChildItem ? WrappedItem.Name : Definition.Name + " (" + WrappedItem.Name + ")";
+						Future.Call(() => 
+						{
+							Name = Parent is CollectionChildItem && !(((Parent as CollectionChildItem).ParentCollection.Definition as CollectionDefinition)?.ChildrenAreUnique ?? false) ? WrappedItem.Name : Definition.Name + " (" + WrappedItem.Name + ")";
+						}, 10);
 					}
 				}
 			};

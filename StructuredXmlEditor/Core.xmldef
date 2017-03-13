@@ -89,7 +89,7 @@
 	<StructDef Name="Colour" ToolTip="A colour (stored as RGB or RGBA in 0-255 range)." TextColour="Primitive">
 		<Attributes>
 			<String Name="Name" Default="Colour" ToolTip="The name to be written for this element." />
-			<Boolean Name="HasAlpha" ToolTip="Whether this colour has an alpha value that isnt 255. If set to false then the colour will only write RGB, instead of RGBA." />
+			<Boolean Name="HasAlpha" Default="true" ToolTip="Whether this colour has an alpha value that isnt 255. If set to false then the colour will only write RGB, instead of RGBA." />
 			<Colour Name="Default" ToolTip="The default colour." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />

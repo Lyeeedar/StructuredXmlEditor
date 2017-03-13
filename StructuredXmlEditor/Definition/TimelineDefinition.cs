@@ -5,11 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using StructuredXmlEditor.Data;
+using System.Windows.Data;
 
 namespace StructuredXmlEditor.Definition
 {
 	public class TimelineDefinition : ComplexDataDefinition
 	{
+		public ListCollectionView ItemsSource { get; set; }
+		public List<Tuple<KeyframeDefinition, string>> Keys { get; } = new List<Tuple<KeyframeDefinition, string>>();
 		public List<KeyframeDefinition> KeyframeDefinitions { get; } = new List<KeyframeDefinition>();
 		public int MinCount { get; set; }
 		public int MaxCount { get; set; }
@@ -99,15 +102,29 @@ namespace StructuredXmlEditor.Definition
 			MaxCount = TryParseInt(definition, "MaxCount", int.MaxValue);
 			Interpolate = TryParseBool(definition, "Interpolate", true);
 
-			var childDefs = definition.Elements();
+			var currentGroup = "Keyframes";
+
+			var childDefs = definition.Nodes();
 			foreach (var childDef in childDefs)
 			{
-				var cdef = LoadDefinition(childDef, "Keyframe") as KeyframeDefinition;
+				if (childDef is XComment)
+				{
+					currentGroup = (childDef as XComment).Value;
+				}
+				else if (childDef is XElement)
+				{
+					var cdef = LoadDefinition(childDef as XElement, "Keyframe") as KeyframeDefinition;
 
-				if (cdef == null) throw new Exception("Argh!");
+					if (cdef == null) throw new Exception("Argh!");
 
-				KeyframeDefinitions.Add(cdef);
+					KeyframeDefinitions.Add(cdef);
+					Keys.Add(new Tuple<KeyframeDefinition, string>(cdef, currentGroup));
+				}
 			}
+
+			ListCollectionView lcv = new ListCollectionView(Keys);
+			lcv.GroupDescriptions.Add(new PropertyGroupDescription("Item2"));
+			ItemsSource = lcv;
 
 			if (KeyframeDefinitions.Count == 0)
 			{
