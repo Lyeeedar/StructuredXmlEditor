@@ -74,6 +74,7 @@ namespace StructuredXmlEditor.Definition
 		{
 			Default = definition.Attribute("Default")?.Value?.ToString();
 			if (Default == null) Default = "";
+			Default = Default.Replace("\\n", "\n");
 
 			ElementPerLine = TryParseBool(definition, "ElementPerLine");
 			IsAsciiGrid = TryParseBool(definition, "IsAsciiGrid");
