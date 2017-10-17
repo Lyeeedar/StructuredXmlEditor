@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
@@ -103,28 +104,40 @@ namespace StructuredXmlEditor.Data
 				var path = FullPath;
 				if (File.Exists(path))
 				{
-					try
+					for (int i = 0; i < 100; i++)
 					{
-						Uri uri = new Uri(path, UriKind.RelativeOrAbsolute);
-						BitmapImage image = new BitmapImage();
-						image.BeginInit();
-						image.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
-						image.CacheOption = BitmapCacheOption.OnLoad;
-						image.UriSource = uri;
-						image.EndInit();
-						image.Freeze();
+						try
+						{
+							using (var stream = new FileStream(path, FileMode.Open))
+							{
+								try
+								{
+									BitmapImage image = new BitmapImage();
+									image.BeginInit();
+									image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
+									image.CacheOption = BitmapCacheOption.OnLoad;
+									image.StreamSource = stream;
+									image.EndInit();
+									image.Freeze();
 
-						Application.Current.Dispatcher.BeginInvoke(new Action(delegate
+									Application.Current.Dispatcher.BeginInvoke(new Action(delegate
+									{
+										Preview = image;
+									}));
+								}
+								catch (Exception)
+								{
+									Application.Current.Dispatcher.BeginInvoke(new Action(delegate
+									{
+										Preview = null;
+									}));
+								}
+							}
+						}
+						catch (Exception)
 						{
-							Preview = image;
-						}));
-					}
-					catch (Exception)
-					{
-						Application.Current.Dispatcher.BeginInvoke(new Action(delegate
-						{
-							Preview = null;
-						}));
+							Thread.Sleep(100);
+						}
 					}
 				}
 				else

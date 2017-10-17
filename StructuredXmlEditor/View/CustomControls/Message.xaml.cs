@@ -61,10 +61,16 @@ namespace StructuredXmlEditor.View
 
 		public static string Show(string message, string title, params string[] buttons)
 		{
-			var dialog = new Message(message, title, buttons);
-			var result = dialog.ShowDialog();
+			string choice = null;
 
-			return dialog.Choice;
+			Application.Current.Dispatcher.Invoke(new Action(() => 
+			{
+				var dialog = new Message(message, title, buttons);
+				var result = dialog.ShowDialog();
+				choice = dialog.Choice;
+			}));
+
+			return choice;
 		}
 	}
 }

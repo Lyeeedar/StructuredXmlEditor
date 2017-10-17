@@ -78,7 +78,7 @@ namespace StructuredXmlEditor.Data
 		public double LeftPad
 		{
 			get { return leftPad; }
-			set { leftPad = value; }
+			set { leftPad = value; RaisePropertyChangedEvent(); }
 		}
 		private double leftPad = 10;
 

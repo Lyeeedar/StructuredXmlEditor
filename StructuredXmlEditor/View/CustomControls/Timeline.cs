@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Controls.Primitives;
 using StructuredXmlEditor.Definition;
 using System.Timers;
+using System.IO;
 
 namespace StructuredXmlEditor.View
 {
@@ -684,6 +685,63 @@ namespace StructuredXmlEditor.View
 							};
 							add.IsEnabled = !TimelineItem.IsAtMax;
 							menu.Items.Add(add);
+
+							var keyDef = TimelineItem.TimelineDef.KeyframeDefinitions[0];
+							var nonBaseDefs = keyDef.Children.Where(e => e != keyDef.TimeDefinition && e != keyDef.DurationDefinition).ToList();
+							var firstChild = nonBaseDefs.FirstOrDefault();
+							if (nonBaseDefs.Count == 1 && firstChild is FileDefinition)
+							{
+								menu.AddItem("Add Multiple", () => 
+								{
+									Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+
+									var fdef = firstChild as FileDefinition;
+
+									if (fdef.AllowedFileTypes != null)
+									{
+										var filter = "Resource files (" +
+											string.Join(", ", fdef.AllowedFileTypes.Select((e) => "*." + e)) +
+											") | " +
+											string.Join("; ", fdef.AllowedFileTypes.Select((e) => "*." + e));
+										dlg.Filter = filter;
+									}
+
+									dlg.Multiselect = true;
+
+									bool? result = dlg.ShowDialog();
+
+									if (result == true)
+									{
+										var newTime = clickPos / pixelsASecond;
+										var roundedTime = Snap(newTime);
+
+										var filenames = dlg.FileNames;
+										foreach (var file in filenames)
+										{
+											var chosen = file;
+
+											if (fdef.StripExtension) chosen = Path.ChangeExtension(chosen, null);
+
+											// make relative
+											var relativeTo = Path.Combine(Path.GetDirectoryName(Workspace.Instance.ProjectRoot), fdef.BasePath, "fakefile.fake");
+
+											Uri path1 = new Uri(chosen);
+											Uri path2 = new Uri(relativeTo);
+											Uri diff = path2.MakeRelativeUri(path1);
+											string relPath = Uri.UnescapeDataString(diff.OriginalString);
+
+											var created = TimelineItem.Add(keyDef, (float)roundedTime);
+
+											var fitem = (FileItem)created.Children.FirstOrDefault(e => e.Definition == firstChild);
+											fitem.Value = relPath;
+
+											roundedTime += 0.1;
+										}
+
+										dirty = true;
+									}
+								});
+							}
 						}
 						else
 						{

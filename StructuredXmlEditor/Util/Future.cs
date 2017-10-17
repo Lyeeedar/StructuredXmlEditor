@@ -11,35 +11,70 @@ namespace StructuredXmlEditor
 	public static class Future
 	{
 		private static object m_locker = new object();
-		private static Dictionary<object, Tuple<Action, Timer>> m_futures = new Dictionary<object, Tuple<Action, Timer>>();
+		private static Dictionary<object, FutureData> m_futures = new Dictionary<object, FutureData>();
 
 		public static void Call(Action func, int ms, object key = null)
 		{
-			if (key == null) key = new object();
+			if (key == null) { key = new object(); }
 
 			lock (m_locker)
 			{
 				if (m_futures.ContainsKey(key))
 				{
-					m_futures[key].Item2.Change(ms, Timeout.Infinite);
+					m_futures[key].func = func;
+					m_futures[key].remainingDelayMS = ms;
 				}
 				else
 				{
-					var timer = new Timer(TimerElapsed, key, ms, Timeout.Infinite);
-					m_futures[key] = new Tuple<Action, Timer>(func, timer);
+					m_futures[key] = new FutureData(key, func, ms);
 				}
 			}
 		}
 
-		private static void TimerElapsed(object key)
+		static Future()
 		{
-			lock (m_locker)
+			new Thread(() =>
 			{
-				var data = m_futures[key];
-				m_futures.Remove(key);
+				Thread.CurrentThread.IsBackground = true;
 
-				Application.Current?.Dispatcher?.BeginInvoke(data.Item1);
-				data.Item2.Dispose();
+				DateTime lastTime = DateTime.Now;
+				while (true)
+				{ 
+					Thread.Sleep(10);
+
+					lock (m_locker)
+					{
+						DateTime currentTime = DateTime.Now;
+						var expired = (int)(currentTime - lastTime).TotalMilliseconds;
+
+						foreach (var data in m_futures.Values.ToList())
+						{
+							data.remainingDelayMS -= expired;
+							if (data.remainingDelayMS <= 0)
+							{
+								m_futures.Remove(data.key);
+							}
+
+							data.func();
+						}
+
+						lastTime = currentTime;
+					}
+				}
+			}).Start();
+		}
+
+		private class FutureData
+		{
+			public object key;
+			public Action func;
+			public int remainingDelayMS;
+
+			public FutureData(object key, Action func, int delayMS)
+			{
+				this.key = key;
+				this.func = func;
+				this.remainingDelayMS = delayMS;
 			}
 		}
 	}
