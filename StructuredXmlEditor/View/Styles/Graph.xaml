@@ -518,6 +518,56 @@
 	</Style>
 
 	<Style
+		TargetType="{x:Type local:GraphComment}">
+		<Setter
+			Property="Canvas.Left"
+			Value="{Binding Path=CanvasX}" />
+		<Setter
+			Property="Canvas.Top"
+			Value="{Binding Path=CanvasY}" />
+		<Setter
+			Property="Width"
+			Value="{Binding Path=CommentWidth}" />
+		<Setter
+			Property="Height"
+			Value="{Binding Path=CommentHeight}" />
+		<Setter
+			Property="Template">
+			<Setter.Value>
+				<ControlTemplate
+					TargetType="{x:Type local:GraphComment}">
+
+					<Grid
+						ToolTip="{Binding Comment.ToolTip}">
+						<Grid.RowDefinitions>
+							<RowDefinition
+								Height="Auto" />
+							<RowDefinition
+								Height="*" />
+						</Grid.RowDefinitions>
+
+						<Grid
+							Background="{Binding Comment.Colour}"
+							Opacity="0.7">
+							<TextBlock
+								Margin="5,2,5,2"
+								Text="{Binding Comment.Title}" />
+						</Grid>
+
+						<Grid
+							Grid.Row="1"
+							Background="{Binding Comment.Colour}"
+							Opacity="0.4">
+							
+						</Grid>
+					</Grid>
+					
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<Style
 		TargetType="{x:Type local:Graph}">
 		<Setter
 			Property="Template">

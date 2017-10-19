@@ -263,6 +263,21 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public IEnumerable<GraphComment> GraphComments
+		{
+			get
+			{
+				foreach (var item in GraphNodeItems.ToList())
+				{
+					foreach (var comment in item.Comments)
+					{
+						yield return comment.GraphComment;
+					}
+				}
+			}
+		}
+
+		//-----------------------------------------------------------------------
 		public IEnumerable<DataItem> Descendants
 		{
 			get

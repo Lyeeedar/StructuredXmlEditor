@@ -64,6 +64,13 @@ namespace StructuredXmlEditor.Definition
 			item.X = TryParseFloat(element, MetaNS + "X");
 			item.Y = TryParseFloat(element, MetaNS + "Y");
 			item.GUID = element.Attribute("GUID")?.Value?.ToString();
+			item.Comment = element.Attribute(MetaNS + "Comment")?.Value?.ToString();
+			
+			var commentData = element.Attribute(MetaNS + "CommentData")?.Value?.ToString();
+			if (commentData != null)
+			{
+				item.Comments = ParseGraphComments(commentData);
+			}
 
 			var commentTexts = Children.Where(e => e is CommentDefinition).Select(e => (e as CommentDefinition).Text);
 

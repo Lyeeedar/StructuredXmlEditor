@@ -159,6 +159,7 @@
     </Compile>
     <Compile Include="View\CustomControls\Graph\Connection.cs" />
     <Compile Include="View\CustomControls\Graph\Graph.cs" />
+    <Compile Include="View\CustomControls\Graph\GraphComment.cs" />
     <Compile Include="View\CustomControls\Graph\GraphNode.cs" />
     <Compile Include="View\CustomControls\Graph\GraphNodeData.cs" />
     <Compile Include="View\CustomControls\Graph\LinkWrapper.cs" />
