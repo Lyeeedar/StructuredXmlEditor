@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -280,7 +281,7 @@ namespace StructuredXmlEditor.View
 			Keyboard.Focus(Graph);
 
 			m_inDrag = true;
-			m_mouseDragLast = e.GetPosition(Parent as IInputElement);
+			m_mouseDragLast = MouseUtilities.CorrectGetPosition(Graph);
 			foreach (var node in Graph.Selected)
 			{
 				node.m_startX = node.X;
@@ -299,7 +300,7 @@ namespace StructuredXmlEditor.View
 		//--------------------------------------------------------------------------
 		protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
 		{
-			var current = e.GetPosition(Parent as IInputElement);
+			var current = MouseUtilities.CorrectGetPosition(Graph);
 			var diff = current - m_mouseDragLast;
 
 			if (Math.Abs(diff.X) < 10 && Math.Abs(diff.Y) < 10)
@@ -355,9 +356,14 @@ namespace StructuredXmlEditor.View
 				}
 			}
 
+			if (e.LeftButton != MouseButtonState.Pressed)
+			{
+				m_inDrag = false;
+			}
+
 			if (m_inDrag)
 			{
-				var current = e.GetPosition(Parent as IInputElement);
+				var current = MouseUtilities.CorrectGetPosition(Graph);
 				var diff = current - m_mouseDragLast;
 
 				if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
@@ -446,5 +452,26 @@ namespace StructuredXmlEditor.View
 				PropertyChanged(this, new PropertyChangedEventArgs(i_propertyName));
 			}
 		}
+	}
+
+	public static class MouseUtilities
+	{
+		public static Point CorrectGetPosition(Visual relativeTo)
+		{
+			Win32Point w32Mouse = new Win32Point();
+			GetCursorPos(ref w32Mouse);
+			return relativeTo.PointFromScreen(new Point(w32Mouse.X, w32Mouse.Y));
+		}
+
+		[StructLayout(LayoutKind.Sequential)]
+		internal struct Win32Point
+		{
+			public Int32 X;
+			public Int32 Y;
+		};
+
+		[DllImport("user32.dll")]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		internal static extern bool GetCursorPos(ref Win32Point pt);
 	}
 }
