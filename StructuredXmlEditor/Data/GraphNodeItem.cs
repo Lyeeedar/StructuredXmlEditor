@@ -83,20 +83,11 @@ namespace StructuredXmlEditor.Data
 			get { return m_comment; }
 			set
 			{
-				if (m_comment != value)
-				{
-					UndoRedo.DoValueChange<string>(this, m_comment, null, value, null, (val, data) =>
-					{
-						m_comment = val;
-						RaisePropertyChangedEvent("Comment");
-					}, "Comment");
-				}
+				m_comment = value;
+				RaisePropertyChangedEvent("Comment");
 			}
 		}
 		private string m_comment;
-
-		//-----------------------------------------------------------------------
-		public List<GraphCommentItem> Comments { get; set; } = new List<GraphCommentItem>();
 
 		//-----------------------------------------------------------------------
 		public IEnumerable<DataItem> GraphData
@@ -226,30 +217,5 @@ namespace StructuredXmlEditor.Data
 				}
 			}
 		}
-	}
-
-	//-----------------------------------------------------------------------
-	public class GraphCommentItem : NotifyPropertyChanged
-	{
-		public string GUID { get; set; }
-		public string Title { get; set; }
-		public string ToolTip { get; set; }
-		public Brush Colour { get; set; }
-
-		public DeferableObservableCollection<GraphNodeItem> Nodes { get; set; } = new DeferableObservableCollection<GraphNodeItem>();
-
-		public GraphComment GraphComment
-		{
-			get
-			{
-				if (m_comment == null)
-				{
-					m_comment = new GraphComment(this);
-				}
-
-				return m_comment;
-			}
-		}
-		private GraphComment m_comment;
 	}
 }

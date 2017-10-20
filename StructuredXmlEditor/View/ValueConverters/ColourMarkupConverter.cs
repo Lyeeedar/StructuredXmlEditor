@@ -91,17 +91,7 @@ namespace StructuredXmlEditor.View
 
 			if (!colourBrushMap.ContainsKey(current))
 			{
-				var split = current.Split(new char[] { ',' });
-
-				byte r = 0;
-				byte g = 0;
-				byte b = 0;
-
-				byte.TryParse(split[0], out r);
-				byte.TryParse(split[1], out g);
-				byte.TryParse(split[2], out b);
-
-				var col = Color.FromArgb(255, r, g, b);
+				var col = current.ToColour().Value;
 				var brush = new SolidColorBrush(col);
 				brush.Freeze();
 

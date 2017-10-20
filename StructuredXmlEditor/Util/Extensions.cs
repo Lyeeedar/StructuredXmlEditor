@@ -79,6 +79,12 @@ namespace StructuredXmlEditor
 		}
 
 		//-----------------------------------------------------------------------
+		public static string ToCSV(this Color input)
+		{
+			return "" + input.R + "," + input.G + "," + input.B + "," + input.A;
+		}
+
+		//-----------------------------------------------------------------------
 		public static Color? ToColour(this string input)
 		{
 			var split = input.Split(new char[] { ',' });

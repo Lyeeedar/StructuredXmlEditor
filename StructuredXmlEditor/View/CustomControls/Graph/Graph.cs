@@ -27,10 +27,9 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		public Graph()
 		{
-			Future.Call(() => 
+			Future.SafeCall(() => 
 			{
 				Offset = new Point(ActualWidth / 3, ActualHeight / 3);
-
 			}, 10);
 		}
 
@@ -390,12 +389,20 @@ namespace StructuredXmlEditor.View
 			GraphNode clickedNode = Nodes.FirstOrDefault(e => GetRectOfObject(e).Contains(pos));
 			if (clickedNode != null)
 			{
+				if (!clickedNode.IsSelected)
+				{
+					clickedNode.IsSelected = true;
+				}
+
 				menu.AddSeperator();
 
 				menu.AddItem("Delete", () => 
 				{
-					DeleteNodes(new List<GraphNode>() { clickedNode });
+					DeleteNodes(Selected.ToList());
 				});
+
+				var dataModel = clickedNode.GraphNodeItem.DataModel;
+				var undo = dataModel.RootItems[0].UndoRedo;
 
 				var commentMenu = menu.AddItem("Set Comment");
 
@@ -404,20 +411,89 @@ namespace StructuredXmlEditor.View
 					var comment = new GraphCommentItem();
 					comment.GUID = Guid.NewGuid().ToString();
 
-					clickedNode.GraphNodeItem.Comments.Add(comment);
-					comment.Nodes.Add(clickedNode.GraphNodeItem);
+					undo.ApplyDoUndo(
+						delegate
+						{
+							clickedNode.GraphNodeItem.DataModel.GraphCommentItems.Add(comment);
+						},
+						delegate
+						{
+							clickedNode.GraphNodeItem.DataModel.GraphCommentItems.Remove(comment);
+						},
+						"Create Graph Comment");
+
+					foreach (var node in Selected)
+					{
+						var previous = node.GraphNodeItem.Comment;
+						var previousComment = Comments.FirstOrDefault(e => e.Comment.GUID == previous);
+
+						undo.ApplyDoUndo(
+							delegate
+							{
+								node.GraphNodeItem.Comment = comment.GUID;
+								comment.Nodes.Add(node.GraphNodeItem);
+
+								if (previousComment != null)
+								{
+									previousComment.Comment.Nodes.Remove(node.GraphNodeItem);
+								}
+							},
+							delegate
+							{
+								node.GraphNodeItem.Comment = previous;
+								comment.Nodes.Remove(node.GraphNodeItem);
+
+								if (previousComment != null)
+								{
+									previousComment.Comment.Nodes.Add(node.GraphNodeItem);
+								}
+							},
+							"Set Graph Comment");
+					}
 
 					clickedNode.GraphNodeItem.DataModel.RaisePropertyChangedEvent("GraphComments");
 				});
 
-				commentMenu.AddSeperator();
+				bool first = true;
 
 				foreach (var comment in Comments)
 				{
-					commentMenu.AddItem(comment.Comment.Title, () => 
+					if (first)
 					{
-						clickedNode.GraphNodeItem.Comment = comment.Comment.GUID;
-						comment.Comment.Nodes.Add(clickedNode.GraphNodeItem);
+						commentMenu.AddSeperator();
+						first = false;
+					}
+
+					commentMenu.AddItem(comment.Comment.Title, () =>
+					{
+						foreach (var node in Selected)
+						{
+							var previous = node.GraphNodeItem.Comment;
+							var previousComment = Comments.FirstOrDefault(e => e.Comment.GUID == previous);
+
+							undo.ApplyDoUndo(
+								delegate
+								{
+									node.GraphNodeItem.Comment = comment.Comment.GUID;
+									comment.Comment.Nodes.Add(node.GraphNodeItem);
+
+									if (previousComment != null)
+									{
+										previousComment.Comment.Nodes.Remove(node.GraphNodeItem);
+									}
+								},
+								delegate
+								{
+									node.GraphNodeItem.Comment = previous;
+									comment.Comment.Nodes.Remove(node.GraphNodeItem);
+
+									if (previousComment != null)
+									{
+										previousComment.Comment.Nodes.Add(node.GraphNodeItem);
+									}
+								},
+								"Set Graph Comment");
+						}
 					});
 				}
 
@@ -425,13 +501,34 @@ namespace StructuredXmlEditor.View
 				{
 					menu.AddItem("Clear Comment", () => 
 					{
-						var comment = Comments.FirstOrDefault(e => e.Comment.GUID == clickedNode.GraphNodeItem.Comment);
-						if (comment != null)
+						foreach (var node in Selected)
 						{
-							comment.Comment.Nodes.Remove(clickedNode.GraphNodeItem);
-						}
+							if (node.GraphNodeItem.Comment == null) continue;
 
-						clickedNode.GraphNodeItem.Comment = null;
+							var previous = node.GraphNodeItem.Comment;
+							var previousComment = Comments.FirstOrDefault(e => e.Comment.GUID == previous);
+
+							undo.ApplyDoUndo(
+								delegate
+								{
+									node.GraphNodeItem.Comment = null;
+
+									if (previousComment != null)
+									{
+										previousComment.Comment.Nodes.Remove(node.GraphNodeItem);
+									}
+								},
+								delegate
+								{
+									node.GraphNodeItem.Comment = previous;
+
+									if (previousComment != null)
+									{
+										previousComment.Comment.Nodes.Add(node.GraphNodeItem);
+									}
+								},
+								"Clear Graph Comment");
+						}
 					});
 				}
 			}
@@ -485,6 +582,21 @@ namespace StructuredXmlEditor.View
 			foreach (var node in nodes)
 			{
 				if (node.GraphNodeItem.DataModel.RootItems.Contains(node.GraphNodeItem)) continue;
+
+				if (node.GraphNodeItem.Comment != null)
+				{
+					var comment = Comments.FirstOrDefault(e => e.Comment.GUID == node.GraphNodeItem.Comment);
+
+					node.GraphNodeItem.UndoRedo.ApplyDoUndo(
+						delegate
+						{
+							comment.Comment.Nodes.Remove(node.GraphNodeItem);
+						},
+						delegate
+						{
+							comment.Comment.Nodes.Add(node.GraphNodeItem);
+						}, "Remove Node Comment");
+				}
 
 				foreach (var parent in node.GraphNodeItem.LinkParents.ToList())
 				{
@@ -675,6 +787,11 @@ namespace StructuredXmlEditor.View
 			{
 				m_offset = value;
 				RaisePropertyChangedEvent();
+
+				foreach (var comment in Comments)
+				{
+					comment.UpdateCommentSize();
+				}
 			}
 		}
 		private Point m_offset;
@@ -689,6 +806,11 @@ namespace StructuredXmlEditor.View
 			{
 				m_scale = value;
 				RaisePropertyChangedEvent();
+
+				foreach (var comment in Comments)
+				{
+					comment.UpdateCommentSize();
+				}
 			}
 		}
 		private double m_scale = 01;

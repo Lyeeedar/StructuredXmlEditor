@@ -31,6 +31,19 @@ namespace StructuredXmlEditor
 			}
 		}
 
+		public static void SafeCall(Action func, int ms, object key = null)
+		{
+			Action safeAction = () =>
+			{
+				Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+				{
+					func();
+				}));
+			};
+
+			Call(safeAction, ms, key);
+		}
+
 		static Future()
 		{
 			new Thread(() =>

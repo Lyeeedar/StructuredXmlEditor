@@ -885,7 +885,20 @@ namespace StructuredXmlEditor.Data
 					document.SetData(item);
 				}
 
-				
+				var commentsStr = firstEl.Attribute(DataDefinition.MetaNS + "GraphCommentData")?.Value;
+				if (commentsStr != null)
+				{
+					document.Data.GraphCommentItems = XmlDataModel.ParseGraphComments(commentsStr);
+
+					foreach (var node in document.Data.GraphNodeItems)
+					{
+						if (node.Comment != null)
+						{
+							var comment = document.Data.GraphCommentItems.FirstOrDefault(e => e.GUID == node.Comment);
+							comment.Nodes.Add(node);
+						}
+					}
+				}
 			}
 
 			return document;

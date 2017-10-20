@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -267,15 +268,15 @@ namespace StructuredXmlEditor.Data
 		{
 			get
 			{
-				foreach (var item in GraphNodeItems.ToList())
+				foreach (var item in GraphCommentItems.ToList())
 				{
-					foreach (var comment in item.Comments)
-					{
-						yield return comment.GraphComment;
-					}
+					yield return item.GraphComment;
 				}
 			}
 		}
+
+		//-----------------------------------------------------------------------
+		public List<GraphCommentItem> GraphCommentItems { get; set; } = new List<GraphCommentItem>();
 
 		//-----------------------------------------------------------------------
 		public IEnumerable<DataItem> Descendants
@@ -549,6 +550,27 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public static List<GraphCommentItem> ParseGraphComments(string commentChain)
+		{
+			var output = new List<GraphCommentItem>();
+
+			var comments = commentChain.Split('%');
+			foreach (var commentString in comments)
+			{
+				var split = commentString.Split('$');
+				var comment = new GraphCommentItem();
+				comment.GUID = split[0];
+				comment.Title = split[1];
+				comment.ToolTip = split[2];
+				comment.Colour = new SolidColorBrush(split[3].ToColour().Value);
+
+				output.Add(comment);
+			}
+
+			return output;
+		}
+
+		//-----------------------------------------------------------------------
 		public void Save(string path)
 		{
 			Directory.CreateDirectory(Path.GetDirectoryName(path));
@@ -568,6 +590,13 @@ namespace StructuredXmlEditor.Data
 			if (doc.Elements().Count() == 0) return;
 
 			doc.Elements().First().SetAttributeValue(XNamespace.Xmlns + "meta", DataDefinition.MetaNS);
+
+			var saveableComments = GraphCommentItems.Where(e => e.Nodes.Count > 0).ToList();
+			if (saveableComments.Count > 0)
+			{
+				var commentStr = string.Join("%", saveableComments.Select(e => e.GUID + "$" + e.Title + "$" + e.ToolTip + "$" + e.Colour.Color.ToCSV()));
+				doc.Elements().First().SetAttributeValue(DataDefinition.MetaNS + "GraphCommentData", commentStr);
+			}
 
 			if (FlattenData)
 			{
@@ -627,6 +656,7 @@ namespace StructuredXmlEditor.Data
 			}
 		}
 
+		//-----------------------------------------------------------------------
 		static object ConvertJTokenToObject(JToken token)
 		{
 			if (token is JValue)
@@ -649,5 +679,30 @@ namespace StructuredXmlEditor.Data
 		ObservableCollection<DataItem> m_rootItems;
 		ObservableCollection<DataItem> m_focusedItemsPath = new ObservableCollection<DataItem>();
 		Dictionary<DataItem, bool> m_lastNullFilterState = new Dictionary<DataItem, bool>();
+	}
+
+	//-----------------------------------------------------------------------
+	public class GraphCommentItem : NotifyPropertyChanged
+	{
+		public string GUID { get; set; }
+		public string Title { get; set; }
+		public string ToolTip { get; set; }
+		public SolidColorBrush Colour { get; set; } = Brushes.Goldenrod;
+
+		public DeferableObservableCollection<GraphNodeItem> Nodes { get; set; } = new DeferableObservableCollection<GraphNodeItem>();
+
+		public GraphComment GraphComment
+		{
+			get
+			{
+				if (m_comment == null)
+				{
+					m_comment = new GraphComment(this);
+				}
+
+				return m_comment;
+			}
+		}
+		private GraphComment m_comment;
 	}
 }

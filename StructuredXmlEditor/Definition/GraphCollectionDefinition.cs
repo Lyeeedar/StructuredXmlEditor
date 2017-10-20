@@ -52,12 +52,6 @@ namespace StructuredXmlEditor.Definition
 			item.GUID = element.Attribute("GUID")?.Value?.ToString();
 			item.Comment = element.Attribute(MetaNS + "Comment")?.Value?.ToString();
 
-			var commentData = element.Attribute(MetaNS + "CommentData")?.Value?.ToString();
-			if (commentData != null)
-			{
-				item.Comments = ParseGraphComments(commentData);
-			}
-
 			foreach (var el in element.Elements())
 			{
 				var prev = el.PreviousNode as XComment;
@@ -149,6 +143,7 @@ namespace StructuredXmlEditor.Definition
 
 			root.Add(new XAttribute(MetaNS + "X", ci.X));
 			root.Add(new XAttribute(MetaNS + "Y", ci.Y));
+			if (ci.Comment != null) root.Add(new XAttribute(MetaNS + "Comment", ci.Comment));
 
 			if (ci.LinkParents.Count > 1 || ci.DataModel.FlattenData)
 			{

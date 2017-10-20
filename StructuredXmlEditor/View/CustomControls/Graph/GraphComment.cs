@@ -71,6 +71,8 @@ namespace StructuredXmlEditor.View
 					node.PropertyChanged += GraphNodePropertyChanged;
 				}
 
+				UpdateCommentSize();
+
 				RaisePropertyChangedEvent("X");
 				RaisePropertyChangedEvent("CanvasX");
 				RaisePropertyChangedEvent("CommentWidth");
@@ -79,6 +81,16 @@ namespace StructuredXmlEditor.View
 				RaisePropertyChangedEvent("CanvasY");
 				RaisePropertyChangedEvent("CommentHeight");
 			};
+
+			nodeCache.Clear();
+			nodeCache.AddRange(Nodes);
+
+			foreach (var node in nodeCache)
+			{
+				node.PropertyChanged += GraphNodePropertyChanged;
+			}
+
+			DataContext = this;
 		}
 
 		//--------------------------------------------------------------------------
@@ -86,12 +98,14 @@ namespace StructuredXmlEditor.View
 		{
 			if (args.PropertyName == "X" || args.PropertyName == "Width")
 			{
+				UpdateCommentSize();
 				RaisePropertyChangedEvent("X");
 				RaisePropertyChangedEvent("CanvasX");
 				RaisePropertyChangedEvent("CommentWidth");
 			}
 			else if (args.PropertyName == "Y" || args.PropertyName == "Height")
 			{
+				UpdateCommentSize();
 				RaisePropertyChangedEvent("Y");
 				RaisePropertyChangedEvent("CanvasY");
 				RaisePropertyChangedEvent("CommentHeight");
@@ -99,7 +113,7 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		private void UpdateCommentSize()
+		public void UpdateCommentSize()
 		{
 			var minX = double.MaxValue;
 			var minY = double.MaxValue;
@@ -116,9 +130,9 @@ namespace StructuredXmlEditor.View
 			}
 
 			X = minX - 10;
-			Y = minY - 10;
-			CommentWidth = (maxX - minX) + 20;
-			CommentHeight = (maxY - minY) + 20;
+			Y = minY - 25;
+			CommentWidth = ((maxX - minX) + 20) * Graph.Scale;
+			CommentHeight = ((maxY - minY) + 35) * Graph.Scale;
 
 			RaisePropertyChangedEvent("X");
 			RaisePropertyChangedEvent("Y");

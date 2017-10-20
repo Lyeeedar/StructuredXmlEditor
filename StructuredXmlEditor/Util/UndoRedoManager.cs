@@ -56,7 +56,20 @@ public class ValueChangeAction<T> : IValueChangeAction
 		return timeStamp;
 	}
 
-	public bool IsChange { get { return !newVal.Equals(oldVal); } }
+	public bool IsChange
+	{
+		get
+		{
+			if (newVal == null)
+			{
+				return oldVal != null;
+			}
+			else
+			{
+				return !newVal.Equals(oldVal);
+			}
+		}
+	}
 
 	public void Do()
 	{
