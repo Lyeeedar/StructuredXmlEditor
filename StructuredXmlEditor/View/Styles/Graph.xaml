@@ -5,9 +5,9 @@
 	xmlns:data="clr-namespace:StructuredXmlEditor.Data">
 
 	<ResourceDictionary.MergedDictionaries>
-		<ResourceDictionary
+		<local:SharedResourceDictionary
 			Source="Brushes.xaml" />
-		<ResourceDictionary
+		<local:SharedResourceDictionary
 			Source="GeneralStyles.xaml" />
 	</ResourceDictionary.MergedDictionaries>
 
@@ -160,6 +160,7 @@
 				<ControlTemplate
 					TargetType="{x:Type local:GraphNodeDataPreview}">
 					<Border
+						Height="27"
 						BorderBrush="{StaticResource WindowBackgroundBrush}"
 						BorderThickness="1"
 						Background="{StaticResource BackgroundNormalBrush}"
@@ -228,8 +229,9 @@
 				<ControlTemplate
 					TargetType="{x:Type local:GraphNodeDataComment}">
 					<Grid
+						Height="25"
 						Background="Transparent"
-						Margin="5,10,5,10">
+						Margin="5">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition
 								Width="*" />

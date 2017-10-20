@@ -115,6 +115,8 @@ namespace StructuredXmlEditor.View
 		//--------------------------------------------------------------------------
 		public void UpdateCommentSize()
 		{
+			if (Graph == null) return;
+
 			var minX = double.MaxValue;
 			var minY = double.MaxValue;
 			var maxX = -double.MaxValue;

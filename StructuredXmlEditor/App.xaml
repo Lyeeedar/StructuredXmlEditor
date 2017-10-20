@@ -1,49 +1,51 @@
-﻿<Application x:Class="StructuredXmlEditor.App"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="MainWindow.xaml">
-    <Application.Resources>
+﻿<Application
+	x:Class="StructuredXmlEditor.App"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:v="clr-namespace:StructuredXmlEditor.View"
+	StartupUri="MainWindow.xaml">
+	<Application.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
-				<ResourceDictionary
+				<v:SharedResourceDictionary
 					Source="View/Styles/Brushes.xaml" />
-				<ResourceDictionary
+				<v:SharedResourceDictionary
 					Source="View/Styles/GeneralStyles.xaml" />
 
-				<ResourceDictionary
+				<v:SharedResourceDictionary
 					Source="View/Styles/Button.xaml" />
-				<ResourceDictionary
+				<v:SharedResourceDictionary
 					Source="View/Styles/ContentPopup.xaml" />
-				<ResourceDictionary
+				<v:SharedResourceDictionary
 					Source="View/Styles/CheckBox.xaml" />
-				<ResourceDictionary
+				<v:SharedResourceDictionary
 					Source="View/Styles/ColorCanvas.xaml" />
-				<ResourceDictionary
+				<v:SharedResourceDictionary
 					Source="View/Styles/ComboBox.xaml" />
-				<ResourceDictionary
+				<v:SharedResourceDictionary
 					Source="View/Styles/XmlDataViewTemplates.xaml" />
-				<ResourceDictionary
+				<v:SharedResourceDictionary
 					Source="View/Styles/Menu.xaml" />
-				<ResourceDictionary
+				<v:SharedResourceDictionary
 					Source="View/Styles/MultilineTextEditor.xaml" />
-				<ResourceDictionary
+				<v:SharedResourceDictionary
 					Source="View/Styles/NumericTextBox.xaml" />
-				<ResourceDictionary
+				<v:SharedResourceDictionary
 					Source="View/Styles/Scrollbar.xaml" />
-				<ResourceDictionary
+				<v:SharedResourceDictionary
 					Source="View/Styles/Slider.xaml" />
-				<ResourceDictionary
+				<v:SharedResourceDictionary
 					Source="View/Styles/TabControl.xaml" />
-				<ResourceDictionary
+				<v:SharedResourceDictionary
 					Source="View/Styles/TextBox.xaml" />
-				<ResourceDictionary
+				<v:SharedResourceDictionary
 					Source="View/Styles/Graph.xaml" />
-				<ResourceDictionary
+				<v:SharedResourceDictionary
 					Source="View/Styles/ListView.xaml" />
-				<ResourceDictionary
+				<v:SharedResourceDictionary
 					Source="View/Styles/XmlDataView.xaml" />
 
-				<ResourceDictionary
+				<v:SharedResourceDictionary
 					Source="View/Styles/AvalonDock.xaml" />
 
 			</ResourceDictionary.MergedDictionaries>

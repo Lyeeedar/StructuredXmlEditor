@@ -5,7 +5,7 @@
 	xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
 	<ResourceDictionary.MergedDictionaries>
-		<ResourceDictionary
+		<local:SharedResourceDictionary
 			Source="Brushes.xaml" />
 	</ResourceDictionary.MergedDictionaries>
 

@@ -5,9 +5,9 @@
 	xmlns:v="clr-namespace:StructuredXmlEditor.View">
 
 	<ResourceDictionary.MergedDictionaries>
-		<ResourceDictionary
+		<v:SharedResourceDictionary
 			Source="Brushes.xaml" />
-		<ResourceDictionary
+		<v:SharedResourceDictionary
 			Source="GeneralStyles.xaml" />
 	</ResourceDictionary.MergedDictionaries>
 
@@ -139,20 +139,21 @@
 					</Border>
 				</v:ContentPopup.PopupContent>
 			</v:ContentPopup>
-		
+
 		</Grid>
 	</ControlTemplate>
 
 	<DataTemplate
 		DataType="{x:Type d:DummyItem}">
 		<Grid>
-			
+
 		</Grid>
 	</DataTemplate>
 
 	<DataTemplate
 		DataType="{x:Type d:TimelineItem}">
-		<Grid>
+		<Grid
+			Height="54">
 			<v:Timeline
 				Height="50"
 				Margin="2" />
@@ -162,7 +163,8 @@
 	<DataTemplate
 		DataType="{x:Type d:StringItem}">
 
-		<Grid>
+		<Grid
+			Height="24">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition
 					Width="Auto" />
@@ -184,11 +186,12 @@
 
 	<DataTemplate
 		DataType="{x:Type d:MultilineStringItem}">
-		<DockPanel>
+		<DockPanel
+			Height="24">
 			<ContentControl
 				DockPanel.Dock="Left"
 				Template="{StaticResource AttributesTemplate}" />
-			
+
 			<Button
 				DockPanel.Dock="Right"
 				Margin="2"
@@ -209,7 +212,8 @@
 
 	<DataTemplate
 		DataType="{x:Type d:TreeItem}">
-		<Grid>
+		<Grid
+			Height="24">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition
 					Width="Auto" />
@@ -239,7 +243,8 @@
 
 	<DataTemplate
 		DataType="{x:Type d:FileItem}">
-		<Grid>
+		<Grid
+			Height="24">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition
 					Width="Auto" />
@@ -254,7 +259,7 @@
 			</Grid.ColumnDefinitions>
 			<ContentControl
 				Template="{StaticResource AttributesTemplate}" />
-			
+
 			<Button
 				Grid.Column="1"
 				Background="Transparent"
@@ -297,7 +302,8 @@
 	<DataTemplate
 		DataType="{x:Type d:NumberItem}">
 
-		<Grid>
+		<Grid
+			Height="24">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition
 					Width="Auto" />
@@ -322,10 +328,13 @@
 
 	<DataTemplate
 		DataType="{x:Type d:VectorItem}">
-		<StackPanel Margin="5,0,0,0" Orientation="Horizontal">
+		<StackPanel
+			Height="24"
+			Margin="5,0,0,0"
+			Orientation="Horizontal">
 			<ContentControl
 				Template="{StaticResource AttributesTemplate}" />
-			
+
 			<DockPanel>
 				<TextBlock
 					DockPanel.Dock="Left"
@@ -400,7 +409,8 @@
 
 	<DataTemplate
 		DataType="{x:Type d:BooleanItem}">
-		<Grid>
+		<Grid
+			Height="24">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition
 					Width="Auto" />
@@ -420,7 +430,8 @@
 
 	<DataTemplate
 		DataType="{x:Type d:EnumItem}">
-		<Grid>
+		<Grid
+			Height="24">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition
 					Width="Auto" />
@@ -442,6 +453,7 @@
 	<DataTemplate
 		DataType="{x:Type d:KeyframeItem}">
 		<ContentControl
+			Height="24"
 			VerticalAlignment="Center"
 			Margin="5,0,5,0"
 			Content="{Binding Description, Converter={v:ColourMarkupConverter}}" />
@@ -449,7 +461,8 @@
 
 	<DataTemplate
 		DataType="{x:Type d:ColourItem}">
-		<Grid>
+		<Grid
+			Height="24">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition
 					Width="Auto" />
@@ -498,6 +511,7 @@
 	<DataTemplate
 		DataType="{x:Type d:StructItem}">
 		<Grid
+			Height="24"
 			VerticalAlignment="Center">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition
@@ -551,6 +565,7 @@
 	<DataTemplate
 		DataType="{x:Type d:ReferenceItem}">
 		<Grid
+			Height="24"
 			VerticalAlignment="Center">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition
@@ -620,6 +635,7 @@
 	<DataTemplate
 		DataType="{x:Type d:GraphStructItem}">
 		<Grid
+			Height="24"
 			VerticalAlignment="Center">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition
@@ -673,6 +689,7 @@
 	<DataTemplate
 		DataType="{x:Type d:GraphReferenceItem}">
 		<Grid
+			Height="24"
 			VerticalAlignment="Center">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition
@@ -754,6 +771,7 @@
 	<DataTemplate
 		DataType="{x:Type d:GraphCollectionItem}">
 		<Grid
+			Height="24"
 			VerticalAlignment="Center">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition
@@ -809,6 +827,7 @@
 	<DataTemplate
 		DataType="{x:Type d:CollectionItem}">
 		<Grid
+			Height="24"
 			VerticalAlignment="Center">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition

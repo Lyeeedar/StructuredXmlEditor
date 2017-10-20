@@ -5,9 +5,9 @@
 	xmlns:l="clr-namespace:StructuredXmlEditor.View">
 
 	<ResourceDictionary.MergedDictionaries>
-		<ResourceDictionary
+		<l:SharedResourceDictionary
 			Source="Brushes.xaml" />
-		<ResourceDictionary
+		<l:SharedResourceDictionary
 			Source="GeneralStyles.xaml" />
 	</ResourceDictionary.MergedDictionaries>
 

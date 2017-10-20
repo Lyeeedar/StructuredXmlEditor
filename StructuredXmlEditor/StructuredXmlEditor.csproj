@@ -180,6 +180,7 @@
     <Compile Include="View\CustomControls\UndoHistoryView.xaml.cs">
       <DependentUpon>UndoHistoryView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\SharedResourceDictionary.cs" />
     <Compile Include="View\Styles\XmlDataView.xaml.cs">
       <DependentUpon>XmlDataView.xaml</DependentUpon>
     </Compile>
