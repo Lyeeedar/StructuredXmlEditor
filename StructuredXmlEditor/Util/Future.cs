@@ -19,10 +19,11 @@ namespace StructuredXmlEditor
 
 			lock (m_locker)
 			{
-				if (m_futures.ContainsKey(key))
+				FutureData existing;
+				if (m_futures.TryGetValue(key, out existing))
 				{
-					m_futures[key].func = func;
-					m_futures[key].remainingDelayMS = ms;
+					existing.func = func;
+					existing.remainingDelayMS = ms;
 				}
 				else
 				{
