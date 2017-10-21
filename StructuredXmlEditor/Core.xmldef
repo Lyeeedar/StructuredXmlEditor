@@ -404,6 +404,11 @@
 			<String Name="Text" ToolTip="The text in this comment." />
 		</Attributes>
 	</StructDef>
+
+	<StructDef Name="GraphComment" Nullable="false">
+		<String Name="Title" />
+		<Colour Name="Colour" />
+	</StructDef>
 	
 	<Collection Name="Definitions" ToolTip="The definitions stored in this file. Can contain only a single non-def element.">
 		<Attributes>

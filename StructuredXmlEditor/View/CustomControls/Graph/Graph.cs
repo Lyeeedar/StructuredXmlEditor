@@ -1,5 +1,6 @@
 ﻿using StructuredXmlEditor.Data;
 using StructuredXmlEditor.Definition;
+using StructuredXmlEditor.Util;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -165,9 +166,17 @@ namespace StructuredXmlEditor.View
 			}
 			else if (args.PropertyName == "IsSelected")
 			{
-				if ((e as GraphNode).IsSelected && !Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl) && !m_isMarqueeSelecting)
+				if ((e as ISelectable).IsSelected && !Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl) && !m_isMarqueeSelecting)
 				{
 					foreach (var node in Nodes)
+					{
+						if (node != e)
+						{
+							node.IsSelected = false;
+						}
+					}
+
+					foreach (var node in Comments)
 					{
 						if (node != e)
 						{
@@ -291,6 +300,11 @@ namespace StructuredXmlEditor.View
 					node.IsSelected = false;
 				}
 
+				foreach (var comment in Comments)
+				{
+					comment.IsSelected = false;
+				}
+
 				Nodes.First().GraphNodeItem.DataModel.Selected = null;
 			}
 
@@ -408,7 +422,7 @@ namespace StructuredXmlEditor.View
 
 				commentMenu.AddItem("New Comment", () =>
 				{
-					var comment = new GraphCommentItem();
+					var comment = new GraphCommentItem(dataModel, undo, "", Colors.Goldenrod);
 					comment.GUID = Guid.NewGuid().ToString();
 
 					undo.ApplyDoUndo(
@@ -642,6 +656,9 @@ namespace StructuredXmlEditor.View
 			{
 				CreatingLink = null;
 				ConnectedLinkTo = null;
+				m_isMarqueeSelecting = false;
+				m_mightBeMarqueeSelecting = false;
+				ReleaseMouseCapture();
 			}
 			else
 			{

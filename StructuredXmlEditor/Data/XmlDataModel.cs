@@ -21,8 +21,12 @@ namespace StructuredXmlEditor.Data
 {
 	public class XmlDataModel : NotifyPropertyChanged
 	{
-		public XmlDataModel()
+		public Workspace Workspace { get; set; }
+
+		public XmlDataModel(Workspace workspace)
 		{
+			this.Workspace = workspace;
+
 			m_proxyRootItem = new DummyItem("   ⌂ ", this);
 			GraphNodeItems = new ObservableCollection<GraphNodeItem>();
 			RootItems = new ObservableCollection<DataItem>();
@@ -550,27 +554,6 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public static List<GraphCommentItem> ParseGraphComments(string commentChain)
-		{
-			var output = new List<GraphCommentItem>();
-
-			var comments = commentChain.Split('%');
-			foreach (var commentString in comments)
-			{
-				var split = commentString.Split('$');
-				var comment = new GraphCommentItem();
-				comment.GUID = split[0];
-				comment.Title = split[1];
-				comment.ToolTip = split[2];
-				comment.Colour = new SolidColorBrush(split[3].ToColour().Value);
-
-				output.Add(comment);
-			}
-
-			return output;
-		}
-
-		//-----------------------------------------------------------------------
 		public void Save(string path)
 		{
 			Directory.CreateDirectory(Path.GetDirectoryName(path));
@@ -594,7 +577,7 @@ namespace StructuredXmlEditor.Data
 			var saveableComments = GraphCommentItems.Where(e => e.Nodes.Count > 0).ToList();
 			if (saveableComments.Count > 0)
 			{
-				var commentStr = string.Join("%", saveableComments.Select(e => e.GUID + "$" + e.Title + "$" + e.ToolTip + "$" + e.Colour.Color.ToCSV()));
+				var commentStr = string.Join("%", saveableComments.Select(e => e.GUID + "$" + e.Title + "$" + e.ToolTip + "$" + e.Colour.ToCSV()));
 				doc.Elements().First().SetAttributeValue(DataDefinition.MetaNS + "GraphCommentData", commentStr);
 			}
 
@@ -684,13 +667,48 @@ namespace StructuredXmlEditor.Data
 	//-----------------------------------------------------------------------
 	public class GraphCommentItem : NotifyPropertyChanged
 	{
+		//-----------------------------------------------------------------------
 		public string GUID { get; set; }
-		public string Title { get; set; }
-		public string ToolTip { get; set; }
-		public SolidColorBrush Colour { get; set; } = Brushes.Goldenrod;
 
+		//-----------------------------------------------------------------------
+		public string Title
+		{
+			get
+			{
+				return ((StringItem)Item.Children[0]).Value;
+			}
+			set
+			{
+				((StringItem)Item.Children[0]).Value = value;
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public string ToolTip { get; set; }
+
+		//-----------------------------------------------------------------------
+		public Color Colour
+		{
+			get
+			{
+				return ((ColourItem)Item.Children[1]).Value.Value;
+			}
+			set
+			{
+				((ColourItem)Item.Children[1]).Value = value;
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public SolidColorBrush ColourBrush
+		{
+			get { return new SolidColorBrush(Colour); }
+		}
+
+		//-----------------------------------------------------------------------
 		public DeferableObservableCollection<GraphNodeItem> Nodes { get; set; } = new DeferableObservableCollection<GraphNodeItem>();
 
+		//-----------------------------------------------------------------------
 		public GraphComment GraphComment
 		{
 			get
@@ -704,5 +722,49 @@ namespace StructuredXmlEditor.Data
 			}
 		}
 		private GraphComment m_comment;
+
+		//-----------------------------------------------------------------------
+		public DataItem Item { get; set; }
+		public XmlDataModel Model { get; set; }
+
+		//-----------------------------------------------------------------------
+		public GraphCommentItem(XmlDataModel dataModel, UndoRedoManager undoRedo, string title, Color colour)
+		{
+			this.Model = dataModel;
+
+			var def = dataModel.Workspace.RootDataTypes["graphcomment"];
+			Item = def.CreateData(undoRedo);
+
+			Item.ChildPropertyChangedEvent += (e, args) => 
+			{
+				RaisePropertyChangedEvent("Title");
+				RaisePropertyChangedEvent("Colour");
+				RaisePropertyChangedEvent("ColourBrush");
+			};
+
+			using (undoRedo.DisableUndoScope())
+			{
+				Title = title;
+				Colour = colour;
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public static List<GraphCommentItem> ParseGraphComments(XmlDataModel model, UndoRedoManager undoRedo, string commentChain)
+		{
+			var output = new List<GraphCommentItem>();
+
+			var comments = commentChain.Split('%');
+			foreach (var commentString in comments)
+			{
+				var split = commentString.Split('$');
+				var comment = new GraphCommentItem(model, undoRedo, split[1], split[3].ToColour().Value);
+				comment.GUID = split[0];
+
+				output.Add(comment);
+			}
+
+			return output;
+		}
 	}
 }

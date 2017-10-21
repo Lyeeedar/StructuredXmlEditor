@@ -1,5 +1,6 @@
 ﻿using StructuredXmlEditor.Data;
 using StructuredXmlEditor.Definition;
+using StructuredXmlEditor.Util;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,7 +18,7 @@ using System.Windows.Media;
 
 namespace StructuredXmlEditor.View
 {
-	public class GraphNode : Control, INotifyPropertyChanged
+	public class GraphNode : Control, INotifyPropertyChanged, ISelectable
 	{
 		//--------------------------------------------------------------------------
 		static GraphNode()

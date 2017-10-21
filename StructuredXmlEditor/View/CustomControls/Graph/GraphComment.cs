@@ -1,4 +1,5 @@
 ﻿using StructuredXmlEditor.Data;
+using StructuredXmlEditor.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,10 +9,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace StructuredXmlEditor.View
 {
-	public class GraphComment : Control, INotifyPropertyChanged
+	public class GraphComment : Control, INotifyPropertyChanged, ISelectable
 	{
 		//--------------------------------------------------------------------------
 		static GraphComment()
@@ -50,6 +52,30 @@ namespace StructuredXmlEditor.View
 		public double Y { get; set; }
 		public double CommentWidth { get; set; }
 		public double CommentHeight { get; set; }
+
+		//--------------------------------------------------------------------------
+		public bool IsSelected
+		{
+			get { return m_isSelected; }
+			set
+			{
+				if (m_isSelected != value)
+				{
+					m_isSelected = value;
+					RaisePropertyChangedEvent();
+
+					if (IsSelected)
+					{
+						Comment.Model.AddSelected(Comment.Item);
+					}
+					else
+					{
+						Comment.Model.RemoveSelected(Comment.Item);
+					}
+				}
+			}
+		}
+		private bool m_isSelected;
 
 		//--------------------------------------------------------------------------
 		public GraphComment(GraphCommentItem comment)
@@ -142,6 +168,31 @@ namespace StructuredXmlEditor.View
 			RaisePropertyChangedEvent("CanvasY");
 			RaisePropertyChangedEvent("CommentWidth");
 			RaisePropertyChangedEvent("CommentHeight");
+		}
+
+		//--------------------------------------------------------------------------
+		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+		{
+			if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+			{
+				//IsSelected = !IsSelected;
+			}
+			else
+			{
+				IsSelected = true;
+			}
+
+			e.Handled = true;
+
+			base.OnMouseLeftButtonDown(e);
+		}
+
+		//--------------------------------------------------------------------------
+		protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
+		{
+			e.Handled = true;
+
+			base.OnPreviewMouseLeftButtonUp(e);
 		}
 
 		//-----------------------------------------------------------------------

@@ -549,16 +549,19 @@
 						</Grid.RowDefinitions>
 
 						<Grid
-							Background="{Binding Comment.Colour}"
+							Background="{Binding Comment.ColourBrush}"
 							Opacity="0.7">
 							<TextBlock
+								FontSize="14"
+								FontWeight="Bold"
 								Margin="5,2,5,2"
+								Foreground="{Binding Comment.Colour, Converter={local:ContrastTextConverter}}"
 								Text="{Binding Comment.Title}" />
 						</Grid>
 
 						<Grid
 							Grid.Row="1"
-							Background="{Binding Comment.Colour}"
+							Background="{Binding Comment.ColourBrush}"
 							Opacity="0.4">
 							
 						</Grid>
