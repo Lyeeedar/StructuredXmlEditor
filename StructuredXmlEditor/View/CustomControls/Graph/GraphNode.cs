@@ -153,6 +153,9 @@ namespace StructuredXmlEditor.View
 		}
 		private bool m_MouseOver;
 
+		//--------------------------------------------------------------------------
+		public GraphComment HiddenBy { get; set; }
+
 		//-----------------------------------------------------------------------
 		private Dictionary<DataItem, GraphNodeData> CachedNodeData = new Dictionary<DataItem, GraphNodeData>();
 
@@ -253,12 +256,20 @@ namespace StructuredXmlEditor.View
 
 		private Point m_mouseDragLast;
 		private bool m_inDrag;
-		private double m_startX;
-		private double m_startY;
+		public double m_startX;
+		public double m_startY;
+
+		//--------------------------------------------------------------------------
+		protected override void OnMouseEnter(MouseEventArgs e)
+		{
+			MouseOver = true;
+			base.OnMouseEnter(e);
+		}
 
 		//--------------------------------------------------------------------------
 		protected override void OnMouseLeave(MouseEventArgs e)
 		{
+			MouseOver = false;
 			if (Graph.MouseOverItem == this) Graph.MouseOverItem = null;
 			Graph.ConnectedLinkTo = null;
 

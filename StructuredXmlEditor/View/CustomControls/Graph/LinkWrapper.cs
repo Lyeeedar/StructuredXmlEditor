@@ -59,8 +59,88 @@ namespace StructuredXmlEditor.View
 		}
 		private Point m_dest;
 
+		//--------------------------------------------------------------------------
 		public InProgressLinkWrapper(GraphNodeDataLink link) : base(link)
 		{
+		}
+	}
+
+	//--------------------------------------------------------------------------
+	public class NodeToCommentLinkWrapper : LinkWrapper
+	{
+		//--------------------------------------------------------------------------
+		public GraphComment Comment
+		{
+			get { return m_comment; }
+			set
+			{
+				m_comment = value;
+				RaisePropertyChangedEvent();
+			}
+		}
+		private GraphComment m_comment;
+
+		//--------------------------------------------------------------------------
+		public NodeToCommentLinkWrapper(GraphNodeDataLink link, GraphComment comment) : base(link)
+		{
+			Comment = comment;
+		}
+	}
+
+	//--------------------------------------------------------------------------
+	public class CommentToNodeLinkWrapper : LinkWrapper
+	{
+		//--------------------------------------------------------------------------
+		public GraphComment Comment
+		{
+			get { return m_comment; }
+			set
+			{
+				m_comment = value;
+				RaisePropertyChangedEvent();
+			}
+		}
+		private GraphComment m_comment;
+
+		//--------------------------------------------------------------------------
+		public CommentToNodeLinkWrapper(GraphNodeDataLink link, GraphComment comment) : base(link)
+		{
+			Comment = comment;
+		}
+	}
+
+	//--------------------------------------------------------------------------
+	public class CommentToCommentLinkWrapper : LinkWrapper
+	{
+		//--------------------------------------------------------------------------
+		public GraphComment CommentStart
+		{
+			get { return m_commentStart; }
+			set
+			{
+				m_commentStart = value;
+				RaisePropertyChangedEvent();
+			}
+		}
+		private GraphComment m_commentStart;
+
+		//--------------------------------------------------------------------------
+		public GraphComment CommentEnd
+		{
+			get { return m_commentEnd; }
+			set
+			{
+				m_commentEnd = value;
+				RaisePropertyChangedEvent();
+			}
+		}
+		private GraphComment m_commentEnd;
+
+		//--------------------------------------------------------------------------
+		public CommentToCommentLinkWrapper(GraphNodeDataLink link, GraphComment commentStart, GraphComment commentEnd) : base(link)
+		{
+			CommentStart = commentStart;
+			CommentEnd = commentEnd;
 		}
 	}
 

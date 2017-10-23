@@ -144,7 +144,36 @@ namespace StructuredXmlEditor.View
 				{
 					foreach (var data in node.Datas)
 					{
-						if (data is GraphNodeDataLink) yield return new LinkWrapper(data as GraphNodeDataLink);
+						if (data is GraphNodeDataLink)
+						{
+							var link = data as GraphNodeDataLink;
+							if (link.Link != null)
+							{
+								if (node.HiddenBy != null && link.Link.HiddenBy != null)
+								{
+									if (node.HiddenBy == link.Link.HiddenBy)
+									{
+										// dont draw
+									}
+									else
+									{
+										yield return new CommentToCommentLinkWrapper(link, node.HiddenBy, link.Link.HiddenBy);
+									}
+								}
+								else if (node.HiddenBy != null && link.Link.HiddenBy == null)
+								{
+									yield return new CommentToNodeLinkWrapper(link, node.HiddenBy);
+								}
+								else if (node.HiddenBy == null && link.Link.HiddenBy != null)
+								{
+									yield return new NodeToCommentLinkWrapper(link, link.Link.HiddenBy);
+								}
+								else
+								{
+									yield return new LinkWrapper(link);
+								}
+							}
+						}
 					}
 				}
 
@@ -152,7 +181,10 @@ namespace StructuredXmlEditor.View
 
 				foreach (var node in Nodes)
 				{
-					yield return node;
+					if (node.HiddenBy == null)
+					{
+						yield return node;
+					}
 				}
 			}
 		}
