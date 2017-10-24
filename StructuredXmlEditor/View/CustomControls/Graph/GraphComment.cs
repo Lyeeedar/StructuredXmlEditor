@@ -61,7 +61,7 @@ namespace StructuredXmlEditor.View
 		{
 			get
 			{
-				return new Point(X + ActualWidth, Y + 10);
+				return new Point((X + ActualWidth) * Graph.Scale + Graph.Offset.X, (Y + 10) * Graph.Scale + Graph.Offset.Y);
 			}
 		}
 
@@ -242,15 +242,18 @@ namespace StructuredXmlEditor.View
 			}
 
 			X = minX - 10;
-			Y = minY - 25;
+			Y = minY - 35;
 			CommentWidth = (maxX - minX) + 20;
 
 			if (IsExpanded)
 			{
-				CommentHeight = (maxY - minY) + 35;
+				CommentHeight = (maxY - minY) + 45;
 			}
 			else
 			{
+				var oldHeight = (maxY - minY) + 45;
+				Y += oldHeight / 2 - 12;
+
 				CommentHeight = 25;
 			}
 

@@ -214,10 +214,10 @@
 		TargetType="{x:Type local:CommentToNodeLinkWrapper}">
 		<Setter
 			Property="Canvas.Left"
-			Value="{Binding Link.Position.X}" />
+			Value="{Binding Comment.LinkExit.X}" />
 		<Setter
 			Property="Canvas.Top"
-			Value="{Binding Link.Position.Y}" />
+			Value="{Binding Comment.LinkExit.Y}" />
 		<Setter
 			Property="Opacity"
 			Value="{Binding Link.Node.Opacity}" />
@@ -275,10 +275,10 @@
 		TargetType="{x:Type local:CommentToCommentLinkWrapper}">
 		<Setter
 			Property="Canvas.Left"
-			Value="{Binding Link.Position.X}" />
+			Value="{Binding Comment.LinkExit.X}" />
 		<Setter
 			Property="Canvas.Top"
-			Value="{Binding Link.Position.Y}" />
+			Value="{Binding Comment.LinkExit.Y}" />
 		<Setter
 			Property="Opacity"
 			Value="{Binding Link.Node.Opacity}" />
@@ -761,26 +761,26 @@
 
 								<Button
 									Background="Transparent"
-									BorderBrush="Transparent"
-									Command="{Binding ToggleExpandedCMD}">
-									<Button.Content>
-										<Path
-											x:Name="PART_Arrow"
-											IsHitTestVisible="False"
-											HorizontalAlignment="Center"
-											VerticalAlignment="Center"
-											Stroke="{Binding Comment.Colour, Converter={local:ContrastTextConverter}}"
-											Fill="{Binding Comment.Colour, Converter={local:ContrastTextConverter}}"
-											Data="M 0 0 L 4 4 L 8 0 Z"
-											RenderTransformOrigin="0.5,0.5">
-											<Path.RenderTransform>
-												<RotateTransform
-													Angle="-90" />
-											</Path.RenderTransform>
-										</Path>
-									</Button.Content>
+									BorderThickness="0"
+									Width="25"
+									Command="{Binding ToggleExpandedCMD}"
+									Grid.Column="1">
+									<Path
+										x:Name="PART_Arrow"
+										IsHitTestVisible="False"
+										HorizontalAlignment="Center"
+										VerticalAlignment="Center"
+										Stroke="{Binding Comment.Colour, Converter={local:ContrastTextConverter}}"
+										Fill="{Binding Comment.Colour, Converter={local:ContrastTextConverter}}"
+										Data="M 0 0 L 4 4 L 8 0 Z"
+										RenderTransformOrigin="0.5,0.5">
+										<Path.RenderTransform>
+											<RotateTransform
+												Angle="-90" />
+										</Path.RenderTransform>
+									</Path>
 								</Button>
-									
+
 							</Grid>
 
 							<Grid
