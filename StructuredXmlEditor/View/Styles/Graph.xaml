@@ -275,10 +275,10 @@
 		TargetType="{x:Type local:CommentToCommentLinkWrapper}">
 		<Setter
 			Property="Canvas.Left"
-			Value="{Binding Comment.LinkExit.X}" />
+			Value="{Binding CommentStart.LinkExit.X}" />
 		<Setter
 			Property="Canvas.Top"
-			Value="{Binding Comment.LinkExit.Y}" />
+			Value="{Binding CommentStart.LinkExit.Y}" />
 		<Setter
 			Property="Opacity"
 			Value="{Binding Link.Node.Opacity}" />
@@ -303,9 +303,9 @@
 								<Binding
 									Path="Link" />
 								<Binding
-									Path="Comment.LinkEntrance" />
+									Path="CommentStart.LinkExit" />
 								<Binding
-									Path="Comment.LinkExit" />
+									Path="CommentEnd.LinkEntrance" />
 							</MultiBinding>
 						</Path.Data>
 						<Path.Style>
