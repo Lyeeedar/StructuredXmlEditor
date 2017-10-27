@@ -142,7 +142,7 @@ namespace StructuredXmlEditor.Data
 				}
 			}
 
-			Data = new XmlDataModel(Workspace);
+			Data = new XmlDataModel(Workspace, item.UndoRedo);
 			Data.SetRootItem(item);
 
 			item.IsExpanded = true;

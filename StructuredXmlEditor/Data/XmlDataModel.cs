@@ -21,15 +21,26 @@ namespace StructuredXmlEditor.Data
 {
 	public class XmlDataModel : NotifyPropertyChanged
 	{
+		//-----------------------------------------------------------------------
 		public Workspace Workspace { get; set; }
 
-		public XmlDataModel(Workspace workspace)
+		//-----------------------------------------------------------------------
+		public UndoRedoManager UndoRedo { get; set; }
+
+		//-----------------------------------------------------------------------
+		public XmlDataModel(Workspace workspace, UndoRedoManager undoRedo)
 		{
 			this.Workspace = workspace;
+			this.UndoRedo = undoRedo;
 
 			m_proxyRootItem = new DummyItem("   ⌂ ", this);
 			GraphNodeItems = new ObservableCollection<GraphNodeItem>();
 			RootItems = new ObservableCollection<DataItem>();
+
+			GraphCommentItems.CollectionChanged += (obj, args) => 
+			{
+				RaisePropertyChangedEvent("GraphComments");
+			};
 		}
 
 		//-----------------------------------------------------------------------
@@ -280,7 +291,7 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public List<GraphCommentItem> GraphCommentItems { get; set; } = new List<GraphCommentItem>();
+		public DeferableObservableCollection<GraphCommentItem> GraphCommentItems { get; set; } = new DeferableObservableCollection<GraphCommentItem>();
 
 		//-----------------------------------------------------------------------
 		public IEnumerable<DataItem> Descendants
@@ -691,7 +702,9 @@ namespace StructuredXmlEditor.Data
 		{
 			get
 			{
-				return ((ColourItem)Item.Children[1]).Value.Value;
+				var col = ((ColourItem)Item.Children[1]).Value;
+				if (col.HasValue) return col.Value;
+				else return Colors.White;
 			}
 			set
 			{
@@ -702,8 +715,20 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public SolidColorBrush ColourBrush
 		{
-			get { return new SolidColorBrush(Colour); }
+			get
+			{
+				if (brush != null && Colour == brush.Color)
+				{
+					return brush;
+				}
+
+				brush = new SolidColorBrush(Colour);
+				brush.Freeze();
+
+				return brush;
+			}
 		}
+		private SolidColorBrush brush;
 
 		//-----------------------------------------------------------------------
 		public DeferableObservableCollection<GraphNodeItem> Nodes { get; set; } = new DeferableObservableCollection<GraphNodeItem>();
@@ -733,7 +758,11 @@ namespace StructuredXmlEditor.Data
 			this.Model = dataModel;
 
 			var def = dataModel.Workspace.RootDataTypes["graphcomment"];
-			Item = def.CreateData(undoRedo);
+
+			using (undoRedo.DisableUndoScope())
+			{
+				Item = def.CreateData(undoRedo);
+			}
 
 			Item.ChildPropertyChangedEvent += (e, args) => 
 			{

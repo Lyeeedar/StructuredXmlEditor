@@ -38,7 +38,38 @@ namespace StructuredXmlEditor.View
 		private List<GraphNode> nodeCache = new List<GraphNode>();
 
 		//--------------------------------------------------------------------------
-		public Graph Graph { get; set; }
+		public Graph Graph
+		{
+			get { return m_graph; }
+			set
+			{
+				if (m_graph != value)
+				{
+					if (m_graph != null) m_graph.PropertyChanged -= OnGraphPropertyChanged;
+
+					m_graph = value;
+
+					if (m_graph != null) m_graph.PropertyChanged += OnGraphPropertyChanged;
+
+					UpdateCommentSize();
+				}
+			}
+		}
+		private Graph m_graph;
+		private void OnGraphPropertyChanged(object sender, PropertyChangedEventArgs args)
+		{
+			if (args.PropertyName == "Offset" || args.PropertyName == "Scale")
+			{
+				RaisePropertyChangedEvent("CanvasX");
+				RaisePropertyChangedEvent("CanvasY");
+
+				RaisePropertyChangedEvent("CommentWidth");
+				RaisePropertyChangedEvent("CommentHeight");
+
+				RaisePropertyChangedEvent("LinkEntrance");
+				RaisePropertyChangedEvent("LinkExit");
+			}
+		}
 
 		//--------------------------------------------------------------------------
 		public GraphCommentItem Comment { get; set; }
@@ -195,6 +226,8 @@ namespace StructuredXmlEditor.View
 					RaisePropertyChangedEvent("LinkExit");
 				}
 			};
+
+			UpdateCommentSize();
 		}
 
 		//--------------------------------------------------------------------------
@@ -225,13 +258,14 @@ namespace StructuredXmlEditor.View
 		//--------------------------------------------------------------------------
 		public void UpdateCommentSize()
 		{
-			if (Graph == null) return;
+			if (Graph == null || m_disableUpdate) return;
 
 			var minX = double.MaxValue;
 			var minY = double.MaxValue;
 			var maxX = -double.MaxValue;
 			var maxY = -double.MaxValue;
 
+			var hasNode = false;
 			foreach (var node in Nodes)
 			{
 				if (node.X < minX) { minX = node.X; }
@@ -239,6 +273,16 @@ namespace StructuredXmlEditor.View
 
 				if (node.Y < minY) { minY = node.Y; }
 				if (node.Y + node.ActualHeight > maxY) { maxY = node.Y + node.ActualHeight; }
+
+				hasNode = true;
+			}
+
+			if (!hasNode)
+			{
+				minX = 0;
+				minY = 0;
+				maxX = 0;
+				maxY = 0;
 			}
 
 			X = minX - 10;
@@ -342,8 +386,8 @@ namespace StructuredXmlEditor.View
 
 				if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
 				{
-					var x = m_startX + diff.X / Graph.Scale;
-					var y = m_startY + diff.Y / Graph.Scale;
+					var x = diff.X / Graph.Scale;
+					var y = diff.Y / Graph.Scale;
 
 					double? chosenSnapX = null;
 					foreach (var snapline in Graph.SnapLinesX)
@@ -384,15 +428,19 @@ namespace StructuredXmlEditor.View
 						y = chosenSnapY.Value;
 					}
 
-					diff.X = (x - m_startX) * Graph.Scale;
-					diff.Y = (y - m_startY) * Graph.Scale;
+					diff.X = x * Graph.Scale;
+					diff.Y = y * Graph.Scale;
 				}
 
+				m_disableUpdate = true;
 				foreach (var node in Nodes)
 				{
 					node.X = node.m_startX + diff.X / Graph.Scale;
 					node.Y = node.m_startY + diff.Y / Graph.Scale;
 				}
+				m_disableUpdate = false;
+
+				UpdateCommentSize();
 			}
 
 			base.OnMouseMove(e);
@@ -427,7 +475,6 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		private Point m_mouseDragLast;
 		private bool m_inDrag;
-		private double m_startX;
-		private double m_startY;
+		private bool m_disableUpdate;
 	}
 }

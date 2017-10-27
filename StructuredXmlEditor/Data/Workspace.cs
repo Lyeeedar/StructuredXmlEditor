@@ -888,7 +888,7 @@ namespace StructuredXmlEditor.Data
 				var commentsStr = firstEl.Attribute(DataDefinition.MetaNS + "GraphCommentData")?.Value;
 				if (commentsStr != null)
 				{
-					document.Data.GraphCommentItems = GraphCommentItem.ParseGraphComments(document.Data, document.UndoRedo, commentsStr);
+					document.Data.GraphCommentItems.AddRange(GraphCommentItem.ParseGraphComments(document.Data, document.UndoRedo, commentsStr));
 
 					foreach (var node in document.Data.GraphNodeItems)
 					{

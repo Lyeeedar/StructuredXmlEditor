@@ -14,6 +14,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Xml.Linq;
 
 namespace StructuredXmlEditor.View
 {
@@ -67,6 +68,17 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		public static readonly DependencyProperty AllowReferenceLinksProperty =
 			DependencyProperty.Register("AllowReferenceLinks", typeof(bool), typeof(Graph), new PropertyMetadata(false, null));
+
+		//-----------------------------------------------------------------------
+		public XmlDataModel XmlDataModel
+		{
+			get { return (XmlDataModel)GetValue(XmlDataModelProperty); }
+			set { SetValue(XmlDataModelProperty, value); }
+		}
+
+		//-----------------------------------------------------------------------
+		public static readonly DependencyProperty XmlDataModelProperty =
+			DependencyProperty.Register("XmlDataModel", typeof(XmlDataModel), typeof(Graph), new PropertyMetadata(null, null));
 
 		//-----------------------------------------------------------------------
 		public IEnumerable<GraphNode> Nodes
@@ -235,6 +247,35 @@ namespace StructuredXmlEditor.View
 		}
 		private bool UpdatingControls = false;
 
+		//-----------------------------------------------------------------------
+		private IEnumerable<GraphNodeDefinition> ValidNodeTypes
+		{
+			get
+			{
+				var validTypes = new HashSet<GraphNodeDefinition>();
+				foreach (var node in Nodes)
+				{
+					foreach (var data in node.Datas)
+					{
+						if (data is GraphNodeDataLink)
+						{
+							var link = data as GraphNodeDataLink;
+							var def = link.GraphReferenceItem.Definition as GraphReferenceDefinition;
+							foreach (var d in def.Definitions.Values)
+							{
+								validTypes.Add(d);
+							}
+						}
+					}
+				}
+
+				foreach (var def in validTypes.OrderBy(d => d.Name))
+				{
+					yield return def;
+				}
+			}
+		}
+
 		//--------------------------------------------------------------------------
 		public object MouseOverItem
 		{
@@ -281,7 +322,6 @@ namespace StructuredXmlEditor.View
 			if (e.ChangedButton == MouseButton.Middle)
 			{
 				lastPanPos = e.GetPosition(this);
-				isPanning = true;
 			}
 		}
 
@@ -384,24 +424,8 @@ namespace StructuredXmlEditor.View
 			ContextMenu menu = new ContextMenu();
 
 			var create = menu.AddItem("Create");
-			var validTypes = new HashSet<GraphNodeDefinition>();
-			foreach (var node in Nodes)
-			{
-				foreach (var data in node.Datas)
-				{
-					if (data is GraphNodeDataLink)
-					{
-						var link = data as GraphNodeDataLink;
-						var def = link.GraphReferenceItem.Definition as GraphReferenceDefinition;
-						foreach (var d in def.Definitions.Values)
-						{
-							validTypes.Add(d);
-						}
-					}
-				}
-			}
 
-			foreach (var def in validTypes.OrderBy(d => d.Name))
+			foreach (var def in ValidNodeTypes)
 			{
 				create.AddItem(def.Name, () => 
 				{
@@ -432,7 +456,17 @@ namespace StructuredXmlEditor.View
 				});
 			}
 
+			if (Clipboard.ContainsData("NodeCopy"))
+			{
+				menu.AddItem("Paste", () => { Paste(scaled); });
+			}
+
 			GraphNode clickedNode = Nodes.FirstOrDefault(e => GetRectOfObject(e).Contains(pos));
+			if (clickedNode == null)
+			{
+				clickedNode = Selected.FirstOrDefault();
+			}
+
 			if (clickedNode != null)
 			{
 				if (!clickedNode.IsSelected)
@@ -446,6 +480,12 @@ namespace StructuredXmlEditor.View
 				{
 					DeleteNodes(Selected.ToList());
 				});
+				menu.AddItem("Copy", () =>
+				{
+					Copy();
+				});
+
+				menu.AddSeperator();
 
 				var dataModel = clickedNode.GraphNodeItem.DataModel;
 				var undo = dataModel.RootItems[0].UndoRedo;
@@ -454,7 +494,7 @@ namespace StructuredXmlEditor.View
 
 				commentMenu.AddItem("New Comment", () =>
 				{
-					var comment = new GraphCommentItem(dataModel, undo, "", Colors.Goldenrod);
+					var comment = new GraphCommentItem(dataModel, undo, "", Colors.White);
 					comment.GUID = Guid.NewGuid().ToString();
 
 					undo.ApplyDoUndo(
@@ -562,10 +602,23 @@ namespace StructuredXmlEditor.View
 									if (previousComment != null)
 									{
 										previousComment.Comment.Nodes.Remove(node.GraphNodeItem);
+
+										if (previousComment.Comment.Nodes.Count == 0)
+										{
+											dataModel.GraphCommentItems.Remove(previousComment.Comment);
+										}
 									}
 								},
 								delegate
 								{
+									if (previousComment != null)
+									{
+										if (!dataModel.GraphCommentItems.Contains(previousComment.Comment))
+										{
+											dataModel.GraphCommentItems.Add(previousComment.Comment);
+										}
+									}
+
 									node.GraphNodeItem.Comment = previous;
 
 									if (previousComment != null)
@@ -620,6 +673,141 @@ namespace StructuredXmlEditor.View
 			{
 				DeleteNodes(Selected.ToList());
 			}
+			else if (e.Key == Key.C && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
+			{
+				Copy();
+			}
+			else if (e.Key == Key.X && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
+			{
+				Copy();
+				DeleteNodes(Selected.ToList());
+			}
+			else if (e.Key == Key.V && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
+			{
+				var scaled = new Point((m_mousePoint.X - Offset.X) / Scale, (m_mousePoint.Y - Offset.Y) / Scale);
+				Paste(scaled);
+			}
+		}
+
+		//--------------------------------------------------------------------------
+		private void Copy()
+		{
+			var nodeData = new XElement("Nodes");
+
+			var selected = Selected.ToList();
+			foreach (var node in selected)
+			{
+				var root = new XElement("Item");
+				node.GraphNodeItem.Definition.SaveData(root, node.GraphNodeItem, true);
+				root.SetAttributeValue("Type", node.GraphNodeItem.Definition.Name);
+
+				nodeData.Add(root);
+			}
+
+			Clipboard.SetData("NodeCopy", nodeData.ToString());
+		}
+
+		//--------------------------------------------------------------------------
+		private void Paste(Point mousePos)
+		{
+			if (Clipboard.ContainsData("NodeCopy"))
+			{
+				var nodesEls = XElement.Parse((string)Clipboard.GetData("NodeCopy"));
+				var nodes = new List<GraphNodeItem>();
+
+				foreach (var itemEl in nodesEls.Elements())
+				{
+					var typeName = itemEl.Attribute("Type").Value;
+					var root = itemEl.Elements().First();
+
+					var def = ValidNodeTypes.FirstOrDefault(e => e.Name == typeName);
+
+					GraphNodeItem item = null;
+					using (XmlDataModel.UndoRedo.DisableUndoScope())
+					{
+						item = (GraphNodeItem)def.LoadData(root, XmlDataModel.UndoRedo);
+						if (item.Children.Count == 0 && item.Attributes.Count == 0) item = (GraphNodeItem)def.CreateData(XmlDataModel.UndoRedo);
+					}
+					item.DataModel = XmlDataModel;
+					foreach (var des in item.Descendants)
+					{
+						des.DataModel = XmlDataModel;
+					}
+
+					nodes.Add(item);
+				}
+
+				var topLeftX = nodes.Select(e => e.X).Min();
+				var topLeftY = nodes.Select(e => e.Y).Min();
+
+				using (XmlDataModel.UndoRedo.DisableUndoScope())
+				{
+					foreach (var node in nodes)
+					{
+						node.X = (node.X - topLeftX) + mousePos.X;
+						node.Y = (node.Y - topLeftY) + mousePos.Y;
+					}
+
+					var guidMap = new Dictionary<string, GraphNodeItem>();
+					foreach (var node in nodes)
+					{
+						var oldGuid = node.GUID;
+						node.GUID = Guid.NewGuid().ToString();
+
+						guidMap[oldGuid] = node;
+					}
+
+					foreach (var node in nodes)
+					{
+						foreach (var data in node.GraphData)
+						{
+							if (data is GraphReferenceItem)
+							{
+								var gri = data as GraphReferenceItem;
+								if (gri.WrappedItem != null)
+								{
+									var wrappedNodeGuid = gri.WrappedItem.GUID;
+
+									GraphNodeItem newNode;
+									if (guidMap.TryGetValue(wrappedNodeGuid, out newNode))
+									{
+										gri.WrappedItem = newNode;
+									}
+									else
+									{
+										gri.WrappedItem = null;
+									}
+								}
+
+								if (gri.GuidToResolve != null)
+								{
+									if (guidMap.ContainsKey(gri.GuidToResolve))
+									{
+										var newNode = guidMap[gri.GuidToResolve];
+										gri.WrappedItem = newNode;
+									}
+
+									gri.GuidToResolve = null;
+								}
+							}
+						}
+					}
+				}
+
+				foreach (var node in nodes)
+				{
+					XmlDataModel.UndoRedo.ApplyDoUndo(
+						delegate
+						{
+							XmlDataModel.GraphNodeItems.Add(node);
+						},
+						delegate
+						{
+							XmlDataModel.GraphNodeItems.Remove(node);
+						},
+						Name + " pasted");
+				}
+			}
 		}
 
 		//--------------------------------------------------------------------------
@@ -632,14 +820,25 @@ namespace StructuredXmlEditor.View
 				if (node.GraphNodeItem.Comment != null)
 				{
 					var comment = Comments.FirstOrDefault(e => e.Comment.GUID == node.GraphNodeItem.Comment);
+					var dataModel = comment.Comment.Model;
 
 					node.GraphNodeItem.UndoRedo.ApplyDoUndo(
 						delegate
 						{
 							comment.Comment.Nodes.Remove(node.GraphNodeItem);
+
+							if (comment.Comment.Nodes.Count == 0)
+							{
+								dataModel.GraphCommentItems.Remove(comment.Comment);
+							}
 						},
 						delegate
 						{
+							if (!dataModel.GraphCommentItems.Contains(comment.Comment))
+							{
+								dataModel.GraphCommentItems.Add(comment.Comment);
+							}
+
 							comment.Comment.Nodes.Add(node.GraphNodeItem);
 						}, "Remove Node Comment");
 				}
@@ -706,7 +905,6 @@ namespace StructuredXmlEditor.View
 
 			if (e.MiddleButton != MouseButtonState.Pressed)
 			{
-				isPanning = false;
 				lastPanPos = e.GetPosition(this);
 			}
 			else
@@ -837,14 +1035,16 @@ namespace StructuredXmlEditor.View
 				m_offset = value;
 				RaisePropertyChangedEvent();
 
-				foreach (var comment in Comments)
+				Application.Current.Dispatcher.BeginInvoke(new Action(() =>
 				{
-					comment.UpdateCommentSize();
-				}
+					foreach (var comment in Comments)
+					{
+						comment.UpdateCommentSize();
+					}
+				}), System.Windows.Threading.DispatcherPriority.Loaded);
 			}
 		}
 		private Point m_offset;
-		private bool isPanning = false;
 		private Point lastPanPos;
 
 		//-----------------------------------------------------------------------
