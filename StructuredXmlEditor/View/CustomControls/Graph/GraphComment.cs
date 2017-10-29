@@ -167,8 +167,11 @@ namespace StructuredXmlEditor.View
 						}
 					}
 
-					UpdateCommentSize();
-					Graph.UpdateControls();
+					if (Graph != null)
+					{
+						UpdateCommentSize();
+						Graph.UpdateControls();
+					}
 				}
 			}
 		}
@@ -239,19 +242,13 @@ namespace StructuredXmlEditor.View
 		//--------------------------------------------------------------------------
 		private void GraphNodePropertyChanged(object sender, PropertyChangedEventArgs args)
 		{
-			if (args.PropertyName == "X" || args.PropertyName == "Width")
+			if (
+				args.PropertyName == "Datas" ||
+				args.PropertyName == "X" || args.PropertyName == "Width" || args.PropertyName == "ActualWidth" ||
+				args.PropertyName == "Y" || args.PropertyName == "Height" || args.PropertyName == "ActualHeight")
 			{
 				UpdateCommentSize();
-				RaisePropertyChangedEvent("X");
-				RaisePropertyChangedEvent("CanvasX");
-				RaisePropertyChangedEvent("CommentWidth");
-			}
-			else if (args.PropertyName == "Y" || args.PropertyName == "Height")
-			{
-				UpdateCommentSize();
-				RaisePropertyChangedEvent("Y");
-				RaisePropertyChangedEvent("CanvasY");
-				RaisePropertyChangedEvent("CommentHeight");
+				Future.SafeCall(() => { UpdateCommentSize(); }, 100, this);
 			}
 		}
 

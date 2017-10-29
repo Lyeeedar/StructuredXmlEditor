@@ -51,6 +51,8 @@ namespace StructuredXmlEditor
 			{
 				Thread.CurrentThread.IsBackground = true;
 
+				var toBeProcessed = new List<FutureData>();
+
 				DateTime lastTime = DateTime.Now;
 				while (true)
 				{ 
@@ -60,17 +62,20 @@ namespace StructuredXmlEditor
 					{
 						DateTime currentTime = DateTime.Now;
 						var expired = (int)(currentTime - lastTime).TotalMilliseconds;
+						System.Diagnostics.Debug.WriteLine(expired);
 
-						foreach (var data in m_futures.Values.ToList())
+						toBeProcessed.AddRange(m_futures.Values);
+						foreach (var data in toBeProcessed)
 						{
 							data.remainingDelayMS -= expired;
 							if (data.remainingDelayMS <= 0)
 							{
 								m_futures.Remove(data.key);
+								data.func();
 							}
-
-							data.func();
 						}
+
+						toBeProcessed.Clear();
 
 						lastTime = currentTime;
 					}

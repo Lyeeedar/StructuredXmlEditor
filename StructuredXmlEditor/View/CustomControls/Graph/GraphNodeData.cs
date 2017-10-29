@@ -51,9 +51,12 @@ namespace StructuredXmlEditor.View
 			get { return m_node; }
 			set
 			{
-				m_node = value;
-				RaisePropertyChangedEvent();
-				RaisePropertyChangedEvent("Graph");
+				if (m_node != value)
+				{
+					m_node = value;
+					RaisePropertyChangedEvent();
+					RaisePropertyChangedEvent("Graph");
+				}
 			}
 		}
 		private GraphNode m_node;

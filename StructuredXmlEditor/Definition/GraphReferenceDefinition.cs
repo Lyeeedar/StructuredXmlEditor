@@ -133,17 +133,17 @@ namespace StructuredXmlEditor.Definition
 			{
 				if (!keyString.Contains('('))
 				{
-					Keys.AddRange(keyString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(e => new Tuple<string, string>(e, "Node")));
+					Keys.AddRange(keyString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(e => new Tuple<string, string>(e.Trim(), "Node")));
 				}
 				else
 				{
 					var categories = keyString.Split(new char[] { ')' }, StringSplitOptions.RemoveEmptyEntries);
 					foreach (var categoryString in categories)
 					{
-						var split = categoryString.Split('(');
-						var category = split[0];
+						var split = categoryString.Trim().Split('(');
+						var category = split[0].Trim();
 						if (category.StartsWith(",")) category = category.Substring(1);
-						Keys.AddRange(split[1].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(e => new Tuple<string, string>(e, category)));
+						Keys.AddRange(split[1].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(e => new Tuple<string, string>(e.Trim(), category)));
 					}
 				}
 

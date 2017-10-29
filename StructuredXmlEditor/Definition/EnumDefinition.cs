@@ -61,7 +61,7 @@ namespace StructuredXmlEditor.Definition
 
 			var rawEnumValues = definition.Attribute("EnumValues")?.Value;
 			if (rawEnumValues == null && definition.Value != null) rawEnumValues = definition.Value;
-			if (rawEnumValues != null) EnumValues = rawEnumValues.Split(new char[] { ',' }).ToList();
+			if (rawEnumValues != null) EnumValues = rawEnumValues.Split(new char[] { ',' }).Select(e => e.Trim()).ToList();
 
 			Default = definition.Attribute("Default")?.Value?.ToString();
 			if (Default == null && EnumValues != null) Default = EnumValues[0];

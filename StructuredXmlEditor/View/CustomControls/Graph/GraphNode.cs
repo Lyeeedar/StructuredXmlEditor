@@ -200,8 +200,8 @@ namespace StructuredXmlEditor.View
 			{
 				foreach (GraphNodeData item in m_dataCache)
 				{
-					item.Node = null;
 					item.PropertyChanged -= func;
+					item.Node = null;
 				}
 
 				foreach (GraphNodeData item in Datas)
