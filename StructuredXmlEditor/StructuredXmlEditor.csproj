@@ -148,6 +148,9 @@
     <Compile Include="Util\SerializableDictionary.cs" />
     <Compile Include="Util\UndoRedoManager.cs" />
     <Compile Include="Util\VersionInfo.cs" />
+    <Compile Include="View\CustomControls\AnimatedImage.xaml.cs">
+      <DependentUpon>AnimatedImage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\CustomControls\AsciiGrid.cs" />
     <Compile Include="View\CustomControls\ColourPicker\ColorCanvas.cs" />
     <Compile Include="View\CustomControls\ColourPicker\ColorSpectrumSlider.cs" />
@@ -215,6 +218,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View\CustomControls\AnimatedImage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\CustomControls\DocumentView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

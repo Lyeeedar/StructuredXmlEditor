@@ -78,6 +78,8 @@ namespace StructuredXmlEditor.Data
 		private BitmapImage m_preview;
 		private string loadedPath;
 
+		public List<BitmapImage> Frames { get; set; } = new List<BitmapImage>();
+
 		//-----------------------------------------------------------------------
 		public virtual Command<object> BrowseCMD { get { return new Command<object>((e) => Browse()); } }
 
@@ -99,6 +101,9 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void LoadPreview()
 		{
+			Frames = new List<BitmapImage>();
+			RaisePropertyChangedEvent("Frames");
+
 			Task.Run(() => 
 			{
 				var path = FullPath;
@@ -108,37 +113,37 @@ namespace StructuredXmlEditor.Data
 					{
 						try
 						{
-							using (var stream = new FileStream(path, FileMode.Open))
-							{
-								try
-								{
-									BitmapImage image = new BitmapImage();
-									image.BeginInit();
-									image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
-									image.CacheOption = BitmapCacheOption.OnLoad;
-									image.StreamSource = stream;
-									image.EndInit();
-									image.Freeze();
-
-									Application.Current.Dispatcher.BeginInvoke(new Action(delegate
-									{
-										Preview = image;
-									}));
-								}
-								catch (Exception)
-								{
-									Application.Current.Dispatcher.BeginInvoke(new Action(delegate
-									{
-										Preview = null;
-									}));
-								}
-							}
+							Preview = LoadImage(path);
 						}
 						catch (Exception)
 						{
 							Thread.Sleep(100);
 						}
 					}
+				}
+				else if (File.Exists(FullPath + "_0.png") || File.Exists(FullPath + "_1.png"))
+				{
+					var frames = new List<BitmapImage>();
+
+					var i = File.Exists(FullPath + "_0.png") ? 0 : 1;
+					while (true)
+					{
+						var imagePath = FullPath + "_" + i + ".png";
+						if (File.Exists(imagePath))
+						{
+							var image = LoadImage(imagePath);
+							frames.Add(image);
+
+							i++;
+						}
+						else
+						{
+							break;
+						}
+					}
+
+					Frames = frames;
+					RaisePropertyChangedEvent("Frames");
 				}
 				else
 				{
@@ -148,6 +153,30 @@ namespace StructuredXmlEditor.Data
 					}));
 				}
 			});
+		}
+
+		//-----------------------------------------------------------------------
+		private BitmapImage LoadImage(string path)
+		{
+			using (var stream = new FileStream(path, FileMode.Open))
+			{
+				try
+				{
+					BitmapImage image = new BitmapImage();
+					image.BeginInit();
+					image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
+					image.CacheOption = BitmapCacheOption.OnLoad;
+					image.StreamSource = stream;
+					image.EndInit();
+					image.Freeze();
+
+					return image;
+				}
+				catch (Exception)
+				{
+					return null;
+				}
+			}
 		}
 
 		//-----------------------------------------------------------------------

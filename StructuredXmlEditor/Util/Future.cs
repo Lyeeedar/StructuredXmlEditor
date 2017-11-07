@@ -62,7 +62,6 @@ namespace StructuredXmlEditor
 					{
 						DateTime currentTime = DateTime.Now;
 						var expired = (int)(currentTime - lastTime).TotalMilliseconds;
-						System.Diagnostics.Debug.WriteLine(expired);
 
 						toBeProcessed.AddRange(m_futures.Values);
 						foreach (var data in toBeProcessed)

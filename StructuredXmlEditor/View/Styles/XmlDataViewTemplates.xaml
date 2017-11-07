@@ -291,6 +291,13 @@
 						Source="{Binding Preview, Converter={v:NullImageConverter}}" />
 				</Image.ToolTip>
 			</Image>
+			<v:AnimatedImage
+				Grid.Column="3"
+				Width="24"
+				Height="24"
+				Margin="2"
+				Frames="{Binding Frames}"
+				Visibility="{Binding Frames.Count, Converter={v:NullOrZeroConverter}, ConverterParameter=Not}"/>
 			<Button
 				Grid.Column="4"
 				ToolTip="Open the file for editing"
