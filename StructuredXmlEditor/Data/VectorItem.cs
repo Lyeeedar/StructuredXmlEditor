@@ -111,19 +111,35 @@ namespace StructuredXmlEditor.Data
 
 		public static VectorN FromString(string data, int components = -1)
 		{
-			var split = string.IsNullOrWhiteSpace(data) ? new string[] { "0", "0" } : data.Split(new char[] { ',' });
-
+			int compCount = 0;
 			float x = 0f;
 			float y = 0f;
 			float z = 0f;
 			float w = 0f;
 
-			float.TryParse(split[0], out x);
-			float.TryParse(split[1], out y);
-			if (split.Length > 2) float.TryParse(split[2], out z);
-			if (split.Length > 3) float.TryParse(split[3], out w);
+			if (data.Contains(','))
+			{
+				var split = string.IsNullOrWhiteSpace(data) ? new string[] { "0", "0" } : data.Split(new char[] { ',' });
+				float.TryParse(split[0], out x);
+				float.TryParse(split[1], out y);
+				if (split.Length > 2) float.TryParse(split[2], out z);
+				if (split.Length > 3) float.TryParse(split[3], out w);
 
-			int numComponents = components != -1 ? components : split.Length;
+				compCount = split.Length;
+			}
+			else
+			{
+				var val = 0f;
+				float.TryParse(data, out val);
+
+				x = val;
+				y = val;
+				z = val;
+				w = val;
+				compCount = 1;
+			}
+
+			int numComponents = components != -1 ? components : compCount;
 
 			return new VectorN(numComponents, x, y, z, w);
 		}
