@@ -62,7 +62,10 @@ namespace StructuredXmlEditor.Definition
 				foreach (var s in split)
 				{
 					var child = primDef.LoadFromString(s, undoRedo);
-					item.Children.Add(child);
+					var citem = ChildDefinitions[0].CreateData(undoRedo) as CollectionChildItem;
+					citem.WrappedItem = child;
+
+					item.Children.Add(citem);
 
 					if (item.Children.Count == MaxCount) break;
 				}
