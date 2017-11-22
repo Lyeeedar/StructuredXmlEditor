@@ -740,14 +740,23 @@ namespace StructuredXmlEditor.View
 			// draw characters
 			for (int x = 0; x < GridWidth; x++)
 			{
+				var drawX = -ViewPos.X + x * PixelsATile - (ZeroPoint.X * PixelsATile);
+				if (drawX > ActualWidth || drawX + PixelsATile < 0) { continue; }
+
 				for (int y = 0; y < GridHeight; y++)
 				{
+					var drawY = -ViewPos.Y + y * PixelsATile - (ZeroPoint.Y * PixelsATile);
+					if (drawY > ActualHeight || drawY + PixelsATile < 0) { continue; }
+
 					GlyphRunBuilder.AddGlyph(x, y, Grid[x, y]);
 				}
 			}
 
-			var run = GlyphRunBuilder.GetRun();
-			drawingContext.DrawGlyphRun(FontBrush, run);
+			if (GlyphRunBuilder.HasGlyphs)
+			{
+				var run = GlyphRunBuilder.GetRun();
+				drawingContext.DrawGlyphRun(FontBrush, run);
+			}
 
 			// draw cursor
 			if (mouseInside)
@@ -1859,6 +1868,14 @@ namespace StructuredXmlEditor.View
 		private List<double> advanceWidths = new List<double>();
 		private List<Point> glyphOffsets = new List<Point>();
 		private GlyphTypeface typeface;
+
+		public bool HasGlyphs
+		{
+			get
+			{
+				return glyphIndices.Count > 0;
+			}
+		}
 
 		public GlyphRunBuilder(Typeface type)
 		{
