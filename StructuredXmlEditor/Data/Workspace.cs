@@ -860,22 +860,26 @@ namespace StructuredXmlEditor.Data
 				if (graphdef != null && graphdef.FlattenData)
 				{
 					var nodesEl = firstEl.Element(graphdef.NodeStoreName);
-					nodesEl.Remove();
 
-					var item = matchedDef.LoadData(firstEl, document.UndoRedo);
-					document.SetData(item);
-
-					foreach (var el in nodesEl.Elements())
+					if (nodesEl != null)
 					{
-						var name = el.Name.ToString().ToLower();
-						var def = ReferenceableDefinitions[matchedDef.SrcFile].ContainsKey(name) ? ReferenceableDefinitions[matchedDef.SrcFile][name] : ReferenceableDefinitions[""][name];
+						nodesEl.Remove();
 
-						var node = def.LoadData(el, document.UndoRedo);
+						var item = matchedDef.LoadData(firstEl, document.UndoRedo);
+						document.SetData(item);
 
-						if (!document.Data.GraphNodeItems.Contains(node as GraphNodeItem))
+						foreach (var el in nodesEl.Elements())
 						{
-							document.Data.GraphNodeItems.Add(node as GraphNodeItem);
-							node.DataModel = document.Data;
+							var name = el.Name.ToString().ToLower();
+							var def = ReferenceableDefinitions[matchedDef.SrcFile].ContainsKey(name) ? ReferenceableDefinitions[matchedDef.SrcFile][name] : ReferenceableDefinitions[""][name];
+
+							var node = def.LoadData(el, document.UndoRedo);
+
+							if (!document.Data.GraphNodeItems.Contains(node as GraphNodeItem))
+							{
+								document.Data.GraphNodeItems.Add(node as GraphNodeItem);
+								node.DataModel = document.Data;
+							}
 						}
 					}
 				}

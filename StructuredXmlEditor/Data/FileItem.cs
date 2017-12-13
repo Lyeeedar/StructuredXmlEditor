@@ -107,19 +107,13 @@ namespace StructuredXmlEditor.Data
 			Task.Run(() => 
 			{
 				var path = FullPath;
-				if (File.Exists(path))
+				if (path.EndsWith(".png") && File.Exists(path))
 				{
-					for (int i = 0; i < 100; i++)
-					{
-						try
-						{
-							Preview = LoadImage(path);
-						}
-						catch (Exception)
-						{
-							Thread.Sleep(100);
-						}
-					}
+					Preview = LoadImage(path);
+				}
+				else if (File.Exists(path + ".png"))
+				{
+					Preview = LoadImage(path + ".png");
 				}
 				else if (File.Exists(FullPath + "_0.png") || File.Exists(FullPath + "_1.png"))
 				{
@@ -158,7 +152,8 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		private BitmapImage LoadImage(string path)
 		{
-			using (var stream = new FileStream(path, FileMode.Open))
+			var bytes = File.ReadAllBytes(path);
+			using (MemoryStream stream = new MemoryStream(bytes))
 			{
 				try
 				{
