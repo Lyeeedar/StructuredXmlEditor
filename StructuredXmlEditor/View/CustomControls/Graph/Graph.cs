@@ -161,11 +161,13 @@ namespace StructuredXmlEditor.View
 							var link = data as GraphNodeDataLink;
 							if (link.Link != null)
 							{
+								var draw = true;
 								if (node.HiddenBy != null && link.Link.HiddenBy != null)
 								{
 									if (node.HiddenBy == link.Link.HiddenBy)
 									{
 										// dont draw
+										draw = false;
 									}
 									else
 									{
@@ -183,6 +185,14 @@ namespace StructuredXmlEditor.View
 								else
 								{
 									yield return new LinkWrapper(link);
+								}
+
+								if (draw)
+								{
+									foreach (var controlPoint in link.ControlPoints)
+									{
+										yield return controlPoint;
+									}
 								}
 							}
 						}
@@ -313,6 +323,18 @@ namespace StructuredXmlEditor.View
 			}
 		}
 		private object m_MouseOverItem;
+
+		//--------------------------------------------------------------------------
+		public Point MousePosition
+		{
+			get
+			{
+				var pos = m_mousePoint;
+				var scaled = new Point((pos.X - Offset.X) / Scale, (pos.Y - Offset.Y) / Scale);
+
+				return scaled;
+			}
+		}
 
 		//--------------------------------------------------------------------------
 		protected override void OnMouseDown(MouseButtonEventArgs e)
@@ -630,6 +652,29 @@ namespace StructuredXmlEditor.View
 						}
 					});
 				}
+			}
+
+			if (mouseOverLink != null)
+			{
+				menu.AddSeperator();
+
+				var link = mouseOverLink;
+				var mousePos = MousePosition;
+				menu.AddItem("Create Control Point", () => 
+				{
+					link.Link.AddControlPoint(mousePos);
+				});
+			}
+
+			if (mouseOverControlPoint != null)
+			{
+				menu.AddSeperator();
+
+				var controlPoint = mouseOverControlPoint;
+				menu.AddItem("Delete", () => 
+				{
+					controlPoint.LinkParent.RemoveControlPoint(controlPoint);
+				});
 			}
 
 			menu.IsOpen = true;
@@ -1011,6 +1056,8 @@ namespace StructuredXmlEditor.View
 		}
 		private GraphNode m_graphNode;
 		public InProgressLinkWrapper m_inProgressLink;
+		public LinkWrapper mouseOverLink;
+		public LinkControlPoint mouseOverControlPoint;
 
 		//-----------------------------------------------------------------------
 		private bool m_mightBeMarqueeSelecting;

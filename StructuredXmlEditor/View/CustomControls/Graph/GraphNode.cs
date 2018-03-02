@@ -71,6 +71,18 @@ namespace StructuredXmlEditor.View
 				RaisePropertyChangedEvent("CanvasY");
 
 				RaisePropertyChangedEvent("Position");
+
+				foreach (var data in Datas)
+				{
+					var link = data as GraphNodeDataLink;
+					if (link != null)
+					{
+						foreach (var controlPoint in link.ControlPoints)
+						{
+							controlPoint.OnGraphPropertyChanged(sender, args);
+						}
+					}
+				}
 			}
 		}
 

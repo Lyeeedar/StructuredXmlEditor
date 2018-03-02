@@ -186,6 +186,9 @@
       <DependentUpon>UndoHistoryView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\SharedResourceDictionary.cs" />
+    <Compile Include="View\Styles\Graph.xaml.cs">
+      <DependentUpon>Graph.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Styles\XmlDataView.xaml.cs">
       <DependentUpon>XmlDataView.xaml</DependentUpon>
     </Compile>

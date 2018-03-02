@@ -61,6 +61,12 @@ namespace StructuredXmlEditor.Definition
 				}
 			}
 
+			if (si.ControlPoints.Count > 0)
+			{
+				var flatControlPoints = string.Join("|", si.ControlPoints.Select(e => "" + e.Position.X + "," + e.Position.Y));
+				el.SetAttributeValue(DataDefinition.MetaNS + "ControlPoints", flatControlPoints);
+			}
+
 			foreach (var att in item.Attributes)
 			{
 				var primDef = att.Definition as PrimitiveDataDefinition;
@@ -116,6 +122,20 @@ namespace StructuredXmlEditor.Definition
 					attItem = att.CreateData(undoRedo);
 				}
 				item.Attributes.Add(attItem);
+			}
+
+			var controlPoints = element.Attribute(DataDefinition.MetaNS + "ControlPoints")?.Value;
+			if (controlPoints != null)
+			{
+				var points = controlPoints.Split('|');
+				foreach (var point in points)
+				{
+					var split = point.Split(',');
+					var x = double.Parse(split[0]);
+					var y = double.Parse(split[1]);
+
+					item.ControlPoints.Add(new GraphReferenceControlPoint(item, new System.Windows.Point(x, y)));
+				}
 			}
 
 			return item;

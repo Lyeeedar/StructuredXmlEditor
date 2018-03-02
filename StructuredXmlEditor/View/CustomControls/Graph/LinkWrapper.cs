@@ -161,9 +161,6 @@ namespace StructuredXmlEditor.View
 
 			src = new Point((src.X - Offset.X) / Scale, (src.Y - Offset.Y) / Scale);
 
-			var yDiff = dst.Y - src.Y;
-			var xDiff = dst.X - src.X;
-
 			var geometry = new PathGeometry();
 
 			var figure = new PathFigure();
@@ -172,15 +169,46 @@ namespace StructuredXmlEditor.View
 
 			figure.StartPoint = new Point(0, 0);
 
-			var segment = new BezierSegment();
+			for (int i = 0; i <= link.ControlPoints.Count; i++)
+			{
+				Point startPos;
+				if (i - 1 == -1)
+				{
+					startPos = src;
+				}
+				else
+				{
+					startPos = link.ControlPoints[i - 1].Position;
+					startPos = new Point(startPos.X + 7, startPos.Y + 7);
+				}
 
-			var offset = Math.Min(Math.Abs(yDiff), 100);
+				Point dstPos;
+				if (i == link.ControlPoints.Count)
+				{
+					dstPos = dst;
+				}
+				else
+				{
+					dstPos = link.ControlPoints[i].Position;
+					dstPos = new Point(dstPos.X + 7, dstPos.Y + 7);
+				}
 
-			segment.Point1 = new Point(offset, yDiff * 0.05);
-			segment.Point2 = new Point(xDiff - offset, yDiff - yDiff * 0.05);
-			segment.Point3 = new Point(xDiff, yDiff);
+				var trueStartX = startPos.X - src.X;
+				var trueStartY = startPos.Y - src.Y;
 
-			figure.Segments.Add(segment);
+				var yDiff = dstPos.Y - startPos.Y;
+				var xDiff = dstPos.X - startPos.X;
+
+				var segment = new BezierSegment();
+
+				var offset = Math.Min(Math.Abs(xDiff) / 2, 100);
+
+				segment.Point1 = new Point(trueStartX + offset, trueStartY + yDiff * 0.05);
+				segment.Point2 = new Point(trueStartX + xDiff - offset, trueStartY + yDiff - yDiff * 0.05);
+				segment.Point3 = new Point(trueStartX + xDiff, trueStartY + yDiff);
+
+				figure.Segments.Add(segment);
+			}
 
 			return geometry;
 		}

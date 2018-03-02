@@ -179,7 +179,7 @@
 				Grid.Column="1"
 				VerticalAlignment="Center"
 				MaxLength="{Binding Definition.MaxLength}"
-				Text="{Binding Value, UpdateSourceTrigger=PropertyChanged, Delay=500, TargetNullValue=---}" />
+				Text="{Binding Value, UpdateSourceTrigger=PropertyChanged, TargetNullValue=---}" />
 		</Grid>
 
 	</DataTemplate>
@@ -237,7 +237,7 @@
 				Grid.Column="1"
 				Visibility="{Binding IsCollectionChild, Converter={v:ValueTypeConverter}}"
 				VerticalAlignment="Center"
-				Text="{Binding Value, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
+				Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" />
 		</Grid>
 	</DataTemplate>
 
@@ -274,7 +274,7 @@
 			<TextBox
 				Grid.Column="2"
 				VerticalAlignment="Center"
-				Text="{Binding Value, UpdateSourceTrigger=PropertyChanged, Delay=500, TargetNullValue=---}" />
+				Text="{Binding Value, UpdateSourceTrigger=PropertyChanged,  TargetNullValue=---}" />
 			<Image
 				Grid.Column="3"
 				ToolTipService.ShowDuration="100000"
@@ -328,7 +328,7 @@
 				UseIntegers="{Binding Definition.UseIntegers}"
 				DefaultValue="{Binding Definition.Default}"
 				VerticalAlignment="Center"
-				Value="{Binding Value, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
+				Value="{Binding Value, UpdateSourceTrigger=PropertyChanged}" />
 		</Grid>
 
 	</DataTemplate>
@@ -356,7 +356,7 @@
 					MaxValue="{Binding Definition.MaxValue}"
 					UseIntegers="{Binding Definition.UseIntegers}"
 					DefaultValue="{Binding Definition.Default.X}"
-					Value="{Binding X, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
+					Value="{Binding X, UpdateSourceTrigger=PropertyChanged}" />
 			</DockPanel>
 
 			<DockPanel>
@@ -373,7 +373,7 @@
 					MaxValue="{Binding Definition.MaxValue}"
 					UseIntegers="{Binding Definition.UseIntegers}"
 					DefaultValue="{Binding Definition.Default.Y}"
-					Value="{Binding Y, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
+					Value="{Binding Y, UpdateSourceTrigger=PropertyChanged}" />
 			</DockPanel>
 
 			<DockPanel
@@ -391,7 +391,7 @@
 					MaxValue="{Binding Definition.MaxValue}"
 					UseIntegers="{Binding Definition.UseIntegers}"
 					DefaultValue="{Binding Definition.Default.Z}"
-					Value="{Binding Z, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
+					Value="{Binding Z, UpdateSourceTrigger=PropertyChanged}" />
 			</DockPanel>
 
 			<DockPanel
@@ -409,7 +409,7 @@
 					MaxValue="{Binding Definition.MaxValue}"
 					UseIntegers="{Binding Definition.UseIntegers}"
 					DefaultValue="{Binding Definition.Default.W}"
-					Value="{Binding W, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
+					Value="{Binding W, UpdateSourceTrigger=PropertyChanged}" />
 			</DockPanel>
 		</StackPanel>
 	</DataTemplate>
