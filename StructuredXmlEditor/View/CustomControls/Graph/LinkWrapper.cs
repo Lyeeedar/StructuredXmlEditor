@@ -171,6 +171,9 @@ namespace StructuredXmlEditor.View
 
 			for (int i = 0; i <= link.ControlPoints.Count; i++)
 			{
+				double flipStart = 1;
+				double flipDst = 1;
+
 				Point startPos;
 				if (i - 1 == -1)
 				{
@@ -180,6 +183,8 @@ namespace StructuredXmlEditor.View
 				{
 					startPos = link.ControlPoints[i - 1].Position;
 					startPos = new Point(startPos.X + 7, startPos.Y + 7);
+
+					flipStart = link.ControlPoints[i - 1].Flip ? -1 : 1;
 				}
 
 				Point dstPos;
@@ -191,6 +196,8 @@ namespace StructuredXmlEditor.View
 				{
 					dstPos = link.ControlPoints[i].Position;
 					dstPos = new Point(dstPos.X + 7, dstPos.Y + 7);
+
+					flipDst = link.ControlPoints[i].Flip? -1 : 1;
 				}
 
 				var trueStartX = startPos.X - src.X;
@@ -203,8 +210,8 @@ namespace StructuredXmlEditor.View
 
 				var offset = Math.Min(Math.Abs(xDiff) / 2, 100);
 
-				segment.Point1 = new Point(trueStartX + offset, trueStartY + yDiff * 0.05);
-				segment.Point2 = new Point(trueStartX + xDiff - offset, trueStartY + yDiff - yDiff * 0.05);
+				segment.Point1 = new Point(trueStartX + offset * flipStart, trueStartY + yDiff * 0.05);
+				segment.Point2 = new Point(trueStartX + xDiff - offset * flipDst, trueStartY + yDiff - yDiff * 0.05);
 				segment.Point3 = new Point(trueStartX + xDiff, trueStartY + yDiff);
 
 				figure.Segments.Add(segment);

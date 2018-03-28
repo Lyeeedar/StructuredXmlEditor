@@ -671,10 +671,15 @@ namespace StructuredXmlEditor.View
 				menu.AddSeperator();
 
 				var controlPoint = mouseOverControlPoint;
-				menu.AddItem("Delete", () => 
+				menu.AddItem("Delete Control Point", () => 
 				{
 					controlPoint.LinkParent.RemoveControlPoint(controlPoint);
 				});
+
+				menu.AddCheckable("Flip Control Point", (state) =>
+				{
+					controlPoint.Flip = !controlPoint.Flip;
+				}, controlPoint.Flip);
 			}
 
 			menu.IsOpen = true;

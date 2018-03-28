@@ -532,12 +532,30 @@ namespace StructuredXmlEditor.Data
 		}
 		private Point m_position;
 
+		public bool Flip
+		{
+			get { return m_flip; }
+			set
+			{
+				Item.UndoRedo.DoValueChange<bool>(this,
+					m_flip, null, value, null,
+					(pos, data) =>
+					{
+						m_flip = pos;
+						RaisePropertyChangedEvent("Flip");
+					},
+					"Flip");
+			}
+		}
+		private bool m_flip;
+
 		private GraphReferenceItem Item;
 
-		public GraphReferenceControlPoint(GraphReferenceItem item, Point pos)
+		public GraphReferenceControlPoint(GraphReferenceItem item, Point pos, bool flip = false)
 		{
 			this.m_position = pos;
 			this.Item = item;
+			this.Flip = flip;
 		}
 	}
 }

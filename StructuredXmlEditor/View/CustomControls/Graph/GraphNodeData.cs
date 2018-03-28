@@ -673,6 +673,18 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
+		public bool Flip
+		{
+			get { return controlPoint.Flip; }
+			set
+			{
+				controlPoint.Flip = value;
+				RaisePropertyChangedEvent();
+				LinkParent.RaisePropertyChangedEvent("Link");
+			}
+		}
+
+		//--------------------------------------------------------------------------
 		public GraphReferenceControlPoint controlPoint;
 
 		//--------------------------------------------------------------------------
@@ -692,6 +704,10 @@ namespace StructuredXmlEditor.View
 					RaisePropertyChangedEvent("CanvasX");
 					RaisePropertyChangedEvent("CanvasY");
 
+					LinkParent.RaisePropertyChangedEvent("Link");
+				}
+				else if (args.PropertyName == "Flip")
+				{
 					LinkParent.RaisePropertyChangedEvent("Link");
 				}
 			};

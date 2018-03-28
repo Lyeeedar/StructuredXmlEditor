@@ -63,7 +63,7 @@ namespace StructuredXmlEditor.Definition
 
 			if (si.ControlPoints.Count > 0)
 			{
-				var flatControlPoints = string.Join("|", si.ControlPoints.Select(e => "" + e.Position.X + "," + e.Position.Y));
+				var flatControlPoints = string.Join("|", si.ControlPoints.Select(e => "" + e.Position.X + "," + e.Position.Y + "," + e.Flip));
 				el.SetAttributeValue(DataDefinition.MetaNS + "ControlPoints", flatControlPoints);
 			}
 
@@ -133,8 +133,9 @@ namespace StructuredXmlEditor.Definition
 					var split = point.Split(',');
 					var x = double.Parse(split[0]);
 					var y = double.Parse(split[1]);
+					var flip = split.Length == 3 ? bool.Parse(split[2]) : false;
 
-					item.ControlPoints.Add(new GraphReferenceControlPoint(item, new System.Windows.Point(x, y)));
+					item.ControlPoints.Add(new GraphReferenceControlPoint(item, new System.Windows.Point(x, y), flip));
 				}
 			}
 
