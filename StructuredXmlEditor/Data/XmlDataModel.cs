@@ -25,11 +25,15 @@ namespace StructuredXmlEditor.Data
 		public Workspace Workspace { get; set; }
 
 		//-----------------------------------------------------------------------
+		public Document Document { get; set; }
+
+		//-----------------------------------------------------------------------
 		public UndoRedoManager UndoRedo { get; set; }
 
 		//-----------------------------------------------------------------------
-		public XmlDataModel(Workspace workspace, UndoRedoManager undoRedo)
+		public XmlDataModel(Workspace workspace, Document document, UndoRedoManager undoRedo)
 		{
+			this.Document = document;
 			this.Workspace = workspace;
 			this.UndoRedo = undoRedo;
 

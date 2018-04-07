@@ -40,6 +40,8 @@ namespace StructuredXmlEditor.Definition
 		public string CustomExtension { get; set; }
 		public string Extension { get { return CustomExtension ?? DataType; } }
 
+		public bool IsRootLevel { get { return this is GraphStructDefinition || this is GraphCollectionDefinition || this is StructDefinition || this is CollectionDefinition; } }
+
 		public List<PrimitiveDataDefinition> Attributes { get; set; } = new List<PrimitiveDataDefinition>();
 
 		public abstract void Parse(XElement definition);

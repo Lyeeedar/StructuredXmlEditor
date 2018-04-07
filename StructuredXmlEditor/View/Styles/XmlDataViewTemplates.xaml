@@ -300,8 +300,15 @@
 				Visibility="{Binding Frames.Count, Converter={v:NullOrZeroConverter}, ConverterParameter=Not}"/>
 			<Button
 				Grid.Column="4"
+				ToolTip="Create a new file"
+				Content="+"
+				Visibility="{Binding Exists, Converter={v:ValueTypeConverter}, ConverterParameter=Not}"
+				Command="{Binding CreateCMD}" />
+			<Button
+				Grid.Column="4"
 				ToolTip="Open the file for editing"
 				Content="->"
+				Visibility="{Binding Exists, Converter={v:ValueTypeConverter}}"
 				Command="{Binding OpenCMD}" />
 		</Grid>
 	</DataTemplate>

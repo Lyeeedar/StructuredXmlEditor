@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using StructuredXmlEditor.Data;
+using StructuredXmlEditor.View;
 
 namespace StructuredXmlEditor.Definition
 {
@@ -13,7 +14,10 @@ namespace StructuredXmlEditor.Definition
 		public bool StripExtension { get; set; }
 		public string Default { get; set; }
 		public string BasePath { get; set; }
+		public string ResourceType { get; set; }
+		public DataDefinition ResourceDataType { get; set; }
 		public List<string> AllowedFileTypes { get; set; }
+		public bool RelativeToThis { get; set; }
 
 		public override DataItem CreateData(UndoRedoManager undoRedo)
 		{
@@ -56,14 +60,15 @@ namespace StructuredXmlEditor.Definition
 
 		public override void Parse(XElement definition)
 		{
-			Default = definition.Attribute("Default")?.Value?.ToString();
-			if (Default == null) Default = "";
+			Default = definition.Attribute("Default")?.Value?.ToString() ?? "";
+			BasePath = definition.Attribute("BasePath")?.Value?.ToString() ?? "";
+			ResourceType = definition.Attribute("ResourceType")?.Value?.ToString();
 
-			BasePath = definition.Attribute("BasePath")?.Value?.ToString();
-			if (BasePath == null) BasePath = "";
+			RelativeToThis = TryParseBool(definition, "RelativeToThis");
 
 			var allowedFileTypes = definition.Attribute("AllowedFileTypes")?.Value?.ToString();
 			if (allowedFileTypes != null) AllowedFileTypes = allowedFileTypes.Split(new char[] { ',' }).ToList();
+			else AllowedFileTypes = new List<string>();
 
 			StripExtension = TryParseBool(definition, "StripExtension");
 		}
@@ -109,6 +114,39 @@ namespace StructuredXmlEditor.Definition
 		public override object DefaultValue()
 		{
 			return Default;
+		}
+
+		public override void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global, Dictionary<string, Dictionary<string, DataDefinition>> referenceableDefinitions)
+		{
+			if (ResourceType != null)
+			{
+				var key = ResourceType.ToLower();
+
+				Dictionary<string, DataDefinition> defs = null;
+				if (local.ContainsKey(key)) defs = local;
+				else if (global.ContainsKey(key)) defs = global;
+
+				if (defs != null)
+				{
+					var def = defs[key];
+					if (def.IsRootLevel)
+					{
+						ResourceDataType = def;
+						AllowedFileTypes.Clear();
+						AllowedFileTypes.Add(ResourceDataType.Extension);
+					}
+					else
+					{
+						Message.Show("Resource " + ResourceType + " is not a root level resource!", "Reference Resolve Failed", "Ok");
+					}
+				}
+				else
+				{
+					Message.Show("Failed to find key " + ResourceType + "!", "Reference Resolve Failed", "Ok");
+				}
+			}
+
+			base.RecursivelyResolve(local, global, referenceableDefinitions);
 		}
 	}
 }

@@ -31,7 +31,17 @@ namespace StructuredXmlEditor.Data
 				if (Value == null) return null;
 
 				var fdef = Definition as FileDefinition;
-				var path = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Workspace.Instance.ProjectRoot), fdef.BasePath, Value));
+
+				string path;
+
+				if (fdef.RelativeToThis)
+				{
+					path = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(DataModel.Document.Path), fdef.BasePath, Value));
+				}
+				else
+				{
+					path = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Workspace.Instance.ProjectRoot), fdef.BasePath, Value));
+				}
 
 				if (fdef.StripExtension)
 				{
@@ -55,6 +65,12 @@ namespace StructuredXmlEditor.Data
 				return path;
 			}
 		}
+
+		//-----------------------------------------------------------------------
+		public bool Exists { get { return File.Exists(FullPath); } }
+
+		//-----------------------------------------------------------------------
+		private FileDefinition FileDef { get { return (FileDefinition)Definition; } }
 
 		//-----------------------------------------------------------------------
 		public BitmapImage Preview
@@ -87,6 +103,9 @@ namespace StructuredXmlEditor.Data
 		public Command<object> OpenCMD { get { return new Command<object>(e => Open(), e => File.Exists(FullPath)); } }
 
 		//-----------------------------------------------------------------------
+		public Command<object> CreateCMD { get { return new Command<object>(e => Create(), e => FileDef.ResourceDataType != null && !File.Exists(FullPath)); } }
+
+		//-----------------------------------------------------------------------
 		public FileItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
 			PropertyChanged += (e, args) => 
@@ -94,8 +113,24 @@ namespace StructuredXmlEditor.Data
 				if (args.PropertyName == "Value")
 				{
 					RaisePropertyChangedEvent("Preview");
+					RaisePropertyChangedEvent("FullPath");
+					RaisePropertyChangedEvent("Exists");
 				}
 			};
+
+			Future.SafeCall(() => { Update(); }, 10000);
+		}
+
+		//-----------------------------------------------------------------------
+		public void Update()
+		{
+			if (DataModel.Workspace.Documents.Contains(DataModel.Document))
+			{
+				RaisePropertyChangedEvent("Exists");
+				RaisePropertyChangedEvent("Preview");
+
+				Future.SafeCall(() => { Update(); }, 10000);
+			}
 		}
 
 		//-----------------------------------------------------------------------
@@ -181,6 +216,57 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public void Create()
+		{
+			var fdef = Definition as FileDefinition;
+			if (string.IsNullOrWhiteSpace(Value))
+			{
+				int index = 1;
+				var baseName = Path.GetFileNameWithoutExtension(DataModel.Document.Path) + Name;
+				while (true)
+				{
+					var name = baseName + index + "." + fdef.AllowedFileTypes.First();
+					if (!File.Exists(name))
+					{
+						if (fdef.StripExtension)
+						{
+							Value = baseName + index;
+						}
+						else
+						{
+							Value = name;
+						}
+
+						break;
+					}
+
+					index++;
+				}
+			}
+			else if (File.Exists(FullPath))
+			{
+				var result = Message.Show("The file '" + FullPath + "' already exists, overwrite?", "File Exists!", "No", "Yes");
+				if (result == "No")
+				{
+					return;
+				}
+				else
+				{
+					File.Delete(FullPath);
+					foreach (var doc in DataModel.Workspace.Documents.ToList())
+					{
+						if (doc.Path == FullPath)
+						{
+							doc.Close(true);
+						}
+					}
+				}
+			}
+
+			Workspace.Instance.New(fdef.ResourceDataType, FullPath);
+		}
+
+		//-----------------------------------------------------------------------
 		public void Browse()
 		{
 			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
@@ -189,7 +275,9 @@ namespace StructuredXmlEditor.Data
 
 			if (fdef.AllowedFileTypes != null)
 			{
-				var filter = "Resource files (" + 
+				var resourceName = fdef.ResourceDataType != null ? fdef.ResourceDataType.Name : "Resource";
+
+				var filter = resourceName + " files (" + 
 					string.Join(", ", fdef.AllowedFileTypes.Select((e) => "*." + e)) +
 					") | " +
 					string.Join("; ", fdef.AllowedFileTypes.Select((e) => "*." + e));
@@ -206,7 +294,15 @@ namespace StructuredXmlEditor.Data
 				if (fdef.StripExtension) chosen = Path.ChangeExtension(dlg.FileName, null);
 
 				// make relative
-				var relativeTo = Path.Combine(Path.GetDirectoryName(Workspace.Instance.ProjectRoot), fdef.BasePath, "fakefile.fake");
+				string relativeTo;
+				if (fdef.RelativeToThis)
+				{
+					relativeTo = Path.Combine(Path.GetDirectoryName(DataModel.Document.Path), fdef.BasePath, "fakefile.fake");
+				}
+				else
+				{
+					relativeTo = Path.Combine(Path.GetDirectoryName(Workspace.Instance.ProjectRoot), fdef.BasePath, "fakefile.fake");
+				}
 
 				Uri path1 = new Uri(chosen);
 				Uri path2 = new Uri(relativeTo);

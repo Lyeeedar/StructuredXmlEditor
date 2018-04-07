@@ -1479,6 +1479,23 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public void New(DataDefinition data, string path)
+		{
+			var ext = data.Extension;
+			var document = new Document(path, this);
+
+			using (document.UndoRedo.DisableUndoScope())
+			{
+				var item = data.CreateData(document.UndoRedo);
+				document.SetData(item);
+			}
+
+			Documents.Add(document);
+
+			Current = document;
+		}
+
+		//-----------------------------------------------------------------------
 		public void SaveAs()
 		{
 			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
