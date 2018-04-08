@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 using System.Xml.Linq;
 using StructuredXmlEditor.Data;
 
@@ -13,6 +14,7 @@ namespace StructuredXmlEditor.Definition
 		public bool ChildrenAreUnique { get; set; }
 		public bool Collapse { get; set; }
 		public string Seperator { get; set; }
+		public List<Tuple<CollectionChildDefinition, string>> Keys { get; } = new List<Tuple<CollectionChildDefinition, string>>();
 		public List<CollectionChildDefinition> ChildDefinitions { get; } = new List<CollectionChildDefinition>();
 		public List<DataDefinition> AdditionalDefs { get; } = new List<DataDefinition>();
 		public int MinCount { get; set; } = 0;
@@ -153,13 +155,29 @@ namespace StructuredXmlEditor.Definition
 			MinCount = TryParseInt(definition, "MinCount", 0);
 			MaxCount = TryParseInt(definition, "MaxCount", int.MaxValue);
 
-			var childDefs = definition.Elements().Where(e => e.Name != "Attributes" && e.Name != "AdditionalDefs");
+			var currentGroup = "Items";
+
+			var childDefs = definition.Nodes();
 			foreach (var childDef in childDefs)
 			{
-				var cdef = new CollectionChildDefinition();
-				cdef.Parse(childDef);
+				if (childDef is XComment)
+				{
+					currentGroup = (childDef as XComment).Value;
+				}
+				else if (childDef is XElement)
+				{
+					var xel = childDef as XElement;
+					if (xel.Name == "Attributes" || xel.Name == "AdditionalDefs")
+					{
+						continue;
+					}
 
-				ChildDefinitions.Add(cdef);
+					var cdef = new CollectionChildDefinition();
+					cdef.Parse(xel);
+
+					ChildDefinitions.Add(cdef);
+					Keys.Add(new Tuple<CollectionChildDefinition, string>(cdef, currentGroup));
+				}
 			}
 
 			if (ChildDefinitions.Count == 0)

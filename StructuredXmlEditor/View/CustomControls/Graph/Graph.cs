@@ -159,7 +159,7 @@ namespace StructuredXmlEditor.View
 						if (data is GraphNodeDataLink)
 						{
 							var link = data as GraphNodeDataLink;
-							if (link.Link != null)
+							if (link.Link != null && link.GraphReferenceItem.IsVisibleFromBindings)
 							{
 								var draw = true;
 								if (node.HiddenBy != null && link.Link.HiddenBy != null)

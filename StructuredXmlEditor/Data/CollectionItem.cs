@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Xml.Linq;
 using System.Collections.Specialized;
+using System.Windows.Data;
 
 namespace StructuredXmlEditor.Data
 {
@@ -28,27 +29,48 @@ namespace StructuredXmlEditor.Data
 		public CollectionDefinition CDef { get { return Definition as CollectionDefinition; } }
 
 		//-----------------------------------------------------------------------
-		public CollectionChildDefinition SelectedDefinition { get; set; }
+		public Tuple<CollectionChildDefinition, string> SelectedDefinition { get; set; }
 
 		//-----------------------------------------------------------------------
-		public IEnumerable<CollectionChildDefinition> AllowedChildren
+		public IEnumerable<Tuple<CollectionChildDefinition, string>> AllowedChildren
 		{
 			get
 			{
 				if (!CDef.ChildrenAreUnique)
 				{
-					foreach (var child in CDef.ChildDefinitions)
+					foreach (var child in CDef.Keys)
 					{
 						yield return child;
 					}
 				}
 				else
 				{
-					foreach (var child in CDef.ChildDefinitions)
+					foreach (var child in CDef.Keys)
 					{
-						if (!Children.Any(e => e.Definition == child)) yield return child;
+						if (!Children.Any(e => e.Definition == child.Item1)) yield return child;
 					}
 				}
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		ListCollectionView m_lcv;
+		string last = "";
+		public ListCollectionView ItemsSource
+		{
+			get
+			{
+				var items = AllowedChildren.ToList();
+				var key = string.Join("+", items.Select(e => e.Item1.Name));
+
+				if (key != last)
+				{
+					last = key;
+					m_lcv = new ListCollectionView(items);
+					m_lcv.GroupDescriptions.Add(new PropertyGroupDescription("Item2"));
+				}
+
+				return m_lcv;
 			}
 		}
 
@@ -83,7 +105,7 @@ namespace StructuredXmlEditor.Data
 				}
 			};
 
-			SelectedDefinition = CDef.ChildDefinitions.First();
+			SelectedDefinition = CDef.Keys.First();
 		}
 
 		//-----------------------------------------------------------------------
@@ -92,6 +114,7 @@ namespace StructuredXmlEditor.Data
 			base.OnChildrenCollectionChanged(sender, e);
 
 			RaisePropertyChangedEvent("AllowedChildren");
+			RaisePropertyChangedEvent("ItemsSource");
 
 			if (CDef.ChildrenAreUnique)
 			{
@@ -165,7 +188,7 @@ namespace StructuredXmlEditor.Data
 
 			using (UndoRedo.DisableUndoScope())
 			{
-				item = SelectedDefinition.CreateData(UndoRedo);
+				item = SelectedDefinition.Item1.CreateData(UndoRedo);
 			}
 
 			UndoRedo.ApplyDoUndo(

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 using System.Windows.Media;
 using System.Xml.Linq;
 
@@ -12,6 +13,7 @@ namespace StructuredXmlEditor.Definition
 	public class GraphCollectionDefinition : GraphNodeDefinition
 	{
 		public bool ChildrenAreUnique { get; set; }
+		public List<Tuple<CollectionChildDefinition, string>> Keys { get; } = new List<Tuple<CollectionChildDefinition, string>>();
 		public List<CollectionChildDefinition> ChildDefinitions { get; } = new List<CollectionChildDefinition>();
 		public int MinCount { get; set; } = 0;
 		public int MaxCount { get; set; } = int.MaxValue;
@@ -125,13 +127,34 @@ namespace StructuredXmlEditor.Definition
 				Background.Freeze();
 			}
 
-			var childDefs = definition.Elements().Where(e => e.Name != "Attributes");
+			var currentGroup = "Items";
+
+			var childDefs = definition.Nodes();
 			foreach (var childDef in childDefs)
 			{
-				var cdef = new CollectionChildDefinition();
-				cdef.Parse(childDef);
+				if (childDef is XComment)
+				{
+					currentGroup = (childDef as XComment).Value;
+				}
+				else if (childDef is XElement)
+				{
+					var xel = childDef as XElement;
+					if (xel.Name == "Attributes")
+					{
+						continue;
+					}
 
-				ChildDefinitions.Add(cdef);
+					var cdef = new CollectionChildDefinition();
+					cdef.Parse(xel);
+
+					ChildDefinitions.Add(cdef);
+					Keys.Add(new Tuple<CollectionChildDefinition, string>(cdef, currentGroup));
+				}
+			}
+
+			if (ChildDefinitions.Count == 0)
+			{
+				throw new Exception("No child definitions in collection '" + Name + "'!");
 			}
 		}
 

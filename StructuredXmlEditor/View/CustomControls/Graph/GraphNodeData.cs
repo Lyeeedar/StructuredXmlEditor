@@ -400,6 +400,10 @@ namespace StructuredXmlEditor.View
 				{
 					RaisePropertyChangedEvent("Title");
 				}
+				else if (args.PropertyName == "IsVisible")
+				{
+					RaisePropertyChangedEvent("Link");
+				}
 			};
 
 			if (GraphReferenceItem.Parent is StructItem && GraphReferenceItem.ReferenceDef.UseParentDescription)
