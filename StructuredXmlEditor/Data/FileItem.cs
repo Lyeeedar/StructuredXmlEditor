@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using System.Xml.Linq;
 
 namespace StructuredXmlEditor.Data
 {
@@ -28,12 +29,11 @@ namespace StructuredXmlEditor.Data
 		{
 			get
 			{
-				if (Value == null) return null;
-
 				var fdef = Definition as FileDefinition;
 
-				string path;
+				if (Value == null) return Path.GetFullPath(Path.Combine(Path.GetDirectoryName(DataModel.Document.Path), fdef.BasePath));
 
+				string path;
 				if (fdef.RelativeToThis)
 				{
 					path = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(DataModel.Document.Path), fdef.BasePath, Value));
@@ -284,13 +284,40 @@ namespace StructuredXmlEditor.Data
 				dlg.Filter = filter;
 			}
 
-			dlg.InitialDirectory = Path.GetDirectoryName(FullPath);
+			var initialPath = FullPath;
+			if (File.Exists(initialPath) && !Directory.Exists(initialPath))
+			{
+				initialPath = Path.GetDirectoryName(initialPath);
+			}
+
+			dlg.InitialDirectory = initialPath;
 
 			bool? result = dlg.ShowDialog();
 
 			if (result == true)
 			{
 				var chosen = dlg.FileName;
+				if (fdef.ResourceDataType != null)
+				{
+					var invalid = false;
+
+					try
+					{
+						var xml = XDocument.Load(chosen);
+						if (xml.Root.Name != fdef.ResourceDataType.Name)
+						{
+							invalid = true;
+						}
+					}
+					catch (Exception) { invalid = true; }
+
+					if (invalid)
+					{
+						Message.Show("'" + chosen + "' is not a valid " + fdef.ResourceDataType.Name + " file!", "Invalid File", "Ok");
+						return;
+					}
+				}
+
 				if (fdef.StripExtension) chosen = Path.ChangeExtension(dlg.FileName, null);
 
 				// make relative
