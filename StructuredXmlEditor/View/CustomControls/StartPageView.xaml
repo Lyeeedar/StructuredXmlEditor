@@ -131,10 +131,10 @@
 								<Hyperlink
 										Command="{Binding DataContext.Workspace.NewCMD, ElementName=newDocs}"
 										Style="{StaticResource hyperlinkStyle}"
-										CommandParameter="{Binding}">
+										CommandParameter="{Binding Name}">
 									<TextBlock
 											Style="{StaticResource textBlockStyle}"
-											Text="{Binding StringFormat=New {0} File...}" />
+											Text="{Binding Name, StringFormat=New {0} File...}" />
 								</Hyperlink>
 							</TextBlock>
 							</DataTemplate>
@@ -157,18 +157,26 @@
 					ItemsSource="{Binding Workspace.RecentFiles}">
 					<ItemsControl.ItemTemplate>
 						<DataTemplate>
-							<TextBlock
-								ToolTip="{Binding}"
-								Margin="5,0,0,0">
+							<DockPanel>
+								<Image
+									DockPanel.Dock="Left"
+									Source="{Binding Icon}"
+									Width="16"
+									Height="16" />
+								<TextBlock
+									ToolTip="{Binding Path}"
+									Margin="5,0,0,0">
 									<Hyperlink
-									Command="{Binding DataContext.Workspace.OpenRecentCMD, ElementName=recentDocs}"
-									Style="{StaticResource hyperlinkStyle}"
-									CommandParameter="{Binding}">
+										Command="{Binding DataContext.Workspace.OpenRecentCMD, ElementName=recentDocs}"
+										Style="{StaticResource hyperlinkStyle}"
+										CommandParameter="{Binding Path}">
 										<TextBlock
-										Style="{StaticResource textBlockStyle}"
-										Text="{Binding Converter={StaticResource PathToFileNameConverter}}" />
+											Style="{StaticResource textBlockStyle}"
+											Text="{Binding Path, Converter={StaticResource PathToFileNameConverter}}" />
 									</Hyperlink>
 								</TextBlock>
+							</DockPanel>
+							
 						</DataTemplate>
 					</ItemsControl.ItemTemplate>
 				</ItemsControl>
@@ -190,18 +198,26 @@
 					ItemsSource="{Binding Workspace.BackupDocuments}">
 					<ItemsControl.ItemTemplate>
 						<DataTemplate>
-							<TextBlock
-								ToolTip="{Binding}"
-								Margin="5,0,0,0">
+							<DockPanel>
+								<Image
+									DockPanel.Dock="Left"
+									Source="{Binding Icon}"
+									Width="16"
+									Height="16" />
+								<TextBlock
+									ToolTip="{Binding Path}"
+									Margin="5,0,0,0">
 									<Hyperlink
-									Command="{Binding DataContext.Workspace.OpenBackupCMD, ElementName=backupDocs}"
-									Style="{StaticResource hyperlinkStyle}"
-									CommandParameter="{Binding}">
+										Command="{Binding DataContext.Workspace.OpenBackupCMD, ElementName=backupDocs}"
+										Style="{StaticResource hyperlinkStyle}"
+										CommandParameter="{Binding Path}">
 										<TextBlock
-										Style="{StaticResource textBlockStyle}"
-										Text="{Binding Converter={StaticResource PathToFileNameConverter}}" />
+											Style="{StaticResource textBlockStyle}"
+											Text="{Binding Path, Converter={StaticResource PathToFileNameConverter}}" />
 									</Hyperlink>
 								</TextBlock>
+							</DockPanel>
+
 						</DataTemplate>
 					</ItemsControl.ItemTemplate>
 				</ItemsControl>

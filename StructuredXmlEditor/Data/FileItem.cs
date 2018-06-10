@@ -263,7 +263,7 @@ namespace StructuredXmlEditor.Data
 				}
 			}
 
-			Workspace.Instance.New(fdef.ResourceDataType, FullPath);
+			Workspace.Instance.NewFromDef(fdef.ResourceDataType, FullPath);
 		}
 
 		//-----------------------------------------------------------------------
@@ -273,7 +273,7 @@ namespace StructuredXmlEditor.Data
 
 			var fdef = Definition as FileDefinition;
 
-			if (fdef.AllowedFileTypes != null)
+			if (fdef.AllowedFileTypes.Count > 0)
 			{
 				var resourceName = fdef.ResourceDataType != null ? fdef.ResourceDataType.Name : "Resource";
 

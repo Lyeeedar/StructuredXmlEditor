@@ -59,20 +59,35 @@
 									Width="16"
 									Height="16" />
 							</MenuItem.Icon>
-							<MenuItem.ItemTemplate>
-								<DataTemplate>
-									<MenuItem
-										Header="{Binding}"
-										Click="NewFileClick" />
-								</DataTemplate>
-							</MenuItem.ItemTemplate>
+							<MenuItem.ItemContainerStyle>
+								<Style
+									TargetType="{x:Type MenuItem}"
+									BasedOn="{StaticResource {x:Type MenuItem}}">
+									<Setter
+										Property="HeaderTemplate">
+										<Setter.Value>
+											<DataTemplate>
+												<TextBlock
+													Text="{Binding Name}"
+													Foreground="{Binding FileColourBrush}" />
+											</DataTemplate>
+										</Setter.Value>
+									</Setter>
+									<EventSetter
+										Event="Click"
+										Handler="NewFileClick" />
+									<Setter
+										Property="Icon"
+										Value="{Binding FileIcon, Converter={v:ValueTypeConverter}, ConverterParameter=Image}" />
+								</Style>
+							</MenuItem.ItemContainerStyle>
 						</MenuItem>
 						<MenuItem
 							Header="New _Definition"
 							Command="{Binding NewDefCMD}">
 							<MenuItem.Icon>
 								<Image
-									Source="/Resources/New.png"
+									Source="/Resources/DefIcon.png"
 									Width="16"
 									Height="16" />
 							</MenuItem.Icon>
@@ -94,7 +109,7 @@
 							<MenuItem.ItemTemplate>
 								<DataTemplate>
 									<MenuItem
-										Header="{Binding}"
+										Header="{Binding Path}"
 										Click="RecentFilesClick" />
 								</DataTemplate>
 							</MenuItem.ItemTemplate>
@@ -107,7 +122,7 @@
 							<MenuItem.ItemTemplate>
 								<DataTemplate>
 									<MenuItem
-										Header="{Binding}"
+										Header="{Binding Path}"
 										Click="BackupFilesClick" />
 								</DataTemplate>
 							</MenuItem.ItemTemplate>

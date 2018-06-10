@@ -113,21 +113,21 @@ namespace StructuredXmlEditor
 
 		private void RecentFilesClick(object sender, RoutedEventArgs e)
 		{
-			var file = (sender as FrameworkElement).DataContext as string;
+			var file = (sender as FrameworkElement).DataContext as FileWrapper;
 
-			Workspace.Open(file);
+			Workspace.Open(file.Path);
 		}
 
 		private void BackupFilesClick(object sender, RoutedEventArgs e)
 		{
-			var file = (sender as FrameworkElement).DataContext as string;
+			var file = (sender as FrameworkElement).DataContext as FileWrapper;
 
-			Workspace.OpenBackup(file);
+			Workspace.OpenBackup(file.Path);
 		}
 
 		private void NewFileClick(object sender, RoutedEventArgs e)
 		{
-			var dataType = (sender as FrameworkElement).DataContext as string;
+			var dataType = (sender as FrameworkElement).DataContext as DataDefinition;
 
 			Workspace.New(dataType);
 		}

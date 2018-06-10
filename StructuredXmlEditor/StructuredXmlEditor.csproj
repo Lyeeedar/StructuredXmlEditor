@@ -411,6 +411,12 @@
   <ItemGroup>
     <Resource Include="Resources\Shape.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\File.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\DefIcon.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.1.29.4\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

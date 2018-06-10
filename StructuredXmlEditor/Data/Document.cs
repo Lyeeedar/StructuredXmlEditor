@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
+using System.Windows.Media;
 
 namespace StructuredXmlEditor.Data
 {
@@ -27,6 +28,26 @@ namespace StructuredXmlEditor.Data
 
 		//-----------------------------------------------------------------------
 		public static string BackupFolder { get { return System.IO.Path.GetFullPath("Backups"); } }
+
+		//-----------------------------------------------------------------------
+		public string Icon
+		{
+			get
+			{
+				var Definition = Data.RootItems[0].Definition;
+				return Definition?.FileIcon;
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public Brush FontColour
+		{
+			get
+			{
+				var Definition = Data.RootItems[0].Definition;
+				return Definition.FileColourBrush;
+			}
+		}
 
 		//-----------------------------------------------------------------------
 		public string BackupPath

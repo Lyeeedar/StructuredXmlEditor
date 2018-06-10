@@ -788,10 +788,20 @@
 
 	<DataTemplate
 		x:Key="DocumentHeaderTemplate">
-		<TextBlock
-			Text="{Binding Title}"
-			TextTrimming="CharacterEllipsis"
-			Foreground="White" />
+		<DockPanel>
+			<Image
+				DockPanel.Dock="Left"
+				Visibility="{Binding Content.Icon, Converter={local:NullOrZeroConverter}, ConverterParameter=Not}"
+				Source="{Binding Content.Icon, Converter={local:NullImageConverter}}"
+				Width="16"
+				Height="16" />
+			<TextBlock
+				VerticalAlignment="Center"
+				Text="{Binding Title}"
+				TextTrimming="CharacterEllipsis"
+				Foreground="{Binding Content.FontColour}" />
+		</DockPanel>
+		
 	</DataTemplate>
 
 	<DataTemplate

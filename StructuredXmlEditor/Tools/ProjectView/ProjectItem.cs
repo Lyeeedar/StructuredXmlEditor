@@ -9,11 +9,14 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Windows.Media;
+using System.Xml.Linq;
 
 namespace StructuredXmlEditor.Tools
 {
 	public class ProjectItem : NotifyPropertyChanged
 	{
+		//-----------------------------------------------------------------------
 		public IEnumerable<ProjectItem> Items
 		{
 			get
@@ -63,13 +66,34 @@ namespace StructuredXmlEditor.Tools
 			}
 		}
 
+		public DataDefinition Definition { get; set; }
+
+		//-----------------------------------------------------------------------
+		public Brush FileColourBrush
+		{
+			get
+			{
+				return Definition?.FileColourBrush ?? Brushes.White;
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public string FileIcon
+		{
+			get
+			{
+				return Definition?.FileIcon;
+			}
+		}
+
 		//-----------------------------------------------------------------------
 		public Command<object> ExpandAllCMD { get { return new Command<object>((e) => Tool.Root.SetExpand(true)); } }
 		public Command<object> CollapseAllCMD { get { return new Command<object>((e) => Tool.Root.SetExpand(false)); } }
 		public Command<object> ExploreToCMD { get { return new Command<object>((e) => OpenInExplorer()); } }
 		public Command<object> MultiEditCMD { get { return new Command<object>((e) => MultiEdit()); } }
-		public Command<string> NewFileCMD { get { return new Command<string>((e) => NewFile(e)); } }
+		public Command<DataDefinition> NewFileCMD { get { return new Command<DataDefinition>((e) => NewFile(e)); } }
 
+		//-----------------------------------------------------------------------
 		public ProjectItem(Workspace workspace, ProjectItem parent, ProjectViewTool tool, string name, bool skipLoadAndAdd = false)
 		{
 			this.Workspace = workspace;
@@ -105,7 +129,7 @@ namespace StructuredXmlEditor.Tools
 				}
 				else
 				{
-					if (IsDataFile(Extension))
+					if (IsDataFile(Extension) && CheckIsValid())
 					{
 						Parent?.Children.Add(this);
 					}
@@ -122,7 +146,7 @@ namespace StructuredXmlEditor.Tools
 		}
 
 		//-----------------------------------------------------------------------
-		private void NewFile(string dataType)
+		private void NewFile(DataDefinition dataType)
 		{
 			if (IsDirectory)
 			{
@@ -187,6 +211,7 @@ namespace StructuredXmlEditor.Tools
 			Process.Start("explorer.exe", string.Format("/select,\"{0}\"", path));
 		}
 
+		//-----------------------------------------------------------------------
 		public void MakeVisible(CancellationToken token)
 		{
 			if (token.IsCancellationRequested) token.ThrowIfCancellationRequested();
@@ -199,6 +224,7 @@ namespace StructuredXmlEditor.Tools
 			}
 		}
 
+		//-----------------------------------------------------------------------
 		public void SetExpand(bool state)
 		{
 			IsExpanded = state;
@@ -206,6 +232,7 @@ namespace StructuredXmlEditor.Tools
 			foreach (var child in Children) child.SetExpand(state);
 		}
 
+		//-----------------------------------------------------------------------
 		public bool Filter(string filter, Regex regex, bool searchContents, CancellationToken token)
 		{
 			if (token.IsCancellationRequested) token.ThrowIfCancellationRequested();
@@ -275,12 +302,39 @@ namespace StructuredXmlEditor.Tools
 			return IsVisible;
 		}
 
+		//-----------------------------------------------------------------------
 		public bool IsDataFile(string ext)
 		{
+			if (ext == String.Empty) return false;
 			if (ext == ".xmldef" || ext == ".xml" || ext == ".json" || ext == ".yaml" || Workspace.SupportedExtensionMap.ContainsKey(ext)) return true;
 			return false;
 		}
 
+		//-----------------------------------------------------------------------
+		public bool CheckIsValid()
+		{
+			if (FullPath.EndsWith(".xmldef"))
+			{
+				Definition = Workspace.RootDefinition;
+				return true;
+			}
+
+			try
+			{
+				var doc = XDocument.Load(FullPath);
+				var fileTypeName = doc.Root.Name.ToString();
+				var dataDef = Workspace.SupportedResourceTypes[fileTypeName.ToLower()];
+				Definition = dataDef;
+
+				return true;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
+		}
+
+		//-----------------------------------------------------------------------
 		public void Load()
 		{
 			if (IsDirectory)
@@ -298,6 +352,7 @@ namespace StructuredXmlEditor.Tools
 			}
 		}
 
+		//-----------------------------------------------------------------------
 		public void UpdateChildFolders()
 		{
 			Children = Children.OrderBy(e => e.Name).ToList();
@@ -317,6 +372,7 @@ namespace StructuredXmlEditor.Tools
 			RaisePropertyChangedEvent("ChildFolders");
 		}
 
+		//-----------------------------------------------------------------------
 		public void Add(string name)
 		{
 			Children.Add(new ProjectItem(Workspace, this, Tool, name, true));
@@ -324,6 +380,7 @@ namespace StructuredXmlEditor.Tools
 			UpdateChildFolders();
 		}
 
+		//-----------------------------------------------------------------------
 		public void Remove(string name)
 		{
 			var existing = Children.FirstOrDefault(e => e.Name == name);

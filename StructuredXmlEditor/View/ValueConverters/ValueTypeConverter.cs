@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace StructuredXmlEditor.View
 {
@@ -49,6 +51,20 @@ namespace StructuredXmlEditor.View
 				if (not.HasValue && not.Value) { val = !val; }
 
 				return val ? Visibility.Visible : Visibility.Collapsed;
+			}
+
+			if (i_targetType == typeof(Image) || i_parameter?.ToString() == "Image")
+			{
+				Image img = new Image { Source = new BitmapImage(new Uri((string)i_value, UriKind.RelativeOrAbsolute)) };
+				img.Width = 16;
+				img.Height = 16;
+
+				return img;
+			}
+
+			if (i_targetType == typeof(ImageSource))
+			{
+				return new BitmapImage(new Uri((string)i_value, UriKind.RelativeOrAbsolute));
 			}
 
 			if (i_targetType == typeof(Brush) && i_value is Color)

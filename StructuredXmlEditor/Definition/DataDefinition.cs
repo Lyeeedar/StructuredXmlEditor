@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Media;
 using System.Xml.Linq;
 
 namespace StructuredXmlEditor.Definition
@@ -39,6 +41,8 @@ namespace StructuredXmlEditor.Definition
 		public string DataType { get; set; }
 		public string CustomExtension { get; set; }
 		public string Extension { get { return CustomExtension ?? DataType; } }
+		public Brush FileColourBrush { get; set; } = Brushes.White; 
+		public string FileIcon { get; set; }
 
 		public bool IsRootLevel { get { return this is GraphStructDefinition || this is GraphCollectionDefinition || this is StructDefinition || this is CollectionDefinition; } }
 
@@ -125,8 +129,6 @@ namespace StructuredXmlEditor.Definition
 				}
 			}
 
-			definition.DataType = element.Attribute("DataType")?.Value?.ToString().ToLower() ?? "xml";
-			definition.CustomExtension = element.Attribute("Extension")?.Value?.ToString();
 			definition.IsGlobal = definition.TryParseBool(element, "IsGlobal");
 			definition.VisibleIf = element.Attribute("VisibleIf")?.Value?.ToString();
 			definition.SkipIfDefault = definition.TryParseBool(element, "SkipIfDefault", true);

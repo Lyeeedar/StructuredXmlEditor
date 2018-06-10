@@ -96,14 +96,40 @@
 								<MenuItem
 									Header="_New File"
 									ItemsSource="{Binding Workspace.AllResourceTypes}">
-									<MenuItem.ItemTemplate>
-										<DataTemplate>
-											<MenuItem
-												Header="{Binding}"
-												Command="{Binding DataContext.NewFileCMD, RelativeSource={RelativeSource AncestorType={x:Type ContentControl}}}"
-												CommandParameter="{Binding}"/>
-										</DataTemplate>
-									</MenuItem.ItemTemplate>
+									<MenuItem.Icon>
+										<Image
+											Source="/Resources/New.png"
+											Width="16"
+											Height="16" />
+									</MenuItem.Icon>
+									<MenuItem.ItemContainerStyle>
+										<Style
+											TargetType="{x:Type MenuItem}"
+											BasedOn="{StaticResource {x:Type MenuItem}}">
+											<Setter
+												Property="HeaderTemplate">
+												<Setter.Value>
+													<DataTemplate>
+														<TextBlock
+															Text="{Binding Name}"
+															Foreground="{Binding FileColourBrush}" />
+													</DataTemplate>
+												</Setter.Value>
+											</Setter>
+											<Setter
+												Property="Foreground"
+												Value="{Binding FileColourBrush}" />
+											<Setter
+												Property="Command"
+												Value="{Binding DataContext.NewFileCMD, RelativeSource={RelativeSource AncestorType={x:Type ContentControl}}}" />
+											<Setter
+												Property="CommandParameter"
+												Value="{Binding}" />
+											<Setter
+												Property="Icon"
+												Value="{Binding FileIcon, Converter={v:ValueTypeConverter}, ConverterParameter=Image}" />
+										</Style>
+									</MenuItem.ItemContainerStyle>
 								</MenuItem>
 
 								<Separator />
@@ -136,6 +162,8 @@
 									Width="Auto" />
 								<ColumnDefinition
 									Width="20" />
+								<ColumnDefinition
+									Width="Auto" />
 								<ColumnDefinition
 									Width="*" />
 							</Grid.ColumnDefinitions>
@@ -187,14 +215,23 @@
 								</Path.Style>
 							</Path>
 
-							<TextBlock
+							<Grid
 								Grid.Column="2"
-								Visibility="{Binding IsDirectory, Converter={v:ValueTypeConverter}, ConverterParameter=Not}"
-								Text="{Binding Name}"
-								Foreground="{StaticResource FontDimBlueBrush}" />
+								Visibility="{Binding FileIcon, Converter={v:NullOrZeroConverter}, ConverterParameter=Not}">
+								<Image
+									Width="16"
+									Height="16"
+									Source="{Binding FileIcon, Converter={v:NullImageConverter}}" />
+							</Grid>
 
 							<TextBlock
-								Grid.Column="2"
+								Grid.Column="3"
+								Visibility="{Binding IsDirectory, Converter={v:ValueTypeConverter}, ConverterParameter=Not}"
+								Text="{Binding Name}"
+								Foreground="{Binding FileColourBrush}" />
+
+							<TextBlock
+								Grid.Column="3"
 								Visibility="{Binding IsDirectory, Converter={v:ValueTypeConverter}}"
 								Text="{Binding Name}"
 								FontWeight="Bold"

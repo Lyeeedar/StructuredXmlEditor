@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace StructuredXmlEditor.Tools
 {
@@ -39,6 +40,24 @@ namespace StructuredXmlEditor.Tools
 		public ToolPosition DefaultPositionDocument { get; set; } = ToolPosition.Default;
 
 		public bool VisibleByDefault { get; set; } = true;
+
+		//-----------------------------------------------------------------------
+		public string Icon
+		{
+			get
+			{
+				return null;
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public Brush FontColour
+		{
+			get
+			{
+				return Brushes.LightGray;
+			}
+		}
 
 		public ToolBase(Workspace workspace, string title)
 		{

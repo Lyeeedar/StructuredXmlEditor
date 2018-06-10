@@ -415,6 +415,8 @@
 	<Collection Name="Definitions" ToolTip="The definitions stored in this file. Can contain only a single non-def element.">
 		<Attributes>
 			<String Name="Extension" ToolTip="The extension to use for these definitions. Leave blank to revert to the data type (.xml, .json etc)." />
+			<Colour Name="Colour" ToolTip="The colour to show this file in the project view and the tab title. Can help to differentiate different files" HasAlpha="false" />
+			<File Name="Icon" ToolTip="An image to use as an icon for this file type" />
 			<Enum Name="DataType" EnumValues="xml,json,yaml" ToolTip="The data type of the data." />
 		</Attributes>
 		<Reference Name="Definition" Keys="Items(Struct,Collection,GraphStruct,GraphCollection),Definitions(StructDef,EnumDef,CollectionDef,GraphStructDef,GraphCollectionDef,ReferenceDef)" ToolTip="A single definition." />
