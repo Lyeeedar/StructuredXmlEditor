@@ -18,7 +18,7 @@ using System.Windows.Media;
 
 namespace StructuredXmlEditor.View
 {
-	public class GraphNode : Control, INotifyPropertyChanged, ISelectable
+	public class GraphNode : Control, INotifyPropertyChanged, IGraphSelectable
 	{
 		//--------------------------------------------------------------------------
 		static GraphNode()
@@ -166,6 +166,25 @@ namespace StructuredXmlEditor.View
 		private bool m_MouseOver;
 
 		//--------------------------------------------------------------------------
+		public IEnumerable<LinkControlPoint> ControlPoints
+		{
+			get
+			{
+				foreach (var data in Datas)
+				{
+					var link = data as GraphNodeDataLink;
+					if (link != null)
+					{
+						foreach (var point in link.ControlPoints)
+						{
+							yield return point;
+						}
+					}
+				}
+			}
+		}
+
+		//--------------------------------------------------------------------------
 		public GraphComment HiddenBy { get; set; }
 
 		//-----------------------------------------------------------------------
@@ -208,7 +227,7 @@ namespace StructuredXmlEditor.View
 
 			PropertyChangedEventHandler func = (e, args) => { RaisePropertyChangedEvent("Child " + args.PropertyName); };
 
-			Datas.CollectionChanged += (e, args) => 
+			Datas.CollectionChanged += (e, args) =>
 			{
 				foreach (GraphNodeData item in m_dataCache)
 				{
@@ -308,8 +327,7 @@ namespace StructuredXmlEditor.View
 			m_mouseDragLast = MouseUtilities.CorrectGetPosition(Graph);
 			foreach (var node in Graph.Selected)
 			{
-				node.m_startX = node.X;
-				node.m_startY = node.Y;
+				node.StoreStartPos();
 			}
 
 			this.CaptureMouse();
@@ -319,6 +337,13 @@ namespace StructuredXmlEditor.View
 			e.Handled = true;
 
 			base.OnMouseLeftButtonDown(e);
+		}
+
+		//--------------------------------------------------------------------------
+		public void StoreStartPos()
+		{
+			m_startX = X;
+			m_startY = Y;
 		}
 
 		//--------------------------------------------------------------------------
@@ -440,13 +465,19 @@ namespace StructuredXmlEditor.View
 
 				foreach (var node in Graph.Selected)
 				{
-					node.X = node.m_startX + diff.X / Graph.Scale;
-					node.Y = node.m_startY + diff.Y / Graph.Scale;
+					node.Translate(new Point(diff.X / Graph.Scale, diff.Y / Graph.Scale));
 				}
 			}
 
 			base.OnMouseMove(e);
-	}
+		}
+
+		//--------------------------------------------------------------------------
+		public void Translate(Point diff)
+		{
+			X = m_startX + diff.X;
+			Y = m_startY + diff.Y;
+		}
 
 		//--------------------------------------------------------------------------
 		protected override void OnMouseUp(MouseButtonEventArgs e)

@@ -1,5 +1,6 @@
 ﻿using StructuredXmlEditor.Data;
 using StructuredXmlEditor.Definition;
+using StructuredXmlEditor.Util;
 using StructuredXmlEditor.View;
 using System;
 using System.Collections.Generic;
@@ -643,7 +644,7 @@ namespace StructuredXmlEditor.View
 		public Command<LinkType> ChangeLinkTypeCMD { get { return new Command<LinkType>((type) => { GraphReferenceItem.LinkType = type; }); } }
 	}
 
-	public class LinkControlPoint : Control, INotifyPropertyChanged
+	public class LinkControlPoint : Control, INotifyPropertyChanged, IGraphSelectable
 	{
 		//--------------------------------------------------------------------------
 		public GraphNodeDataLink LinkParent { get; set; }
@@ -673,7 +674,7 @@ namespace StructuredXmlEditor.View
 		//--------------------------------------------------------------------------
 		public Brush Colour
 		{
-			get { return LinkParent.GraphReferenceItem.LinkType == LinkType.Duplicate ? Brushes.MediumSpringGreen : Brushes.MediumPurple; }
+			get { return LinkParent.GraphReferenceItem.LinkType == LinkType.Duplicate ? Brushes.MediumSpringGreen : Brushes.DarkSlateBlue; }
 		}
 
 		//--------------------------------------------------------------------------
@@ -687,6 +688,42 @@ namespace StructuredXmlEditor.View
 				LinkParent.RaisePropertyChangedEvent("Link");
 			}
 		}
+
+		//--------------------------------------------------------------------------
+		public bool IsSelected
+		{
+			get { return m_isSelected; }
+			set
+			{
+				if (m_isSelected != value)
+				{
+					m_isSelected = value;
+					RaisePropertyChangedEvent();
+					
+					if (value && !Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl) && !LinkParent.Graph.m_isMarqueeSelecting)
+					{
+						foreach (var node in LinkParent.Graph.Nodes)
+						{
+							node.IsSelected = false;
+
+							foreach (var point in node.ControlPoints)
+							{
+								if (point != this)
+								{
+									point.IsSelected = false;
+								}
+							}
+						}
+
+						foreach (var node in LinkParent.Graph.Comments)
+						{
+							node.IsSelected = false;
+						}
+					}
+				}
+			}
+		}
+		private bool m_isSelected;
 
 		//--------------------------------------------------------------------------
 		public GraphReferenceControlPoint controlPoint;
@@ -755,16 +792,35 @@ namespace StructuredXmlEditor.View
 		//--------------------------------------------------------------------------
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
+			if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+			{
+				//IsSelected = !IsSelected;
+			}
+			else
+			{
+				IsSelected = true;
+			}
+
 			m_inDrag = true;
 			m_mouseDragLast = MouseUtilities.CorrectGetPosition(LinkParent.Graph);
-			m_startX = Position.X;
-			m_startY = Position.Y;
+
+			foreach (var node in LinkParent.Graph.Selected)
+			{
+				node.StoreStartPos();
+			}
 
 			this.CaptureMouse();
 
 			e.Handled = true;
 
 			base.OnMouseLeftButtonDown(e);
+		}
+
+		//--------------------------------------------------------------------------
+		public void StoreStartPos()
+		{
+			m_startX = Position.X;
+			m_startY = Position.Y;
 		}
 
 		//--------------------------------------------------------------------------
@@ -828,13 +884,22 @@ namespace StructuredXmlEditor.View
 					diff.Y = (y - m_startY) * LinkParent.Graph.Scale;
 				}
 
-				var newX = m_startX + diff.X / LinkParent.Graph.Scale;
-				var newY = m_startY + diff.Y / LinkParent.Graph.Scale;
-
-				Position = new Point(newX, newY);
+				foreach (var node in LinkParent.Graph.Selected)
+				{
+					node.Translate(new Point(diff.X / LinkParent.Graph.Scale, diff.Y / LinkParent.Graph.Scale));
+				}
 			}
 
 			base.OnMouseMove(e);
+		}
+
+		//--------------------------------------------------------------------------
+		public void Translate(Point diff)
+		{
+			var newX = m_startX + diff.X;
+			var newY = m_startY + diff.Y;
+
+			Position = new Point(newX, newY);
 		}
 
 		//--------------------------------------------------------------------------

@@ -36,13 +36,25 @@ namespace StructuredXmlEditor.View
 		}
 
 		//-----------------------------------------------------------------------
-		public IEnumerable<GraphNode> Selected
+		public IEnumerable<IGraphSelectable> Selected
 		{
 			get
 			{
 				foreach (var node in Nodes)
 				{
 					if (node.IsSelected) yield return node;
+
+					foreach (var data in node.Datas)
+					{
+						var link = data as GraphNodeDataLink;
+						if (link != null)
+						{
+							foreach (var point in link.ControlPoints)
+							{
+								if (point.IsSelected) yield return point;
+							}
+						}
+					}
 				}
 			}
 		}
@@ -220,13 +232,21 @@ namespace StructuredXmlEditor.View
 			}
 			else if (args.PropertyName == "IsSelected")
 			{
-				if ((e as ISelectable).IsSelected && !Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl) && !m_isMarqueeSelecting)
+				if ((e as IGraphSelectable).IsSelected && !Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl) && !m_isMarqueeSelecting)
 				{
 					foreach (var node in Nodes)
 					{
 						if (node != e)
 						{
 							node.IsSelected = false;
+						}
+
+						foreach (var point in node.ControlPoints)
+						{
+							if (point != e)
+							{
+								point.IsSelected = false;
+							}
 						}
 					}
 
@@ -392,6 +412,11 @@ namespace StructuredXmlEditor.View
 				foreach (var node in Nodes)
 				{
 					node.IsSelected = false;
+
+					foreach (var point in node.ControlPoints)
+					{
+						point.IsSelected = false;
+					}
 				}
 
 				foreach (var comment in Comments)
@@ -422,6 +447,18 @@ namespace StructuredXmlEditor.View
 						else
 						{
 							node.IsSelected = false;
+						}
+					}
+
+					foreach (var point in node.ControlPoints)
+					{
+						if (m_marquee.IntersectsWith(GetRectOfObject(point)))
+						{
+							point.IsSelected = true;
+						}
+						else
+						{
+							point.IsSelected = false;
 						}
 					}
 				}
@@ -486,7 +523,7 @@ namespace StructuredXmlEditor.View
 			GraphNode clickedNode = Nodes.FirstOrDefault(e => GetRectOfObject(e).Contains(pos));
 			if (clickedNode == null)
 			{
-				clickedNode = Selected.FirstOrDefault();
+				clickedNode = Selected.Where(e => e is GraphNode).FirstOrDefault() as GraphNode;
 			}
 
 			if (clickedNode != null)
@@ -500,7 +537,7 @@ namespace StructuredXmlEditor.View
 
 				menu.AddItem("Delete", () => 
 				{
-					DeleteNodes(Selected.ToList());
+					DeleteNodes(Selected.Where(e => e is GraphNode).Cast<GraphNode>().ToList());
 				});
 				menu.AddItem("Copy", () =>
 				{
@@ -530,7 +567,7 @@ namespace StructuredXmlEditor.View
 						},
 						"Create Graph Comment");
 
-					foreach (var node in Selected)
+					foreach (var node in Selected.Where(e => e is GraphNode).Cast<GraphNode>())
 					{
 						var previous = node.GraphNodeItem.Comment;
 						var previousComment = Comments.FirstOrDefault(e => e.Comment.GUID == previous);
@@ -574,7 +611,7 @@ namespace StructuredXmlEditor.View
 
 					commentMenu.AddItem(comment.Comment.Title, () =>
 					{
-						foreach (var node in Selected)
+						foreach (var node in Selected.Where(e => e is GraphNode).Cast<GraphNode>())
 						{
 							var previous = node.GraphNodeItem.Comment;
 							var previousComment = Comments.FirstOrDefault(e => e.Comment.GUID == previous);
@@ -609,7 +646,7 @@ namespace StructuredXmlEditor.View
 				{
 					menu.AddItem("Clear Comment", () => 
 					{
-						foreach (var node in Selected)
+						foreach (var node in Selected.Where(e => e is GraphNode).Cast<GraphNode>())
 						{
 							if (node.GraphNodeItem.Comment == null) continue;
 
@@ -715,24 +752,37 @@ namespace StructuredXmlEditor.View
 		}
 
 		//--------------------------------------------------------------------------
-		protected override void OnKeyUp(KeyEventArgs e)
+		private Rect GetRectOfObject(LinkControlPoint point)
 		{
-			base.OnKeyUp(e);
+			Rect rectangleBounds = new Rect();
 
-			if (e.Key == Key.Delete)
+			rectangleBounds.X = point.CanvasX;
+			rectangleBounds.Y = point.CanvasY;
+			rectangleBounds.Width = point.ActualWidth * Scale;
+			rectangleBounds.Height = point.ActualHeight * Scale;
+
+			return rectangleBounds;
+		}
+
+		//--------------------------------------------------------------------------
+		protected override void OnKeyUp(KeyEventArgs args)
+		{
+			base.OnKeyUp(args);
+
+			if (args.Key == Key.Delete)
 			{
-				DeleteNodes(Selected.ToList());
+				DeleteNodes(Selected.Where(e => e is GraphNode).Cast<GraphNode>().ToList());
 			}
-			else if (e.Key == Key.C && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
+			else if (args.Key == Key.C && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
 			{
 				Copy();
 			}
-			else if (e.Key == Key.X && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
+			else if (args.Key == Key.X && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
 			{
 				Copy();
-				DeleteNodes(Selected.ToList());
+				DeleteNodes(Selected.Where(e => e is GraphNode).Cast<GraphNode>().ToList());
 			}
-			else if (e.Key == Key.V && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
+			else if (args.Key == Key.V && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
 			{
 				var scaled = new Point((m_mousePoint.X - Offset.X) / Scale, (m_mousePoint.Y - Offset.Y) / Scale);
 				Paste(scaled);
@@ -745,7 +795,7 @@ namespace StructuredXmlEditor.View
 			var nodeData = new XElement("Nodes");
 
 			var selected = Selected.ToList();
-			foreach (var node in selected)
+			foreach (var node in selected.Where(e => e is GraphNode).Cast<GraphNode>())
 			{
 				var root = new XElement("Item");
 				node.GraphNodeItem.Definition.SaveData(root, node.GraphNodeItem, true);
@@ -1066,7 +1116,7 @@ namespace StructuredXmlEditor.View
 
 		//-----------------------------------------------------------------------
 		private bool m_mightBeMarqueeSelecting;
-		private bool m_isMarqueeSelecting;
+		public bool m_isMarqueeSelecting;
 		private Point m_marqueeStart;
 		private Rect m_marquee;
 

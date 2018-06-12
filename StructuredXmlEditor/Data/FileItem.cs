@@ -31,6 +31,7 @@ namespace StructuredXmlEditor.Data
 			{
 				var fdef = Definition as FileDefinition;
 
+				if (DataModel == null) return "";
 				if (Value == null) return Path.GetFullPath(Path.Combine(Path.GetDirectoryName(DataModel.Document.Path), fdef.BasePath));
 
 				string path;
@@ -124,7 +125,7 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public void Update()
 		{
-			if (DataModel.Workspace.Documents.Contains(DataModel.Document))
+			if (DataModel != null && DataModel.Workspace.Documents.Contains(DataModel.Document))
 			{
 				RaisePropertyChangedEvent("Exists");
 				RaisePropertyChangedEvent("Preview");

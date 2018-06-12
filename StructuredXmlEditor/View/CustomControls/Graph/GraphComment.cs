@@ -13,7 +13,7 @@ using System.Windows.Input;
 
 namespace StructuredXmlEditor.View
 {
-	public class GraphComment : Control, INotifyPropertyChanged, ISelectable
+	public class GraphComment : Control, INotifyPropertyChanged, IGraphSelectable
 	{
 		//--------------------------------------------------------------------------
 		static GraphComment()
@@ -338,8 +338,7 @@ namespace StructuredXmlEditor.View
 			m_mouseDragLast = MouseUtilities.CorrectGetPosition(Graph);
 			foreach (var node in Nodes)
 			{
-				node.m_startX = node.X;
-				node.m_startY = node.Y;
+				node.StoreStartPos();
 			}
 
 			this.CaptureMouse();
@@ -432,8 +431,7 @@ namespace StructuredXmlEditor.View
 				m_disableUpdate = true;
 				foreach (var node in Nodes)
 				{
-					node.X = node.m_startX + diff.X / Graph.Scale;
-					node.Y = node.m_startY + diff.Y / Graph.Scale;
+					node.Translate(new Point(diff.X / Graph.Scale, diff.Y / Graph.Scale));
 				}
 				m_disableUpdate = false;
 
@@ -467,6 +465,18 @@ namespace StructuredXmlEditor.View
 			{
 				PropertyChanged(this, new PropertyChangedEventArgs(i_propertyName));
 			}
+		}
+
+		//-----------------------------------------------------------------------
+		public void StoreStartPos()
+		{
+			
+		}
+
+		//-----------------------------------------------------------------------
+		public void Translate(Point diff)
+		{
+			
 		}
 
 		//-----------------------------------------------------------------------

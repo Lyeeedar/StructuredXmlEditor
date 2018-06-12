@@ -52,6 +52,13 @@
 											Property="Border.BorderBrush"
 											Value="{StaticResource BorderDarkBrush}" />
 									</DataTrigger>
+									<DataTrigger
+										Binding="{Binding IsSelected}"
+										Value="true">
+										<Setter
+											Property="Border.BorderBrush"
+											Value="{StaticResource SelectionBorderBrush}" />
+									</DataTrigger>
 								</Style.Triggers>
 							</Style>
 						</Border.Style>
@@ -149,7 +156,7 @@
 										Value="{x:Static data:LinkType.Reference}">
 										<Setter
 											Property="Stroke"
-											Value="MediumPurple" />
+											Value="MediumSlateBlue" />
 									</DataTrigger>
 								</Style.Triggers>
 							</Style>
@@ -262,7 +269,7 @@
 										Value="{x:Static data:LinkType.Reference}">
 										<Setter
 											Property="Stroke"
-											Value="MediumPurple" />
+											Value="MediumSlateBlue" />
 									</DataTrigger>
 								</Style.Triggers>
 							</Style>
@@ -323,7 +330,7 @@
 										Value="{x:Static data:LinkType.Reference}">
 										<Setter
 											Property="Stroke"
-											Value="MediumPurple" />
+											Value="MediumSlateBlue" />
 									</DataTrigger>
 								</Style.Triggers>
 							</Style>
@@ -384,7 +391,7 @@
 										Value="{x:Static data:LinkType.Reference}">
 										<Setter
 											Property="Stroke"
-											Value="MediumPurple" />
+											Value="MediumSlateBlue" />
 									</DataTrigger>
 								</Style.Triggers>
 							</Style>

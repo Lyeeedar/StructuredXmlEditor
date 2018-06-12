@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace StructuredXmlEditor.Util
 {
-	interface ISelectable
+	public interface IGraphSelectable
 	{
+		void StoreStartPos();
+		void Translate(Point diff);
 		bool IsSelected { get; set; }
 	}
 }
