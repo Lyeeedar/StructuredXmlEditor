@@ -222,26 +222,41 @@ namespace StructuredXmlEditor.Data
 			var fdef = Definition as FileDefinition;
 			if (string.IsNullOrWhiteSpace(Value))
 			{
-				int index = 1;
 				var baseName = Path.GetFileNameWithoutExtension(DataModel.Document.Path) + Name;
-				while (true)
+				var name = baseName + "." + fdef.AllowedFileTypes.First();
+				if (!File.Exists(name))
 				{
-					var name = baseName + index + "." + fdef.AllowedFileTypes.First();
-					if (!File.Exists(name))
+					if (fdef.StripExtension)
 					{
-						if (fdef.StripExtension)
-						{
-							Value = baseName + index;
-						}
-						else
-						{
-							Value = name;
-						}
-
-						break;
+						Value = baseName;
 					}
+					else
+					{
+						Value = name;
+					}
+				}
+				else
+				{
+					int index = 2;
+					while (true)
+					{
+						name = baseName + index + "." + fdef.AllowedFileTypes.First();
+						if (!File.Exists(name))
+						{
+							if (fdef.StripExtension)
+							{
+								Value = baseName + index;
+							}
+							else
+							{
+								Value = name;
+							}
 
-					index++;
+							break;
+						}
+
+						index++;
+					}
 				}
 			}
 			else if (File.Exists(FullPath))
