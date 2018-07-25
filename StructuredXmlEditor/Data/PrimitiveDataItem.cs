@@ -82,6 +82,7 @@ namespace StructuredXmlEditor.Data
 			if (args.PropertyName == "Value")
 			{
 				RaisePropertyChangedEvent("Value");
+				RaisePropertyChangedEvent("Description");
 			}
 		}
 

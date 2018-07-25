@@ -301,12 +301,7 @@ namespace StructuredXmlEditor.Data
 			}
 
 			var initialPath = FullPath;
-			if (File.Exists(initialPath) && !Directory.Exists(initialPath))
-			{
-				initialPath = Path.GetDirectoryName(initialPath);
-			}
-
-			dlg.InitialDirectory = initialPath;
+			dlg.InitialDirectory = Path.GetDirectoryName(initialPath);
 
 			bool? result = dlg.ShowDialog();
 

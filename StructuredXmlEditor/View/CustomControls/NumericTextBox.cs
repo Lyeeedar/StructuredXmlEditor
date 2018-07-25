@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using NCalc;
 
 namespace StructuredXmlEditor.View
@@ -78,8 +79,7 @@ namespace StructuredXmlEditor.View
 			}
 			else
 			{
-				m_valueText = newVal?.ToString() ?? "---";
-				RaisePropertyChangedEvent("ValueText");
+				UpdateValueText();
 			}
 		}
 
@@ -139,24 +139,113 @@ namespace StructuredXmlEditor.View
 			DependencyProperty.Register("UseIntegers", typeof(bool), typeof(NumericTextBox), new PropertyMetadata(false));
 		#endregion UseIntegers
 
+		#region FallbackDescription
+		//--------------------------------------------------------------------------
+		public string FallbackDescription
+		{
+			get { return (string)GetValue(FallbackDescriptionProperty); }
+			set { SetValue(FallbackDescriptionProperty, value); }
+		}
+
+		//--------------------------------------------------------------------------
+		public static readonly DependencyProperty FallbackDescriptionProperty =
+			DependencyProperty.Register("FallbackDescription", typeof(string), typeof(NumericTextBox), new PropertyMetadata(null, (s, a) => 
+			{
+				((NumericTextBox)s).OnFallbackDescriptionChanged((string)a.OldValue, (string)a.NewValue);
+			}));
+
+		//--------------------------------------------------------------------------
+		public void OnFallbackDescriptionChanged(string oldVal, string newVal)
+		{
+			if (cameFromUs)
+			{
+				
+			}
+			else
+			{
+				UpdateValueText();
+			}
+		}
+
+		#endregion FallbackDescription
+
+		#region ExpressionCommand
+		//--------------------------------------------------------------------------
+		public Command<string> ExpressionCommand
+		{
+			get { return (Command<string>)GetValue(ExpressionCommandProperty); }
+			set { SetValue(ExpressionCommandProperty, value); }
+		}
+
+		//--------------------------------------------------------------------------
+		public static readonly DependencyProperty ExpressionCommandProperty =
+			DependencyProperty.Register("ExpressionCommand", typeof(Command<string>), typeof(NumericTextBox), new PropertyMetadata(null));
+		#endregion ExpressionCommand
+
 		#endregion DependencyProperties
 		//##########################################################################
 		#region Methods
+
+		//--------------------------------------------------------------------------
+		public void UpdateValueText()
+		{
+			if (Value == null)
+			{
+				if (FallbackDescription != null)
+				{
+					m_valueText = FallbackDescription;
+				}
+				else
+				{
+					m_valueText = "---";
+				}
+			}
+			else
+			{
+				m_valueText = Value.Value.ToString();
+			}
+
+			RaisePropertyChangedEvent("ValueText");
+		}
+
+		//--------------------------------------------------------------------------
+		protected override void OnKeyDown(KeyEventArgs e)
+		{
+			base.OnKeyDown(e);
+
+			if (e.Key == Key.Enter && hasExpressionCMD)
+			{
+				ExpressionCommand.Execute(ValueText);
+				UpdateValueText();
+			}
+		}
+
+		//--------------------------------------------------------------------------
+		private string[] Operators = new string[] { "/=", "*=", "+=", "-=" };
 
 		//--------------------------------------------------------------------------
 		public void ValueTextChanged()
 		{
 			float value = 0f;
 
+			hasExpressionCMD = false;
+			if (ExpressionCommand != null)
+			{
+				foreach (var o in Operators)
+				{
+					if (ValueText.StartsWith(o))
+					{
+						HasError = false;
+						hasExpressionCMD = true;
+
+						return;
+					}
+				}
+			}
+
 			try
 			{
-				var exp = new NCalc.Expression(ValueText);
-				var obj = exp.Evaluate();
-
-				if (obj is double) value = (float)(double)obj;
-				else if (obj is int) value = (float)(int)obj;
-				else if (obj is bool) value = (bool)obj ? 1 : 0;
-				else value = (float)obj;
+				value = ValueText.Evaluate();
 			}
 			catch (Exception)
 			{
@@ -183,6 +272,8 @@ namespace StructuredXmlEditor.View
 		#endregion Methods
 		//##########################################################################
 		#region Data
+
+		private bool hasExpressionCMD = false;
 
 		#endregion Data
 		//##########################################################################

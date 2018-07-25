@@ -17,6 +17,21 @@ namespace StructuredXmlEditor
 	public static class Extensions
 	{
 		//-----------------------------------------------------------------------
+		public static float Evaluate(this string expression)
+		{
+			var exp = new NCalc.Expression(expression);
+			var obj = exp.Evaluate();
+
+			float value;
+			if (obj is double) value = (float)(double)obj;
+			else if (obj is int) value = (float)(int)obj;
+			else if (obj is bool) value = (bool)obj ? 1 : 0;
+			else value = (float)obj;
+
+			return value;
+		}
+
+		//-----------------------------------------------------------------------
 		public static string SerializeObject<T>(this T toSerialize)
 		{
 			XmlSerializer xmlSerializer = new XmlSerializer(toSerialize.GetType());

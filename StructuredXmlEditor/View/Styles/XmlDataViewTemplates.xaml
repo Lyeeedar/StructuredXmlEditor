@@ -334,6 +334,8 @@
 				MaxValue="{Binding Definition.MaxValue}"
 				UseIntegers="{Binding Definition.UseIntegers}"
 				DefaultValue="{Binding Definition.Default}"
+				FallbackDescription="{Binding Description}"
+				ExpressionCommand="{Binding ExpressionCMD}"
 				VerticalAlignment="Center"
 				Value="{Binding Value, UpdateSourceTrigger=PropertyChanged}" />
 		</Grid>

@@ -1385,6 +1385,7 @@ namespace StructuredXmlEditor.Data
 			{
 				var el = new XElement("Data");
 				el.Add(new XAttribute("Name", def.Name));
+				el.Add(new XAttribute("SkipIfDefault", "false"));
 				el.Add(new XAttribute(DataDefinition.MetaNS + "RefKey", "String"));
 
 				return el;
@@ -1393,6 +1394,7 @@ namespace StructuredXmlEditor.Data
 			{
 				var el = new XElement("Data");
 				el.Add(new XAttribute("Name", def.Name));
+				el.Add(new XAttribute("SkipIfDefault", "false"));
 				el.Add(new XAttribute(DataDefinition.MetaNS + "RefKey", "File"));
 
 				return el;
@@ -1401,6 +1403,7 @@ namespace StructuredXmlEditor.Data
 			{
 				var el = new XElement("Data");
 				el.Add(new XAttribute("Name", def.Name));
+				el.Add(new XAttribute("SkipIfDefault", "false"));
 				el.Add(new XAttribute(DataDefinition.MetaNS + "RefKey", "Boolean"));
 
 				return el;
@@ -1413,6 +1416,7 @@ namespace StructuredXmlEditor.Data
 				el.Add(new XAttribute("Name", def.Name));
 				el.Add(new XAttribute("Min", ndef.MinValue));
 				el.Add(new XAttribute("Max", ndef.MaxValue));
+				el.Add(new XAttribute("SkipIfDefault", "false"));
 				if (ndef.UseIntegers) el.Add(new XAttribute("Type", "int"));
 				el.Add(new XAttribute(DataDefinition.MetaNS + "RefKey", "Number"));
 
@@ -1424,6 +1428,7 @@ namespace StructuredXmlEditor.Data
 
 				var el = new XElement("Data");
 				el.Add(new XAttribute("Name", def.Name));
+				el.Add(new XAttribute("SkipIfDefault", "false"));
 				el.Add(new XAttribute("EnumValues", string.Join(",", ndef.EnumValues.OrderBy(e => e))));
 				el.Add(new XAttribute(DataDefinition.MetaNS + "RefKey", "Enum"));
 
@@ -1435,14 +1440,26 @@ namespace StructuredXmlEditor.Data
 
 				var el = new XElement("Definition");
 				el.Add(new XAttribute("Name", def.Name));
+				el.Add(new XAttribute("SkipIfDefault", "false"));
 				el.Add(new XAttribute(DataDefinition.MetaNS + "RefKey", "Struct"));
 
+				var hasNameChild = false;
 				foreach (var cdef in ndef.Children)
 				{
 					var cel = DefinitionToElement(cdef);
 					cel.Name = "Data";
 
+					if (cdef.Name.ToLower() == "name")
+					{
+						hasNameChild = true;
+					}
+
 					el.Add(cel);
+				}
+
+				if (hasNameChild)
+				{
+					el.Add(new XAttribute("Description", "{name}"));
 				}
 
 				return el;
@@ -1453,6 +1470,7 @@ namespace StructuredXmlEditor.Data
 
 				var el = new XElement("Definition");
 				el.Add(new XAttribute("Name", def.Name));
+				el.Add(new XAttribute("SkipIfDefault", "false"));
 				el.Add(new XAttribute(DataDefinition.MetaNS + "RefKey", "Collection"));
 
 				var cel = DefinitionToElement(ndef.ChildDefinitions[0].WrappedDefinition);
