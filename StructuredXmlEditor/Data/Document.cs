@@ -186,8 +186,6 @@ namespace StructuredXmlEditor.Data
 			Data.RootItems[0].MultiEdit(data, data.Count);
 
 			backupTimer.Stop();
-
-			Path = "";
 		}
 
 		//-----------------------------------------------------------------------

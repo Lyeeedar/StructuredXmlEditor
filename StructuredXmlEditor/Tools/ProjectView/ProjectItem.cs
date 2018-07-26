@@ -181,18 +181,21 @@ namespace StructuredXmlEditor.Tools
 				var data = new List<Document>();
 				foreach (var path in paths)
 				{
-					var doc = Workspace.OpenImpl(path);
-					data.Add(doc);
+					if (File.Exists(path))
+					{
+						var doc = Workspace.OpenImpl(path);
+						data.Add(doc);
 
-					if (doc.Data.RootItems[0].Definition != first.Data.RootItems[0].Definition)
-					{
-						Message.Show("Cannot multi edit files of different types!", "Cannot Multiedit", "Ok");
-						return;
-					}
-					else if (doc.Data.RootItems[0].Definition is GraphNodeDefinition)
-					{
-						Message.Show("Cannot multi edit graphs!", "Cannot Multiedit", "Ok");
-						return;
+						if (doc.Data.RootItems[0].Definition != first.Data.RootItems[0].Definition)
+						{
+							Message.Show("Cannot multi edit files of different types!", "Cannot Multiedit", "Ok");
+							return;
+						}
+						else if (doc.Data.RootItems[0].Definition is GraphNodeDefinition)
+						{
+							Message.Show("Cannot multi edit graphs!", "Cannot Multiedit", "Ok");
+							return;
+						}
 					}
 				}
 
