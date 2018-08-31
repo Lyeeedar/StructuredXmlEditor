@@ -1,0 +1,64 @@
+﻿<UserControl
+	x:Class="StructuredXmlEditor.View.TemplateCreatorToolView"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:local="clr-namespace:StructuredXmlEditor.View">
+	<Grid>
+		
+		<Grid.RowDefinitions>
+			<RowDefinition
+				Height="Auto" />
+			<RowDefinition
+				Height="*" />
+			<RowDefinition
+				Height="Auto" />
+		</Grid.RowDefinitions>
+
+		<ComboBox
+			ItemsSource="{Binding Templates}"
+			SelectedItem="{Binding SelectedTemplate}" />
+
+		<ListView
+			Grid.Row="1"
+			ItemsSource="{Binding TemplateKeys}">
+			<ListView.ItemContainerStyle>
+				<Style
+					TargetType="ListViewItem"
+					BasedOn="{StaticResource {x:Type ListViewItem}}">
+					<Setter
+						Property="HorizontalAlignment"
+						Value="Stretch" />
+					<Setter
+						Property="HorizontalContentAlignment"
+						Value="Stretch" />
+				</Style>
+			</ListView.ItemContainerStyle>
+			<ListView.ItemTemplate>
+				<DataTemplate>
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition
+								Width="*" />
+							<ColumnDefinition
+								Width="Auto" />
+						</Grid.ColumnDefinitions>
+
+						<TextBlock
+							Text="{Binding Name}" />
+
+						<local:MultilineTextEditor
+							Grid.Column="1"
+							Text="{Binding Value}" />
+					</Grid>
+				</DataTemplate>
+			</ListView.ItemTemplate>
+		</ListView>
+
+		<Button
+			Grid.Row="2"
+			Content="Create"
+			Command="{Binding CreateCMD}" />
+	</Grid>
+</UserControl>

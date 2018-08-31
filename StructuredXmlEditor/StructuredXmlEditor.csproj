@@ -53,6 +53,8 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -137,6 +139,7 @@
     <Compile Include="Tools\ProjectView\ProjectItem.cs" />
     <Compile Include="Tools\ProjectView\ProjectViewTool.cs" />
     <Compile Include="Tools\StartPage.cs" />
+    <Compile Include="Tools\TemplateCreatorTool.cs" />
     <Compile Include="Tools\ToolBase.cs" />
     <Compile Include="Tools\UndoHistoryTool.cs" />
     <Compile Include="Util\DescendantPropertyChangedEventArgs.cs" />
@@ -144,6 +147,7 @@
     <Compile Include="Util\Extensions.cs" />
     <Compile Include="Util\Future.cs" />
     <Compile Include="Util\ISelectable.cs" />
+    <Compile Include="Util\OpenFolderDialog.cs" />
     <Compile Include="Util\Pool.cs" />
     <Compile Include="Util\SerializableDictionary.cs" />
     <Compile Include="Util\UndoRedoManager.cs" />
@@ -180,6 +184,9 @@
     </Compile>
     <Compile Include="View\CustomControls\StartPageView.xaml.cs">
       <DependentUpon>StartPageView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\CustomControls\TemplateCreatorToolView.xaml.cs">
+      <DependentUpon>TemplateCreatorToolView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\CustomControls\Timeline.cs" />
     <Compile Include="View\CustomControls\UndoHistoryView.xaml.cs">
@@ -242,6 +249,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\CustomControls\StartPageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\CustomControls\TemplateCreatorToolView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

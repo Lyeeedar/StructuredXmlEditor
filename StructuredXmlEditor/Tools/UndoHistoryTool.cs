@@ -10,7 +10,7 @@ namespace StructuredXmlEditor.Tools
 {
 	public class UndoHistoryTool : ToolBase
 	{
-		public UndoHistoryTool(Workspace workspace) : base(workspace, "UndoHistory")
+		public UndoHistoryTool(Workspace workspace) : base(workspace, "Undo History")
 		{
 		}
 	}

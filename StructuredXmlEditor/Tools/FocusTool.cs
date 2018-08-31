@@ -11,7 +11,7 @@ namespace StructuredXmlEditor.Tools
 	{
 		public static bool IsMouseInFocusTool;
 
-		public FocusTool(Workspace workspace) : base(workspace, "FocusTool")
+		public FocusTool(Workspace workspace) : base(workspace, "Focus Tool")
 		{
 			VisibleByDefault = false;
 		}

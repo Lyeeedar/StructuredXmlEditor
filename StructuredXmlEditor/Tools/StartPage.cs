@@ -29,7 +29,7 @@ namespace StructuredXmlEditor.Tools
 		public Command<object> UpdateFeatureCMD { get { return new Command<object>((o) => { VersionInfo.UpdateApplication(VersionInfo.AvailableFeatureVersion, Workspace); }); } }
 		public Command<object> UpdateBugfixCMD { get { return new Command<object>((o) => { VersionInfo.UpdateApplication(VersionInfo.AvailableBugfixVersion, Workspace); }); } }
 
-		public StartPage(Workspace workspace) : base(workspace, "StartPage")
+		public StartPage(Workspace workspace) : base(workspace, "Start Page")
 		{
 			DefaultPositionDocument = ToolPosition.Document;
 

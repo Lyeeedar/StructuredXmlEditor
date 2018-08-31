@@ -87,7 +87,7 @@ namespace StructuredXmlEditor.Tools
 		public Command<object> ClearFilterCMD { get { return new Command<object>((e) => Filter = null); } }
 
 		//-----------------------------------------------------------------------
-		public ProjectViewTool(Workspace workspace) : base(workspace, "ProjectView")
+		public ProjectViewTool(Workspace workspace) : base(workspace, "Project View")
 		{
 			DefaultPositionDocument = ToolPosition.ProjectView;
 			VisibleByDefault = true;

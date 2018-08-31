@@ -236,6 +236,7 @@ namespace StructuredXmlEditor.Data
 			Tools.Add(new StartPage(this));
 			Tools.Add(new FocusTool(this));
 			Tools.Add(new ProjectViewTool(this));
+			Tools.Add(new TemplateCreatorTool(this));
 
 			Thread workerThread = new Thread(WorkerThreadLoop);
 			workerThread.IsBackground = true;
