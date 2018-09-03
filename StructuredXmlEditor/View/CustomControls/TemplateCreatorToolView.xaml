@@ -21,6 +21,7 @@
 			SelectedItem="{Binding SelectedTemplate}" />
 
 		<ListView
+			ScrollViewer.HorizontalScrollBarVisibility="Disabled"
 			Grid.Row="1"
 			ItemsSource="{Binding TemplateKeys}">
 			<ListView.ItemContainerStyle>
@@ -42,14 +43,16 @@
 							<ColumnDefinition
 								Width="*" />
 							<ColumnDefinition
-								Width="Auto" />
+								Width="3*" />
 						</Grid.ColumnDefinitions>
 
 						<TextBlock
 							Text="{Binding Name}" />
 
-						<local:MultilineTextEditor
+						<TextBox
 							Grid.Column="1"
+							AcceptsReturn="True"
+							TextWrapping="Wrap"
 							Text="{Binding Value}" />
 					</Grid>
 				</DataTemplate>
