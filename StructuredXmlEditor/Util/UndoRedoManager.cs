@@ -23,37 +23,40 @@ public class UndoRedoDescription
 }
 
 //-----------------------------------------------------------------------
-public interface IValueChangeAction
+public interface IUndoRedoAction
 {
-	bool IsChange { get; }
-	DateTime GetTimeStamp();
+	string Desc { get; }
 	void Do();
 	void Undo();
 }
-public class ValueChangeAction<T> : IValueChangeAction
-{
-	public DateTime timeStamp;
 
+//-----------------------------------------------------------------------
+public interface IValueChangeAction
+{
+	string ValueName { get; }
+	object KeyObj { get; }
+}
+public class ValueChangeAction<T> : IValueChangeAction, IUndoRedoAction
+{
 	public object oldData;
 	public object newData;
+
 	public T oldVal;
 	public T newVal;
-	public Action<T, object> setter;
-	public string valueName;
 
-	public ValueChangeAction(T oldVal, T newVal, Action<T, object> setter, DateTime timeStamp, string valueName)
+	public Action<T, object> setter;
+	public string ValueName { get; set; }
+	public object KeyObj { get; set; }
+
+	public string Desc { get { return "Change " + ValueName + " (" + oldVal + " -> " + newVal + ")"; } }
+
+	public ValueChangeAction(T oldVal, T newVal, Action<T, object> setter, object keyObj, string valueName)
 	{
 		this.oldVal = oldVal;
 		this.newVal = newVal;
 		this.setter = setter;
-		this.valueName = valueName;
-
-		this.timeStamp = timeStamp;
-	}
-
-	public DateTime GetTimeStamp()
-	{
-		return timeStamp;
+		this.ValueName = valueName;
+		this.KeyObj = keyObj;
 	}
 
 	public bool IsChange
@@ -80,11 +83,6 @@ public class ValueChangeAction<T> : IValueChangeAction
 	{
 		setter(oldVal, oldData);
 	}
-
-	public override string ToString()
-	{
-		return "Change " + valueName + " (" + oldVal + " -> " + newVal + ")";
-	}
 }
 
 //-----------------------------------------------------------------------
@@ -94,7 +92,6 @@ public class UndoRedoManager : NotifyPropertyChanged
 
 	public Stack<UndoRedoGroup> UndoStack = new Stack<UndoRedoGroup>();
 	public Stack<UndoRedoGroup> RedoStack = new Stack<UndoRedoGroup>();
-	public Dictionary<string, IValueChangeAction> ValueChangeDict = new Dictionary<string, IValueChangeAction>();
 
 	public IEnumerable<UndoRedoDescription> DescriptionStack
 	{
@@ -158,27 +155,7 @@ public class UndoRedoManager : NotifyPropertyChanged
 
 	public UndoRedoManager()
 	{
-		valueTimer = new Timer();
-		valueTimer.Interval = 500;
-		valueTimer.AutoReset = true;
-		valueTimer.Elapsed += (e, args) => 
-		{
-			foreach (var entry in ValueChangeDict.ToList())
-			{
-				var value = entry.Value;
 
-				if ((DateTime.Now - value.GetTimeStamp()).TotalMilliseconds > 300)
-				{
-					if (value.IsChange) ApplyDoUndo(delegate { value.Do(); }, delegate { value.Undo(); }, value.ToString());
-					ValueChangeDict.Remove(entry.Key);
-				}
-			}
-
-			if (ValueChangeDict.Count == 0)
-			{
-				valueTimer.Stop();
-			}
-		};
 	}
 
 	public UsingContext DisableUndoScope()
@@ -215,48 +192,73 @@ public class UndoRedoManager : NotifyPropertyChanged
 			return;
 		}
 
-		string key = keyObj.GetHashCode().ToString() + valueName;
+		// collapse into existing
+		var collapsed = false;
+		if (UndoStack.Count > 0)
+		{
+			var lastGroup = UndoStack.Peek();
 
-		if (ValueChangeDict.ContainsKey(key))
-		{
-			desc = ValueChangeDict[key] as ValueChangeAction<T>;
-			desc.newVal = newValue;
-			desc.newData = newData;
-			desc.timeStamp = DateTime.Now;
+			var currentTime = DateTime.Now;
+			var diff = (currentTime - lastGroup.LastActionTime).TotalMilliseconds;
+
+			if (diff <= GroupingMS)
+			{
+				foreach (var action in lastGroup.Actions)
+				{
+					var valueChange = action as ValueChangeAction<T>;
+					if (valueChange != null)
+					{
+						if (valueChange.KeyObj == keyObj && valueChange.ValueName == valueName)
+						{
+							valueChange.newVal = newValue;
+							valueChange.newData = newData;
+							valueChange.Do();
+
+							lastGroup.LastActionTime = currentTime;
+
+							collapsed = true;
+						}
+					}
+				}
+			}
 		}
-		else
+
+		if (!collapsed)
 		{
-			desc = new ValueChangeAction<T>(prevValue, newValue, setter, DateTime.Now, valueName);
+			desc = new ValueChangeAction<T>(prevValue, newValue, setter, keyObj, valueName);
 			desc.oldData = prevData;
 			desc.newData = newData;
-			ValueChangeDict[key] = desc;
+
+			AddUndoRedoAction(desc);
 		}
-
-		desc.Do();
-
-		if (!valueTimer.Enabled) valueTimer.Start();
+		
 	}
 
 	public void ApplyDoUndo(Action _do, Action _undo, string _desc = "")
 	{
 		if (overrideName != null) _desc = overrideName;
 
+		var action = new UndoRedoAction(_do, _undo, _desc);
+
+		AddUndoRedoAction(action);
+	}
+
+	public void AddUndoRedoAction(IUndoRedoAction action)
+	{
 		if (enableUndoRedo == 0)
 		{
 			if (isInApplyUndo)
 			{
 				Message.Show("Nested ApplyDoUndo calls! This is bad!", "Undo Redo borked", "Ok");
-				_do();
+				action.Do();
 				return;
 			}
 
 			isInApplyUndo = true;
 
-			_do();
+			action.Do();
 
 			RedoStack.Clear();
-
-			var action = new UndoRedoAction(_do, _undo, _desc);
 
 			if (UndoStack.Count > 0)
 			{
@@ -274,7 +276,7 @@ public class UndoRedoManager : NotifyPropertyChanged
 				{
 					var group = new UndoRedoGroup();
 					group.Actions.Add(action);
-					group.LastActionTime = DateTime.Now;
+					group.LastActionTime = currentTime;
 					UndoStack.Push(group);
 				}
 			}
@@ -295,7 +297,7 @@ public class UndoRedoManager : NotifyPropertyChanged
 		}
 		else
 		{
-			_do();
+			action.Do();
 		}
 	}
 
@@ -364,13 +366,12 @@ public class UndoRedoManager : NotifyPropertyChanged
 	UndoRedoGroup savePoint;
 	bool isInApplyUndo;
 	string overrideName;
-	Timer valueTimer;
 }
 
 //-----------------------------------------------------------------------
 public class UndoRedoGroup
 {
-	public List<UndoRedoAction> Actions { get; set; } = new List<UndoRedoAction>();
+	public List<IUndoRedoAction> Actions { get; set; } = new List<IUndoRedoAction>();
 	public DateTime LastActionTime { get; set; }
 
 	public void Do()
@@ -395,17 +396,27 @@ public class UndoRedoGroup
 }
 
 //-----------------------------------------------------------------------
-public class UndoRedoAction
+public class UndoRedoAction : IUndoRedoAction
 {
-	public Action Do { get; set; }
-	public Action Undo { get; set; }
+	public Action DoAction { get; set; }
+	public Action UndoAction { get; set; }
 	public string Desc { get; set; }
 
 	public UndoRedoAction(Action _do, Action _undo, string _desc)
 	{
-		this.Do = _do;
-		this.Undo = _undo;
+		this.DoAction = _do;
+		this.UndoAction = _undo;
 		this.Desc = _desc;
+	}
+
+	public void Do()
+	{
+		DoAction();
+	}
+
+	public void Undo()
+	{
+		UndoAction();
 	}
 }
 
