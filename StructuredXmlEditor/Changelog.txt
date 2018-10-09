@@ -1,4 +1,30 @@
-﻿--------- 1.7.0 ---------
+﻿--------- 1.8.0 ---------
+
+- Use the comments in the definition for a timelines keyframes to group them in the dropdown.
+- Allow referencedefs to be global.
+- Added an 'add multiple' option to timlines that have only a file as the keyframe data.
+
+- Added support for referencing resource types in files. When you pick a file with this on it will check the resource type of the file you choose to make sure it matches. It also provides a create button to make one of those file types.
+- Added a 'relativetothis' option to files that will store the path to the file relative to the currently open file, instead of relative to the project root.
+
+- Added support for resource type specific colours and icons. You can configure this at the root element in a definition.
+
+- Added support for comments in the graph. You can now rightclick on a graph node and set the comment. Click on the coment title to edit the name/colour. Comments can be expanded/collapsed too.
+- Added support for graph copy/paste. Currently only available via rightclick.
+- Added support for control points in the graph. Right click on a link and select 'add control point'. You can then drag this around to change the link. Right click on it to flip the sides the link connects to.
+
+- Added support for showing animated previews of image sequences, assuming the image is of the form '{path}_1.png, {path}_2.png' etc.
+
+- Added a template creator tool. This allows creating a collection of files from a template. Templates are just a zipped collection of files placed in the 'Templates' folder. The tool looks through the zip and finds all strings surrounded by {}, then shows an editor so the user can give them new content.
+
+- Fix undoredo to happen instantly, instead of 500ms after the change was made.
+
+- Fix many bugs in the graph, including nodes suddenly jumping around, nodes becoming detached and moving with the scroll, and others.
+
+- Lots and lots of optimisations to graphs, asciigrid and large data types.
+
+
+--------- 1.7.0 ---------
 
 - Mode for collections that only allow a single instance of each of their children.
 - Max length parameter on strings.

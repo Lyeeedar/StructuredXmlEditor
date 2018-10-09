@@ -234,9 +234,9 @@ namespace StructuredXmlEditor.Data
 
 			Tools.Add(new UndoHistoryTool(this));
 			Tools.Add(new StartPage(this));
-			Tools.Add(new FocusTool(this));
 			Tools.Add(new ProjectViewTool(this));
 			Tools.Add(new TemplateCreatorTool(this));
+			Tools.Add(new FocusTool(this));
 
 			Thread workerThread = new Thread(WorkerThreadLoop);
 			workerThread.IsBackground = true;
