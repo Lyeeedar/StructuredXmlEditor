@@ -10,7 +10,7 @@
 		  Background="Transparent">
 
 		<v:XmlDataView
-			Visibility="{Binding Workspace.Current.Data.IsSelectedDataItem, Converter={v:ValueTypeConverter}}"
+			Visibility="{Binding Workspace.Current.Data.IsSelectedDataItem, Converter={v:ValueTypeConverter}, FallbackValue=Collapsed}"
 			RootItems="{Binding Workspace.Current.Data.SelectedItems}">
 		</v:XmlDataView>
 
@@ -178,5 +178,128 @@
 				Grid.Row="2"
 				Text="{Binding InfoText, ElementName=AsciiGrid}" />
 		</Grid>
+
+		<Grid
+			Visibility="{Binding DataContext.Workspace.Current.Data.IsSelectedSkeletalAnimation, Converter={v:ValueTypeConverter}, ElementName=Root, FallbackValue=Collapsed}"
+			DataContext="{Binding Workspace.Current.Data.Selected}">
+
+			<Grid.RowDefinitions>
+				<RowDefinition
+					Height="*" />
+				<RowDefinition
+					Height="5" />
+				<RowDefinition
+					Height="*" />
+				<RowDefinition
+					Height="5" />
+				<RowDefinition
+					Height="*" />
+			</Grid.RowDefinitions>
+
+			<Border
+				BorderBrush="{StaticResource BorderDarkBrush}"
+				BorderThickness="1" />
+
+			<GridSplitter
+				Grid.Row="1"
+				Height="5"
+				Background="Transparent"
+				HorizontalAlignment="Stretch"
+				VerticalAlignment="Center" />
+
+			<Border
+				Grid.Row="2"
+				BorderBrush="{StaticResource BorderDarkBrush}"
+				BorderThickness="1">
+				<ContentPresenter
+					Content="{Binding SelectedObject}">
+					<ContentPresenter.Resources>
+
+						<DataTemplate
+							DataType="{x:Type data:Bone}">
+							<StackPanel Orientation="Vertical">
+								
+								<DockPanel>
+									<Label
+										DockPanel.Dock="Left"
+										Content="Name: " />
+									<TextBox
+										Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Delay=100}" />
+								</DockPanel>
+
+								<Grid>
+									
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition
+											Width="Auto" />
+										<ColumnDefinition
+											Width="Auto" />
+										<ColumnDefinition
+											Width="*" />
+										<ColumnDefinition
+											Width="Auto" />
+									</Grid.ColumnDefinitions>
+									
+									<Label
+										Content="Image: " />
+									
+									<Button
+										Grid.Column="1"
+										Background="Transparent"
+										BorderBrush="Transparent"
+										Margin="2"
+										ToolTip="Browse"
+										Command="{Binding BrowseCMD}">
+										<Image
+											Source="/Resources/Open.png"
+											Width="16"
+											Height="16" />
+									</Button>
+									
+									<TextBox
+										Grid.Column="2"
+										Text="{Binding ImagePath, UpdateSourceTrigger=PropertyChanged, Delay=100}" />
+									
+									<Image
+										Grid.Column="3"
+										ToolTipService.ShowDuration="100000"
+										RenderOptions.BitmapScalingMode="Fant"
+										Width="24"
+										Height="24"
+										Margin="2"
+										Source="{Binding Image, Converter={v:NullImageConverter}}"
+										Visibility="{Binding Image, Converter={v:NullOrZeroConverter}, ConverterParameter=Not}">
+										<Image.ToolTip>
+											<Image
+												Width="256"
+												Height="256"
+												Source="{Binding Image, Converter={v:NullImageConverter}}" />
+										</Image.ToolTip>
+									</Image>
+									
+								</Grid>
+
+							</StackPanel>
+							
+						</DataTemplate>
+						
+					</ContentPresenter.Resources>
+				</ContentPresenter>
+			</Border>
+
+			<GridSplitter
+				Grid.Row="3"
+				Height="5"
+				Background="Transparent"
+				HorizontalAlignment="Stretch"
+				VerticalAlignment="Center" />
+
+			<Border
+				Grid.Row="4"
+				BorderBrush="{StaticResource BorderDarkBrush}"
+				BorderThickness="1" />
+
+		</Grid>
+
 	</Grid>
 </UserControl>

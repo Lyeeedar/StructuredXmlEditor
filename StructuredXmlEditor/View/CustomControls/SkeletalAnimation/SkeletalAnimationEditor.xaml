@@ -16,11 +16,37 @@
 		</Grid.ColumnDefinitions>
 		
 		<!-- Options sidebar -->
-		<DockPanel
-			Width="24"
-			Background="DarkGray">
-			
-		</DockPanel>
+		<Border
+			Background="{StaticResource BackgroundDarkBrush}"
+			BorderBrush="{StaticResource BorderDarkBrush}"
+			BorderThickness="1">
+			<DockPanel
+				Margin="2"
+				LastChildFill="False">
+				<ToggleButton
+					Margin="1"
+					Width="24"
+					DockPanel.Dock="Top"
+					ToolTip="Translation Mode"
+					Content="T"
+					IsChecked="{Binding EditorPanel.TranslateMode, RelativeSource={RelativeSource AncestorType={x:Type local:SkeletalAnimationEditor}}}" />
+				<ToggleButton
+					Margin="1"
+					Width="24"
+					DockPanel.Dock="Top"
+					ToolTip="Rotation Mode"
+					Content="R"
+					IsChecked="{Binding EditorPanel.RotationMode, RelativeSource={RelativeSource AncestorType={x:Type local:SkeletalAnimationEditor}}}" />
+				<ToggleButton
+					Margin="1,10,1,1"
+					Width="24"
+					DockPanel.Dock="Top"
+					ToolTip="Show Bone Names"
+					Content="B"
+					IsChecked="{Binding EditorPanel.ShowBoneNames, RelativeSource={RelativeSource AncestorType={x:Type local:SkeletalAnimationEditor}}}" />
+			</DockPanel>
+		</Border>
+		
 		
 		<!-- Editor area -->
 		<ContentPresenter

@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using StructuredXmlEditor.Definition;
+using StructuredXmlEditor.View;
 
 namespace StructuredXmlEditor.Data
 {
@@ -49,10 +52,22 @@ namespace StructuredXmlEditor.Data
 		{
 			throw new NotImplementedException();
 		}
+
+		//-----------------------------------------------------------------------
+		public object SelectedObject
+		{
+			get { return m_selected; }
+			set
+			{
+				m_selected = value;
+				RaisePropertyChangedEvent();
+			}
+		}
+		private object m_selected;
 	}
 
 	//-----------------------------------------------------------------------
-	public class Bone
+	public class Bone : NotifyPropertyChanged
 	{
 		//-----------------------------------------------------------------------
 		public Bone Parent { get; set; }
@@ -104,7 +119,7 @@ namespace StructuredXmlEditor.Data
 				{
 					m_worldTransformDirty = false;
 
-					m_worldTransform = Parent != null ? Parent.WorldTransform * LocalTransform : LocalTransform;
+					m_worldTransform = Parent != null ? LocalTransform * Parent.WorldTransform : LocalTransform;
 				}
 
 				return m_worldTransform;
@@ -141,16 +156,32 @@ namespace StructuredXmlEditor.Data
 			set
 			{
 				m_translation = value;
-				foreach (var bone in Descendants) { bone.m_worldTransformDirty = true; }
+				foreach (var bone in Descendants) { bone.m_worldTransformDirty = true; bone.m_worldRotationDirty = true; }
 				m_localTransformDirty = true;
 			}
 		}
 		private Point m_translation;
 
+		public Point DragStartPos;
+
 		//-----------------------------------------------------------------------
 		public double Rotation
 		{
-			get { return m_rotation; }
+			get
+			{
+				if (Parent == null)
+				{
+					return m_rotation;
+				}
+
+				var parentPoint = Parent.WorldTransform.Transform(new Point());
+				var point = Parent.WorldTransform.Transform(Translation);
+
+				var parentToThis = parentPoint - point;
+				var angle = VectorToAngle(parentToThis.X, parentToThis.Y);
+
+				return angle;
+			}
 			set
 			{
 				m_rotation = value;
@@ -161,9 +192,76 @@ namespace StructuredXmlEditor.Data
 		private double m_rotation;
 
 		//-----------------------------------------------------------------------
+		private double VectorToAngle(double x, double y)
+		{
+			// basis vector 0,1
+			var dot = 0.0 * x + 1.0 * y; // dot product
+			var det = 0.0 * y - 1.0 * x; // determinant
+			var angle = Math.Atan2(det, dot) * radiansToDegrees;
+
+			return angle;
+		}
+		private double radiansToDegrees = 180.0 / Math.PI;
+
+		//-----------------------------------------------------------------------
+		public string Name { get; set; }
+
+		//-----------------------------------------------------------------------
 		public bool IsMouseOver { get; set; }
 
 		//-----------------------------------------------------------------------
 		public bool IsSelected { get; set; }
+
+		//-----------------------------------------------------------------------
+		public string ImagePath
+		{
+			get { return m_imagePath; }
+			set
+			{
+				m_imagePath = value;
+
+				if (File.Exists(m_imagePath))
+				{
+					try
+					{
+						Image = new BitmapImage(new Uri(m_imagePath));
+					}
+					catch (Exception)
+					{
+						Image = null;
+					}
+				}
+				else
+				{
+					Image = null;
+				}
+
+				RaisePropertyChangedEvent();
+				RaisePropertyChangedEvent(nameof(Image));
+			}
+		}
+		private string m_imagePath;
+		public ImageSource Image { get; set; }
+
+		//-----------------------------------------------------------------------
+		public Command<object> BrowseCMD { get { return new View.Command<object>((obj) => { Browse(); }); } }
+
+		//-----------------------------------------------------------------------
+		public void Browse()
+		{
+			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+
+			dlg.InitialDirectory = Path.GetDirectoryName(ImagePath);
+			dlg.Filter = "Image files (*.bmp, *.jpg, *.jpeg, *.png) | *.bmp; *.jpg; *.jpeg; *.png";
+
+			bool? result = dlg.ShowDialog();
+
+			if (result == true)
+			{
+				var chosen = dlg.FileName;
+
+				ImagePath = chosen;
+			}
+		}
 	}
 }

@@ -152,6 +152,7 @@ namespace StructuredXmlEditor.Data
 			else if (RootItems.All(e => e is SkeletalAnimationItem))
 			{
 				ShowAsSkeletalEditor = true;
+				Selected = RootItems[0];
 			}
 			else
 			{
@@ -219,12 +220,14 @@ namespace StructuredXmlEditor.Data
 					RaisePropertyChangedEvent("SelectedItems");
 					RaisePropertyChangedEvent("IsSelectedDataItem");
 					RaisePropertyChangedEvent("IsSelectedAsciiGrid");
+					RaisePropertyChangedEvent("IsSelectedSkeletalAnimation");
 				}
 			}
 		}
 		private object m_selected;
 		private List<DataItem> m_selectedDataItems = new List<DataItem>();
 
+		//-----------------------------------------------------------------------
 		public void AddSelected(DataItem item)
 		{
 			if (!m_selectedDataItems.Contains(item))
@@ -243,6 +246,7 @@ namespace StructuredXmlEditor.Data
 			Selected = m_selectedDataItems;
 		}
 
+		//-----------------------------------------------------------------------
 		public void RemoveSelected(DataItem item)
 		{
 			m_selectedDataItems.Remove(item);
@@ -257,13 +261,16 @@ namespace StructuredXmlEditor.Data
 			}
 		}
 
+		//-----------------------------------------------------------------------
 		public List<DataItem> SelectedItems
 		{
 			get { return Selected as List<DataItem>; }
 		}
 
+		//-----------------------------------------------------------------------
 		public bool IsSelectedDataItem { get { return SelectedItems != null; } }
 		public bool IsSelectedAsciiGrid { get { return Selected is MultilineStringItem; } }
+		public bool IsSelectedSkeletalAnimation { get { return Selected is SkeletalAnimationItem; } }
 
 		//-----------------------------------------------------------------------
 		public IEnumerable<GraphNode> GraphNodes

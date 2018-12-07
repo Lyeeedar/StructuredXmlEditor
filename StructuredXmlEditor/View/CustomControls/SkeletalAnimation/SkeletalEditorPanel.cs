@@ -1,7 +1,10 @@
 ﻿using StructuredXmlEditor.Data;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,7 +14,7 @@ using System.Windows.Media;
 
 namespace StructuredXmlEditor.View
 {
-	public class SkeletalEditorPanel : Control
+	public class SkeletalEditorPanel : Control, INotifyPropertyChanged
 	{
 		//-----------------------------------------------------------------------
 		private Pen RootBorderPen = new Pen(Brushes.DarkKhaki, 2.0);
@@ -28,13 +31,51 @@ namespace StructuredXmlEditor.View
 		private Pen SelectedPenThin = new Pen(Brushes.LawnGreen, 2);
 		private Pen SelectedPenThick = new Pen(Brushes.LawnGreen, 4);
 
-		private Brush BackgroundBrush = Brushes.Black;
-
 		private Pen BluePen = new Pen(Brushes.Blue, 2.0);
 		private Pen RedPen = new Pen(Brushes.Red, 2.0);
 
 		//-----------------------------------------------------------------------
-		public bool RotationMode { get; set; } = true;
+		public bool ShowBoneNames
+		{
+			get { return m_ShowBoneNames; }
+			set
+			{
+				m_ShowBoneNames = value;
+				RaisePropertyChangedEvent();
+
+				InvalidateVisual();
+			}
+		}
+		private bool m_ShowBoneNames;
+
+		//-----------------------------------------------------------------------
+		public bool RotationMode
+		{
+			get { return m_rotationMode; }
+			set
+			{
+				m_rotationMode = value;
+				RaisePropertyChangedEvent();
+				RaisePropertyChangedEvent(nameof(TranslateMode));
+
+				InvalidateVisual();
+			}
+		}
+		private bool m_rotationMode;
+
+		//-----------------------------------------------------------------------
+		public bool TranslateMode
+		{
+			get { return !m_rotationMode; }
+			set
+			{
+				m_rotationMode = !value;
+				RaisePropertyChangedEvent();
+				RaisePropertyChangedEvent(nameof(RotationMode));
+
+				InvalidateVisual();
+			}
+		}
 
 		//-----------------------------------------------------------------------
 		public SkeletalAnimationItem Item { get { return (DataContext as XmlDataModel).RootItems[0] as SkeletalAnimationItem; } }
@@ -54,7 +95,7 @@ namespace StructuredXmlEditor.View
 
 			m_mouseOverWidget = false;
 
-			if (!RotationMode && DraggingBone != null && (m_inDrag || (m_mouseDownPos - pos).Length > 5))
+			if (DraggingBone != null && (m_inDrag || (m_mouseDownPos - pos).Length > 5))
 			{
 				m_inDrag = true;
 
@@ -102,7 +143,30 @@ namespace StructuredXmlEditor.View
 						var currentAngle = VectorToAngle(diff.X, diff.Y);
 
 						var diffangle = currentAngle - m_startAngle;
-						selected.Rotation = m_startBoneRotation + diffangle;
+
+						if (selected.Parent == null)
+						{
+							selected.Rotation = m_startBoneRotation + diffangle;
+						}
+						else
+						{
+							// rotate all children around this by the move amount
+							foreach (var child in selected.Children)
+							{
+								var childPos = child.Parent.WorldTransform.Transform(child.DragStartPos);
+								var childPoint = new Point(ActualWidth / 2f + Offset.X + childPos.X, ActualHeight / 2f + Offset.Y + childPos.Y);
+								var childdiff = childPoint - point;
+								var len = childdiff.Length;
+								var childangle = VectorToAngle(childdiff.X, childdiff.Y);
+
+								var mat = new Matrix();
+								mat.Rotate(childangle + diffangle);
+
+								var newPos = mat.Transform(new Point(0, len));
+
+								child.Translation = newPos;
+							}
+						}
 					}
 					else
 					{
@@ -174,6 +238,11 @@ namespace StructuredXmlEditor.View
 					m_startAngle = VectorToAngle(diff.X, diff.Y);
 					m_startBoneRotation = selected.Rotation;
 
+					foreach (var child in selected.Children)
+					{
+						child.DragStartPos = child.Translation;
+					}
+
 					m_inDrag = true;
 				}
 			}
@@ -183,7 +252,7 @@ namespace StructuredXmlEditor.View
 
 				m_inDrag = false;
 
-				if (!RotationMode && args.RightButton == MouseButtonState.Pressed)
+				if (args.RightButton == MouseButtonState.Pressed && DraggingBone != null)
 				{
 					var childBone = new Bone();
 					childBone.Parent = DraggingBone;
@@ -224,6 +293,7 @@ namespace StructuredXmlEditor.View
 				}
 
 				DraggingBone.IsSelected = true;
+				Item.SelectedObject = DraggingBone;
 
 				InvalidateVisual();
 			}
@@ -246,13 +316,18 @@ namespace StructuredXmlEditor.View
 		{
 			base.OnRender(drawingContext);
 
-			drawingContext.DrawRectangle(BackgroundBrush, null, new Rect(0, 0, ActualWidth, ActualHeight));
+			if (Item == null) { return; }
+
+			drawingContext.DrawRectangle(Brushes.Transparent, null, new Rect(0, 0, ActualWidth, ActualHeight));
 
 			foreach (var bone in Item.AllBones)
 			{
 				RenderBone(drawingContext, bone);
 			}
 		}
+
+		//-----------------------------------------------------------------------
+		private Typeface Font = new Typeface("Verdana");
 
 		//-----------------------------------------------------------------------
 		private void RenderBone(DrawingContext drawingContext, Bone bone)
@@ -262,6 +337,12 @@ namespace StructuredXmlEditor.View
 
 			if (bone.Parent == null)
 			{
+				// draw image
+				if (bone.Image != null)
+				{
+					drawingContext.DrawImage(bone.Image, new Rect(ActualWidth / 2f + Offset.X + point.X - bone.Image.Width / 2f, ActualHeight / 2f + Offset.Y + point.Y - bone.Image.Height / 2f, bone.Image.Width, bone.Image.Height));
+				}
+
 				if (bone.IsMouseOver)
 				{
 					drawingContext.DrawRoundedRectangle(HighlightBrush, null,
@@ -275,6 +356,22 @@ namespace StructuredXmlEditor.View
 			{
 				var parentTrans = bone.Parent.WorldTransform;
 				var parentPoint = parentTrans.Transform(new Point());
+
+				// draw image
+				if (bone.Image != null)
+				{
+					var parentToThis = parentPoint - point;
+					var angle = VectorToAngle(parentToThis.X, parentToThis.Y);
+
+					var pos = new Point(ActualWidth / 2f + Offset.X + point.X, ActualHeight / 2f + Offset.Y + point.Y);
+					var mat = new Matrix();
+					mat.Rotate(angle);
+					mat.Translate(pos.X, pos.Y);
+
+					drawingContext.PushTransform(new MatrixTransform(mat));
+					drawingContext.DrawImage(bone.Image, new Rect(-bone.Image.Width / 2f, -bone.Image.Height / 2f, bone.Image.Width, bone.Image.Height));
+					drawingContext.Pop();
+				}
 
 				drawingContext.DrawLine(ConnectionPen, 
 					new Point(ActualWidth / 2f + Offset.X + parentPoint.X, ActualHeight / 2f + Offset.Y + parentPoint.Y),
@@ -290,12 +387,21 @@ namespace StructuredXmlEditor.View
 					new Rect(ActualWidth / 2f + Offset.X + point.X - 5, ActualHeight / 2f + Offset.Y + point.Y - 5, 10, 10), 5, 5);
 			}
 
+			// draw name
+			var bonepos = new Point(ActualWidth / 2f + Offset.X + point.X, ActualHeight / 2f + Offset.Y + point.Y);
+
+			if (ShowBoneNames && !string.IsNullOrWhiteSpace(bone.Name))
+			{
+				var text = new FormattedText(bone.Name, CultureInfo.GetCultureInfo("en-uk"), FlowDirection.LeftToRight, Font, 12, Brushes.White);
+				var textPos = new Point(bonepos.X - text.Width / 2f, bonepos.Y - text.Height - 5);
+
+				drawingContext.DrawText(text, textPos);
+			}
+
 			if (RotationMode && bone.IsSelected)
 			{
 				var rotationOnlyMat = new Matrix();
 				rotationOnlyMat.Rotate(bone.WorldRotation);
-
-				var bonepos = new Point(ActualWidth / 2f + Offset.X + point.X, ActualHeight / 2f + Offset.Y + point.Y);
 
 				var up = rotationOnlyMat.Transform(new Point(0, 15));
 				var right = rotationOnlyMat.Transform(new Point(15, 0));
@@ -305,6 +411,21 @@ namespace StructuredXmlEditor.View
 
 				drawingContext.DrawRoundedRectangle(null, m_mouseOverWidget ? SelectedPenThick : SelectedPenThin,
 					 new Rect(ActualWidth / 2f + Offset.X + point.X - 30, ActualHeight / 2f + Offset.Y + point.Y - 30, 60, 60), 30, 30);
+			}
+		}
+
+		//--------------------------------------------------------------------------
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		//-----------------------------------------------------------------------
+		public void RaisePropertyChangedEvent
+		(
+			[CallerMemberName] string i_propertyName = ""
+		)
+		{
+			if (PropertyChanged != null)
+			{
+				PropertyChanged(this, new PropertyChangedEventArgs(i_propertyName));
 			}
 		}
 	}
