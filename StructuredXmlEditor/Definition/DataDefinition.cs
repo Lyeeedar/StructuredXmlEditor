@@ -98,6 +98,7 @@ namespace StructuredXmlEditor.Definition
 			else if (name == "GRAPHREFERENCE") definition = new GraphReferenceDefinition();
 			else if (name == "KEYFRAME") definition = new KeyframeDefinition();
 			else if (name == "COMMENT") definition = new CommentDefinition();
+			else if (name == "SKELETALANIMATION") definition = new SkeletalAnimationDefinition();
 			else throw new Exception("Unknown definition type " + name + "!");
 
 			definition.Name = element.Attribute("Name")?.Value?.ToString();

@@ -104,6 +104,7 @@
     <Compile Include="Data\PrimitiveDataItem.cs" />
     <Compile Include="Data\MultilineStringItem.cs" />
     <Compile Include="Data\ReferenceItem.cs" />
+    <Compile Include="Data\SkeletalAnimationItem.cs" />
     <Compile Include="Data\TimelineItem.cs" />
     <Compile Include="Data\TreeItem.cs" />
     <Compile Include="Data\VectorItem.cs" />
@@ -113,6 +114,7 @@
     <Compile Include="Definition\GraphStructDefinition.cs" />
     <Compile Include="Definition\GraphReferenceDefinition.cs" />
     <Compile Include="Definition\KeyframeDefinition.cs" />
+    <Compile Include="Definition\SkeletalAnimationDefinition.cs" />
     <Compile Include="Definition\TimelineDefinition.cs" />
     <Compile Include="Definition\VectorDefinition.cs" />
     <Compile Include="Data\Workspace.cs" />
@@ -182,6 +184,10 @@
     <Compile Include="View\CustomControls\ProjectViewView.xaml.cs">
       <DependentUpon>ProjectViewView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\CustomControls\SkeletalAnimation\SkeletalAnimationEditor.xaml.cs">
+      <DependentUpon>SkeletalAnimationEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\CustomControls\SkeletalAnimation\SkeletalEditorPanel.cs" />
     <Compile Include="View\CustomControls\StartPageView.xaml.cs">
       <DependentUpon>StartPageView.xaml</DependentUpon>
     </Compile>
@@ -245,6 +251,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\CustomControls\ProjectViewView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\CustomControls\SkeletalAnimation\SkeletalAnimationEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

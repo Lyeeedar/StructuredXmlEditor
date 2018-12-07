@@ -128,36 +128,39 @@ namespace StructuredXmlEditor.Data
 					m_rootItems.CollectionChanged += RootItemCollectionChanged;
 				}
 
-				if (RootItems.Any(e => !(e is GraphNodeItem)))
-				{
-					ShowAsGraph = false;
-					ShowAsDataModel = true;
-				}
-				else
-				{
-					ShowAsGraph = true;
-					ShowAsDataModel = false;
-				}
-
-				RaisePropertyChangedEvent("ShowAsGraph");
-				RaisePropertyChangedEvent("ShowAsDataModel");
+				UpdateEditorType();
 			}
 		}
+
+		//-----------------------------------------------------------------------
 		private void RootItemCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
 		{
-			if (RootItems.Any(e => !(e is GraphNodeItem)))
+			UpdateEditorType();
+		}
+
+		//-----------------------------------------------------------------------
+		private void UpdateEditorType()
+		{
+			ShowAsGraph = false;
+			ShowAsDataModel = false;
+			ShowAsSkeletalEditor = false;
+
+			if (RootItems.All(e => e is GraphNodeItem))
 			{
-				ShowAsGraph = false;
-				ShowAsDataModel = true;
+				ShowAsGraph = true;
+			}
+			else if (RootItems.All(e => e is SkeletalAnimationItem))
+			{
+				ShowAsSkeletalEditor = true;
 			}
 			else
 			{
-				ShowAsGraph = true;
-				ShowAsDataModel = false;
+				ShowAsDataModel = true;
 			}
 
 			RaisePropertyChangedEvent("ShowAsGraph");
 			RaisePropertyChangedEvent("ShowAsDataModel");
+			RaisePropertyChangedEvent("ShowAsSkeletalEditor");
 		}
 
 		//-----------------------------------------------------------------------
@@ -317,6 +320,7 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public bool ShowAsDataModel { get; set; } = true;
 		public bool ShowAsGraph { get; set; }
+		public bool ShowAsSkeletalEditor { get; set; }
 
 		//##############################################################################################################
 		#region Filter
@@ -553,19 +557,7 @@ namespace StructuredXmlEditor.Data
 				}
 			}
 
-			if (RootItems.Any(e => !(e is GraphNodeItem)))
-			{
-				ShowAsGraph = false;
-				ShowAsDataModel = true;
-			}
-			else
-			{
-				ShowAsGraph = true;
-				ShowAsDataModel = false;
-			}
-
-			RaisePropertyChangedEvent("ShowAsGraph");
-			RaisePropertyChangedEvent("ShowAsDataModel");
+			UpdateEditorType();
 		}
 
 		//-----------------------------------------------------------------------

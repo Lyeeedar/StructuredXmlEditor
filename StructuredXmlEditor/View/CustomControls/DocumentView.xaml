@@ -233,6 +233,9 @@
 				RootItems="{Binding RootItems}">
 			</v:XmlDataView>
 
+			<v:SkeletalAnimationEditor
+				Visibility="{Binding ShowAsSkeletalEditor, Converter={v:ValueTypeConverter}}" />
+
 		</Grid>
 		
 	</DockPanel>

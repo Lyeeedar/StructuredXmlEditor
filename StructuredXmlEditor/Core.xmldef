@@ -6,6 +6,17 @@
 		<Reference Name="Attribute" Keys="Boolean,Colour,Enum,File,Number,String" ToolTip="The attribute" />
 	</CollectionDef>
 
+	<StructDef Name="SkeletalAnimation" ToolTip="A skeletal animation." TextColour="Struct">
+		<Attributes>
+			<String Name="Name" Default="Animation" ToolTip="The name to be written for this element. Place a path to an element inside a '{}' to use that elements value." />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
+			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
+			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
+			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
+		</Attributes>
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
+	</StructDef>
+	
 	<StructDef Name="Number" ToolTip="A number." TextColour="Primitive">
 		<Attributes>
 			<String Name="Name" Default="Number" ToolTip="The name to be written for this element. Place a path to an element inside a '{}' to use that elements value." />
@@ -419,7 +430,7 @@
 			<File Name="Icon" ToolTip="An image to use as an icon for this file type" />
 			<Enum Name="DataType" EnumValues="xml,json,yaml" ToolTip="The data type of the data." />
 		</Attributes>
-		<Reference Name="Definition" Keys="Items(Struct,Collection,GraphStruct,GraphCollection),Definitions(StructDef,EnumDef,CollectionDef,GraphStructDef,GraphCollectionDef,ReferenceDef)" ToolTip="A single definition." />
+		<Reference Name="Definition" Keys="Items(Struct,Collection,GraphStruct,GraphCollection,SkeletalAnimation),Definitions(StructDef,EnumDef,CollectionDef,GraphStructDef,GraphCollectionDef,ReferenceDef)" ToolTip="A single definition." />
 	</Collection>
 	
 </Definitions>

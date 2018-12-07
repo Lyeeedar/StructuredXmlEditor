@@ -34,7 +34,7 @@ namespace StructuredXmlEditor.View
 				return;
 			}
 
-			var centerPoint = new Point(ActualWidth / 2, ActualHeight / 2);
+			var centerPoint = new Point(7, 7);
 			Position = TransformToAncestor(Graph).Transform(centerPoint);
 		}
 
