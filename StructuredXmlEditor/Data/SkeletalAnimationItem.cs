@@ -99,16 +99,35 @@ namespace StructuredXmlEditor.Data
 					m_localTransformDirty = false;
 
 					var mat = new Matrix();
-					mat.Rotate(Rotation);
+					var matWithRot = new Matrix();
+
+					if (Parent != null)
+					{
+						var parentPoint = Parent.WorldTransform.Transform(new Point());
+						var point = Parent.WorldTransform.Transform(Translation);
+
+						var parentToThis = parentPoint - point;
+						var angle = VectorToAngle(parentToThis.X, parentToThis.Y);
+
+						mat.Rotate(angle);
+						matWithRot.Rotate(angle);
+					}
+
+					matWithRot.Rotate(Rotation);
+
 					mat.Translate(Translation.X, Translation.Y);
+					matWithRot.Translate(Translation.X, Translation.Y);
 
 					m_localTransform = mat;
+
+					m_localTransformWithRotation = matWithRot;
 				}
 
 				return m_localTransform;
 			}
 		}
 		private Matrix m_localTransform;
+		private Matrix m_localTransformWithRotation;
 
 		//-----------------------------------------------------------------------
 		public Matrix WorldTransform
@@ -119,13 +138,30 @@ namespace StructuredXmlEditor.Data
 				{
 					m_worldTransformDirty = false;
 
-					m_worldTransform = Parent != null ? LocalTransform * Parent.WorldTransform : LocalTransform;
+					m_worldTransform = Parent != null ? LocalTransform * Parent.WorldTransformWithRotation : LocalTransform;
 				}
 
 				return m_worldTransform;
 			}
 		}
 		private Matrix m_worldTransform;
+
+		//-----------------------------------------------------------------------
+		public Matrix WorldTransformWithRotation
+		{
+			get
+			{
+				if (m_worldTransformWithRotationDirty)
+				{
+					m_worldTransformWithRotationDirty = false;
+
+					m_worldTransformWithRotation = Parent != null ? m_localTransformWithRotation * Parent.WorldTransformWithRotation : m_localTransformWithRotation;
+				}
+
+				return m_worldTransformWithRotation;
+			}
+		}
+		private Matrix m_worldTransformWithRotation;
 
 		//-----------------------------------------------------------------------
 		public double WorldRotation
@@ -136,7 +172,20 @@ namespace StructuredXmlEditor.Data
 				{
 					m_worldRotationDirty = false;
 
-					m_worldRotation = Parent != null ? Parent.WorldRotation + Rotation : Rotation;
+					if (Parent == null)
+					{
+						m_worldRotation = Rotation;
+					}
+					else
+					{
+						var parentPoint = Parent.WorldTransform.Transform(new Point());
+						var point = Parent.WorldTransformWithRotation.Transform(Translation);
+
+						var parentToThis = parentPoint - point;
+						var angle = VectorToAngle(parentToThis.X, parentToThis.Y);
+
+						m_worldRotation = Parent.WorldRotation + angle + Rotation;
+					}
 				}
 
 				return m_worldRotation;
@@ -146,6 +195,7 @@ namespace StructuredXmlEditor.Data
 
 		//-----------------------------------------------------------------------
 		private bool m_worldTransformDirty = true;
+		private bool m_worldTransformWithRotationDirty = true;
 		private bool m_worldRotationDirty = true;
 		private bool m_localTransformDirty = true;
 
@@ -156,7 +206,7 @@ namespace StructuredXmlEditor.Data
 			set
 			{
 				m_translation = value;
-				foreach (var bone in Descendants) { bone.m_worldTransformDirty = true; bone.m_worldRotationDirty = true; }
+				foreach (var bone in Descendants) { bone.m_worldTransformDirty = true; bone.m_worldTransformWithRotationDirty = true; bone.m_worldRotationDirty = true; }
 				m_localTransformDirty = true;
 			}
 		}
@@ -169,23 +219,12 @@ namespace StructuredXmlEditor.Data
 		{
 			get
 			{
-				if (Parent == null)
-				{
-					return m_rotation;
-				}
-
-				var parentPoint = Parent.WorldTransform.Transform(new Point());
-				var point = Parent.WorldTransform.Transform(Translation);
-
-				var parentToThis = parentPoint - point;
-				var angle = VectorToAngle(parentToThis.X, parentToThis.Y);
-
-				return angle;
+				return m_rotation;
 			}
 			set
 			{
 				m_rotation = value;
-				foreach (var bone in Descendants) { bone.m_worldTransformDirty = true; bone.m_worldRotationDirty = true; }
+				foreach (var bone in Descendants) { bone.m_worldTransformDirty = true; bone.m_worldTransformWithRotationDirty = true; bone.m_worldRotationDirty = true; }
 				m_localTransformDirty = true;
 			}
 		}

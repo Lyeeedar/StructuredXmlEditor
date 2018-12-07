@@ -113,7 +113,7 @@ namespace StructuredXmlEditor.View
 					var worldMat = new Matrix();
 					worldMat.Translate(newpos.X, newpos.Y);
 
-					var parentMat = DraggingBone.Parent.WorldTransform;
+					var parentMat = DraggingBone.Parent.WorldTransformWithRotation;
 					parentMat.Invert();
 
 					var diff = worldMat * parentMat;
@@ -144,29 +144,7 @@ namespace StructuredXmlEditor.View
 
 						var diffangle = currentAngle - m_startAngle;
 
-						if (selected.Parent == null)
-						{
-							selected.Rotation = m_startBoneRotation + diffangle;
-						}
-						else
-						{
-							// rotate all children around this by the move amount
-							foreach (var child in selected.Children)
-							{
-								var childPos = child.Parent.WorldTransform.Transform(child.DragStartPos);
-								var childPoint = new Point(ActualWidth / 2f + Offset.X + childPos.X, ActualHeight / 2f + Offset.Y + childPos.Y);
-								var childdiff = childPoint - point;
-								var len = childdiff.Length;
-								var childangle = VectorToAngle(childdiff.X, childdiff.Y);
-
-								var mat = new Matrix();
-								mat.Rotate(childangle + diffangle);
-
-								var newPos = mat.Transform(new Point(0, len));
-
-								child.Translation = newPos;
-							}
-						}
+						selected.Rotation = m_startBoneRotation + diffangle;
 					}
 					else
 					{
@@ -318,19 +296,33 @@ namespace StructuredXmlEditor.View
 
 			if (Item == null) { return; }
 
-			drawingContext.DrawRectangle(Brushes.Transparent, null, new Rect(0, 0, ActualWidth, ActualHeight));
+			var bounds = new Rect(0, 0, ActualWidth, ActualHeight);
+			drawingContext.PushClip(new RectangleGeometry(bounds));
+			drawingContext.DrawRectangle(Brushes.Transparent, null, bounds);
+
+			foreach (var bone in Item.AllBones)
+			{
+				RenderBoneImage(drawingContext, bone);
+			}
+
+			foreach (var bone in Item.AllBones)
+			{
+				RenderBoneConnections(drawingContext, bone);
+			}
 
 			foreach (var bone in Item.AllBones)
 			{
 				RenderBone(drawingContext, bone);
 			}
+
+			drawingContext.Pop();
 		}
 
 		//-----------------------------------------------------------------------
 		private Typeface Font = new Typeface("Verdana");
 
 		//-----------------------------------------------------------------------
-		private void RenderBone(DrawingContext drawingContext, Bone bone)
+		private void RenderBoneImage(DrawingContext drawingContext, Bone bone)
 		{
 			var trans = bone.WorldTransform;
 			var point = trans.Transform(new Point());
@@ -342,7 +334,55 @@ namespace StructuredXmlEditor.View
 				{
 					drawingContext.DrawImage(bone.Image, new Rect(ActualWidth / 2f + Offset.X + point.X - bone.Image.Width / 2f, ActualHeight / 2f + Offset.Y + point.Y - bone.Image.Height / 2f, bone.Image.Width, bone.Image.Height));
 				}
+			}
+			else
+			{
+				var parentTrans = bone.Parent.WorldTransform;
+				var parentPoint = parentTrans.Transform(new Point());
 
+				// draw image
+				if (bone.Image != null)
+				{
+					var pos = new Point(ActualWidth / 2f + Offset.X, ActualHeight / 2f + Offset.Y);
+					var mat = bone.WorldTransformWithRotation;
+					mat.Translate(pos.X, pos.Y);
+
+					drawingContext.PushTransform(new MatrixTransform(mat));
+					drawingContext.DrawImage(bone.Image, new Rect(-bone.Image.Width / 2f, -bone.Image.Height / 2f, bone.Image.Width, bone.Image.Height));
+					drawingContext.Pop();
+				}
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		private void RenderBoneConnections(DrawingContext drawingContext, Bone bone)
+		{
+			var trans = bone.WorldTransform;
+			var point = trans.Transform(new Point());
+
+			if (bone.Parent == null)
+			{
+
+			}
+			else
+			{
+				var parentTrans = bone.Parent.WorldTransform;
+				var parentPoint = parentTrans.Transform(new Point());
+
+				drawingContext.DrawLine(ConnectionPen,
+					new Point(ActualWidth / 2f + Offset.X + parentPoint.X, ActualHeight / 2f + Offset.Y + parentPoint.Y),
+					new Point(ActualWidth / 2f + Offset.X + point.X, ActualHeight / 2f + Offset.Y + point.Y));
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		private void RenderBone(DrawingContext drawingContext, Bone bone)
+		{
+			var trans = bone.WorldTransform;
+			var point = trans.Transform(new Point());
+
+			if (bone.Parent == null)
+			{
 				if (bone.IsMouseOver)
 				{
 					drawingContext.DrawRoundedRectangle(HighlightBrush, null,
@@ -356,26 +396,6 @@ namespace StructuredXmlEditor.View
 			{
 				var parentTrans = bone.Parent.WorldTransform;
 				var parentPoint = parentTrans.Transform(new Point());
-
-				// draw image
-				if (bone.Image != null)
-				{
-					var parentToThis = parentPoint - point;
-					var angle = VectorToAngle(parentToThis.X, parentToThis.Y);
-
-					var pos = new Point(ActualWidth / 2f + Offset.X + point.X, ActualHeight / 2f + Offset.Y + point.Y);
-					var mat = new Matrix();
-					mat.Rotate(angle);
-					mat.Translate(pos.X, pos.Y);
-
-					drawingContext.PushTransform(new MatrixTransform(mat));
-					drawingContext.DrawImage(bone.Image, new Rect(-bone.Image.Width / 2f, -bone.Image.Height / 2f, bone.Image.Width, bone.Image.Height));
-					drawingContext.Pop();
-				}
-
-				drawingContext.DrawLine(ConnectionPen, 
-					new Point(ActualWidth / 2f + Offset.X + parentPoint.X, ActualHeight / 2f + Offset.Y + parentPoint.Y),
-					new Point(ActualWidth / 2f + Offset.X + point.X, ActualHeight / 2f + Offset.Y + point.Y));
 
 				if (bone.IsMouseOver)
 				{
