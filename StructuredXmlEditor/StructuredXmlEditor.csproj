@@ -184,6 +184,7 @@
     <Compile Include="View\CustomControls\ProjectViewView.xaml.cs">
       <DependentUpon>ProjectViewView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\CustomControls\SkeletalAnimation\AnimationTimeline.cs" />
     <Compile Include="View\CustomControls\SkeletalAnimation\SkeletalAnimationEditor.xaml.cs">
       <DependentUpon>SkeletalAnimationEditor.xaml</DependentUpon>
     </Compile>

@@ -197,18 +197,7 @@
 			</Grid.RowDefinitions>
 
 			<Border
-				BorderBrush="{StaticResource BorderDarkBrush}"
-				BorderThickness="1" />
-
-			<GridSplitter
-				Grid.Row="1"
-				Height="5"
-				Background="Transparent"
-				HorizontalAlignment="Stretch"
-				VerticalAlignment="Center" />
-
-			<Border
-				Grid.Row="2"
+				Grid.Row="0"
 				BorderBrush="{StaticResource BorderDarkBrush}"
 				BorderThickness="1">
 				<ContentPresenter
@@ -217,8 +206,9 @@
 
 						<DataTemplate
 							DataType="{x:Type data:Bone}">
-							<StackPanel Orientation="Vertical">
-								
+							<StackPanel
+								Orientation="Vertical">
+
 								<DockPanel>
 									<Label
 										DockPanel.Dock="Left"
@@ -228,7 +218,7 @@
 								</DockPanel>
 
 								<Grid>
-									
+
 									<Grid.ColumnDefinitions>
 										<ColumnDefinition
 											Width="Auto" />
@@ -239,10 +229,10 @@
 										<ColumnDefinition
 											Width="Auto" />
 									</Grid.ColumnDefinitions>
-									
+
 									<Label
 										Content="Image: " />
-									
+
 									<Button
 										Grid.Column="1"
 										Background="Transparent"
@@ -255,11 +245,11 @@
 											Width="16"
 											Height="16" />
 									</Button>
-									
+
 									<TextBox
 										Grid.Column="2"
 										Text="{Binding ImagePath, UpdateSourceTrigger=PropertyChanged, Delay=100}" />
-									
+
 									<Image
 										Grid.Column="3"
 										ToolTipService.ShowDuration="100000"
@@ -276,15 +266,163 @@
 												Source="{Binding Image, Converter={v:NullImageConverter}}" />
 										</Image.ToolTip>
 									</Image>
-									
+
 								</Grid>
 
+								<DockPanel>
+									<CheckBox
+										Content="Lock Length: "
+										IsChecked="{Binding LockLength}" />
+								</DockPanel>
+
+								<DockPanel>
+									<Label
+										DockPanel.Dock="Left"
+										Content="ZIndex: " />
+									<v:NumericTextBox
+										MinValue="0"
+										UseIntegers="True"
+										Value="{Binding ZIndex, UpdateSourceTrigger=PropertyChanged, Delay=100}" />
+								</DockPanel>
+
 							</StackPanel>
-							
+
 						</DataTemplate>
-						
+
+						<DataTemplate
+							DataType="{x:Type data:AnimatedBone}">
+							<StackPanel
+								Orientation="Vertical">
+
+								<Grid>
+
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition
+											Width="Auto" />
+										<ColumnDefinition
+											Width="Auto" />
+										<ColumnDefinition
+											Width="*" />
+										<ColumnDefinition
+											Width="Auto" />
+									</Grid.ColumnDefinitions>
+
+									<Label
+										Content="Image: " />
+
+									<Button
+										Grid.Column="1"
+										Background="Transparent"
+										BorderBrush="Transparent"
+										Margin="2"
+										ToolTip="Browse"
+										Command="{Binding BrowseCMD}">
+										<Image
+											Source="/Resources/Open.png"
+											Width="16"
+											Height="16" />
+									</Button>
+
+									<TextBox
+										Grid.Column="2"
+										Text="{Binding ImagePath, UpdateSourceTrigger=PropertyChanged, Delay=100}" />
+
+									<Image
+										Grid.Column="3"
+										ToolTipService.ShowDuration="100000"
+										RenderOptions.BitmapScalingMode="Fant"
+										Width="24"
+										Height="24"
+										Margin="2"
+										Source="{Binding Image, Converter={v:NullImageConverter}}"
+										Visibility="{Binding Image, Converter={v:NullOrZeroConverter}, ConverterParameter=Not}">
+										<Image.ToolTip>
+											<Image
+												Width="256"
+												Height="256"
+												Source="{Binding Image, Converter={v:NullImageConverter}}" />
+										</Image.ToolTip>
+									</Image>
+
+								</Grid>
+
+								<CheckBox
+									Content="Override Rotation: "
+									IsChecked="{Binding OverrideRotation}" />
+
+								<CheckBox
+									Content="Override Translation: "
+									IsChecked="{Binding OverrideTranslation}" />
+
+							</StackPanel>
+
+						</DataTemplate>
+
 					</ContentPresenter.Resources>
 				</ContentPresenter>
+			</Border>
+
+			<GridSplitter
+				Grid.Row="1"
+				Height="5"
+				Background="Transparent"
+				HorizontalAlignment="Stretch"
+				VerticalAlignment="Center" />
+
+			<Border
+				Grid.Row="2"
+				BorderBrush="{StaticResource BorderDarkBrush}"
+				BorderThickness="1">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition
+							Height="*" />
+						<RowDefinition
+							Height="Auto" />
+					</Grid.RowDefinitions>
+
+					<ListView
+						SelectionMode="Single"
+						ItemsSource="{Binding Animations}">
+						<ListView.Resources>
+							<Style
+								TargetType="{x:Type ListViewItem}"
+								BasedOn="{StaticResource {x:Type ListViewItem}}">
+								<Setter
+									Property="IsSelected"
+									Value="{Binding IsSelected, Mode=TwoWay}" />
+								<Setter
+									Property="HorizontalAlignment"
+									Value="Stretch" />
+							</Style>
+						</ListView.Resources>
+						<ListView.ItemTemplate>
+							<DataTemplate>
+								<Grid>
+
+									<TextBlock
+										Text="{Binding Name}" />
+
+								</Grid>
+							</DataTemplate>
+						</ListView.ItemTemplate>
+					</ListView>
+
+					<Button
+						Grid.Row="1"
+						HorizontalAlignment="Right"
+						Background="Transparent"
+						BorderBrush="Transparent"
+						Command="{Binding AddAnimationCMD}"
+						Margin="5">
+						<Image
+							Source="/Resources/Add.png"
+							RenderOptions.BitmapScalingMode="NearestNeighbor"
+							Height="16"
+							Width="16" />
+					</Button>
+
+				</Grid>
 			</Border>
 
 			<GridSplitter

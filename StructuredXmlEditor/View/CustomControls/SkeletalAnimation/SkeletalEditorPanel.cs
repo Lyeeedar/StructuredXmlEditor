@@ -17,6 +17,31 @@ namespace StructuredXmlEditor.View
 	public class SkeletalEditorPanel : Control, INotifyPropertyChanged
 	{
 		//-----------------------------------------------------------------------
+		public SkeletalEditorPanel()
+		{
+			DataContextChanged += (e, args) => 
+			{
+				var oldItem = (args.OldValue as XmlDataModel)?.RootItems[0] as SkeletalAnimationItem;
+				if (oldItem != null)
+				{
+					oldItem.PropertyChanged -= ItemPropertyChanged;
+				}
+
+				var newItem = (args.NewValue as XmlDataModel)?.RootItems[0] as SkeletalAnimationItem;
+				if (newItem != null)
+				{
+					newItem.PropertyChanged += ItemPropertyChanged;
+				}
+			};
+		}
+
+		//-----------------------------------------------------------------------
+		private void ItemPropertyChanged(object sender, PropertyChangedEventArgs args)
+		{
+			InvalidateVisual();
+		}
+
+		//-----------------------------------------------------------------------
 		private Pen RootBorderPen = new Pen(Brushes.DarkKhaki, 2.0);
 		private Brush RootBackgroundBrush = Brushes.Khaki;
 
@@ -47,6 +72,48 @@ namespace StructuredXmlEditor.View
 			}
 		}
 		private bool m_ShowBoneNames;
+
+		//-----------------------------------------------------------------------
+		public bool ShowBoneImages
+		{
+			get { return m_ShowBoneImages; }
+			set
+			{
+				m_ShowBoneImages = value;
+				RaisePropertyChangedEvent();
+
+				InvalidateVisual();
+			}
+		}
+		private bool m_ShowBoneImages = true;
+
+		//-----------------------------------------------------------------------
+		public bool ShowBoneConnections
+		{
+			get { return m_ShowBoneConnections; }
+			set
+			{
+				m_ShowBoneConnections = value;
+				RaisePropertyChangedEvent();
+
+				InvalidateVisual();
+			}
+		}
+		private bool m_ShowBoneConnections = true;
+
+		//-----------------------------------------------------------------------
+		public bool ShowBoneNodes
+		{
+			get { return m_ShowBoneNodes; }
+			set
+			{
+				m_ShowBoneNodes = value;
+				RaisePropertyChangedEvent();
+
+				InvalidateVisual();
+			}
+		}
+		private bool m_ShowBoneNodes = true;
 
 		//-----------------------------------------------------------------------
 		public bool RotationMode
@@ -81,10 +148,42 @@ namespace StructuredXmlEditor.View
 		public SkeletalAnimationItem Item { get { return (DataContext as XmlDataModel).RootItems[0] as SkeletalAnimationItem; } }
 
 		//-----------------------------------------------------------------------
+		public ISkeletonProvider Skeleton { get { return (ISkeletonProvider)Item.SelectedAnimation?.SelectedKeyframe ?? (ISkeletonProvider)Item.SelectedAnimation ?? (ISkeletonProvider)Item; } }
+
+		//-----------------------------------------------------------------------
 		public Point Offset { get; set; } = new Point();
 
 		//-----------------------------------------------------------------------
 		private bool m_mouseOverWidget;
+
+		//-----------------------------------------------------------------------
+		protected override void OnKeyDown(KeyEventArgs args)
+		{
+			if (args.Key == Key.Delete)
+			{
+				var selected = Skeleton.Skeleton.Descendants.FirstOrDefault(e => e.IsSelected);
+				if (selected != null)
+				{
+					if (selected.Parent != null)
+					{
+						Item.UndoRedo.ApplyDoUndo(
+							() =>
+							{
+								selected.Parent.Children.Remove(selected);
+								InvalidateVisual();
+							}, 
+							() => 
+							{
+								selected.Parent.Children.Add(selected);
+								InvalidateVisual();
+							}, 
+							"Delete Bone");
+					}
+				}
+			}
+
+			base.OnKeyDown(args);
+		}
 
 		//-----------------------------------------------------------------------
 		protected override void OnMouseMove(MouseEventArgs args)
@@ -109,6 +208,16 @@ namespace StructuredXmlEditor.View
 				}
 				else
 				{
+					if (DraggingBone.LockLength && DraggingBone.Parent != null)
+					{
+						var parentPos = DraggingBone.Parent.WorldTransformWithRotation.Transform(new Point());
+
+						var bonediff = new Point(newpos.X, newpos.Y) - parentPos;
+						bonediff.Normalize();
+
+						newpos = new Vector(parentPos.X + bonediff.X * DraggingBone.m_lockedLength, parentPos.Y + bonediff.Y * DraggingBone.m_lockedLength);
+					}
+
 					// find rel transform from parent
 					var worldMat = new Matrix();
 					worldMat.Translate(newpos.X, newpos.Y);
@@ -126,7 +235,7 @@ namespace StructuredXmlEditor.View
 			}
 			else if (RotationMode)
 			{
-				var selected = Item.AllBones.FirstOrDefault(e => e.IsSelected);
+				var selected = Skeleton.Skeleton.Descendants.FirstOrDefault(e => e.IsSelected);
 				if (selected != null)
 				{
 					if (m_inDrag)
@@ -162,7 +271,7 @@ namespace StructuredXmlEditor.View
 				}
 			}
 
-			foreach (var bone in Item.AllBones)
+			foreach (var bone in Skeleton.Skeleton.Descendants)
 			{
 				var trans = bone.WorldTransform;
 				var point = trans.Transform(new Point());
@@ -199,11 +308,13 @@ namespace StructuredXmlEditor.View
 		{
 			base.OnMouseDown(args);
 
+			Keyboard.Focus(this);
+
 			m_mouseDownPos = args.GetPosition(this);
 
 			if (RotationMode && m_mouseOverWidget)
 			{
-				var selected = Item.AllBones.FirstOrDefault(e => e.IsSelected);
+				var selected = Skeleton.Skeleton.Descendants.FirstOrDefault(e => e.IsSelected);
 				if (selected != null)
 				{
 					var trans = selected.WorldTransform;
@@ -226,15 +337,28 @@ namespace StructuredXmlEditor.View
 			}
 			else
 			{
-				DraggingBone = Item.AllBones.FirstOrDefault(e => e.IsMouseOver);
+				DraggingBone = Skeleton.Skeleton.Descendants.FirstOrDefault(e => e.IsMouseOver);
 
 				m_inDrag = false;
 
 				if (args.RightButton == MouseButtonState.Pressed && DraggingBone != null)
 				{
-					var childBone = new Bone();
-					childBone.Parent = DraggingBone;
-					DraggingBone.Children.Add(childBone);
+					var childBone = new Bone(Item);
+					var parent = DraggingBone;
+					childBone.Parent = parent;
+
+					Item.UndoRedo.ApplyDoUndo(
+						() =>
+						{
+							parent.Children.Add(childBone);
+							InvalidateVisual();
+						},
+						() =>
+						{
+							parent.Children.Remove(childBone);
+							InvalidateVisual();
+						},
+						"Add Bone");
 
 					DraggingBone = childBone;
 
@@ -243,7 +367,7 @@ namespace StructuredXmlEditor.View
 
 				if (DraggingBone == null)
 				{
-					foreach (var bone in Item.AllBones)
+					foreach (var bone in Skeleton.Skeleton.Descendants)
 					{
 						bone.IsSelected = false;
 					}
@@ -265,7 +389,7 @@ namespace StructuredXmlEditor.View
 
 			if (DraggingBone != null && !m_inDrag)
 			{
-				foreach (var bone in Item.AllBones)
+				foreach (var bone in Skeleton.Skeleton.Descendants)
 				{
 					bone.IsSelected = false;
 				}
@@ -300,19 +424,28 @@ namespace StructuredXmlEditor.View
 			drawingContext.PushClip(new RectangleGeometry(bounds));
 			drawingContext.DrawRectangle(Brushes.Transparent, null, bounds);
 
-			foreach (var bone in Item.AllBones)
+			if (m_ShowBoneImages)
 			{
-				RenderBoneImage(drawingContext, bone);
+				foreach (var bone in Skeleton.Skeleton.Descendants.OrderBy(e => e.ZIndex))
+				{
+					RenderBoneImage(drawingContext, bone);
+				}
 			}
 
-			foreach (var bone in Item.AllBones)
+			if (ShowBoneConnections)
 			{
-				RenderBoneConnections(drawingContext, bone);
+				foreach (var bone in Skeleton.Skeleton.Descendants)
+				{
+					RenderBoneConnections(drawingContext, bone);
+				}
 			}
 
-			foreach (var bone in Item.AllBones)
+			if (ShowBoneNodes)
 			{
-				RenderBone(drawingContext, bone);
+				foreach (var bone in Skeleton.Skeleton.Descendants)
+				{
+					RenderBone(drawingContext, bone);
+				}
 			}
 
 			drawingContext.Pop();

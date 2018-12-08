@@ -92,13 +92,9 @@ namespace StructuredXmlEditor.View
 					dirty = false;
 				}
 			};
-			redrawTimer.Start();
-		}
 
-		//-----------------------------------------------------------------------
-		~Timeline()
-		{
-			redrawTimer.Stop();
+			Loaded += (e, args) => { redrawTimer.Start(); };
+			Unloaded += (e, args) => { redrawTimer.Stop(); };
 		}
 
 		//-----------------------------------------------------------------------
