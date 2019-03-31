@@ -36,7 +36,7 @@ namespace StructuredXmlEditor
 		{
 			Action safeAction = () =>
 			{
-				Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+				Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
 				{
 					func();
 				}));

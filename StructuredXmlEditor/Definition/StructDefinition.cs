@@ -100,7 +100,7 @@ namespace StructuredXmlEditor.Definition
 				{
 					var name = def.Name;
 
-					var els = element.Elements(name);
+					var els = !(def is CommentDefinition) ? element.Elements(name) : new List<XElement>();
 
 					if (els.Count() > 0)
 					{
@@ -179,16 +179,28 @@ namespace StructuredXmlEditor.Definition
 			Extends = definition.Attribute("Extends")?.Value?.ToString()?.ToLower();
 			ExtendsAfter = definition.Attribute("ExtendsAfter")?.Value?.ToString()?.ToLower();
 
-			foreach (var child in definition.Elements())
+			foreach (var node in definition.Nodes())
 			{
-				if (child.Name == "Attributes")
+				if (node is XComment)
 				{
-					
+					var child = node as XComment;
+					var commentDef = new CommentDefinition();
+					commentDef.CanEdit = false;
+					commentDef.Text = child.Value;
+					Children.Add(commentDef);
 				}
-				else
+				else if (node is XElement)
 				{
-					var childDef = LoadDefinition(child);
-					Children.Add(childDef);
+					var child = node as XElement;
+					if (child.Name == "Attributes")
+					{
+
+					}
+					else
+					{
+						var childDef = LoadDefinition(child);
+						Children.Add(childDef);
+					}
 				}
 			}
 
@@ -280,6 +292,11 @@ namespace StructuredXmlEditor.Definition
 				{
 					var childDef = child.Definition;
 					if (!Children.Contains(childDef) && !(childDef is CommentDefinition)) throw new Exception("A child has a definition that we dont have! Something broke!");
+
+					if (childDef is CommentDefinition && !((CommentDefinition)childDef).CanEdit)
+					{
+						continue; // dont save out the default comments
+					}
 
 					child.Definition.SaveData(el, child);
 				}
