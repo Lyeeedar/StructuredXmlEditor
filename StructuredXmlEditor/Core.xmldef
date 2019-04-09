@@ -1,9 +1,9 @@
 ﻿<Definitions Extension="xmldef">
 
-	<ReferenceDef Name="Elements" Keys="Primitive(Boolean,Colour,Enum,File,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree),Comment(Comment)" />
+	<ReferenceDef Name="Elements" Keys="Primitive(Boolean,Colour,Enum,File,Flags,Number,String,Vector),Complex(Collection,GraphReference,MultilineString,Reference,Struct,Timeline,Tree),Comment(Comment)" />
 	
 	<CollectionDef Name="Attributes" ToolTip="A the attributes of this element." TextColour="Struct" SkipIfDefault="true">
-		<Reference Name="Attribute" Keys="Boolean,Colour,Enum,File,Number,String" ToolTip="The attribute" />
+		<Reference Name="Attribute" Keys="Boolean,Colour,Enum,File,Flags,Number,String" ToolTip="The attribute" />
 	</CollectionDef>
 
 	<StructDef Name="SkeletalAnimation" ToolTip="A skeletal animation." TextColour="Struct">
@@ -135,6 +135,21 @@
 			<String Name="EnumValues" ToolTip="A comma seperated list of enum values that can be picked." VisibleIf="Key==null" />
 			<String Name="Key" ToolTip="The key of the EnumDef to load the EnumValues from." VisibleIf="EnumValues==null" />
 			<String Name="Default" ToolTip="The default value for this element. If not set it defaults to the first EnumValue." />
+			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
+			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
+			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
+			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
+			<Boolean Name="HasAttributes" ToolTip="Enable to allow adding attributes" VisibleIf="Root.DataType==xml" />
+		</Attributes>
+		<Reference Name="Attributes" Keys="Attributes" ToolTip="The attributes of this element" Nullable="true" VisibleIf="HasAttributes==true" />
+	</StructDef>
+
+	<StructDef Name="Flags" ToolTip="A collection of values chosen from a series of valid values." TextColour="Primitive">
+		<Attributes>
+			<String Name="Name" Default="Flags" ToolTip="The name to be written for this element. Place a path to an element inside a '{}' to use that elements value." />
+			<String Name="FlagValues" ToolTip="A comma seperated list of flag values that can be picked." VisibleIf="Key==null" />
+			<String Name="Key" ToolTip="The key of the EnumDef to load the FlagValues from." VisibleIf="FlagValues==null" />
+			<String Name="Default" ToolTip="The default value for this element. If not set it defaults to empty." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />

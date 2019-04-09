@@ -50,6 +50,13 @@ namespace StructuredXmlEditor.Tools
 		public bool IsSelected { get; set; }
 		private bool storedExpanded;
 		private bool isFiltering = false;
+		public bool IsDefinitionsFolder
+		{
+			get
+			{
+				return FullPath.Contains("Definitions");
+			}
+		}
 
 		public bool IsExpanded
 		{
@@ -92,6 +99,7 @@ namespace StructuredXmlEditor.Tools
 		public Command<object> ExploreToCMD { get { return new Command<object>((e) => OpenInExplorer()); } }
 		public Command<object> MultiEditCMD { get { return new Command<object>((e) => MultiEdit()); } }
 		public Command<DataDefinition> NewFileCMD { get { return new Command<DataDefinition>((e) => NewFile(e)); } }
+		public Command<object> NewDefinitionCMD { get { return new Command<object>((e) => NewDefinition()); } }
 
 		//-----------------------------------------------------------------------
 		public ProjectItem(Workspace workspace, ProjectItem parent, ProjectViewTool tool, string name, bool skipLoadAndAdd = false)
@@ -156,6 +164,12 @@ namespace StructuredXmlEditor.Tools
 			{
 				Workspace.New(dataType, System.IO.Path.GetDirectoryName(FullPath));
 			}
+		}
+
+		//-----------------------------------------------------------------------
+		private void NewDefinition()
+		{
+			Workspace.NewDef();
 		}
 
 		//-----------------------------------------------------------------------

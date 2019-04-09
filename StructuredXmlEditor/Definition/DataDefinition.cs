@@ -89,6 +89,7 @@ namespace StructuredXmlEditor.Definition
 			else if (name == "BOOLEAN") definition = new BooleanDefinition();
 			else if (name == "COLOUR") definition = new ColourDefinition();
 			else if (name == "ENUM") definition = new EnumDefinition();
+			else if (name == "FLAGS") definition = new FlagsDefinition();
 			else if (name == "FILE") definition = new FileDefinition();
 			else if (name == "TREE") definition = new TreeDefinition();
 			else if (name == "VECTOR") definition = new VectorDefinition();

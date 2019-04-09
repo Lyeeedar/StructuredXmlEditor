@@ -94,6 +94,18 @@
 							<ContextMenu>
 
 								<MenuItem
+									Header="New _Definition"
+									Command="{Binding NewDefinitionCMD}"
+									Visibility="{Binding IsDefinitionsFolder, Converter={v:ValueTypeConverter}}">
+									<MenuItem.Icon>
+										<Image
+											Source="/Resources/New.png"
+											Width="16"
+											Height="16" />
+									</MenuItem.Icon>
+								</MenuItem>
+
+								<MenuItem
 									Header="_New File"
 									ItemsSource="{Binding Workspace.AllResourceTypes}">
 									<MenuItem.Icon>
@@ -135,13 +147,13 @@
 								<Separator />
 
 								<MenuItem
-									Header="Multiedit"
+									Header="_Multiedit"
 									Command="{Binding MultiEditCMD}" />
 
 								<Separator />
 
 								<MenuItem
-									Header="Explore To"
+									Header="_Explore To"
 									Command="{Binding ExploreToCMD}" />
 
 								<Separator />

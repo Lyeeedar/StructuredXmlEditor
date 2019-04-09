@@ -467,6 +467,66 @@
 	</DataTemplate>
 
 	<DataTemplate
+		DataType="{x:Type d:FlagsItem}">
+		<Grid
+			Height="24">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition
+					Width="Auto" />
+				<ColumnDefinition
+					Width="24" />
+				<ColumnDefinition
+					Width="*" />
+			</Grid.ColumnDefinitions>
+
+			<ContentControl
+				Template="{StaticResource AttributesTemplate}" />
+
+			<v:ContentPopup
+				Style="{StaticResource EmptyContentPopupStyle}"
+				Grid.Column="1"
+				HorizontalContentAlignment="Stretch">
+				<Image
+					Source="/Resources/Edit.png"
+					RenderOptions.BitmapScalingMode="NearestNeighbor"
+					Height="12"
+					Width="12" />
+
+				<v:ContentPopup.PopupContent>
+					<Border
+						BorderThickness="1"
+						BorderBrush="{StaticResource SelectionBorderBrush}"
+						Background="{StaticResource BackgroundDarkBrush}">
+						<ItemsControl
+							ItemsSource="{Binding Flags}">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<UniformGrid/>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<CheckBox
+										Margin="5"
+										Content="{Binding Flag}"
+										IsChecked="{Binding IsChecked}" />
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</Border>
+				</v:ContentPopup.PopupContent>
+			</v:ContentPopup>
+
+			<TextBlock
+				Margin="5,0,0,0"
+				Grid.Column="2"
+				VerticalAlignment="Center"
+				Text="{Binding Value}" />
+		</Grid>
+	</DataTemplate>
+
+	<DataTemplate
 		DataType="{x:Type d:KeyframeItem}">
 		<ContentControl
 			Height="24"
