@@ -159,6 +159,7 @@ namespace StructuredXmlEditor.Data
 			if (IsAtMin) return;
 
 			var index = Children.IndexOf(item);
+			item.IsSelected = false;
 
 			UndoRedo.ApplyDoUndo(
 				delegate

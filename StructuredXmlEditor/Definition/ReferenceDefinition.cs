@@ -68,6 +68,11 @@ namespace StructuredXmlEditor.Definition
 			var key = element.Attribute(MetaNS + "RefKey")?.Value?.ToString();
 			if (key == null) key = element.Attribute("RefKey")?.Value?.ToString();
 
+			if (key == null && Definitions.Count == 1 && !IsNullable)
+			{
+				key = Definitions.First().Key;
+			}
+
 			ReferenceItem item = null;
 
 			if (key != null && Definitions.ContainsKey(key))
