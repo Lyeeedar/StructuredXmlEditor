@@ -99,6 +99,11 @@ namespace StructuredXmlEditor.Data
 				var parent = Parent is CollectionChildItem || Parent is ReferenceItem ? FirstComplexParent(Parent) : Parent;
 
 				var thisIndex = parent.Children.Select(e => GetNonWrappedItem(e)).ToList().IndexOf(this);
+				if (thisIndex == -1)
+				{
+					yield break;
+				}
+
 				var minIndex = thisIndex;
 				var maxIndex = thisIndex;
 
