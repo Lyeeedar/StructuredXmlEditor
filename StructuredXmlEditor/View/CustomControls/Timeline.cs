@@ -50,6 +50,41 @@ namespace StructuredXmlEditor.View
 		protected Brush PopupBorderBrush { get { return (Application.Current.TryFindResource("SelectionBorderBrush") as SolidColorBrush); } }
 
 		//-----------------------------------------------------------------------
+		public IEnumerable<KeyframeItem> SelectedItems
+		{
+			get
+			{
+				foreach (var item in TimelineItem.Children)
+				{
+					var keyItem = (KeyframeItem)item;
+					if (keyItem.IsSelected)
+					{
+						yield return keyItem;
+					}
+				}
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		public IEnumerable<KeyframeItem> SelectedItemsInGroup
+		{
+			get
+			{
+				foreach (var timeline in TimelineItem.TimelineGroup)
+				{
+					foreach (var item in timeline.Children)
+					{
+						var keyItem = (KeyframeItem)item;
+						if (keyItem.IsSelected)
+						{
+							yield return keyItem;
+						}
+					}
+				}
+			}
+		}
+
+		//-----------------------------------------------------------------------
 		public Timeline()
 		{
 			DataContextChanged += (src, args) =>
@@ -288,7 +323,9 @@ namespace StructuredXmlEditor.View
 			foreach (KeyframeItem keyframe in TimelineItem.Children)
 			{
 				var background = keyframe.KeyframeDef.Background;
-				var thickness = keyframe == mouseOverItem ? 2 : 1;
+				var thickness = keyframe.IsSelected ? 2 : 1;
+				if (keyframe == mouseOverItem) thickness++;
+
 				var pen = keyframe.IsSelected ? new Pen(SelectedBrush, thickness) : new Pen(UnselectedBrush, thickness);
 				var width = GetKeyframeWidth(keyframe);
 
@@ -354,30 +391,9 @@ namespace StructuredXmlEditor.View
 		}
 
 		//-----------------------------------------------------------------------
-		protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
+		private KeyframeItem GetItemAt(double clickPos)
 		{
-			if (TimelineItem == null) return;
-
-			var pos = e.GetPosition(this);
-			var clickPos = pos.X - TimelineItem.LeftPad;
-
 			double pixelsASecond = ActualWidth / TimelineItem.TimelineRange;
-
-			if (TimelineItem.DataModel.SelectedItems != null)
-			{
-				foreach (var selected in TimelineItem.DataModel.SelectedItems.ToList())
-				{
-					selected.IsSelected = false;
-				}
-			}
-
-			foreach (var timeline in TimelineItem.TimelineGroup)
-			{
-				foreach (var keyframe in timeline.Children)
-				{
-					keyframe.IsSelected = false;
-				}
-			}
 
 			foreach (KeyframeItem keyframe in TimelineItem.Children)
 			{
@@ -386,29 +402,71 @@ namespace StructuredXmlEditor.View
 
 				if (diff >= 0 && diff < GetKeyframeWidth(keyframe))
 				{
-					draggedItem = keyframe;
-					startPos = clickPos;
-					keyframe.IsSelected = true;
-					dragActionOffset = (clickPos / pixelsASecond) - keyframe.Time;
-
-					if (!keyframe.IsDurationLocked)
-					{
-						if (Math.Abs(keyframe.EndTime * pixelsASecond - clickPos) < 10)
-						{
-							isResizing = true;
-							resizingLeft = false;
-						}
-						else if (Math.Abs(time - clickPos) < 10)
-						{
-							isResizing = true;
-							resizingLeft = true;
-						}
-					}
-
-					GenerateSnapList(draggedItem);
-
-					break;
+					return keyframe;
 				}
+			}
+
+			return null;
+		}
+
+		//-----------------------------------------------------------------------
+		protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
+		{
+			if (TimelineItem == null) return;
+
+			var pos = e.GetPosition(this);
+			startClick = pos;
+			var clickPos = pos.X - TimelineItem.LeftPad;
+
+			double pixelsASecond = ActualWidth / TimelineItem.TimelineRange;
+
+			var clickItem = GetItemAt(clickPos);
+
+			if (clickItem == null || (!Keyboard.IsKeyDown(Key.LeftCtrl) && !clickItem.IsSelected))
+			{
+				if (TimelineItem.DataModel.SelectedItems != null)
+				{
+					foreach (var selected in TimelineItem.DataModel.SelectedItems.ToList())
+					{
+						selected.IsSelected = false;
+					}
+				}
+
+				foreach (var timeline in TimelineItem.TimelineGroup)
+				{
+					foreach (var keyframe in timeline.Children)
+					{
+						keyframe.IsSelected = false;
+					}
+				}
+			}
+
+			if (clickItem != null)
+			{
+				// select
+				clickItem.IsSelected = true;
+				lastSelectedItem = clickItem;
+
+				// prepare resize
+				resizeItem = clickItem;
+				startPos = clickPos;
+
+				if (!clickItem.IsDurationLocked)
+				{
+					var time = clickItem.GetKeyframeTime() * pixelsASecond;
+					if (Math.Abs(clickItem.EndTime * pixelsASecond - clickPos) < 10)
+					{
+						isResizing = true;
+						resizingLeft = false;
+					}
+					else if (Math.Abs(time - clickPos) < 10)
+					{
+						isResizing = true;
+						resizingLeft = true;
+					}
+				}
+
+				GenerateSnapList(resizeItem);
 			}
 
 			e.Handled = true;
@@ -452,41 +510,94 @@ namespace StructuredXmlEditor.View
 		{
 			if (TimelineItem == null) return;
 
-			if (e.LeftButton != MouseButtonState.Pressed && e.MiddleButton != MouseButtonState.Pressed)
+			if ((isDraggingItems || isDragging) && e.LeftButton != MouseButtonState.Pressed && e.MiddleButton != MouseButtonState.Pressed)
 			{
 				EndDrag();
 			}
 
-			bool setCursor = false;
+			setCursor = false;
 
 			var pos = e.GetPosition(this);
 			var clickPos = pos.X - TimelineItem.LeftPad;
 
 			double pixelsASecond = ActualWidth / TimelineItem.TimelineRange;
 
-			if (draggedItem == null)
+			mouseOverItem = GetItemAt(clickPos);
+
+			if (isDraggingItems)
 			{
-				mouseOverItem = null;
+				var dragItems = draggedActions;
+				var dragItem = draggedAction;
 
-				foreach (KeyframeItem keyframe in TimelineItem.Children)
+				// do time change
+				var newTime = clickPos / pixelsASecond - dragItem.ActionStartOffset;
+				var roundedTime = Snap(newTime);
+
+				if (dragItem.Item.Duration > 0 && !Keyboard.IsKeyDown(Key.LeftCtrl))
 				{
-					var time = keyframe.Time * pixelsASecond;
-					var diff = clickPos - time;
+					var endTime = newTime + dragItem.Item.Duration;
+					var snapped = Snap(endTime);
+					roundedTime += snapped - endTime;
+				}
 
-					if (diff >= 0 && diff < GetKeyframeWidth(keyframe))
+				var diff = roundedTime - dragItem.OriginalPosition;
+
+				foreach (var item in dragItems)
+				{
+					item.Item.SetKeyframeTime((float)(item.OriginalPosition + diff));
+				}
+
+				// do timeline change
+				var timelineGroup = TimelineItem.TimelineGroup.ToList();
+				var currentTimelineIndex = timelineGroup.IndexOf(TimelineItem);
+				if (currentTimelineIndex != timelineGroup.IndexOf(dragItem.Item.Timeline))
+				{
+					var idealChange = currentTimelineIndex - dragItem.StartTimelineIndex;
+
+					// move items
+					foreach (var item in dragItems)
 					{
-						mouseOverItem = keyframe;
+						var itemTimelineIndex = item.StartTimelineIndex;
 
-						if (!keyframe.IsDurationLocked)
+						for (int i = 0; i < idealChange+1; i++)
 						{
-							if (Math.Abs(time - clickPos) < 10 || Math.Abs(keyframe.EndTime * pixelsASecond - clickPos) < 10)
+							var index = itemTimelineIndex + (idealChange - i);
+							var targetTimeline = timelineGroup[index];
+
+							if (targetTimeline.TimelineDef.KeyframeDefinitions.Contains(item.Item.KeyframeDef))
 							{
-								Mouse.OverrideCursor = Cursors.SizeWE;
-								setCursor = true;
+								item.Item.Timeline.Children.Remove(item.Item);
+								targetTimeline.Children.Add(item.Item);
+								item.Item.Parent = targetTimeline;
+
+								break;
 							}
 						}
+					}
+				}
 
-						break;
+				Mouse.OverrideCursor = Cursors.ScrollWE;
+				setCursor = true;
+
+				foreach (var timeline in TimelineItem.TimelineGroup)
+				{
+					timeline.Timeline.dirty = true;
+				}
+			}
+			else if (resizeItem == null)
+			{
+				if (mouseOverItem != null)
+				{
+					var time = mouseOverItem.Time * pixelsASecond;
+					var diff = clickPos - time;
+
+					if (!mouseOverItem.IsDurationLocked)
+					{
+						if (Math.Abs(time - clickPos) < 10 || Math.Abs(mouseOverItem.EndTime * pixelsASecond - clickPos) < 10)
+						{
+							Mouse.OverrideCursor = Cursors.SizeWE;
+							setCursor = true;
+						}
 					}
 				}
 
@@ -517,7 +628,7 @@ namespace StructuredXmlEditor.View
 				}
 
 			}
-			else
+			else if (isResizing)
 			{
 				if (Math.Abs(clickPos - startPos) > SystemParameters.MinimumHorizontalDragDistance)
 				{
@@ -525,44 +636,52 @@ namespace StructuredXmlEditor.View
 					CaptureMouse();
 				}
 
-				if (isResizing)
+				if (resizingLeft)
 				{
-					if (resizingLeft)
-					{
-						var newTime = clickPos / pixelsASecond;
-						var roundedTime = Snap(newTime);
+					var newTime = clickPos / pixelsASecond;
+					var roundedTime = Snap(newTime);
 
-						var oldEnd = draggedItem.EndTime;
+					var oldEnd = resizeItem.EndTime;
 
-						if (roundedTime > oldEnd) roundedTime = oldEnd;
-						draggedItem.SetKeyframeTime((float)roundedTime);
+					if (roundedTime > oldEnd) roundedTime = oldEnd;
+					resizeItem.SetKeyframeTime((float)roundedTime);
 
-						draggedItem.Duration = oldEnd - draggedItem.Time;
-					}
-					else
-					{
-						var newTime = clickPos / pixelsASecond;
-						var roundedTime = Snap(newTime);
-
-						draggedItem.Duration = (float)roundedTime - draggedItem.Time;
-					}
-
-					Mouse.OverrideCursor = Cursors.SizeWE;
-					setCursor = true;
+					resizeItem.Duration = oldEnd - resizeItem.Time;
 				}
 				else
 				{
-					var newTime = clickPos / pixelsASecond - dragActionOffset;
+					var newTime = clickPos / pixelsASecond;
 					var roundedTime = Snap(newTime);
 
-					if (draggedItem.Duration > 0 && !Keyboard.IsKeyDown(Key.LeftCtrl))
-					{
-						var endTime = newTime + draggedItem.Duration;
-						var snapped = Snap(endTime);
-						roundedTime += snapped - endTime;
-					}
+					resizeItem.Duration = (float)roundedTime - resizeItem.Time;
+				}
 
-					draggedItem.SetKeyframeTime((float)roundedTime);
+				Mouse.OverrideCursor = Cursors.SizeWE;
+				setCursor = true;
+			}
+			else
+			{
+				if (e.LeftButton == MouseButtonState.Pressed &&
+					(Math.Abs(clickPos - startPos) > SystemParameters.MinimumHorizontalDragDistance || Math.Abs(pos.Y - startClick.Y) > SystemParameters.MinimumHorizontalDragDistance))
+				{
+					// begin the drag
+					var selectedActions = SelectedItemsInGroup.ToList();
+					var dragItems = new List<DragAction>();
+
+					var timelineGroup = TimelineItem.TimelineGroup.ToList();
+					foreach (var action in selectedActions)
+					{
+						var startoffset = (clickPos / pixelsASecond) - action.Time;
+						dragItems.Add(new DragAction(action, action.Time, startoffset, timelineGroup.IndexOf(action.Timeline)));
+					}
+					var mouseOverDragItem = new DragAction(lastSelectedItem, lastSelectedItem.Time, (clickPos / pixelsASecond) - lastSelectedItem.Time, timelineGroup.IndexOf(lastSelectedItem.Timeline));
+
+					draggedAction = mouseOverDragItem;
+					draggedActions = dragItems;
+					isDraggingItems = true;
+
+					Mouse.OverrideCursor = Cursors.ScrollWE;
+					setCursor = true;
 				}
 			}
 
@@ -575,7 +694,13 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		protected override void OnMouseLeave(MouseEventArgs e)
 		{
-			Mouse.OverrideCursor = null;
+			if (setCursor)
+			{
+				Mouse.OverrideCursor = null;
+			}
+			setCursor = false;
+			mouseOverItem = null;
+			dirty = true;
 
 			base.OnMouseLeave(e);
 		}
@@ -589,7 +714,7 @@ namespace StructuredXmlEditor.View
 			{
 				foreach (KeyframeItem keyframe in timeline.Children)
 				{
-					if (keyframe != dragged)
+					if (keyframe != dragged && !keyframe.IsSelected)
 					{
 						var time = keyframe.Time;
 						if (!snapLines.Contains(time)) snapLines.Add(time);
@@ -649,7 +774,7 @@ namespace StructuredXmlEditor.View
 			var clickPos = pos.X - TimelineItem.LeftPad;
 			double pixelsASecond = ActualWidth / TimelineItem.TimelineRange;
 
-			if (!isDragging)
+			if (!isDragging && !isDraggingItems)
 			{
 				if (args.ChangedButton == MouseButton.Right)
 				{
@@ -810,19 +935,27 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		public void EndDrag()
 		{
-			bool wasDragging = isDragging;
+			bool wasDragging = isDragging || isDraggingItems;
 			isDragging = false;
-			draggedItem = null;
+			resizeItem = null;
 			isPanning = false;
 			isResizing = false;
+			isDraggingItems = false;
 
 			ReleaseMouseCapture();
 
-			Mouse.OverrideCursor = null;
+			if (setCursor)
+			{
+				Mouse.OverrideCursor = null;
+			}
+			setCursor = false;
 
 			if (wasDragging)
 			{
-				TimelineItem.Children.Sort((e) => (e as KeyframeItem).Time);
+				foreach (var timeline in TimelineItem.TimelineGroup)
+				{
+					timeline.Children.Sort((e) => (e as KeyframeItem).Time);
+				}
 			}
 		}
 
@@ -867,20 +1000,43 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		List<double> snapLines = new List<double>();
 
+		Point startClick;
 		double startPos = 0;
 		double panPos = 0;
 
 		bool isResizing = false;
 		bool isDragging = false;
 		bool isPanning = false;
+		bool setCursor = false;
 
 		bool resizingLeft;
-		KeyframeItem draggedItem;
+		KeyframeItem resizeItem;
 		KeyframeItem mouseOverItem;
-		double dragActionOffset;
+		KeyframeItem lastSelectedItem;
 
 		Timer redrawTimer;
 		bool dirty = false;
 		bool isRedrawing;
+
+		static bool isDraggingItems;
+		static List<DragAction> draggedActions;
+		static DragAction draggedAction;
+	}
+
+	//-----------------------------------------------------------------------
+	class DragAction
+	{
+		public KeyframeItem Item { get; set; }
+		public double OriginalPosition { get; set; }
+		public double ActionStartOffset { get; set; }
+		public int StartTimelineIndex { get; set; }
+
+		public DragAction(KeyframeItem item, double originalPos, double startOffset, int timelineIndex)
+		{
+			Item = item;
+			OriginalPosition = originalPos;
+			ActionStartOffset = startOffset;
+			StartTimelineIndex = timelineIndex;
+		}
 	}
 }
