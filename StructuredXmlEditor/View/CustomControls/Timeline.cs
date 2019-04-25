@@ -38,6 +38,17 @@ namespace StructuredXmlEditor.View
 		protected Brush SelectedBrush { get { return (Application.Current.TryFindResource("SelectionBorderBrush") as SolidColorBrush); } }
 
 		//-----------------------------------------------------------------------
+		protected Brush MarqueeBrush
+		{
+			get
+			{
+				var col = (Color)Application.Current.TryFindResource("SelectionBorderColour");
+				col.ScA = 0.5f;
+				return new SolidColorBrush(col);
+			}
+		}
+
+		//-----------------------------------------------------------------------
 		protected Brush UnselectedBrush { get { return (Application.Current.TryFindResource("BorderLightBrush") as SolidColorBrush); } }
 
 		//-----------------------------------------------------------------------
@@ -343,6 +354,22 @@ namespace StructuredXmlEditor.View
 				}
 			}
 
+			if (isMarqueeSelecting && Math.Abs(marqueeCurrentPos - marqueeStartPos) > 5)
+			{
+				var timelineIndex = TimelineItem.TimelineGroup.ToList().IndexOf(TimelineItem);
+				var marqueeMinTimeline = Math.Min(marqueeStartTimeline, marqueeCurrentTimeline);
+				var marqueeMaxTimeline = Math.Max(marqueeStartTimeline, marqueeCurrentTimeline);
+
+				if (timelineIndex >= marqueeMinTimeline && timelineIndex <= marqueeMaxTimeline)
+				{
+					// draw marquee box
+					var minPos = Math.Min(marqueeStartPos, marqueeCurrentPos) + TimelineItem.LeftPad;
+					var maxPos = Math.Max(marqueeStartPos, marqueeCurrentPos) + TimelineItem.LeftPad;
+
+					drawingContext.DrawRectangle(MarqueeBrush, null, new Rect(minPos, 0, maxPos - minPos, ActualHeight));
+				}
+			}
+
 			isRedrawing = false;
 		}
 
@@ -468,6 +495,14 @@ namespace StructuredXmlEditor.View
 
 				GenerateSnapList(resizeItem);
 			}
+			else
+			{
+				isMarqueeSelecting = true;
+				marqueeStartPos = clickPos;
+				marqueeStartTimeline = TimelineItem.TimelineGroup.ToList().IndexOf(TimelineItem);
+				marqueeCurrentPos = marqueeStartPos;
+				marqueeCurrentTimeline = marqueeStartTimeline;
+			}
 
 			e.Handled = true;
 			dirty = true;
@@ -510,7 +545,7 @@ namespace StructuredXmlEditor.View
 		{
 			if (TimelineItem == null) return;
 
-			if ((isDraggingItems || isDragging) && e.LeftButton != MouseButtonState.Pressed)
+			if ((isDraggingItems || isResizeDragging) && e.LeftButton != MouseButtonState.Pressed)
 			{
 				EndDrag();
 			}
@@ -584,6 +619,16 @@ namespace StructuredXmlEditor.View
 					timeline.Timeline.dirty = true;
 				}
 			}
+			else if (isMarqueeSelecting)
+			{
+				marqueeCurrentPos = clickPos;
+				marqueeCurrentTimeline = TimelineItem.TimelineGroup.ToList().IndexOf(TimelineItem);
+
+				foreach (var timeline in TimelineItem.TimelineGroup)
+				{
+					timeline.Timeline.dirty = true;
+				}
+			}
 			else if (resizeItem == null)
 			{
 				if (mouseOverItem != null)
@@ -632,7 +677,7 @@ namespace StructuredXmlEditor.View
 			{
 				if (Math.Abs(clickPos - startPos) > SystemParameters.MinimumHorizontalDragDistance)
 				{
-					isDragging = true;
+					isResizeDragging = true;
 					CaptureMouse();
 				}
 
@@ -774,7 +819,62 @@ namespace StructuredXmlEditor.View
 			var clickPos = pos.X - TimelineItem.LeftPad;
 			double pixelsASecond = ActualWidth / TimelineItem.TimelineRange;
 
-			if (!isDragging && !isDraggingItems)
+			if (isMarqueeSelecting)
+			{
+				if (Math.Abs(marqueeCurrentPos - marqueeStartPos) > 5)
+				{
+					var timelineIndex = TimelineItem.TimelineGroup.ToList().IndexOf(TimelineItem);
+					var marqueeMinTimeline = (int)Math.Min(marqueeStartTimeline, marqueeCurrentTimeline);
+					var marqueeMaxTimeline = (int)Math.Max(marqueeStartTimeline, marqueeCurrentTimeline);
+
+					if (timelineIndex >= marqueeMinTimeline && timelineIndex <= marqueeMaxTimeline)
+					{
+						// deselect all
+						if (TimelineItem.DataModel.SelectedItems != null)
+						{
+							foreach (var selected in TimelineItem.DataModel.SelectedItems.ToList())
+							{
+								selected.IsSelected = false;
+							}
+						}
+
+						foreach (var timeline in TimelineItem.TimelineGroup)
+						{
+							foreach (var keyframe in timeline.Children)
+							{
+								keyframe.IsSelected = false;
+							}
+						}
+
+						// do selection
+						var minPos = Math.Min(marqueeStartPos, marqueeCurrentPos);
+						var maxPos = Math.Max(marqueeStartPos, marqueeCurrentPos);
+
+						var timelineGroup = TimelineItem.TimelineGroup.ToList();
+						for (int i = marqueeMinTimeline; i <= marqueeMaxTimeline; i++)
+						{
+							var timeline = timelineGroup[i];
+
+							foreach (KeyframeItem keyframe in timeline.Children)
+							{
+								var leftPos = keyframe.GetKeyframeTime() * pixelsASecond;
+								var rightPos = leftPos + GetKeyframeWidth(keyframe);
+
+								if (minPos < rightPos && maxPos > leftPos)
+								{
+									keyframe.IsSelected = true;
+								}
+							}
+						}
+					}
+				}
+
+				foreach (var timeline in TimelineItem.TimelineGroup)
+				{
+					timeline.Timeline.dirty = true;
+				}
+			}
+			else if (!isResizeDragging && !isDraggingItems && !isMarqueeSelecting)
 			{
 				if (args.ChangedButton == MouseButton.Right)
 				{
@@ -935,12 +1035,13 @@ namespace StructuredXmlEditor.View
 		//-----------------------------------------------------------------------
 		public void EndDrag()
 		{
-			bool wasDragging = isDragging || isDraggingItems;
-			isDragging = false;
+			bool wasDragging = isResizeDragging || isDraggingItems;
+			isResizeDragging = false;
 			resizeItem = null;
 			isPanning = false;
 			isResizing = false;
 			isDraggingItems = false;
+			isMarqueeSelecting = false;
 
 			ReleaseMouseCapture();
 
@@ -1005,7 +1106,7 @@ namespace StructuredXmlEditor.View
 		double panPos = 0;
 
 		bool isResizing = false;
-		bool isDragging = false;
+		bool isResizeDragging = false;
 		bool isPanning = false;
 		bool setCursor = false;
 
@@ -1017,6 +1118,12 @@ namespace StructuredXmlEditor.View
 		Timer redrawTimer;
 		bool dirty = false;
 		bool isRedrawing;
+
+		static bool isMarqueeSelecting;
+		static double marqueeStartPos;
+		static int marqueeStartTimeline;
+		static double marqueeCurrentPos;
+		static double marqueeCurrentTimeline;
 
 		static bool isDraggingItems;
 		static List<DragAction> draggedActions;
