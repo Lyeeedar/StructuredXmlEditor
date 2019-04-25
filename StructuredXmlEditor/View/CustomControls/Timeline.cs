@@ -510,7 +510,7 @@ namespace StructuredXmlEditor.View
 		{
 			if (TimelineItem == null) return;
 
-			if ((isDraggingItems || isDragging) && e.LeftButton != MouseButtonState.Pressed && e.MiddleButton != MouseButtonState.Pressed)
+			if ((isDraggingItems || isDragging) && e.LeftButton != MouseButtonState.Pressed)
 			{
 				EndDrag();
 			}
@@ -559,16 +559,16 @@ namespace StructuredXmlEditor.View
 					{
 						var itemTimelineIndex = item.StartTimelineIndex;
 
-						for (int i = 0; i < idealChange+1; i++)
+						for (int i = 0; i < Math.Abs(idealChange)+1; i++)
 						{
-							var index = itemTimelineIndex + (idealChange - i);
+							var signedI = idealChange < 0 ? -i : i;
+							var index = itemTimelineIndex + (idealChange - signedI);
 							var targetTimeline = timelineGroup[index];
 
 							if (targetTimeline.TimelineDef.KeyframeDefinitions.Contains(item.Item.KeyframeDef))
 							{
 								item.Item.Timeline.Children.Remove(item.Item);
 								targetTimeline.Children.Add(item.Item);
-								item.Item.Parent = targetTimeline;
 
 								break;
 							}

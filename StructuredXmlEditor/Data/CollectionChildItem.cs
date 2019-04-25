@@ -281,6 +281,34 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		protected override void OnChildrenCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			foreach (var child in m_childrenCache)
+			{
+				child.PropertyChanged -= ChildPropertyChanged;
+			}
+
+			foreach (var child in Children)
+			{
+				child.DataModel = DataModel;
+				child.PropertyChanged += ChildPropertyChanged;
+			}
+
+			for (int i = 0; i < Children.Count; ++i)
+			{
+				Children[i].Index = i;
+			}
+
+			m_oldChildrenCache.Clear();
+			m_oldChildrenCache.AddRange(m_childrenCache);
+
+			m_childrenCache.Clear();
+			m_childrenCache.AddRange(Children);
+
+			RaisePropertyChangedEvent("ChildrenItems");
+		}
+
+		//-----------------------------------------------------------------------
 		public void Remove()
 		{
 			(ParentCollection as ICollectionItem).Remove(this);
