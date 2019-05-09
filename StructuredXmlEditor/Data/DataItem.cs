@@ -176,12 +176,16 @@ namespace StructuredXmlEditor.Data
 						}
 					}
 
-					if (isValid) return true;
+					if (isValid)
+					{
+						return true;
+					}
 				}
 
 				return false;
 			}
 		}
+		private bool m_lastIsVisibleFromBinding;
 
 		//-----------------------------------------------------------------------
 		public virtual bool IsExpanded
@@ -555,7 +559,7 @@ namespace StructuredXmlEditor.Data
 				{
 					if (stmnt.Target != null)
 					{
-						stmnt.Target.PropertyChanged -= VisiblityPropertyChanged;
+						stmnt.Target.PropertyChanged -= VisibilityPropertyChanged;
 					}
 				}
 			}
@@ -609,7 +613,7 @@ namespace StructuredXmlEditor.Data
 						if (current != null)
 						{
 							stmnt.SetTarget(current);
-							current.PropertyChanged += VisiblityPropertyChanged;
+							current.PropertyChanged += VisibilityPropertyChanged;
 						}
 					}
 				}
@@ -857,11 +861,16 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public virtual void VisiblityPropertyChanged(object sender, PropertyChangedEventArgs args)
+		public virtual void VisibilityPropertyChanged(object sender, PropertyChangedEventArgs args)
 		{
 			if (args.PropertyName == "Value")
 			{
-				RaisePropertyChangedEvent("IsVisible");
+				var newVal = IsVisibleFromBindings;
+				if (newVal != m_lastIsVisibleFromBinding)
+				{
+					RaisePropertyChangedEvent(nameof(IsVisible));
+					m_lastIsVisibleFromBinding = newVal;
+				}
 			}
 		}
 
