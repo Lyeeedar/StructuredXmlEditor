@@ -477,6 +477,9 @@ namespace StructuredXmlEditor.View
 		{
 			X = m_startX + diff.X;
 			Y = m_startY + diff.Y;
+
+			X = (int)(X / 15) * 15;
+			Y = (int)(Y / 15) * 15;
 		}
 
 		//--------------------------------------------------------------------------

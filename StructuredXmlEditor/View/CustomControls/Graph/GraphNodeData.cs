@@ -899,6 +899,9 @@ namespace StructuredXmlEditor.View
 			var newX = m_startX + diff.X;
 			var newY = m_startY + diff.Y;
 
+			newX = (int)(newX / 15) * 15;
+			newY = (int)(newY / 15) * 15;
+
 			Position = new Point(newX, newY);
 		}
 

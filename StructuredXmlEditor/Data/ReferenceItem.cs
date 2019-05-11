@@ -128,7 +128,14 @@ namespace StructuredXmlEditor.Data
 					{
 						Future.Call(() => 
 						{
-							Name = Parent is CollectionChildItem && !(((Parent as CollectionChildItem).ParentCollection.Definition as CollectionDefinition)?.ChildrenAreUnique ?? false) ? WrappedItem.Name : Definition.Name + " (" + WrappedItem.Name + ")";
+							try
+							{
+								Name = Parent is CollectionChildItem && !(((Parent as CollectionChildItem).ParentCollection.Definition as CollectionDefinition)?.ChildrenAreUnique ?? false) ? WrappedItem.Name : Definition.Name + " (" + WrappedItem.Name + ")";
+							}
+							catch (Exception)
+							{
+
+							}
 						}, 10);
 					}
 				}
