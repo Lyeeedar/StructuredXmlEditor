@@ -63,7 +63,7 @@ namespace StructuredXmlEditor.Definition
 			if (rawFlagValues == null && definition.Value != null) rawFlagValues = definition.Value;
 			if (rawFlagValues != null) FlagValues = rawFlagValues.Split(new char[] { ',' }).Select(e => e.Trim()).ToList();
 
-			Default = definition.Attribute("Default")?.Value?.ToString();
+			Default = definition.Attribute("Default")?.Value?.ToString() ?? "";
 		}
 
 		public override void DoSaveData(XElement parent, DataItem item)
