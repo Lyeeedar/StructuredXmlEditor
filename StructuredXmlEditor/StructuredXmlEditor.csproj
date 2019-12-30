@@ -142,6 +142,41 @@
     <Compile Include="Definition\ReferenceDefinition.cs" />
     <Compile Include="Definition\TreeDefinition.cs" />
     <Compile Include="Tools\FocusTool.cs" />
+    <Compile Include="Tools\GitTool.cs" />
+    <Compile Include="Tools\GitTool\GitApp\Util\Command.cs" />
+    <Compile Include="Tools\GitTool\GitApp\Util\Extensions.cs" />
+    <Compile Include="Tools\GitTool\GitApp\Util\Future.cs" />
+    <Compile Include="Tools\GitTool\GitApp\Util\NotifyPropertyChanged.cs" />
+    <Compile Include="Tools\GitTool\GitApp\Util\Pool.cs" />
+    <Compile Include="Tools\GitTool\GitApp\Util\ProcessUtils.cs" />
+    <Compile Include="Tools\GitTool\GitApp\ViewModel.cs" />
+    <Compile Include="Tools\GitTool\GitApp\ViewModelView.xaml.cs">
+      <DependentUpon>ViewModelView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\GitTool\GitApp\View\CustomControls\AnimatedImage.xaml.cs">
+      <DependentUpon>AnimatedImage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\GitTool\GitApp\View\CustomControls\AutoCompleteTextBox.cs" />
+    <Compile Include="Tools\GitTool\GitApp\View\CustomControls\ColourPicker\ColorCanvas.cs" />
+    <Compile Include="Tools\GitTool\GitApp\View\CustomControls\ColourPicker\ColorSpectrumSlider.cs" />
+    <Compile Include="Tools\GitTool\GitApp\View\CustomControls\ColourPicker\ColourUtilities.cs" />
+    <Compile Include="Tools\GitTool\GitApp\View\CustomControls\ColourPicker\HsvColor.cs" />
+    <Compile Include="Tools\GitTool\GitApp\View\CustomControls\ContentPopup.cs" />
+    <Compile Include="Tools\GitTool\GitApp\View\CustomControls\InsertionAdorner.cs" />
+    <Compile Include="Tools\GitTool\GitApp\View\CustomControls\MenuItemGroupHeader.cs" />
+    <Compile Include="Tools\GitTool\GitApp\View\CustomControls\Message.xaml.cs">
+      <DependentUpon>Message.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\GitTool\GitApp\View\CustomControls\MultilineTextEditor.cs" />
+    <Compile Include="Tools\GitTool\GitApp\View\CustomControls\NumericTextBox.cs" />
+    <Compile Include="Tools\GitTool\GitApp\View\CustomControls\PromptTextBox.cs" />
+    <Compile Include="Tools\GitTool\GitApp\View\SharedResourceDictionary.cs" />
+    <Compile Include="Tools\GitTool\GitApp\View\ValueConverters\ColourMarkupConverter.cs" />
+    <Compile Include="Tools\GitTool\GitApp\View\ValueConverters\ContrastTextConverter.cs" />
+    <Compile Include="Tools\GitTool\GitApp\View\ValueConverters\ConverterBase.cs" />
+    <Compile Include="Tools\GitTool\GitApp\View\ValueConverters\NullImageConverter.cs" />
+    <Compile Include="Tools\GitTool\GitApp\View\ValueConverters\NullOrZeroConverter.cs" />
+    <Compile Include="Tools\GitTool\GitApp\View\ValueConverters\ValueTypeConverter.cs" />
     <Compile Include="Tools\ProjectView\ProjectItem.cs" />
     <Compile Include="Tools\ProjectView\ProjectViewTool.cs" />
     <Compile Include="Tools\StartPage.cs" />
@@ -239,6 +274,86 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Tools\GitTool\GitApp\ViewModelView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\GitTool\GitApp\View\CustomControls\AnimatedImage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\GitTool\GitApp\View\CustomControls\Message.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\GitTool\GitApp\View\Styles\AutoCompleteTextBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\GitTool\GitApp\View\Styles\Brushes.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\GitTool\GitApp\View\Styles\Button.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\GitTool\GitApp\View\Styles\CheckBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\GitTool\GitApp\View\Styles\ColorCanvas.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\GitTool\GitApp\View\Styles\ComboBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\GitTool\GitApp\View\Styles\ContentPopup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\GitTool\GitApp\View\Styles\GeneralStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\GitTool\GitApp\View\Styles\ListView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\GitTool\GitApp\View\Styles\Menu.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\GitTool\GitApp\View\Styles\MultilineTextEditor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\GitTool\GitApp\View\Styles\NumericTextBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\GitTool\GitApp\View\Styles\PromptTextBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\GitTool\GitApp\View\Styles\Scrollbar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\GitTool\GitApp\View\Styles\Slider.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\GitTool\GitApp\View\Styles\TabControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\GitTool\GitApp\View\Styles\TextBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="View\CustomControls\AnimatedImage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -442,6 +557,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\DefIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Branch.png" />
+    <Resource Include="Resources\DownArrow.png" />
+    <Resource Include="Resources\Pull.png" />
+    <Resource Include="Resources\Push.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.4.2.1\build\Fody.targets" Condition="Exists('..\packages\Fody.4.2.1\build\Fody.targets')" />

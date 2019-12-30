@@ -310,6 +310,11 @@
 						DataType="{x:Type t:TemplateCreatorTool}">
 						<v:TemplateCreatorToolView />
 					</DataTemplate>
+					<DataTemplate
+						DataType="{x:Type t:GitTool}">
+						<ContentPresenter
+							Content="{Binding View}" />
+					</DataTemplate>
 				</dock:DockingManager.Resources>
 
 				<dock:DockingManager.LayoutItemContainerStyleSelector>

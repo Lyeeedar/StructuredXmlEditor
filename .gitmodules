@@ -1,0 +1,3 @@
+[submodule "StructuredXmlEditor/Tools/GitTool"]
+	path = StructuredXmlEditor/Tools/GitTool
+	url = https://github.com/Lyeeedar/GitApp.git
