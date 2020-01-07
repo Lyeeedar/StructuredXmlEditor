@@ -55,6 +55,14 @@ namespace StructuredXmlEditor
 					VersionInfo.CheckForUpdates(Workspace);
 				}));
 			};
+
+			Activated += (e, args) =>
+			{
+				if (Workspace != null)
+				{
+					Workspace.Current = Workspace.Current;
+				}
+			};
 		}
 
 		protected override void OnPreviewKeyDown(KeyEventArgs e)

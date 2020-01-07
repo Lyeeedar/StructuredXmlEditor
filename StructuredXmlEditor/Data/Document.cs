@@ -21,6 +21,7 @@ namespace StructuredXmlEditor.Data
 		public UndoRedoManager UndoRedo { get; set; } = new UndoRedoManager();
 		public Workspace Workspace { get; set; }
 		public bool IsBackup { get; set; }
+		public bool NeedsReload { get; set; }
 
 		//-----------------------------------------------------------------------
 		public List<Document> MultieditDocs { get; set; }

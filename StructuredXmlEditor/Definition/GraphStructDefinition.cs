@@ -226,8 +226,10 @@ namespace StructuredXmlEditor.Definition
 			var el = new XElement(name);
 			parent.Add(el);
 
-			el.Add(new XAttribute(MetaNS + "X", si.X));
-			el.Add(new XAttribute(MetaNS + "Y", si.Y));
+			var relativeToNode = item.DataModel.RootItems.First(e => e.Definition is GraphNodeDefinition) as GraphNodeItem;
+
+			el.Add(new XAttribute(MetaNS + "X", si.X - relativeToNode.X));
+			el.Add(new XAttribute(MetaNS + "Y", si.Y - relativeToNode.Y));
 			if (si.Comment != null) el.Add(new XAttribute(MetaNS + "Comment", si.Comment));
 
 			if (string.IsNullOrWhiteSpace(ChildAsGUID) && (si.LinkParents.Count > 1 || si.DataModel.FlattenData))

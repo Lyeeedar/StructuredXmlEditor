@@ -37,6 +37,20 @@ namespace StructuredXmlEditor.Data
 			set
 			{
 				m_current = value;
+
+				if (m_current != null && m_current.NeedsReload)
+				{
+					m_current.NeedsReload = false;
+
+					string response = Message.Show("This document changed on disk, do you want to reload it? Clicking Yes will discard any local changes.", "Document Changed On Disk", "Yes", "No");
+
+					if (response == "Yes")
+					{
+						m_current.Close(true);
+						Current = Open(m_current.Path);
+					}
+				}
+
 				RaisePropertyChangedEvent();
 			}
 		}
@@ -258,14 +272,7 @@ namespace StructuredXmlEditor.Data
 				var open = Documents.FirstOrDefault(e => e.Path == path);
 				if (open != null)
 				{
-					Current = open;
-					string response = Message.Show("This document changed on disk, do you want to reload it? Clicking Yes will discard any local changes.", "Document Changed On Disk", "Yes", "No");
-
-					if (response == "Yes")
-					{
-						open.Close(true);
-						Open(path);
-					}
+					open.NeedsReload = true;
 				}
 
 				ProjectViewTool.Instance.Add(path);

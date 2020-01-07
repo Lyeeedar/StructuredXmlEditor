@@ -164,8 +164,10 @@ namespace StructuredXmlEditor.Definition
 
 			XElement root = new XElement(Name);
 
-			root.Add(new XAttribute(MetaNS + "X", ci.X));
-			root.Add(new XAttribute(MetaNS + "Y", ci.Y));
+			var relativeToNode = item.DataModel.RootItems.First(e => e.Definition is GraphNodeDefinition) as GraphNodeItem;
+
+			root.Add(new XAttribute(MetaNS + "X", ci.X - relativeToNode.X));
+			root.Add(new XAttribute(MetaNS + "Y", ci.Y - relativeToNode.Y));
 			if (ci.Comment != null) root.Add(new XAttribute(MetaNS + "Comment", ci.Comment));
 
 			if (ci.LinkParents.Count > 1 || ci.DataModel.FlattenData)

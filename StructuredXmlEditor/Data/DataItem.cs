@@ -162,7 +162,7 @@ namespace StructuredXmlEditor.Data
 			{
 				if (VisibleIfStatements.Count == 0) return true;
 
-				UpdateVisibleIfBinding();
+				//UpdateVisibleIfBinding();
 
 				foreach (var group in VisibleIfStatements)
 				{
@@ -567,6 +567,11 @@ namespace StructuredXmlEditor.Data
 
 			if (Definition.VisibleIf != null)
 			{
+				if (Definition.VisibleIf.Contains('('))
+				{
+					throw new Exception("VisibleIf doesnt support brackets yet");
+				}
+
 				// decompose into or groups
 				var orgroups = Definition.VisibleIf.Split(new string[] { "||" }, StringSplitOptions.RemoveEmptyEntries);
 				foreach (var orgroup in orgroups)
