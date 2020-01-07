@@ -1,4 +1,23 @@
-﻿--------- 1.8.0 ---------
+﻿--------- 1.9.0 ---------
+
+- StructElements now load comments from the definition file and use them in the created item.
+- Added a flags dara type. This is a comma seperated list of strings, editted with a multiselect editor.
+- You can now drag between timelines in a group. 
+- You can now marquee select across a timeline group.
+- Allow loading of references that have only a single valid type (useful for switching from struct -> reference).
+- Make graph nodes snap to a grid. This should make it easier to make nicer looking graphs.
+- Documents now only prompt to reload when focused, and only prompt a single time.
+- Graphs are now positioned with their root node at the origin on save.
+
+- Fix a number of cases of keyboard focus being lost on editing.
+- Fix a crash on shutdown.
+- Fix a bug when deleting timeline keyframes.
+- Fix a crash in the timeline.
+- Fix a crash when updating the description of reference items.
+- Fix a bug that was preventing visibleif bindings being updated on change.
+
+
+--------- 1.8.0 ---------
 
 - Use the comments in the definition for a timelines keyframes to group them in the dropdown.
 - Allow referencedefs to be global.

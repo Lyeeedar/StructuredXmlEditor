@@ -13,7 +13,7 @@ using System.Windows;
 public class VersionInfo
 {
 	public const int MajorVersion = 1;
-	public const int FeatureVersion = 8;
+	public const int FeatureVersion = 9;
 	public const int BugFixVersion = 0;
 
 	public static string Version { get { return MajorVersion + "." + FeatureVersion + "." + BugFixVersion; } }
