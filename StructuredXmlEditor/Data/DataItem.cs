@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -513,6 +514,17 @@ namespace StructuredXmlEditor.Data
 			}
 
 			return -1;
+		}
+
+		//-----------------------------------------------------------------------
+		public string GetPathToRoot()
+		{
+			if (!HasParent)
+			{
+				return $"{Path.GetFileNameWithoutExtension(DataModel.Document.Path)}.{Name}";
+			}
+
+			return $"{Parent.GetPathToRoot()}.{Name}";
 		}
 
 		//-----------------------------------------------------------------------

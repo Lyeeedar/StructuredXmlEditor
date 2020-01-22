@@ -5,11 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using StructuredXmlEditor.Data;
+using StructuredXmlEditor.Util;
 
 namespace StructuredXmlEditor.Definition
 {
 	public class StringDefinition : PrimitiveDataDefinition
 	{
+		public bool NeedsLocalisation { get; set; }
+		public string LocalisationFile { get; set; }
 		public string Default { get; set; }
 		public int MaxLength { get; set; }
 
@@ -31,7 +34,27 @@ namespace StructuredXmlEditor.Definition
 		{
 			var item = new StringItem(this, undoRedo);
 
-			item.Value = element.Value;
+			if (NeedsLocalisation)
+			{
+				var id = element.Value;
+
+				try
+				{
+					item.LocalisationID = id.Split(':')[1];
+
+					item.Value = Localisation.GetLocalisation(LocalisationFile, id);
+				}
+				catch (Exception)
+				{
+					// fallback to assuming the text was in the element
+					item.LocalisationID = null;
+					item.Value = id;
+				}
+			}
+			else
+			{
+				item.Value = element.Value;
+			}
 
 			foreach (var att in Attributes)
 			{
@@ -57,14 +80,36 @@ namespace StructuredXmlEditor.Definition
 			Default = definition.Attribute("Default")?.Value?.ToString();
 			MaxLength = TryParseInt(definition, "MaxLength", 999999999);
 			if (Default == null) Default = "";
+			NeedsLocalisation = TryParseBool(definition, "NeedsLocalisation", false);
+			LocalisationFile = definition.Attribute("LocalisationFile")?.Value?.ToString() ?? "Default";
 		}
 
 		public override void DoSaveData(XElement parent, DataItem item)
 		{
 			var si = item as StringItem;
 
-			var el = new XElement(Name, si.Value);
-			parent.Add(el);
+			XElement el;
+			if (NeedsLocalisation)
+			{
+				if (si.LocalisationID == null)
+				{
+					si.LocalisationID = Guid.NewGuid().ToString();
+				}
+
+				var pathToRoot = si.GetPathToRoot();
+
+				var fullID = $"{pathToRoot}:{si.LocalisationID}";
+
+				el = new XElement(Name, fullID);
+				parent.Add(el);
+
+				Localisation.StoreLocalisation(LocalisationFile, fullID, si.Value);
+			}
+			else
+			{
+				el = new XElement(Name, si.Value);
+				parent.Add(el);
+			}
 
 			foreach (var att in item.Attributes)
 			{

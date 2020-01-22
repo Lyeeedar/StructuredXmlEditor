@@ -188,6 +188,7 @@
     <Compile Include="Util\Extensions.cs" />
     <Compile Include="Util\Future.cs" />
     <Compile Include="Util\ISelectable.cs" />
+    <Compile Include="Util\Localisation.cs" />
     <Compile Include="Util\OpenFolderDialog.cs" />
     <Compile Include="Util\Pool.cs" />
     <Compile Include="Util\SerializableDictionary.cs" />

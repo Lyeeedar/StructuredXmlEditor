@@ -9,6 +9,8 @@ namespace StructuredXmlEditor.Data
 {
 	public class StringItem : PrimitiveDataItem<string>
 	{
+		public string LocalisationID { get; set; }
+
 		public StringItem(DataDefinition definition, UndoRedoManager undoRedo) : base(definition, undoRedo)
 		{
 

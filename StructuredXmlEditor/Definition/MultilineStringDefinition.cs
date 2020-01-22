@@ -12,6 +12,7 @@ namespace StructuredXmlEditor.Definition
 	{
 		private const string Seperator = "\n";
 
+		public bool NeedsLocalisation { get; set; }
 		public string Default { get; set; }
 		public bool ElementPerLine { get; set; }
 		public bool IsAsciiGrid { get; set; }
