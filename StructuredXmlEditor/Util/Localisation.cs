@@ -13,56 +13,52 @@ namespace StructuredXmlEditor.Util
 {
 	public static class Localisation
 	{
-		private static string[] Languages = new string[] { "EN-GB", "EN-US", "DE" };
-
-		private static Dictionary<string, Tuple<string, bool>> LoadLocalisationFile(string file, string language)
+		private static Dictionary<string, string> LoadLocalisationFile(string file)
 		{
 			var workspaceRoot = Workspace.Instance.ProjectRoot;
 			var workspaceFolder = Path.GetDirectoryName(workspaceRoot);
 
-			var localisationFile = Path.Combine(workspaceFolder, "Localisation", language, file + ".xml");
+			var localisationFile = Path.Combine(workspaceFolder, "Localisation", "EN-GB", file + ".xml");
 
 			if (!File.Exists(localisationFile))
 			{
-				return new Dictionary<string, Tuple<string, bool>>();
+				return new Dictionary<string, string>();
 			}
 
 			var contents = XDocument.Load(localisationFile);
 
-			var output = new Dictionary<string, Tuple<string, bool>>();
+			var output = new Dictionary<string, string>();
 
 			foreach (var el in contents.Root.Elements())
 			{
 				var id = el.Attribute("ID").Value;
-				var translated = bool.Parse(el.Attribute("Translated").Value);
 				var text = el.Value;
 
-				output[id] = new Tuple<string, bool>(text, translated);
+				output[id] = text;
 			}
 
 			return output;
 		}
 
-		private static void SaveLocalisationFile(string file, string language, Dictionary<string, Tuple<string, bool>> contents)
+		private static void SaveLocalisationFile(string file, Dictionary<string, string> contents)
 		{
 			var workspaceRoot = Workspace.Instance.ProjectRoot;
 			var workspaceFolder = Path.GetDirectoryName(workspaceRoot);
 
-			var localisationFile = Path.Combine(workspaceFolder, "Localisation", language, file + ".xml");
+			var localisationFile = Path.Combine(workspaceFolder, "Localisation", "EN-GB", file + ".xml");
 
 			var doc = new XDocument();
 
 			var rootEl = new XElement("Localisation");
-			rootEl.SetAttributeValue("Language", language);
+			rootEl.SetAttributeValue("Language", "EN-GB");
 
 			doc.Add(rootEl);
 			doc.Elements().First().SetAttributeValue(XNamespace.Xmlns + "meta", DataDefinition.MetaNS);
 
 			foreach (var item in contents.OrderBy(e => e.Key.Split(':')[0]).ThenBy(e => e.Key.Split(':')[1]))
 			{
-				var el = new XElement("Text", item.Value.Item1);
+				var el = new XElement("Text", item.Value);
 				el.SetAttributeValue("ID", item.Key);
-				el.SetAttributeValue("Translated", item.Value.Item2);
 
 				rootEl.Add(el);
 			}
@@ -91,19 +87,16 @@ namespace StructuredXmlEditor.Util
 
 		public static string GetLocalisation(string file, string id)
 		{
-			var contents = LoadLocalisationFile(file, "EN-GB");
-			return contents[id].Item1;
+			var contents = LoadLocalisationFile(file);
+			return contents[id];
 		}
 
 		public static void StoreLocalisation(string file, string id, string text)
 		{
-			foreach (var language in Languages)
-			{
-				var contents = LoadLocalisationFile(file, language);
-				contents[id] = new Tuple<string, bool>(text, language.StartsWith("EN-"));
+			var contents = LoadLocalisationFile(file);
+			contents[id] = text;
 
-				SaveLocalisationFile(file, language, contents);
-			}
+			SaveLocalisationFile(file, contents);
 		}
 	}
 }

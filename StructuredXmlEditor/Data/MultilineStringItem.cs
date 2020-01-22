@@ -11,6 +11,8 @@ namespace StructuredXmlEditor.Data
 {
 	public class MultilineStringItem : PrimitiveDataItem<string>
 	{
+		public string LocalisationID { get; set; }
+
 		//-----------------------------------------------------------------------
 		public override string Description
 		{

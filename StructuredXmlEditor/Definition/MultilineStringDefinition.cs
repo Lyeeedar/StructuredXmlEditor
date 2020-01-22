@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using StructuredXmlEditor.Data;
+using StructuredXmlEditor.Util;
 
 namespace StructuredXmlEditor.Definition
 {
@@ -13,6 +14,7 @@ namespace StructuredXmlEditor.Definition
 		private const string Seperator = "\n";
 
 		public bool NeedsLocalisation { get; set; }
+		public string LocalisationFile { get; set; }
 		public string Default { get; set; }
 		public bool ElementPerLine { get; set; }
 		public bool IsAsciiGrid { get; set; }
@@ -42,7 +44,27 @@ namespace StructuredXmlEditor.Definition
 			}
 			else
 			{
-				item.Value = element.Value;
+				if (NeedsLocalisation)
+				{
+					var id = element.Value;
+
+					try
+					{
+						item.LocalisationID = id.Split(':')[1];
+
+						item.Value = Localisation.GetLocalisation(LocalisationFile, id);
+					}
+					catch (Exception)
+					{
+						// fallback to assuming the text was in the element
+						item.LocalisationID = null;
+						item.Value = id;
+					}
+				}
+				else
+				{
+					item.Value = element.Value;
+				}
 			}
 
 			foreach (var att in Attributes)
@@ -80,6 +102,9 @@ namespace StructuredXmlEditor.Definition
 			ElementPerLine = TryParseBool(definition, "ElementPerLine");
 			IsAsciiGrid = TryParseBool(definition, "IsAsciiGrid");
 			LineElementName = definition.Attribute("LineElementName")?.Value?.ToString() ?? "Line";
+
+			NeedsLocalisation = TryParseBool(definition, "NeedsLocalisation", false);
+			LocalisationFile = definition.Attribute("LocalisationFile")?.Value?.ToString() ?? "Default";
 		}
 
 		public override void DoSaveData(XElement parent, DataItem item)
@@ -102,8 +127,27 @@ namespace StructuredXmlEditor.Definition
 			}
 			else
 			{
-				el = new XElement(Name, si.Value);
-				parent.Add(el);
+				if (NeedsLocalisation)
+				{
+					if (si.LocalisationID == null)
+					{
+						si.LocalisationID = Guid.NewGuid().ToString();
+					}
+
+					var pathToRoot = si.GetPathToRoot();
+
+					var fullID = $"{pathToRoot}:{si.LocalisationID}";
+
+					el = new XElement(Name, fullID);
+					parent.Add(el);
+
+					Localisation.StoreLocalisation(LocalisationFile, fullID, si.Value);
+				}
+				else
+				{
+					el = new XElement(Name, si.Value);
+					parent.Add(el);
+				}
 			}
 
 			foreach (var att in item.Attributes)

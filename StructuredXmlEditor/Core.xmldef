@@ -60,7 +60,7 @@
 			<Number Name="MaxLength" Default="9999999" Type="Int" Min="1" ToolTip="The max number of characters in this element" />
 			<String Name="Default" ToolTip="The default value for this element." />
 			<Boolean Name="NeedsLocalisation" ToolTip="Whether the text should be written to a seperate localisation file" Default="false" />
-			<String Name="LocalisationFile" ToolTip="The name of the localisation file to store the localisation in" />
+			<String Name="LocalisationFile" ToolTip="The name of the localisation file to store the localisation in" VisibleIf="NeedsLocalisation==true" />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
@@ -122,7 +122,9 @@
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<Boolean Name="ElementPerLine" ToolTip="If true then the string will be split line by line into child elements." />
 			<String Name="LineElementName" ToolTip="The name of the element that holds each line of the string" Default="Line" VisibleIf="ElementPerLine==true" />
-			<Boolean Name="IsAsciiGrid" ToolTip="If true then the option to use the ascii grid editor will be present for this element." />
+			<Boolean Name="IsAsciiGrid" ToolTip="If true then the option to use the ascii grid editor will be present for this element." VisibleIf="ElementPerLine==true" />
+			<Boolean Name="NeedsLocalisation" ToolTip="Whether the text should be written to a seperate localisation file" Default="false" VisibleIf="ElementPerLine==false" />
+			<String Name="LocalisationFile" ToolTip="The name of the localisation file to store the localisation in" VisibleIf="NeedsLocalisation==true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Primitive" HasAlpha="false" />
 			<String Name="ToolTip" ToolTip="The tooltip to display when this element is moused over." />
