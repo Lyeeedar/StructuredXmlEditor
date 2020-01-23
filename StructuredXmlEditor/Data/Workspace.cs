@@ -110,6 +110,9 @@ namespace StructuredXmlEditor.Data
 		public Command<object> SaveAsCMD { get { return new Command<object>((e) => SaveAs(), (e) => Current != null); } }
 
 		//-----------------------------------------------------------------------
+		public Command<object> ResaveAllCMD { get { return new Command<object>((e) => ResaveAllFiles()); } }
+
+		//-----------------------------------------------------------------------
 		public Command<object> UndoCMD { get { return new Command<object>((e) => Undo(), (e) => Current != null && Current.UndoRedo.CanUndo); } }
 
 		//-----------------------------------------------------------------------
@@ -1677,6 +1680,33 @@ namespace StructuredXmlEditor.Data
 					Message.Show(e.Message, "Exception!");
 				}
 			}
+		}
+
+		//-----------------------------------------------------------------------
+		public void ResaveAllFiles()
+		{
+			var resaveCount = 0;
+
+			var projectDir = Path.GetDirectoryName(ProjectRoot);
+			var files = Directory.EnumerateFiles(projectDir, "*", SearchOption.AllDirectories).ToList();
+			foreach (var file in files)
+			{
+				var ext = Path.GetExtension(file);
+
+				if (ext == ".xml" || ext == ".json" || ext == ".yaml" || SupportedExtensionMap.ContainsKey(ext))
+				{
+					try
+					{
+						var doc = OpenImpl(file);
+						doc.Save();
+
+						resaveCount++;
+					}
+					catch (Exception) { }
+				}	
+			}
+
+			Message.Show($"Resaved {resaveCount} files.", "Completed resave");
 		}
 
 		//-----------------------------------------------------------------------

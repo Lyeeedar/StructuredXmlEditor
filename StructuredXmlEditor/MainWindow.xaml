@@ -154,6 +154,19 @@
 						<Separator />
 
 						<MenuItem
+							Header="_Resave all files"
+							Command="{Binding ResaveAllCMD}">
+							<MenuItem.Icon>
+								<Image
+									Source="/Resources/Save.png"
+									Width="16"
+									Height="16" />
+							</MenuItem.Icon>
+						</MenuItem>
+
+						<Separator />
+
+						<MenuItem
 							Header="Switch _Project"
 							Command="{Binding SwitchProjectCMD}">
 						</MenuItem>
