@@ -18,7 +18,7 @@ namespace StructuredXmlEditor.Util
 			var workspaceRoot = Workspace.Instance.ProjectRoot;
 			var workspaceFolder = Path.GetDirectoryName(workspaceRoot);
 
-			var localisationFile = Path.Combine(workspaceFolder, "Localisation", "EN-GB", file + ".xml");
+			var localisationFile = Path.Combine(workspaceFolder, "Localisation", "en", file + ".xml");
 
 			if (!File.Exists(localisationFile))
 			{
@@ -45,12 +45,12 @@ namespace StructuredXmlEditor.Util
 			var workspaceRoot = Workspace.Instance.ProjectRoot;
 			var workspaceFolder = Path.GetDirectoryName(workspaceRoot);
 
-			var localisationFile = Path.Combine(workspaceFolder, "Localisation", "EN-GB", file + ".xml");
+			var localisationFile = Path.Combine(workspaceFolder, "Localisation", "en", file + ".xml");
 
 			var doc = new XDocument();
 
 			var rootEl = new XElement("Localisation");
-			rootEl.SetAttributeValue("Language", "EN-GB");
+			rootEl.SetAttributeValue("Language", "en");
 
 			doc.Add(rootEl);
 			doc.Elements().First().SetAttributeValue(XNamespace.Xmlns + "meta", DataDefinition.MetaNS);
