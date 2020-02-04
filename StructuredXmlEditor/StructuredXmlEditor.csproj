@@ -88,6 +88,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Data\DefinitionCreator.cs" />
     <Compile Include="Data\Document.cs" />
     <Compile Include="Data\Item\BooleanItem.cs" />
     <Compile Include="Data\Item\CollectionChildItem.cs" />
