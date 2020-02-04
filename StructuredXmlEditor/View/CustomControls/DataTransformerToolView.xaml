@@ -1,0 +1,155 @@
+﻿<UserControl
+	x:Class="StructuredXmlEditor.View.DataTransformerToolView"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:diff="clr-namespace:DiffPlex.DiffBuilder.Model;assembly=DiffPlex"
+	xmlns:local="clr-namespace:StructuredXmlEditor.View">
+	<UserControl.Resources>
+		<Style
+			x:Key="DiffLineStyle"
+			TargetType="Border">
+			<Style.Triggers>
+				<DataTrigger
+					Binding="{Binding Type}"
+					Value="{x:Static diff:ChangeType.Modified}">
+					<Setter
+						Property="Background">
+						<Setter.Value>
+							<SolidColorBrush
+								Color="Yellow"
+								Opacity="0.2" />
+						</Setter.Value>
+					</Setter>
+				</DataTrigger>
+				<DataTrigger
+					Binding="{Binding Type}"
+					Value="{x:Static diff:ChangeType.Inserted}">
+					<Setter
+						Property="Background">
+						<Setter.Value>
+							<SolidColorBrush
+								Color="Green"
+								Opacity="0.2" />
+						</Setter.Value>
+					</Setter>
+				</DataTrigger>
+				<DataTrigger
+					Binding="{Binding Type}"
+					Value="{x:Static diff:ChangeType.Imaginary}">
+					<Setter
+						Property="Background">
+						<Setter.Value>
+							<SolidColorBrush
+								Color="Gray"
+								Opacity="0.2" />
+						</Setter.Value>
+					</Setter>
+				</DataTrigger>
+				<DataTrigger
+					Binding="{Binding Type}"
+					Value="{x:Static diff:ChangeType.Deleted}">
+					<Setter
+						Property="Background">
+						<Setter.Value>
+							<SolidColorBrush
+								Color="Red"
+								Opacity="0.2" />
+						</Setter.Value>
+					</Setter>
+				</DataTrigger>
+			</Style.Triggers>
+		</Style>
+	</UserControl.Resources>
+	
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition
+				Height="Auto" />
+			<RowDefinition
+				Height="*" />
+			<RowDefinition
+				Height="Auto" />
+			<RowDefinition
+				Height="*" />
+		</Grid.RowDefinitions>
+		
+		<TextBox
+			Margin="5"
+			Text="{Binding ElementPath, UpdateSourceTrigger=PropertyChanged, Delay=200}" />
+		<TextBox
+			Grid.Row="1"
+			Margin="5"
+			AcceptsReturn="True"
+			Text="{Binding OutputTemplate, UpdateSourceTrigger=PropertyChanged, Delay=200}" />
+
+		<DockPanel
+			Grid.Row="2">
+			<local:MultilineTextEditor
+				DockPanel.Dock="Left"
+				Margin="10"
+				MaxWidth="100"
+				Text="{Binding ExampleDocument, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=200}" />
+			<TextBlock
+				DockPanel.Dock="Left"
+				Margin="10"
+				Text="IsMatch: " />
+			<TextBlock
+				DockPanel.Dock="Left"
+				Margin="10"
+				Text="{Binding IsDocumentMatch}" />
+
+			<Button
+				DockPanel.Dock="Right"
+				Content="Run On Project"
+				Command="{Binding DoTransformCMD}" />
+
+			<TextBlock
+				Margin="10"
+				Text="{Binding TransformError}" />
+		</DockPanel>
+
+		<ScrollViewer
+			HorizontalScrollBarVisibility="Disabled"
+			Margin="5"
+			Grid.Row="3">
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition
+						Width="*" />
+					<ColumnDefinition
+						Width="*" />
+				</Grid.ColumnDefinitions>
+
+				<ItemsControl
+					Grid.Column="0"
+					ItemsSource="{Binding DiffModel.OldText.Lines}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<Border
+								Style="{StaticResource DiffLineStyle}">
+								<TextBlock
+									Text="{Binding Text}" />
+							</Border>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+
+				<ItemsControl
+					Grid.Column="1"
+					ItemsSource="{Binding DiffModel.NewText.Lines}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<Border
+								Style="{StaticResource DiffLineStyle}">
+								<TextBlock
+									Text="{Binding Text}" />
+							</Border>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</Grid>
+		</ScrollViewer>
+	</Grid>
+</UserControl>

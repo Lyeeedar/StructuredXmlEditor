@@ -254,6 +254,7 @@ namespace StructuredXmlEditor.Data
 			Tools.Add(new ProjectViewTool(this));
 			Tools.Add(new TemplateCreatorTool(this));
 			Tools.Add(new FocusTool(this));
+			Tools.Add(new DataTransformerTool(this));
 
 #if DEBUG
 			Tools.Add(new GitTool(this));

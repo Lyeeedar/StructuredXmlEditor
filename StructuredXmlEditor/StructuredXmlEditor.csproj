@@ -46,6 +46,9 @@
     <Reference Include="Costura, Version=3.3.3.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
       <HintPath>..\packages\Costura.Fody.3.3.3\lib\net40\Costura.dll</HintPath>
     </Reference>
+    <Reference Include="DiffPlex, Version=1.5.0.0, Culture=neutral, PublicKeyToken=1d35e91d1bd7bc0f, processorArchitecture=MSIL">
+      <HintPath>..\packages\DiffPlex.1.5.0\lib\net40\DiffPlex.dll</HintPath>
+    </Reference>
     <Reference Include="NCalc, Version=1.3.8.0, Culture=neutral, PublicKeyToken=973cde3f1cafed03, processorArchitecture=MSIL">
       <HintPath>..\packages\ncalc.1.3.8\lib\NCalc.dll</HintPath>
       <Private>True</Private>
@@ -88,6 +91,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Data\DataTransformer.cs" />
     <Compile Include="Data\DefinitionCreator.cs" />
     <Compile Include="Data\Document.cs" />
     <Compile Include="Data\Item\BooleanItem.cs" />
@@ -145,6 +149,7 @@
     <Compile Include="Definition\StructDefinition.cs" />
     <Compile Include="Definition\ReferenceDefinition.cs" />
     <Compile Include="Definition\TreeDefinition.cs" />
+    <Compile Include="Tools\DataTransformerTool.cs" />
     <Compile Include="Tools\FocusTool.cs" />
     <Compile Include="Tools\GitTool.cs" />
     <Compile Include="Tools\GitTool\GitApp\Util\Command.cs" />
@@ -206,6 +211,9 @@
     <Compile Include="View\CustomControls\ColourPicker\ColorSpectrumSlider.cs" />
     <Compile Include="View\CustomControls\ColourPicker\ColourUtilities.cs" />
     <Compile Include="View\CustomControls\ColourPicker\HsvColor.cs" />
+    <Compile Include="View\CustomControls\DataTransformerToolView.xaml.cs">
+      <DependentUpon>DataTransformerToolView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\CustomControls\DocumentView.xaml.cs">
       <DependentUpon>DocumentView.xaml</DependentUpon>
     </Compile>
@@ -357,6 +365,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="View\CustomControls\AnimatedImage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\CustomControls\DataTransformerToolView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

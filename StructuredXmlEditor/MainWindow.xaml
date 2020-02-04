@@ -323,6 +323,10 @@
 						<v:FocusToolView />
 					</DataTemplate>
 					<DataTemplate
+						DataType="{x:Type t:DataTransformerTool}">
+						<v:DataTransformerToolView />
+					</DataTemplate>
+					<DataTemplate
 						DataType="{x:Type t:ProjectViewTool}">
 						<v:ProjectViewView />
 					</DataTemplate>
