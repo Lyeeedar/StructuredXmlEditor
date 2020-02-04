@@ -295,6 +295,13 @@
 							Header="Open in Explorer"
 							Command="{Binding Model.OpenInExplorerCMD}"
 							CommandParameter="{Binding Model.Path}" />
+
+						<Separator />
+
+						<MenuItem
+							Header="Close all but this"
+							Command="{Binding Model.CloseAllButThisCMD}" />
+
 					</ContextMenu>
 				</dock:DockingManager.DocumentContextMenu>
 

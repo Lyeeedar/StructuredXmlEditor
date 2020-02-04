@@ -153,16 +153,16 @@
 								<Separator />
 
 								<MenuItem
-									Header="_Explore To"
+									Header="_Open in Explorer"
 									Command="{Binding ExploreToCMD}" />
 
 								<Separator />
 
 								<MenuItem
-									Header="Expand All"
+									Header="_Expand All"
 									Command="{Binding ExpandAllCMD}" />
 								<MenuItem
-									Header="Collapse All"
+									Header="_Collapse All"
 									Command="{Binding CollapseAllCMD}" />
 
 							</ContextMenu>

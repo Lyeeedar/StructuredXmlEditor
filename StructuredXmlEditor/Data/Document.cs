@@ -72,6 +72,9 @@ namespace StructuredXmlEditor.Data
 		public Command<string> OpenInExplorerCMD { get { return new Command<string>((e) => OpenInExplorer(e)); } }
 
 		//-----------------------------------------------------------------------
+		public Command<string> CloseAllButThisCMD { get { return new Command<string>((e) => CloseAllButThis()); } }
+
+		//-----------------------------------------------------------------------
 		public string Title
 		{
 			get
@@ -134,6 +137,20 @@ namespace StructuredXmlEditor.Data
 			}
 
 			return false;
+		}
+
+		//-----------------------------------------------------------------------
+		public void CloseAllButThis()
+		{
+			foreach (var doc in Workspace.Documents.ToList())
+			{
+				if (doc != this)
+				{
+					doc.Close();
+				}
+			}
+
+			Workspace.Current = this;
 		}
 
 		//-----------------------------------------------------------------------
