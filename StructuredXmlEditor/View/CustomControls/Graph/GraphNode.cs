@@ -415,57 +415,60 @@ namespace StructuredXmlEditor.View
 				var current = MouseUtilities.CorrectGetPosition(Graph);
 				var diff = current - m_mouseDragLast;
 
-				if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+				if (diff.LengthSquared != 0)
 				{
-					var x = m_startX + diff.X / Graph.Scale;
-					var y = m_startY + diff.Y / Graph.Scale;
-
-					double? chosenSnapX = null;
-					foreach (var snapline in Graph.SnapLinesX)
+					if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
 					{
-						if (Math.Abs(x - snapline) < 10)
+						var x = m_startX + diff.X / Graph.Scale;
+						var y = m_startY + diff.Y / Graph.Scale;
+
+						double? chosenSnapX = null;
+						foreach (var snapline in Graph.SnapLinesX)
 						{
-							chosenSnapX = snapline;
-							break;
+							if (Math.Abs(x - snapline) < 10)
+							{
+								chosenSnapX = snapline;
+								break;
+							}
+							else if (Math.Abs((x + ActualWidth) - snapline) < 10)
+							{
+								chosenSnapX = snapline - ActualWidth;
+								break;
+							}
 						}
-						else if (Math.Abs((x + ActualWidth) - snapline) < 10)
+
+						double? chosenSnapY = null;
+						foreach (var snapline in Graph.SnapLinesY)
 						{
-							chosenSnapX = snapline - ActualWidth;
-							break;
+							if (Math.Abs(y - snapline) < 10)
+							{
+								chosenSnapY = snapline;
+								break;
+							}
+							else if (Math.Abs((y + ActualHeight) - snapline) < 10)
+							{
+								chosenSnapY = snapline - ActualHeight;
+								break;
+							}
 						}
+
+						if (chosenSnapX.HasValue)
+						{
+							x = chosenSnapX.Value;
+						}
+						if (chosenSnapY.HasValue)
+						{
+							y = chosenSnapY.Value;
+						}
+
+						diff.X = (x - m_startX) * Graph.Scale;
+						diff.Y = (y - m_startY) * Graph.Scale;
 					}
 
-					double? chosenSnapY = null;
-					foreach (var snapline in Graph.SnapLinesY)
+					foreach (var node in Graph.Selected)
 					{
-						if (Math.Abs(y - snapline) < 10)
-						{
-							chosenSnapY = snapline;
-							break;
-						}
-						else if (Math.Abs((y + ActualHeight) - snapline) < 10)
-						{
-							chosenSnapY = snapline - ActualHeight;
-							break;
-						}
+						node.Translate(new Point(diff.X / Graph.Scale, diff.Y / Graph.Scale));
 					}
-
-					if (chosenSnapX.HasValue)
-					{
-						x = chosenSnapX.Value;
-					}
-					if (chosenSnapY.HasValue)
-					{
-						y = chosenSnapY.Value;
-					}
-
-					diff.X = (x - m_startX) * Graph.Scale;
-					diff.Y = (y - m_startY) * Graph.Scale;
-				}
-
-				foreach (var node in Graph.Selected)
-				{
-					node.Translate(new Point(diff.X / Graph.Scale, diff.Y / Graph.Scale));
 				}
 			}
 
