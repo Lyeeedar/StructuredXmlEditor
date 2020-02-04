@@ -11,7 +11,7 @@ namespace StructuredXmlEditor.Data
 	public class DataTransformer
 	{
 		//-----------------------------------------------------------------------
-		public string ElementPath { get; set; }
+		public List<string> ElementPaths { get; set; }
 		public string OutputTemplate { get; set; }
 
 		//-----------------------------------------------------------------------
@@ -45,29 +45,61 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public bool TransformDocument(XElement root)
 		{
-			var resourceType = ElementPath.Split('.')[0];
-			if (root.Name != resourceType)
+			var processed = false;
+			foreach (var ElementPath in ElementPaths)
 			{
-				return false;
-			}
-
-			var elementPath = ElementPath.Replace(resourceType + ".", "");
-
-			var matchingEls = GetElements(root, elementPath);
-			if (matchingEls.Count > 0)
-			{
-				foreach (var el in matchingEls)
+				var pathParts = ElementPath.Split('.');
+				var resourceType = pathParts[0];
+				if (resourceType == "*")
 				{
-					var parent = el.Parent;
-					var transformed = TransformElement(root, el);
+					var firstNode = pathParts[1];
 
-					el.ReplaceWith(transformed);
+					var potentialStarts = root.Descendants(firstNode);
+
+					var elementPath = ElementPath.Replace(resourceType + "." + firstNode + ".", "");
+					foreach (var potentialRoot in potentialStarts)
+					{
+						var matchingEls = GetElements(potentialRoot, elementPath);
+						if (matchingEls.Count > 0)
+						{
+							foreach (var el in matchingEls)
+							{
+								var parent = el.Parent;
+								var transformed = TransformElement(root, el);
+
+								el.ReplaceWith(transformed);
+							}
+
+							processed = true;
+						}
+					}
 				}
+				else
+				{
+					if (root.Name != resourceType || resourceType == "*")
+					{
+						continue;
+					}
 
-				return true;
+					var elementPath = ElementPath.Replace(resourceType + ".", "");
+
+					var matchingEls = GetElements(root, elementPath);
+					if (matchingEls.Count > 0)
+					{
+						foreach (var el in matchingEls)
+						{
+							var parent = el.Parent;
+							var transformed = TransformElement(root, el);
+
+							el.ReplaceWith(transformed);
+						}
+
+						processed = true;
+					}
+				}
 			}
 
-			return false;
+			return processed;
 		}
 
 		//-----------------------------------------------------------------------

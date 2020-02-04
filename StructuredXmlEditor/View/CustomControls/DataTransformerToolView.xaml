@@ -77,6 +77,7 @@
 		
 		<TextBox
 			Margin="5"
+			AcceptsReturn="True"
 			Text="{Binding ElementPath, UpdateSourceTrigger=PropertyChanged, Delay=200}" />
 		<TextBox
 			Grid.Row="1"

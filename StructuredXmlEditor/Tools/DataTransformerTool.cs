@@ -89,7 +89,7 @@ namespace StructuredXmlEditor.Tools
 		//-----------------------------------------------------------------------
 		public void UpdatePreview()
 		{
-			DataTransformer.ElementPath = ElementPath;
+			DataTransformer.ElementPaths = ElementPath.Split('\n').Select(e => e.Trim()).ToList();
 			DataTransformer.OutputTemplate = OutputTemplate;
 
 			TransformError = null;
