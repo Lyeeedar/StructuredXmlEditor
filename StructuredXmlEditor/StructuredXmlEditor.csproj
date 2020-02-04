@@ -88,29 +88,34 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Data\BooleanItem.cs" />
-    <Compile Include="Data\CollectionChildItem.cs" />
-    <Compile Include="Data\ColourItem.cs" />
-    <Compile Include="Data\CommentItem.cs" />
-    <Compile Include="Data\ComplexDataItem.cs" />
     <Compile Include="Data\Document.cs" />
-    <Compile Include="Data\EnumItem.cs" />
-    <Compile Include="Data\FileItem.cs" />
-    <Compile Include="Data\FlagsItem.cs" />
-    <Compile Include="Data\GraphCollectionItem.cs" />
-    <Compile Include="Data\GraphStructItem.cs" />
-    <Compile Include="Data\GraphNodeItem.cs" />
-    <Compile Include="Data\GraphReferenceItem.cs" />
-    <Compile Include="Data\ICollectionItem.cs" />
-    <Compile Include="Data\KeyframeItem.cs" />
-    <Compile Include="Data\NumberItem.cs" />
-    <Compile Include="Data\PrimitiveDataItem.cs" />
-    <Compile Include="Data\MultilineStringItem.cs" />
-    <Compile Include="Data\ReferenceItem.cs" />
-    <Compile Include="Data\SkeletalAnimationItem.cs" />
-    <Compile Include="Data\TimelineItem.cs" />
-    <Compile Include="Data\TreeItem.cs" />
-    <Compile Include="Data\VectorItem.cs" />
+    <Compile Include="Data\Item\BooleanItem.cs" />
+    <Compile Include="Data\Item\CollectionChildItem.cs" />
+    <Compile Include="Data\Item\CollectionItem.cs" />
+    <Compile Include="Data\Item\ColourItem.cs" />
+    <Compile Include="Data\Item\CommentItem.cs" />
+    <Compile Include="Data\Item\ComplexDataItem.cs" />
+    <Compile Include="Data\Item\DataItem.cs" />
+    <Compile Include="Data\Item\DummyItem.cs" />
+    <Compile Include="Data\Item\EnumItem.cs" />
+    <Compile Include="Data\Item\FileItem.cs" />
+    <Compile Include="Data\Item\FlagsItem.cs" />
+    <Compile Include="Data\Item\GraphCollectionItem.cs" />
+    <Compile Include="Data\Item\GraphNodeItem.cs" />
+    <Compile Include="Data\Item\GraphReferenceItem.cs" />
+    <Compile Include="Data\Item\GraphStructItem.cs" />
+    <Compile Include="Data\Item\ICollectionItem.cs" />
+    <Compile Include="Data\Item\KeyframeItem.cs" />
+    <Compile Include="Data\Item\MultilineStringItem.cs" />
+    <Compile Include="Data\Item\NumberItem.cs" />
+    <Compile Include="Data\Item\PrimitiveDataItem.cs" />
+    <Compile Include="Data\Item\ReferenceItem.cs" />
+    <Compile Include="Data\Item\SkeletalAnimationItem.cs" />
+    <Compile Include="Data\Item\StringItem.cs" />
+    <Compile Include="Data\Item\StructItem.cs" />
+    <Compile Include="Data\Item\TimelineItem.cs" />
+    <Compile Include="Data\Item\TreeItem.cs" />
+    <Compile Include="Data\Item\VectorItem.cs" />
     <Compile Include="Definition\CommentDefinition.cs" />
     <Compile Include="Definition\FlagsDefinition.cs" />
     <Compile Include="Definition\GraphCollectionDefinition.cs" />
@@ -125,8 +130,6 @@
     <Compile Include="Definition\BooleanDefinition.cs" />
     <Compile Include="Definition\CollectionChildDefinition.cs" />
     <Compile Include="Data\XmlDataModel.cs" />
-    <Compile Include="Data\CollectionItem.cs" />
-    <Compile Include="Data\DummyItem.cs" />
     <Compile Include="Definition\CollectionDefinition.cs" />
     <Compile Include="Definition\ColourDefinition.cs" />
     <Compile Include="Definition\ComplexDataDefinition.cs" />
@@ -268,9 +271,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Data\DataItem.cs" />
-    <Compile Include="Data\StringItem.cs" />
-    <Compile Include="Data\StructItem.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
