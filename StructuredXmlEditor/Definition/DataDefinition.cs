@@ -67,6 +67,13 @@ namespace StructuredXmlEditor.Definition
 
 		public static DataDefinition LoadDefinition(XElement element, string forceLoadAs = null)
 		{
+			if (element.Name.ToString() == "Const")
+			{
+				var constDef = new ConstDefinition();
+				constDef.Parse(element);
+				return constDef;
+			}
+
 			var name = element.Attribute(MetaNS + "RefKey")?.Value.ToString().ToUpper();
 			if (name == null) name = element.Attribute("RefKey")?.Value.ToString().ToUpper();
 			if (name == null) name = element.Name.ToString().ToUpper();

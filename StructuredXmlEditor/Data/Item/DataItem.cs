@@ -142,7 +142,7 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public bool IsVisible
+		public virtual bool IsVisible
 		{
 			get { return m_isVisible && !m_isSearchFiltered && !IsMultieditFiltered && IsVisibleFromBindings; }
 			set

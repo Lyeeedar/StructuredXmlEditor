@@ -100,6 +100,7 @@
     <Compile Include="Data\Item\ColourItem.cs" />
     <Compile Include="Data\Item\CommentItem.cs" />
     <Compile Include="Data\Item\ComplexDataItem.cs" />
+    <Compile Include="Data\Item\ConstDataItem.cs" />
     <Compile Include="Data\Item\DataItem.cs" />
     <Compile Include="Data\Item\DummyItem.cs" />
     <Compile Include="Data\Item\EnumItem.cs" />
@@ -122,6 +123,7 @@
     <Compile Include="Data\Item\TreeItem.cs" />
     <Compile Include="Data\Item\VectorItem.cs" />
     <Compile Include="Definition\CommentDefinition.cs" />
+    <Compile Include="Definition\ConstDefinition.cs" />
     <Compile Include="Definition\FlagsDefinition.cs" />
     <Compile Include="Definition\GraphCollectionDefinition.cs" />
     <Compile Include="Definition\GraphNodeDefinition.cs" />
