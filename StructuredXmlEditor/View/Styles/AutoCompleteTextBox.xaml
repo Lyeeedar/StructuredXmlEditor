@@ -1,0 +1,96 @@
+﻿<ResourceDictionary
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="clr-namespace:StructuredXmlEditor.View">
+
+	<Style
+		TargetType="{x:Type local:AutoCompleteTextBox}"
+		BasedOn="{StaticResource {x:Type local:PromptTextBox}}">
+		<Setter
+			Property="KeyboardNavigation.TabNavigation"
+			Value="None" />
+		<Setter
+			Property="HorizontalContentAlignment"
+			Value="Left" />
+		<Setter
+			Property="FocusVisualStyle"
+			Value="{x:Null}" />
+		<Setter
+			Property="AllowDrop"
+			Value="true" />
+		<Setter
+			Property="Template">
+			<Setter.Value>
+				<ControlTemplate
+					TargetType="{x:Type local:AutoCompleteTextBox}">
+					<Grid
+						x:Name="Gd">
+						<Border
+							x:Name="Bd"
+							SnapsToDevicePixels="true"
+							Background="{TemplateBinding Background}"
+							BorderBrush="{TemplateBinding BorderBrush}"
+							BorderThickness="{TemplateBinding BorderThickness}">
+							<Grid>
+								<ScrollViewer
+									x:Name="PART_ContentHost" />
+								<TextBlock
+									x:Name="Message"
+									FontSize="{TemplateBinding FontSize}"
+									Text="{TemplateBinding PromptText}"
+									IsHitTestVisible="False"
+									FontStyle="Italic"
+									Margin="4,2,2,0"
+									Opacity="0.4" />
+							</Grid>
+						</Border>
+						<Popup
+							x:Name="PART_Popup"
+							Width="{Binding ElementName=Gd, Path=ActualWidth}"
+							MinWidth="200"
+							MaxHeight="200"
+							AllowsTransparency="True"
+							Focusable="False"
+							VerticalOffset="1"
+							Placement="Bottom"
+							StaysOpen="False">
+							<Border
+								x:Name="brd"
+								BorderThickness="1"
+								BorderBrush="{x:Static SystemColors.WindowFrameBrush}"
+								Background="{StaticResource WindowBackgroundBrush}">
+								<ListView
+									x:Name="PART_ListBox"
+									Background="{TemplateBinding Background}"
+									BorderBrush="{TemplateBinding BorderBrush}"
+									BorderThickness="{TemplateBinding BorderThickness}"
+									HorizontalAlignment="Stretch"
+									HorizontalContentAlignment="Stretch" />
+							</Border>
+						</Popup>
+					</Grid>
+					<ControlTemplate.Triggers>
+						<Trigger
+							Property="IsFocused"
+							Value="True">
+							<Setter
+								TargetName="Message"
+								Property="Visibility"
+								Value="Hidden" />
+						</Trigger>
+
+						<Trigger
+							Property="HasText"
+							Value="True">
+							<Setter
+								TargetName="Message"
+								Property="Visibility"
+								Value="Hidden" />
+						</Trigger>
+					</ControlTemplate.Triggers>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+</ResourceDictionary>

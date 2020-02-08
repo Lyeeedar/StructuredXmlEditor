@@ -44,6 +44,10 @@
 					Source="View/Styles/ListView.xaml" />
 				<v:SharedResourceDictionary
 					Source="View/Styles/XmlDataView.xaml" />
+				<v:SharedResourceDictionary
+					Source="View/Styles/PromptTextBox.xaml" />
+				<v:SharedResourceDictionary
+					Source="View/Styles/AutoCompleteTextBox.xaml" />
 
 				<v:SharedResourceDictionary
 					Source="View/Styles/AvalonDock.xaml" />
