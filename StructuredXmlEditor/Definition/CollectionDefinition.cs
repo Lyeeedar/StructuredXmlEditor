@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Xml.Linq;
 using StructuredXmlEditor.Data;
+using StructuredXmlEditor.View;
 
 namespace StructuredXmlEditor.Definition
 {
@@ -19,6 +20,8 @@ namespace StructuredXmlEditor.Definition
 		public List<DataDefinition> AdditionalDefs { get; } = new List<DataDefinition>();
 		public int MinCount { get; set; } = 0;
 		public int MaxCount { get; set; } = int.MaxValue;
+		public List<Tuple<string, string>> DefKeys { get; set; } = new List<Tuple<string, string>>();
+		public string DefKey { get; set; }
 
 		public CollectionDefinition()
 		{
@@ -155,6 +158,27 @@ namespace StructuredXmlEditor.Definition
 			MinCount = TryParseInt(definition, "MinCount", 0);
 			MaxCount = TryParseInt(definition, "MaxCount", int.MaxValue);
 
+			DefKey = definition.Attribute("DefKey")?.Value?.ToString();
+			var keyString = definition.Attribute("Keys")?.Value?.ToString();
+			if (!string.IsNullOrWhiteSpace(keyString))
+			{
+				if (!keyString.Contains('('))
+				{
+					DefKeys.AddRange(keyString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(e => new Tuple<string, string>(e.Trim(), "Type")));
+				}
+				else
+				{
+					var categories = keyString.Split(new char[] { ')' }, StringSplitOptions.RemoveEmptyEntries);
+					foreach (var categoryString in categories)
+					{
+						var split = categoryString.Split('(');
+						var category = split[0].Trim();
+						if (category.StartsWith(",")) category = category.Substring(1);
+						DefKeys.AddRange(split[1].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(e => new Tuple<string, string>(e.Trim(), category)));
+					}
+				}
+			}
+
 			var currentGroup = "Items";
 
 			var childDefs = definition.Nodes();
@@ -180,7 +204,7 @@ namespace StructuredXmlEditor.Definition
 				}
 			}
 
-			if (ChildDefinitions.Count == 0)
+			if (ChildDefinitions.Count == 0 && DefKey == null && DefKeys.Count == 0)
 			{
 				throw new Exception("No child definitions in collection '" + Name + "'!");
 			}
@@ -289,6 +313,46 @@ namespace StructuredXmlEditor.Definition
 
 		public override void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global, Dictionary<string, Dictionary<string, DataDefinition>> referenceableDefinitions)
 		{
+			if (DefKey != null)
+			{
+				var key = DefKey.ToLower();
+
+				Dictionary<string, DataDefinition> defs = null;
+				if (local.ContainsKey(key)) defs = local;
+				else if (global.ContainsKey(key)) defs = global;
+
+				if (defs != null)
+				{
+					var def = defs[key] as ReferenceDefinition;
+					DefKeys = def.Keys;
+				}
+				else
+				{
+					Message.Show("Failed to find key " + DefKey + "!", "Collection Resolve Failed", "Ok");
+				}
+			}
+
+			foreach (var key in DefKeys)
+			{
+				Dictionary<string, DataDefinition> defs = null;
+				if (local.ContainsKey(key.Item1.ToLower())) defs = local;
+				else if (global.ContainsKey(key.Item1.ToLower())) defs = global;
+
+				if (defs != null)
+				{
+					var childDef = defs[key.Item1.ToLower()];
+					var childWrapperDef = new CollectionChildDefinition();
+					childWrapperDef.WrappedDefinition = childDef;
+
+					ChildDefinitions.Add(childWrapperDef);
+					Keys.Add(new Tuple<CollectionChildDefinition, string>(childWrapperDef, key.Item2));
+				}
+				else if (key.Item1 != "---")
+				{
+					Message.Show("Failed to find key " + key.Item1 + "!", "Collection Resolve Failed", "Ok");
+				}
+			}
+
 			foreach (var def in ChildDefinitions) def.WrappedDefinition.RecursivelyResolve(local, global, referenceableDefinitions);
 			foreach (var def in AdditionalDefs) def.RecursivelyResolve(local, global, referenceableDefinitions);
 		}

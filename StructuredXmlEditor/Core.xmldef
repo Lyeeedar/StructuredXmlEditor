@@ -196,6 +196,8 @@
 			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." VisibleIf="Collapse==true" />
 			<Number Name="MinCount" Min="0" ToolTip="The minimum number of child elements this can have." />
 			<Number Name="MaxCount" Min="1" Default="99999999" ToolTip="The maximum number of child elements this can have." />
+			<String Name="Keys" ToolTip="The names of the objects to use in this collection." />
+			<String Name="DefKey" ToolTip="The name of the ReferenceDef to use in this collection." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Collection" HasAlpha="false" />
@@ -216,6 +218,8 @@
 			<String Name="Seperator" Default="," ToolTip="The string to be used when in collapse mode." VisibleIf="Collapse==true" />
 			<Number Name="MinCount" Min="0" ToolTip="The minimum number of child elements this can have." />
 			<Number Name="MaxCount" Min="1" Default="99999999" ToolTip="The maximum number of child elements this can have." />
+			<String Name="Keys" ToolTip="The names of the objects to use in this collection." />
+			<String Name="DefKey" ToolTip="The name of the ReferenceDef to use in this collection." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />
 			<String Name="VisibleIf" ToolTip="The expression to use to determine whether this element is visible. Leave blank to have always visible." />
 			<Colour Name="TextColour" ToolTip="The colour on the element name in the ui." Default="Collection" HasAlpha="false" />

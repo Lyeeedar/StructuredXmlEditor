@@ -201,9 +201,16 @@ namespace StructuredXmlEditor.Data
 				var nextEls = new List<XElement>();
 				foreach (var currentEl in els)
 				{
-					foreach (var nextEl in currentEl.Elements(part))
+					if (part == "*")
 					{
-						nextEls.Add(nextEl);
+						nextEls.AddRange(currentEl.Elements());
+					}
+					else
+					{
+						foreach (var nextEl in currentEl.Elements(part))
+						{
+							nextEls.Add(nextEl);
+						}
 					}
 				}
 
