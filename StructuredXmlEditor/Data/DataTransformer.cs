@@ -67,7 +67,11 @@ namespace StructuredXmlEditor.Data
 								var parent = el.Parent;
 								var transformed = TransformElement(root, el);
 
-								el.ReplaceWith(transformed);
+								foreach (var newEl in transformed)
+								{
+									el.AddBeforeSelf(newEl);
+								}
+								el.Remove();
 							}
 
 							processed = true;
@@ -91,7 +95,11 @@ namespace StructuredXmlEditor.Data
 							var parent = el.Parent;
 							var transformed = TransformElement(root, el);
 
-							el.ReplaceWith(transformed);
+							foreach (var newEl in transformed)
+							{
+								el.AddBeforeSelf(newEl);
+							}
+							el.Remove();
 						}
 
 						processed = true;
@@ -103,7 +111,7 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		public XElement TransformElement(XElement root, XElement originalEl)
+		public IEnumerable<XElement> TransformElement(XElement root, XElement originalEl)
 		{
 			// split the template into variable chunks
 			var template = OutputTemplate;
@@ -123,7 +131,7 @@ namespace StructuredXmlEditor.Data
 					{
 						sourceEl = originalEl;
 					}
-					else if (variableSplit[1] == "root")
+					else if (variableSplit[0] == "root")
 					{
 						sourceEl = root;
 					}
@@ -166,6 +174,10 @@ namespace StructuredXmlEditor.Data
 							variableValue = targetEl.Value;
 						}
 					}
+					else if (!string.IsNullOrWhiteSpace(variableSplit[2]))
+					{
+						throw new Exception("Unknown variable part type '" + variableSplit[2] + "'!");
+					}
 					else
 					{
 						variableValue = targetEl.ToString();
@@ -186,7 +198,7 @@ namespace StructuredXmlEditor.Data
 
 			// parse expanded template into xelement
 			var tempEl = XElement.Parse(fakeRoot);
-			return tempEl.Elements().First();
+			return tempEl.Elements();
 		}
 
 		//-----------------------------------------------------------------------
