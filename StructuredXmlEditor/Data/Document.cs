@@ -102,6 +102,23 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public void PromptForReload()
+		{
+			if (NeedsReload)
+			{
+				NeedsReload = false;
+
+				string response = Message.Show("This document changed on disk, do you want to reload it? Clicking Yes will discard any local changes.", "Document Changed On Disk", "Yes", "No");
+
+				if (response == "Yes")
+				{
+					Close(true);
+					Workspace.Open(Path);
+				}
+			}
+		}
+
+		//-----------------------------------------------------------------------
 		private void OpenInExplorer(string path)
 		{
 			if (IsMultiediting)

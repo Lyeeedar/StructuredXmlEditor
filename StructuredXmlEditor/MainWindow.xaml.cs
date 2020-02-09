@@ -60,7 +60,15 @@ namespace StructuredXmlEditor
 			{
 				if (Workspace != null)
 				{
-					Workspace.Current = Workspace.Current;
+					Workspace.IsWorkspaceActive = true;
+				}
+			};
+
+			Deactivated += (e, args) =>
+			{
+				if (Workspace != null)
+				{
+					Workspace.IsWorkspaceActive = false;
 				}
 			};
 		}

@@ -30,6 +30,31 @@ namespace StructuredXmlEditor.Data
 		public static Workspace Instance;
 
 		//-----------------------------------------------------------------------
+		public bool IsWorkspaceActive
+		{
+			get { return m_isWorkspaceActive; }
+			set
+			{
+				m_isWorkspaceActive = value;
+
+				if (value)
+				{
+					Current?.PromptForReload();
+
+					if (NeedsLoadDefinitions)
+					{
+						NeedsLoadDefinitions = false;
+						LoadDefinitions();
+					}
+				}
+			}
+		}
+		private bool m_isWorkspaceActive;
+
+		//--------------------------------------------------------------------------
+		private bool NeedsLoadDefinitions { get; set; }
+
+		//-----------------------------------------------------------------------
 		public ObservableCollection<Document> Documents { get; set; } = new ObservableCollection<Document>();
 		public Document Current
 		{
@@ -40,15 +65,7 @@ namespace StructuredXmlEditor.Data
 
 				if (m_current != null && m_current.NeedsReload)
 				{
-					m_current.NeedsReload = false;
-
-					string response = Message.Show("This document changed on disk, do you want to reload it? Clicking Yes will discard any local changes.", "Document Changed On Disk", "Yes", "No");
-
-					if (response == "Yes")
-					{
-						m_current.Close(true);
-						Current = Open(m_current.Path);
-					}
+					m_current.PromptForReload();
 				}
 
 				RaisePropertyChangedEvent();
@@ -274,12 +291,19 @@ namespace StructuredXmlEditor.Data
 		{
 			FileChanged += (path) =>
 			{
-				if (Path.GetExtension(path) == ".xmldef") LoadDefinitions();
+				if (Path.GetExtension(path) == ".xmldef")
+				{
+					QueueLoadDefinitions();
+				}
 
 				var open = Documents.FirstOrDefault(e => e.Path == path);
 				if (open != null)
 				{
 					open.NeedsReload = true;
+					if (IsWorkspaceActive)
+					{
+						open.PromptForReload();
+					}
 				}
 
 				ProjectViewTool.Instance.Add(path);
@@ -287,18 +311,31 @@ namespace StructuredXmlEditor.Data
 
 			FileCreated += (path) =>
 			{
-				if (Path.GetExtension(path) == ".xmldef") LoadDefinitions();
+				if (Path.GetExtension(path) == ".xmldef")
+				{
+					QueueLoadDefinitions();
+				}
+
 				ProjectViewTool.Instance.Add(path);
 			};
 
 			FileDeleted += (path) =>
 			{
-				if (Path.GetExtension(path) == ".xmldef") LoadDefinitions();
+				if (Path.GetExtension(path) == ".xmldef")
+				{
+					QueueLoadDefinitions();
+				}
+
 				ProjectViewTool.Instance.Remove(path);
 			};
 
 			FileRenamed += (oldPath, newPath) =>
 			{
+				if (Path.GetExtension(oldPath) == ".xmldef" || Path.GetExtension(newPath) == ".xmldef")
+				{
+					QueueLoadDefinitions();
+				}
+
 				ProjectViewTool.Instance.Remove(oldPath);
 				ProjectViewTool.Instance.Add(newPath);
 			};
@@ -433,6 +470,19 @@ namespace StructuredXmlEditor.Data
 			}
 
 			return null;
+		}
+
+		//-----------------------------------------------------------------------
+		public void QueueLoadDefinitions()
+		{
+			if (IsWorkspaceActive)
+			{
+				LoadDefinitions();
+			}
+			else
+			{
+				NeedsLoadDefinitions = true;
+			}
 		}
 
 		//-----------------------------------------------------------------------
