@@ -324,7 +324,16 @@ namespace StructuredXmlEditor.Definition
 				if (defs != null)
 				{
 					var def = defs[key] as ReferenceDefinition;
-					DefKeys = def.Keys;
+					
+					foreach (var keydef in def.Keys)
+					{
+						var childDef = def.Definitions[keydef.Item1];
+						var childWrapperDef = new CollectionChildDefinition();
+						childWrapperDef.WrappedDefinition = childDef;
+
+						ChildDefinitions.Add(childWrapperDef);
+						Keys.Add(new Tuple<CollectionChildDefinition, string>(childWrapperDef, keydef.Item2));
+					}
 				}
 				else
 				{

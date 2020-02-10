@@ -590,7 +590,22 @@ namespace StructuredXmlEditor.Data
 
 			foreach (var scope in ReferenceableDefinitions.Values)
 			{
-				foreach (var def in scope.Values)
+				foreach (var def in scope.Values.Where(e => e is ReferenceDefinition))
+				{
+					try
+					{
+						def.RecursivelyResolve(ReferenceableDefinitions[def.SrcFile], ReferenceableDefinitions[""], ReferenceableDefinitions);
+					}
+					catch (Exception ex)
+					{
+						Message.Show("Failed to resolve references in definition '" + def.Name + "'!\n\n" + ex.Message, "Resolve Definition Failed", "Ok");
+					}
+				}
+			}
+
+			foreach (var scope in ReferenceableDefinitions.Values)
+			{
+				foreach (var def in scope.Values.Where(e => !(e is ReferenceDefinition)))
 				{
 					try
 					{

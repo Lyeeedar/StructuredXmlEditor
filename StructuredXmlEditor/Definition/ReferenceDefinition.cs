@@ -154,6 +154,7 @@ namespace StructuredXmlEditor.Definition
 				{
 					var def = defs[key] as ReferenceDefinition;
 					Keys = def.Keys;
+					Definitions = def.Definitions;
 
 					ListCollectionView lcv = new ListCollectionView(Keys);
 					lcv.GroupDescriptions.Add(new PropertyGroupDescription("Item2"));
@@ -164,32 +165,34 @@ namespace StructuredXmlEditor.Definition
 					Message.Show("Failed to find key " + DefKey + "!", "Reference Resolve Failed", "Ok");
 				}
 			}
-
-			foreach (var key in Keys)
+			else
 			{
-				Dictionary<string, DataDefinition> defs = null;
-				if (local.ContainsKey(key.Item1.ToLower())) defs = local;
-				else if (global.ContainsKey(key.Item1.ToLower())) defs = global;
-
-				if (defs != null)
+				foreach (var key in Keys)
 				{
-					Definitions[key.Item1] = defs[key.Item1.ToLower()];
+					Dictionary<string, DataDefinition> defs = null;
+					if (local.ContainsKey(key.Item1.ToLower())) defs = local;
+					else if (global.ContainsKey(key.Item1.ToLower())) defs = global;
+
+					if (defs != null)
+					{
+						Definitions[key.Item1] = defs[key.Item1.ToLower()];
+					}
+					else if (key.Item1 != "---")
+					{
+						Message.Show("Failed to find key " + key.Item1 + "!", "Reference Resolve Failed", "Ok");
+					}
 				}
-				else if (key.Item1 != "---")
+
+				if (Keys.Count == 0)
 				{
-					Message.Show("Failed to find key " + key.Item1 + "!", "Reference Resolve Failed", "Ok");
+					Keys.Add(new Tuple<string, string>("---", "---"));
+
+					ListCollectionView lcv = new ListCollectionView(Keys);
+					lcv.GroupDescriptions.Add(new PropertyGroupDescription("Item2"));
+					ItemsSource = lcv;
+
+					Definitions["---"] = new DummyDefinition();
 				}
-			}
-
-			if (Keys.Count == 0)
-			{
-				Keys.Add(new Tuple<string, string>("---", "---"));
-
-				ListCollectionView lcv = new ListCollectionView(Keys);
-				lcv.GroupDescriptions.Add(new PropertyGroupDescription("Item2"));
-				ItemsSource = lcv;
-
-				Definitions["---"] = new DummyDefinition();
 			}
 		}
 
