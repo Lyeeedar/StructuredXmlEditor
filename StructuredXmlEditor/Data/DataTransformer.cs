@@ -141,55 +141,58 @@ namespace StructuredXmlEditor.Data
 						throw new Exception("Unknown variable source '" + variableSplit[0] + "'");
 					}
 
-					XElement targetEl;
+					List<XElement> targetEls;
 					if (variableSplit[1].Length > 0)
 					{
-						targetEl = GetElements(sourceEl, variableSplit[1]).FirstOrDefault();
+						targetEls = GetElements(sourceEl, variableSplit[1]);
 					}
 					else
 					{
-						targetEl = sourceEl;
+						targetEls = new List<XElement>() { sourceEl };
 					}
 
-					string variableValue;
-					if (targetEl == null)
+					foreach (var targetEl in targetEls)
 					{
-						variableValue = "";
-					}
-					else if (variableSplit[2] == "name")
-					{
-						variableValue = targetEl.Name.ToString();
-					}
-					else if (variableSplit[2] == "contents")
-					{
-						if (targetEl.HasElements)
+						string variableValue;
+						if (targetEl == null)
 						{
 							variableValue = "";
-							foreach (var el in targetEl.Elements())
+						}
+						else if (variableSplit[2] == "name")
+						{
+							variableValue = targetEl.Name.ToString();
+						}
+						else if (variableSplit[2] == "contents")
+						{
+							if (targetEl.HasElements)
 							{
-								variableValue += el.ToString();
+								variableValue = "";
+								foreach (var el in targetEl.Elements())
+								{
+									variableValue += el.ToString();
+								}
 							}
+							else
+							{
+								variableValue = targetEl.Value;
+							}
+						}
+						else if (variableSplit[2] == "refkey")
+						{
+							variableValue = targetEl.Attribute(DataDefinition.MetaNS + "RefKey").Value;
+						}
+						else if (!string.IsNullOrWhiteSpace(variableSplit[2]))
+						{
+							throw new Exception("Unknown variable part type '" + variableSplit[2] + "'!");
 						}
 						else
 						{
-							variableValue = targetEl.Value;
+							variableValue = targetEl.ToString();
 						}
-					}
-					else if (variableSplit[2] == "refkey")
-					{
-						variableValue = targetEl.Attribute(DataDefinition.MetaNS + "RefKey").Value;
-					}
-					else if (!string.IsNullOrWhiteSpace(variableSplit[2]))
-					{
-						throw new Exception("Unknown variable part type '" + variableSplit[2] + "'!");
-					}
-					else
-					{
-						variableValue = targetEl.ToString();
-					}
-					variableValue = variableValue.Replace("xmlns:meta=\"Editor\"", "");
+						variableValue = variableValue.Replace("xmlns:meta=\"Editor\"", "");
 
-					expandedTemplate += variableValue;
+						expandedTemplate += variableValue;
+					}
 				}
 				else
 				{
