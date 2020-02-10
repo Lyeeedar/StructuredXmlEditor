@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StructuredXmlEditor.Definition;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -173,6 +174,10 @@ namespace StructuredXmlEditor.Data
 						{
 							variableValue = targetEl.Value;
 						}
+					}
+					else if (variableSplit[2] == "refkey")
+					{
+						variableValue = targetEl.Attribute(DataDefinition.MetaNS + "RefKey").Value;
 					}
 					else if (!string.IsNullOrWhiteSpace(variableSplit[2]))
 					{
