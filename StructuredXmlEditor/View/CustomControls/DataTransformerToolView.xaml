@@ -62,110 +62,228 @@
 			</Style.Triggers>
 		</Style>
 	</UserControl.Resources>
-	
+
 	<Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition
-				Height="Auto" />
-			<RowDefinition
-				Height="Auto" />
-			<RowDefinition
-				Height="Auto" />
-			<RowDefinition
-				Height="*" />
-			<RowDefinition
-				Height="Auto" />
-			<RowDefinition
-				Height="*" />
-		</Grid.RowDefinitions>
-
-		<TextBlock
-			Grid.Row="0"
-			Margin="5,5,5,0"
-			Text="Element Path. Supports wildcards '*'. Press enter to add an additional path." />
-		<local:PromptTextBox
-			Grid.Row="1"
-			AcceptsReturn="True"
-			PromptText="Element Path"
-			Text="{Binding ElementPath, UpdateSourceTrigger=PropertyChanged, Delay=200}" />
-
-		<TextBlock
-			Grid.Row="2"
-			Margin="5,5,5,0"
-			Text="Replace template. Access content with {(el,root) | (path) | (contents,name,refkey)}." />
-		<local:PromptTextBox
-			Grid.Row="3"
-			AcceptsReturn="True"
-			PromptText="Replace template"
-			Text="{Binding OutputTemplate, UpdateSourceTrigger=PropertyChanged, Delay=200}" />
-
-		<DockPanel
-			Grid.Row="4"
-			Margin="5">
-			<local:MultilineTextEditor
-				DockPanel.Dock="Left"
-				Margin="10"
-				MaxWidth="100"
-				Text="{Binding ExampleDocument, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=200}" />
-			<TextBlock
-				DockPanel.Dock="Left"
-				Margin="10"
-				Text="IsMatch: " />
-			<TextBlock
-				DockPanel.Dock="Left"
-				Margin="10"
-				Text="{Binding IsDocumentMatch}" />
-
-			<Button
-				DockPanel.Dock="Right"
-				Content="Run On Project"
-				Command="{Binding DoTransformCMD}" />
+		<Grid
+			Visibility="{Binding Preview, Converter={local:NullOrZeroConverter}}">
+			<Grid.RowDefinitions>
+				<RowDefinition
+					Height="Auto" />
+				<RowDefinition
+					Height="Auto" />
+				<RowDefinition
+					Height="Auto" />
+				<RowDefinition
+					Height="*" />
+				<RowDefinition
+					Height="Auto" />
+				<RowDefinition
+					Height="*" />
+			</Grid.RowDefinitions>
 
 			<TextBlock
-				Margin="10"
-				Text="{Binding TransformError}" />
-		</DockPanel>
+				Grid.Row="0"
+				Margin="5,5,5,0"
+				Text="Element Path. Supports wildcards '*'. Press enter to add an additional path." />
+			<local:PromptTextBox
+				Grid.Row="1"
+				AcceptsReturn="True"
+				PromptText="Element Path"
+				Text="{Binding ElementPath, UpdateSourceTrigger=PropertyChanged, Delay=200}" />
 
-		<ScrollViewer
-			HorizontalScrollBarVisibility="Disabled"
-			Margin="5"
-			Grid.Row="5">
-			<Grid>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition
-						Width="*" />
-					<ColumnDefinition
-						Width="*" />
-				</Grid.ColumnDefinitions>
+			<TextBlock
+				Grid.Row="2"
+				Margin="5,5,5,0"
+				Text="Replace template. Access content with {(el,root) | (path) | (contents,name,refkey)}." />
+			<local:PromptTextBox
+				Grid.Row="3"
+				AcceptsReturn="True"
+				PromptText="Replace template"
+				Text="{Binding OutputTemplate, UpdateSourceTrigger=PropertyChanged, Delay=200}" />
 
-				<ItemsControl
-					Grid.Column="0"
-					ItemsSource="{Binding DiffModel.OldText.Lines}">
-					<ItemsControl.ItemTemplate>
-						<DataTemplate>
-							<Border
-								Style="{StaticResource DiffLineStyle}">
-								<TextBlock
-									Text="{Binding Text}" />
-							</Border>
-						</DataTemplate>
-					</ItemsControl.ItemTemplate>
-				</ItemsControl>
+			<DockPanel
+				Grid.Row="4"
+				Margin="5">
+				<local:MultilineTextEditor
+					DockPanel.Dock="Left"
+					Margin="10"
+					MaxWidth="100"
+					Text="{Binding ExampleDocument, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=200}" />
+				<TextBlock
+					DockPanel.Dock="Left"
+					Margin="10"
+					Text="IsMatch: " />
+				<TextBlock
+					DockPanel.Dock="Left"
+					Margin="10"
+					Text="{Binding IsDocumentMatch}" />
 
-				<ItemsControl
-					Grid.Column="1"
-					ItemsSource="{Binding DiffModel.NewText.Lines}">
-					<ItemsControl.ItemTemplate>
-						<DataTemplate>
-							<Border
-								Style="{StaticResource DiffLineStyle}">
-								<TextBlock
-									Text="{Binding Text}" />
-							</Border>
-						</DataTemplate>
-					</ItemsControl.ItemTemplate>
-				</ItemsControl>
-			</Grid>
-		</ScrollViewer>
+				<Button
+					DockPanel.Dock="Right"
+					Content="Run On Project"
+					Command="{Binding DoTransformCMD}" />
+
+				<TextBlock
+					Margin="10"
+					Text="{Binding TransformError}" />
+			</DockPanel>
+
+			<ScrollViewer
+				HorizontalScrollBarVisibility="Disabled"
+				Margin="5"
+				Grid.Row="5">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition
+							Width="*" />
+						<ColumnDefinition
+							Width="*" />
+					</Grid.ColumnDefinitions>
+
+					<ItemsControl
+						Grid.Column="0"
+						ItemsSource="{Binding DiffModel.OldText.Lines}">
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<Border
+									Style="{StaticResource DiffLineStyle}">
+									<TextBlock
+										Text="{Binding Text}" />
+								</Border>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+
+					<ItemsControl
+						Grid.Column="1"
+						ItemsSource="{Binding DiffModel.NewText.Lines}">
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<Border
+									Style="{StaticResource DiffLineStyle}">
+									<TextBlock
+										Text="{Binding Text}" />
+								</Border>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</Grid>
+			</ScrollViewer>
+		</Grid>
+		<Grid
+			Visibility="{Binding Preview, Converter={local:NullOrZeroConverter}, ConverterParameter=Not}">
+			<Grid.RowDefinitions>
+				<RowDefinition
+					Height="Auto" />
+				<RowDefinition
+					Height="*" />
+				<RowDefinition
+					Height="Auto" />
+			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition
+					Width="*" />
+				<ColumnDefinition
+					Width="5" />
+				<ColumnDefinition
+					Width="2*" />
+			</Grid.ColumnDefinitions>
+
+			<DockPanel
+				LastChildFill="False">
+				<Button
+					DockPanel.Dock="Left"
+					Margin="5"
+					Width="100"
+					Height="30"
+					Content="Return"
+					Command="{Binding ReturnCMD}" />
+			</DockPanel>
+
+			<ListView
+				Grid.Row="1"
+				Margin="5"
+				SelectedItem="{Binding Preview.Selected, Mode=TwoWay}"
+				ItemsSource="{Binding Preview.Files}">
+				<ListView.ItemTemplate>
+					<DataTemplate>
+						<TextBlock
+							Text="{Binding Item2}" />
+					</DataTemplate>
+				</ListView.ItemTemplate>
+			</ListView>
+
+			<GridSplitter
+				Background="{StaticResource WindowBackgroundLightBrush}"
+				Grid.Row="1"
+				Grid.Column="1"
+				Width="5"
+				VerticalAlignment="Stretch"
+				HorizontalAlignment="Center"/>
+
+			<ScrollViewer
+				Grid.Row="1"
+				HorizontalScrollBarVisibility="Disabled"
+				Margin="5"
+				Grid.Column="2">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition
+							Width="*" />
+						<ColumnDefinition
+							Width="*" />
+					</Grid.ColumnDefinitions>
+
+					<ItemsControl
+						Grid.Column="0"
+						ItemsSource="{Binding Preview.Selected.Item4.OldText.Lines}">
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<Border
+									Style="{StaticResource DiffLineStyle}">
+									<TextBlock
+										Text="{Binding Text}" />
+								</Border>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+
+					<ItemsControl
+						Grid.Column="1"
+						ItemsSource="{Binding Preview.Selected.Item4.NewText.Lines}">
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<Border
+									Style="{StaticResource DiffLineStyle}">
+									<TextBlock
+										Text="{Binding Text}" />
+								</Border>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</Grid>
+			</ScrollViewer>
+
+			<DockPanel
+				Grid.Row="2"
+				Grid.Column="2"
+				LastChildFill="False">
+				<Button
+					Width="100"
+					Height="30"
+					Margin="5"
+					DockPanel.Dock="Right"
+					Content="Save All"
+					Command="{Binding SaveAllCMD}" />
+				<Button
+					Width="100"
+					Height="30"
+					Margin="5"
+					DockPanel.Dock="Right"
+					Content="Save"
+					Command="{Binding SaveCMD}" />
+			</DockPanel>
+		</Grid>
 	</Grid>
+
 </UserControl>
