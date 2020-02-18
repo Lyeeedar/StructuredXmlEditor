@@ -1,14 +1,17 @@
 ﻿using DiffPlex;
 using DiffPlex.DiffBuilder;
 using DiffPlex.DiffBuilder.Model;
+using ICSharpCode.AvalonEdit;
 using StructuredXmlEditor.Data;
 using StructuredXmlEditor.View;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -32,18 +35,7 @@ namespace StructuredXmlEditor.Tools
 		private string m_elementPath = "Example.Data";
 
 		//-----------------------------------------------------------------------
-		public string OutputTemplate
-		{
-			get { return m_outputTemplate; }
-			set
-			{
-				m_outputTemplate = value;
-				RaisePropertyChangedEvent();
-
-				UpdatePreview();
-			}
-		}
-		private string m_outputTemplate = "{el||}";
+		public TextEditor TextEditor { get; set; }
 
 		//-----------------------------------------------------------------------
 		private DataTransformer DataTransformer { get; } = new DataTransformer();
@@ -88,6 +80,24 @@ namespace StructuredXmlEditor.Tools
 		//-----------------------------------------------------------------------
 		public DataTransformerTool(Workspace workspace) : base(workspace, "Data Transformer Tool")
 		{
+			TextEditor = new TextEditor();
+
+			var assembly = Assembly.GetExecutingAssembly();
+			var resourceName = ("StructuredXmlEditor.Resources.DataTransformerSyntax.xshd");
+			using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+			using (XmlTextReader reader = new XmlTextReader(stream))
+			{
+				TextEditor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader.Load(reader, ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance);
+			}
+
+			TextEditor.Text = "{el||}";
+			TextEditor.Foreground = new SolidColorBrush(Color.FromRgb(255, 255, 255));
+			TextEditor.Background = Brushes.Transparent;
+			TextEditor.Document.TextChanged += (e, args) => 
+			{
+				UpdatePreview();
+			};
+
 			ExampleDocument = "<Example><Data /></Example>";
 
 			VisibleByDefault = false;
@@ -99,7 +109,7 @@ namespace StructuredXmlEditor.Tools
 		public void UpdatePreview()
 		{
 			DataTransformer.ElementPaths = ElementPath.Split('\n').Select(e => e.Trim()).ToList();
-			DataTransformer.OutputTemplate = OutputTemplate;
+			DataTransformer.OutputTemplate = TextEditor.Text;
 
 			TransformError = null;
 

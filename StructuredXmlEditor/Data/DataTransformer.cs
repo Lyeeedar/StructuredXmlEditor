@@ -55,27 +55,44 @@ namespace StructuredXmlEditor.Data
 				{
 					var firstNode = pathParts[1];
 
-					var potentialStarts = root.Descendants(firstNode);
+					var potentialStarts = root.Descendants(firstNode).ToList();
 
 					var elementPath = ElementPath.Replace(resourceType + "." + firstNode + ".", "");
 					foreach (var potentialRoot in potentialStarts)
 					{
-						var matchingEls = GetElements(potentialRoot, elementPath);
-						if (matchingEls.Count > 0)
+						if (pathParts.Length == 2)
 						{
-							foreach (var el in matchingEls)
-							{
-								var parent = el.Parent;
-								var transformed = TransformElement(root, el);
+							var el = potentialRoot;
+							var parent = el.Parent;
+							var transformed = TransformElement(root, el);
 
-								foreach (var newEl in transformed)
-								{
-									el.AddBeforeSelf(newEl);
-								}
-								el.Remove();
+							foreach (var newEl in transformed)
+							{
+								el.AddBeforeSelf(newEl);
 							}
+							el.Remove();
 
 							processed = true;
+						}
+						else
+						{
+							var matchingEls = GetElements(potentialRoot, elementPath);
+							if (matchingEls.Count > 0)
+							{
+								foreach (var el in matchingEls)
+								{
+									var parent = el.Parent;
+									var transformed = TransformElement(root, el);
+
+									foreach (var newEl in transformed)
+									{
+										el.AddBeforeSelf(newEl);
+									}
+									el.Remove();
+								}
+
+								processed = true;
+							}
 						}
 					}
 				}
