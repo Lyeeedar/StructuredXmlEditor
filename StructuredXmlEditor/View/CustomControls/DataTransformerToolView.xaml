@@ -74,6 +74,10 @@
 				<RowDefinition
 					Height="Auto" />
 				<RowDefinition
+					Height="Auto" />
+				<RowDefinition
+					Height="Auto" />
+				<RowDefinition
 					Height="*" />
 				<RowDefinition
 					Height="Auto" />
@@ -94,18 +98,27 @@
 			<TextBlock
 				Grid.Row="2"
 				Margin="5,5,5,0"
+				Text="Match condition. (e.g. Child.Child.value == pie || Child.other != null)" />
+			<local:PromptTextBox
+				Grid.Row="3"
+				PromptText="Match Condition"
+				Text="{Binding Condition, UpdateSourceTrigger=PropertyChanged, Delay=200}" />
+
+			<TextBlock
+				Grid.Row="4"
+				Margin="5,5,5,0"
 				Text="Replace template. Access content with {(el,root) | (path) | (contents,name,refkey)}." />
 			<Border
 				Background="{StaticResource BackgroundEditBrush}"
 				BorderThickness="1"
 				BorderBrush="{StaticResource BorderEditBrush}"
-				Grid.Row="3">
+				Grid.Row="5">
 				<ContentPresenter
 					Content="{Binding TextEditor}" />
 			</Border>
 
 			<DockPanel
-				Grid.Row="4"
+				Grid.Row="6"
 				Margin="5">
 				<local:MultilineTextEditor
 					DockPanel.Dock="Left"
@@ -134,7 +147,7 @@
 			<ScrollViewer
 				HorizontalScrollBarVisibility="Disabled"
 				Margin="5"
-				Grid.Row="5">
+				Grid.Row="7">
 				<Grid>
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition

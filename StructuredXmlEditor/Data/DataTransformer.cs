@@ -13,6 +13,7 @@ namespace StructuredXmlEditor.Data
 	{
 		//-----------------------------------------------------------------------
 		public List<string> ElementPaths { get; set; }
+		public string Condition { get; set; }
 		public string OutputTemplate { get; set; }
 
 		//-----------------------------------------------------------------------
@@ -131,6 +132,114 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public IEnumerable<XElement> TransformElement(XElement root, XElement originalEl)
 		{
+			if (!string.IsNullOrWhiteSpace(Condition))
+			{
+				var orConditions = Condition.Split(new string[] { "||" }, StringSplitOptions.RemoveEmptyEntries);
+
+				var conditionTrue = false;
+				foreach (var orCondition in orConditions)
+				{
+					var andConditions = orCondition.Split(new string[] { "&&" }, StringSplitOptions.RemoveEmptyEntries);
+
+					var partTrue = true;
+					foreach (var andCondition in andConditions)
+					{
+						if (andCondition.Contains("=="))
+						{
+							var statementSplit = andCondition.Split(new string[] { "==" }, StringSplitOptions.RemoveEmptyEntries);
+							var path = statementSplit[0];
+							var checkValue = false;
+							if (path.EndsWith(".value"))
+							{
+								path = path.Substring(0, path.Length - ".value".Length);
+								checkValue = true;
+							}
+
+							var value = statementSplit[1].Trim();
+
+							var targetEl = GetElements(originalEl, path.Trim()).FirstOrDefault();
+							if (targetEl == null)
+							{
+								if (value == "null")
+								{
+									partTrue = true;
+								}
+								else
+								{
+									partTrue = false;
+								}
+							}
+							else if (checkValue)
+							{
+								partTrue = value == targetEl.Value;
+							}
+							else
+							{
+								if (value == "null")
+								{
+									partTrue = false;
+								}
+								else
+								{
+									partTrue = true;
+								}
+							}
+						}
+						else if (andCondition.Contains("!="))
+						{
+							var statementSplit = andCondition.Split(new string[] { "!=" }, StringSplitOptions.RemoveEmptyEntries);
+							var path = statementSplit[0];
+							var checkValue = false;
+							if (path.EndsWith(".value"))
+							{
+								path = path.Substring(0, path.Length - ".value".Length);
+								checkValue = true;
+							}
+
+							var value = statementSplit[1].Trim();
+
+							var targetEl = GetElements(originalEl, path.Trim()).FirstOrDefault();
+							if (targetEl == null)
+							{
+								if (value != "null")
+								{
+									partTrue = true;
+								}
+								else
+								{
+									partTrue = false;
+								}
+							}
+							else if (checkValue)
+							{
+								partTrue = value != targetEl.Value;
+							}
+							else
+							{
+								if (value != "null")
+								{
+									partTrue = false;
+								}
+								else
+								{
+									partTrue = true;
+								}
+							}
+						}
+					}
+
+					if (partTrue)
+					{
+						conditionTrue = true;
+					}
+				}
+
+				if (!conditionTrue)
+				{
+					return new List<XElement>() { originalEl };
+				}
+			}
+
 			// split the template into variable chunks
 			var template = OutputTemplate;
 			var split = template.Split(new char[] { '{', '}' });

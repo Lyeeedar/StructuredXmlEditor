@@ -37,6 +37,20 @@ namespace StructuredXmlEditor.Tools
 		private string m_elementPath = "Example.Data";
 
 		//-----------------------------------------------------------------------
+		public string Condition
+		{
+			get { return m_Condition; }
+			set
+			{
+				m_Condition = value;
+				RaisePropertyChangedEvent();
+
+				UpdatePreview();
+			}
+		}
+		private string m_Condition = "";
+
+		//-----------------------------------------------------------------------
 		public TextEditor TextEditor { get; set; }
 
 		//-----------------------------------------------------------------------
@@ -63,7 +77,27 @@ namespace StructuredXmlEditor.Tools
 		}
 		private string m_exampleDocument = "";
 
-		public string TransformedDocument { get; set; }
+		public string TransformedDocument
+		{
+			get { return m_transformedDocument; }
+			set
+			{
+				if (m_transformedDocument != value)
+				{
+					m_transformedDocument = value;
+
+					Future.SafeCall(() => 
+					{
+						var builder = new SideBySideDiffBuilder(new Differ());
+						DiffModel = builder.BuildDiffModel(ExampleDocument, TransformedDocument);
+
+						RaisePropertyChangedEvent(nameof(DiffModel));
+					}, 500, this);
+				}
+			}
+		}
+		private string m_transformedDocument = "";
+
 		public bool IsDocumentMatch { get; set; }
 		public string TransformError { get; set; }
 		public SideBySideDiffModel DiffModel { get; set; }
@@ -95,11 +129,13 @@ namespace StructuredXmlEditor.Tools
 			TextEditor.Text = "{el||}";
 			TextEditor.Foreground = new SolidColorBrush(Color.FromRgb(255, 255, 255));
 			TextEditor.Background = Brushes.Transparent;
+			TextEditor.TextChanged += (e, args) =>
+			{
+				UpdatePreview();
+			};
 			TextEditor.TextArea.TextEntered += (e, args) => 
 			{
 				Autocomplete(e, args);
-
-				UpdatePreview();
 			};
 
 			ExampleDocument = "<Example><Data /></Example>";
@@ -113,6 +149,7 @@ namespace StructuredXmlEditor.Tools
 		public void UpdatePreview()
 		{
 			DataTransformer.ElementPaths = ElementPath.Split('\n').Select(e => e.Trim()).ToList();
+			DataTransformer.Condition = Condition;
 			DataTransformer.OutputTemplate = TextEditor.Text;
 
 			TransformError = null;
@@ -123,15 +160,12 @@ namespace StructuredXmlEditor.Tools
 				IsDocumentMatch = DataTransformer.TransformDocument(el);
 
 				TransformedDocument = el.ToString().Replace("  ", "    ");
-
-				var builder = new SideBySideDiffBuilder(new Differ());
-				DiffModel = builder.BuildDiffModel(ExampleDocument, TransformedDocument);
-
-				RaisePropertyChangedEvent(nameof(DiffModel));
 			}
 			catch (Exception ex)
 			{
 				TransformError = ex.Message;
+
+				TransformedDocument = "";
 			}
 
 			RaisePropertyChangedEvent(nameof(IsDocumentMatch));
