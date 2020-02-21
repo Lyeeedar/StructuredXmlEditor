@@ -207,13 +207,17 @@ namespace StructuredXmlEditor.Tools
 						}
 
 						var original = File.ReadAllText(file);
+						var newContents = asString.ToString();
 
-						var builder = new SideBySideDiffBuilder(new Differ());
-						var diff = builder.BuildDiffModel(original, asString.ToString());
-
-						if (transformed)
+						if (transformed && original != newContents)
 						{
-							preview.Files.Add(new Tuple<string, string, string, SideBySideDiffModel>(file, Path.GetFileNameWithoutExtension(file), asString.ToString(), diff));
+							var builder = new SideBySideDiffBuilder(new Differ());
+							var diff = builder.BuildDiffModel(original, newContents);
+
+							if (diff.NewText.Lines.Any(e => e.Type != ChangeType.Unchanged) || diff.OldText.Lines.Any(e => e.Type != ChangeType.Unchanged))
+							{
+								preview.Files.Add(new Tuple<string, string, string, SideBySideDiffModel>(file, Path.GetFileNameWithoutExtension(file), newContents, diff));
+							}
 						}
 					}
 					catch (Exception) { }
