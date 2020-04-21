@@ -1,4 +1,12 @@
-﻿--------- 1.9.0 ---------
+﻿--------- 1.10.0 ---------
+- Add basic support for localised strings. Marking a string element as NeedsLocalisation will write the string contents to a file, and reference it with a GUID in the original element.
+- Create a data transformer tool that allows mutating xml files through a template.
+- Allow Collections to load their contents from a Keys list or a DefKey, like References do.
+
+- Fix multiple prompts to reload file when it changes on disk.
+- Fix some graph node jumping bugs.
+
+--------- 1.9.0 ---------
 
 - StructElements now load comments from the definition file and use them in the created item.
 - Added a flags dara type. This is a comma seperated list of strings, editted with a multiselect editor.
