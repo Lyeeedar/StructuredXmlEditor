@@ -327,6 +327,8 @@
 			<Boolean Name="AllowCircularLinks" Default="false" ToolTip="Whether circular links are allowed." VisibleIf="AllowReferenceLinks==true" />
 			<Boolean Name="FlattenData" Default="false" ToolTip="If true each graph node will be placed in a flat list within this element." VisibleIf="AllowReferenceLinks==true" />
 			<String Name="NodeStoreName" Default="Nodes" ToolTip="The name of the node added to this to store all the graph nodes." VisibleIf="FlattenData==true" />
+			<String Name="Keys" ToolTip="The names of the objects to use in this collection." />
+			<String Name="DefKey" ToolTip="The name of the ReferenceDef to use in this collection." />
 			<Number Name="MinCount" Min="0" ToolTip="The minimum number of child elements this can have." />
 			<Number Name="MaxCount" Min="1" Default="99999999" ToolTip="The maximum number of child elements this can have." />
 			<Colour Name="Background" Default="0,0,0,0" />
@@ -346,6 +348,8 @@
 		<Attributes>
 			<String Name="Name" Default="GraphCollection" ToolTip="The name to be written for this element. Place a path to an element inside a '{}' to use that elements value. This will be used as the key when referencing it." />
 			<Boolean Name="ChildrenAreUnique" ToolTip="If set then each child can only be added once" />
+			<String Name="Keys" ToolTip="The names of the objects to use in this collection." />
+			<String Name="DefKey" ToolTip="The name of the ReferenceDef to use in this collection." />
 			<Number Name="MinCount" Min="0" ToolTip="The minimum number of child elements this can have." />
 			<Number Name="MaxCount" Min="1" Default="99999999" ToolTip="The maximum number of child elements this can have." />
 			<Colour Name="Background" Default="0,0,0,0" />
