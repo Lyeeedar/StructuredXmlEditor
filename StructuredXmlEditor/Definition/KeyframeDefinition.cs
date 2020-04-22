@@ -185,6 +185,7 @@ namespace StructuredXmlEditor.Definition
 			var backgroundCol = definition.Attribute("Background")?.Value?.ToString();
 			if (backgroundCol != null)
 			{
+				TextColour = backgroundCol;
 				LoadBackgroundCol(backgroundCol);
 			}
 
@@ -283,6 +284,7 @@ namespace StructuredXmlEditor.Definition
 
 			Name = structDef.Name;
 			ToolTip = structDef.ToolTip;
+			TextColour = structDef.TextColour;
 			LoadBackgroundCol(structDef.TextColour);
 			VisibleIf = structDef.VisibleIf;
 			SkipIfDefault = structDef.SkipIfDefault;

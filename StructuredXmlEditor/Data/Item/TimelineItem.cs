@@ -279,12 +279,22 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public int NumColourData()
 		{
+			if (TimelineDef.KeyframeDefinitions.Count > 1)
+			{
+				return 0;
+			}
+
 			return TimelineDef.KeyframeDefinitions[0].Children.Where((e) => e is ColourDefinition).Count();
 		}
 
 		//-----------------------------------------------------------------------
 		public int NumNumberData()
 		{
+			if (TimelineDef.KeyframeDefinitions.Count > 1)
+			{
+				return 0;
+			}
+
 			var keyDef = TimelineDef.KeyframeDefinitions[0];
 			return keyDef.Children.Where((e) => e is NumberDefinition && e != keyDef.TimeDefinition && e != keyDef.DurationDefinition).Count();
 		}
