@@ -14,6 +14,8 @@ namespace StructuredXmlEditor.Definition
 		public ListCollectionView ItemsSource { get; set; }
 		public List<Tuple<KeyframeDefinition, string>> Keys { get; } = new List<Tuple<KeyframeDefinition, string>>();
 		public List<KeyframeDefinition> KeyframeDefinitions { get; } = new List<KeyframeDefinition>();
+		public List<Tuple<string, string>> DefKeys { get; set; } = new List<Tuple<string, string>>();
+		public string DefKey { get; set; }
 		public int MinCount { get; set; }
 		public int MaxCount { get; set; }
 		public bool Interpolate { get; set; }
@@ -104,6 +106,27 @@ namespace StructuredXmlEditor.Definition
 
 			var currentGroup = "Keyframes";
 
+			DefKey = definition.Attribute("DefKey")?.Value?.ToString();
+			var keyString = definition.Attribute("Keys")?.Value?.ToString();
+			if (!string.IsNullOrWhiteSpace(keyString))
+			{
+				if (!keyString.Contains('('))
+				{
+					DefKeys.AddRange(keyString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(e => new Tuple<string, string>(e.Trim(), "Type")));
+				}
+				else
+				{
+					var categories = keyString.Split(new char[] { ')' }, StringSplitOptions.RemoveEmptyEntries);
+					foreach (var categoryString in categories)
+					{
+						var split = categoryString.Split('(');
+						var category = split[0].Trim();
+						if (category.StartsWith(",")) category = category.Substring(1);
+						DefKeys.AddRange(split[1].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(e => new Tuple<string, string>(e.Trim(), category)));
+					}
+				}
+			}
+
 			var childDefs = definition.Nodes();
 			foreach (var childDef in childDefs)
 			{
@@ -126,7 +149,7 @@ namespace StructuredXmlEditor.Definition
 			lcv.GroupDescriptions.Add(new PropertyGroupDescription("Item2"));
 			ItemsSource = lcv;
 
-			if (KeyframeDefinitions.Count == 0)
+			if (KeyframeDefinitions.Count == 0 && DefKey == null && DefKeys.Count == 0)
 			{
 				throw new Exception("No keyframe definitions in collection '" + Name + "'!");
 			}
@@ -134,6 +157,59 @@ namespace StructuredXmlEditor.Definition
 
 		public override void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global, Dictionary<string, Dictionary<string, DataDefinition>> referenceableDefinitions)
 		{
+			if (DefKey != null)
+			{
+				var key = DefKey.ToLower();
+
+				Dictionary<string, DataDefinition> defs = null;
+				if (local.ContainsKey(key)) defs = local;
+				else if (global.ContainsKey(key)) defs = global;
+
+				if (defs != null)
+				{
+					var def = defs[key] as ReferenceDefinition;
+
+					foreach (var keydef in def.Keys)
+					{
+						var childDef = def.Definitions[keydef.Item1];
+						childDef.RecursivelyResolve(local, global, referenceableDefinitions);
+
+						var keyframeDef = new KeyframeDefinition();
+						keyframeDef.CreateFrom(childDef);
+
+						KeyframeDefinitions.Add(keyframeDef);
+						Keys.Add(new Tuple<KeyframeDefinition, string>(keyframeDef, keydef.Item2));
+					}
+				}
+				else
+				{
+					throw new Exception("Failed to find key " + DefKey + "!");
+				}
+			}
+
+			foreach (var key in DefKeys)
+			{
+				Dictionary<string, DataDefinition> defs = null;
+				if (local.ContainsKey(key.Item1.ToLower())) defs = local;
+				else if (global.ContainsKey(key.Item1.ToLower())) defs = global;
+
+				if (defs != null)
+				{
+					var childDef = defs[key.Item1.ToLower()];
+					childDef.RecursivelyResolve(local, global, referenceableDefinitions);
+
+					var keyframeDef = new KeyframeDefinition();
+					keyframeDef.CreateFrom(childDef);
+
+					KeyframeDefinitions.Add(keyframeDef);
+					Keys.Add(new Tuple<KeyframeDefinition, string>(keyframeDef, key.Item2));
+				}
+				else if (key.Item1 != "---")
+				{
+					throw new Exception("Failed to find key " + key.Item1 + "!");
+				}
+			}
+
 			foreach (var def in KeyframeDefinitions) def.RecursivelyResolve(local, global, referenceableDefinitions);
 		}
 	}

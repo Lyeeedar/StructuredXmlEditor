@@ -384,6 +384,8 @@
 		<Attributes>
 			<String Name="Name" Default="Timeline" ToolTip="The name to be written for this element. Place a path to an element inside a '{}' to use that elements value." />
 			<Boolean Name="Interpolate" Default="true" ToolTip="Whether the timeline should show interpolated values" />
+			<String Name="Keys" ToolTip="The names of the objects to use in this collection." />
+			<String Name="DefKey" ToolTip="The name of the ReferenceDef to use in this collection." />
 			<Number Name="MinCount" Min="0" ToolTip="The minimum number of keyframes this can have." />
 			<Number Name="MaxCount" Min="1" Default="99999999" ToolTip="The maximum number of keyframes this can have." />
 			<Boolean Name="SkipIfDefault" ToolTip="Don't write out this element if it is at the default value." Default="true" />

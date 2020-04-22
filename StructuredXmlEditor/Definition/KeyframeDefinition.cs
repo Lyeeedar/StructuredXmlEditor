@@ -185,39 +185,14 @@ namespace StructuredXmlEditor.Definition
 			var backgroundCol = definition.Attribute("Background")?.Value?.ToString();
 			if (backgroundCol != null)
 			{
-				var split = backgroundCol.Split(new char[] { ',' });
-
-				byte r = 0;
-				byte g = 0;
-				byte b = 0;
-				byte a = 0;
-
-				byte.TryParse(split[0], out r);
-				byte.TryParse(split[1], out g);
-				byte.TryParse(split[2], out b);
-				byte.TryParse(split[3], out a);
-
-				var col = Color.FromArgb(a, r, g, b);
-				Background = new SolidColorBrush(col);
-				Background.Freeze();
+				LoadBackgroundCol(backgroundCol);
 			}
 
 			foreach (var child in definition.Elements())
 			{
 				if (child.Name == "Attributes")
 				{
-					foreach (var att in child.Elements())
-					{
-						var attDef = LoadDefinition(att);
-						if (attDef is PrimitiveDataDefinition)
-						{
-							Attributes.Add(attDef as PrimitiveDataDefinition);
-						}
-						else
-						{
-							throw new Exception("Cannot put a non-primitive into attributes!");
-						}
-					}
+
 				}
 				else
 				{
@@ -257,19 +232,83 @@ namespace StructuredXmlEditor.Definition
 				{
 					if (!(type is PrimitiveDataDefinition))
 					{
-						Message.Show("Tried to collapse a struct that has a non-primitive child. This does not work!", "Parse Error", "Ok");
-						Collapse = false;
-						break;
+						throw new Exception("Tried to collapse a struct that has a non-primitive child. This does not work!");
 					}
 					else if (Seperator == "," && type is ColourDefinition)
 					{
-						Message.Show("If collapsing a colour the seperator should not be a comma (as colours use that to seperate their components). Please use something else.", "Parse Error", "Ok");
+						throw new Exception("If collapsing a colour the seperator should not be a comma (as colours use that to seperate their components). Please use something else.");
 					}
 					else if (Seperator == "," && type is VectorDefinition)
 					{
-						Message.Show("If collapsing a vector the seperator should not be a comma (as vectors use that to seperate their components). Please use something else.", "Parse Error", "Ok");
+						throw new Exception("If collapsing a vector the seperator should not be a comma (as vectors use that to seperate their components). Please use something else.");
 					}
 				}
+			}
+		}
+
+		private void LoadBackgroundCol(String colour)
+		{
+			var split = colour.Split(new char[] { ',' });
+
+			byte r = 0;
+			byte g = 0;
+			byte b = 0;
+			byte a = 0;
+
+			byte.TryParse(split[0], out r);
+			byte.TryParse(split[1], out g);
+			byte.TryParse(split[2], out b);
+
+			if (split.Length == 4)
+			{
+				byte.TryParse(split[3], out a);
+			}
+			else
+			{
+				a = 255;
+			}
+
+			var col = Color.FromArgb(a, r, g, b);
+			Background = new SolidColorBrush(col);
+			Background.Freeze();
+		}
+
+		public void CreateFrom(DataDefinition definition)
+		{
+			var structDef = definition as StructDefinition;
+			if (structDef == null)
+			{
+				throw new Exception("Timeline keyframe must reference a StructDefinition. Not a " + definition.GetType());
+			}
+
+			Name = structDef.Name;
+			ToolTip = structDef.ToolTip;
+			LoadBackgroundCol(structDef.TextColour);
+			VisibleIf = structDef.VisibleIf;
+			SkipIfDefault = structDef.SkipIfDefault;
+			Description = structDef.Description;
+
+			foreach (var childDef in structDef.Children)
+			{
+				Children.Add(childDef);
+
+				if (childDef.Name == "Time")
+				{
+					TimeDefinition = (NumberDefinition)childDef;
+				}
+				else if (childDef.Name == "Duration")
+				{
+					DurationDefinition = (NumberDefinition)childDef;
+
+					var lockDef = new BooleanDefinition();
+					lockDef.Name = "LockDuration";
+					DurationDefinition.Attributes.Add(lockDef);
+				}
+			}
+
+			if (TimeDefinition == null)
+			{
+				throw new Exception("Tried to create a KeyframeDefinition from a StructDefinition without a Time element!");
 			}
 		}
 
