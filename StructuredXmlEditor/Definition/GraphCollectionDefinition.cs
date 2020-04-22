@@ -272,7 +272,7 @@ namespace StructuredXmlEditor.Definition
 				}
 				else
 				{
-					Message.Show("Failed to find key " + DefKey + "!", "Collection Resolve Failed", "Ok");
+					throw new Exception("Failed to find key " + DefKey + "!");
 				}
 			}
 
@@ -293,7 +293,7 @@ namespace StructuredXmlEditor.Definition
 				}
 				else if (key.Item1 != "---")
 				{
-					Message.Show("Failed to find key " + key.Item1 + "!", "Collection Resolve Failed", "Ok");
+					throw new Exception("Failed to find key " + key.Item1 + "!");
 				}
 			}
 

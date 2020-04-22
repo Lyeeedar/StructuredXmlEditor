@@ -137,12 +137,12 @@ namespace StructuredXmlEditor.Definition
 					}
 					else
 					{
-						Message.Show("Resource " + ResourceType + " is not a root level resource!", "Reference Resolve Failed", "Ok");
+						throw new Exception("Resource " + ResourceType + " is not a root level resource!");
 					}
 				}
 				else
 				{
-					Message.Show("Failed to find key " + ResourceType + "!", "Reference Resolve Failed", "Ok");
+					throw new Exception("Failed to find key " + ResourceType + "!");
 				}
 			}
 

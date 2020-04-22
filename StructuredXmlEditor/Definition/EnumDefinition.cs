@@ -118,7 +118,7 @@ namespace StructuredXmlEditor.Definition
 				}
 				else
 				{
-					Message.Show("Failed to find key " + Key + "!", "Reference Resolve Failed", "Ok");
+					throw new Exception("Failed to find key " + Key + "!");
 				}
 			}
 		}

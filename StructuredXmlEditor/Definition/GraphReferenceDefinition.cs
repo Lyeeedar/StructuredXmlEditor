@@ -195,7 +195,7 @@ namespace StructuredXmlEditor.Definition
 				}
 				else
 				{
-					Message.Show("Failed to find key " + DefKey + "!", "Reference Resolve Failed", "Ok");
+					throw new Exception("Failed to find key " + DefKey + "!");
 				}
 			}
 
@@ -215,12 +215,12 @@ namespace StructuredXmlEditor.Definition
 					}
 					else if (key.Item1 != "---")
 					{
-						Message.Show("Tried to add definition of type " + def.GetType() + " (key = " + key.Item1 + ") to graph reference!", "Reference Resolve Failed", "Ok");
+						throw new Exception("Tried to add definition of type " + def.GetType() + " (key = " + key.Item1 + ") to graph reference!");
 					}
 				}
 				else
 				{
-					Message.Show("Failed to find key " + key.Item1 + "!", "Reference Resolve Failed", "Ok");
+					throw new Exception("Failed to find key " + key.Item1 + "!");
 				}
 			}
 

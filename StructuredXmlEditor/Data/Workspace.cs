@@ -497,6 +497,7 @@ namespace StructuredXmlEditor.Data
 			RootDataTypes.Clear();
 			RootDefinition = null;
 
+			var errors = new Dictionary<String, HashSet<String>>();
 			foreach (var file in Directory.EnumerateFiles(Path.Combine(Path.GetDirectoryName(ProjectRoot), DefsFolder), "*.xmldef", SearchOption.AllDirectories))
 			{
 				try
@@ -584,7 +585,13 @@ namespace StructuredXmlEditor.Data
 				}
 				catch (Exception ex)
 				{
-					Message.Show("Failed to load definition '" + file + "'!\n\n" + ex.Message, "Load Definition Failed", "Ok");
+					HashSet<String> errorsList;
+					if (!errors.TryGetValue(file, out errorsList))
+					{
+						errorsList = new HashSet<string>();
+						errors[file] = errorsList;
+					}
+					errorsList.Add(ex.Message);
 				}
 			}
 
@@ -598,7 +605,14 @@ namespace StructuredXmlEditor.Data
 					}
 					catch (Exception ex)
 					{
-						Message.Show("Failed to resolve references in definition '" + def.Name + "'!\n\n" + ex.Message, "Resolve Definition Failed", "Ok");
+						var file = def.SrcFile;
+						HashSet<String> errorsList;
+						if (!errors.TryGetValue(file, out errorsList))
+						{
+							errorsList = new HashSet<string>();
+							errors[file] = errorsList;
+						}
+						errorsList.Add(ex.Message);
 					}
 				}
 			}
@@ -613,7 +627,14 @@ namespace StructuredXmlEditor.Data
 					}
 					catch (Exception ex)
 					{
-						Message.Show("Failed to resolve references in definition '" + def.Name + "'!\n\n" + ex.Message, "Resolve Definition Failed", "Ok");
+						var file = def.SrcFile;
+						HashSet<String> errorsList;
+						if (!errors.TryGetValue(file, out errorsList))
+						{
+							errorsList = new HashSet<string>();
+							errors[file] = errorsList;
+						}
+						errorsList.Add(ex.Message);
 					}
 				}
 			}
@@ -626,8 +647,31 @@ namespace StructuredXmlEditor.Data
 				}
 				catch (Exception ex)
 				{
-					Message.Show("Failed to resolve references in definition '" + def.Name + "'!\n\n" + ex.Message, "Resolve Definition Failed", "Ok");
+					var file = def.SrcFile;
+					HashSet<String> errorsList;
+					if (!errors.TryGetValue(file, out errorsList))
+					{
+						errorsList = new HashSet<string>();
+						errors[file] = errorsList;
+					}
+					errorsList.Add(ex.Message);
 				}
+			}
+
+			if (errors.Count > 0)
+			{
+				var message = "Some definitions failed to load:\n";
+				foreach (var errorList in errors)
+				{
+					message += Path.GetFileNameWithoutExtension(errorList.Key) + "\n";
+					
+					foreach (var e in errorList.Value)
+					{
+						message += "\t" + e + "\n";
+					}
+				}
+
+				Message.Show(message, "Definition Load Error", "Ok");
 			}
 
 			// load xmldef definition

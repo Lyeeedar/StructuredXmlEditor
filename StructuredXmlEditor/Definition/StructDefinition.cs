@@ -220,17 +220,15 @@ namespace StructuredXmlEditor.Definition
 				{
 					if (!(type is PrimitiveDataDefinition))
 					{
-						Message.Show("Tried to collapse a struct that has a non-primitive child. This does not work!", "Parse Error", "Ok");
-						Collapse = false;
-						break;
+						throw new Exception("Tried to collapse a struct that has a non-primitive child. This does not work!");
 					}
 					else if (Seperator == "," && type is ColourDefinition)
 					{
-						Message.Show("If collapsing a colour the seperator should not be a comma (as colours use that to seperate their components). Please use something else.", "Parse Error", "Ok");
+						throw new Exception("If collapsing a colour the seperator should not be a comma (as colours use that to seperate their components). Please use something else.");
 					}
 					else if (Seperator == "," && type is VectorDefinition)
 					{
-						Message.Show("If collapsing a vector the seperator should not be a comma (as vectors use that to seperate their components). Please use something else.", "Parse Error", "Ok");
+						throw new Exception("If collapsing a vector the seperator should not be a comma (as vectors use that to seperate their components). Please use something else.");
 					}
 				}
 			}
