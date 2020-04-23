@@ -123,7 +123,14 @@ namespace StructuredXmlEditor.Definition
 				byte.TryParse(split[0], out r);
 				byte.TryParse(split[1], out g);
 				byte.TryParse(split[2], out b);
-				byte.TryParse(split[3], out a);
+				if (split.Length == 4)
+				{
+					byte.TryParse(split[3], out a);
+				}
+				else
+				{
+					a = 75;
+				}
 
 				var col = Color.FromArgb(a, r, g, b);
 				Background = new SolidColorBrush(col);
