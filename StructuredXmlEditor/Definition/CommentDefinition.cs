@@ -49,5 +49,10 @@ namespace StructuredXmlEditor.Definition
 			Text = definition.Attribute("Text")?.Value?.ToString();
 			CanEdit = false;
 		}
+
+		protected override void DoRecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global, Dictionary<string, Dictionary<string, DataDefinition>> referenceableDefinitions)
+		{
+			
+		}
 	}
 }

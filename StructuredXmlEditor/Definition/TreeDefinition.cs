@@ -72,5 +72,10 @@ namespace StructuredXmlEditor.Definition
 		{
 			return string.IsNullOrWhiteSpace((item as TreeItem).Value) && item.Children.Count == 0;
 		}
+
+		protected override void DoRecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global, Dictionary<string, Dictionary<string, DataDefinition>> referenceableDefinitions)
+		{
+
+		}
 	}
 }

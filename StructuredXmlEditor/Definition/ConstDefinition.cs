@@ -38,5 +38,10 @@ namespace StructuredXmlEditor.Definition
 			Name = definition.Attribute("Name").Value;
 			Value = definition.Value;
 		}
+
+		protected override void DoRecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global, Dictionary<string, Dictionary<string, DataDefinition>> referenceableDefinitions)
+		{
+			
+		}
 	}
 }

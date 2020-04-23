@@ -23,5 +23,10 @@ namespace StructuredXmlEditor.Definition
 		{
 			return WriteToString(item) == DefaultValueString();
 		}
+
+		protected override void DoRecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global, Dictionary<string, Dictionary<string, DataDefinition>> referenceableDefinitions)
+		{
+			
+		}
 	}
 }

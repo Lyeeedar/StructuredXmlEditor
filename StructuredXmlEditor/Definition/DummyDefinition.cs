@@ -34,5 +34,10 @@ namespace StructuredXmlEditor.Definition
 		{
 			throw new NotImplementedException();
 		}
+
+		protected override void DoRecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global, Dictionary<string, Dictionary<string, DataDefinition>> referenceableDefinitions)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

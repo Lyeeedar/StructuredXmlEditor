@@ -263,12 +263,8 @@ namespace StructuredXmlEditor.Definition
 			}
 		}
 
-		bool isResolving = false;
-		public override void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global, Dictionary<string, Dictionary<string, DataDefinition>> referenceableDefinitions)
+		protected override void DoRecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global, Dictionary<string, Dictionary<string, DataDefinition>> referenceableDefinitions)
 		{
-			if (isResolving) return;
-			isResolving = true;
-
 			if (Extends != null)
 			{
 				ComplexDataDefinition def = null;

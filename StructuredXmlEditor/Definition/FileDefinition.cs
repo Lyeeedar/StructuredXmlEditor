@@ -116,7 +116,7 @@ namespace StructuredXmlEditor.Definition
 			return Default;
 		}
 
-		public override void RecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global, Dictionary<string, Dictionary<string, DataDefinition>> referenceableDefinitions)
+		protected override void DoRecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global, Dictionary<string, Dictionary<string, DataDefinition>> referenceableDefinitions)
 		{
 			if (ResourceType != null)
 			{
@@ -145,8 +145,6 @@ namespace StructuredXmlEditor.Definition
 					throw new Exception("Failed to find key " + ResourceType + "!");
 				}
 			}
-
-			base.RecursivelyResolve(local, global, referenceableDefinitions);
 		}
 	}
 }

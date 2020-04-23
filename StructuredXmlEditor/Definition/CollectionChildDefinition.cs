@@ -55,5 +55,10 @@ namespace StructuredXmlEditor.Definition
 		{
 			return (item as CollectionChildItem).WrappedItem == null;
 		}
+
+		protected override void DoRecursivelyResolve(Dictionary<string, DataDefinition> local, Dictionary<string, DataDefinition> global, Dictionary<string, Dictionary<string, DataDefinition>> referenceableDefinitions)
+		{
+			
+		}
 	}
 }
