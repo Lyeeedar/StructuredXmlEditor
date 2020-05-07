@@ -110,11 +110,11 @@
 
 				<TextBlock
 					Margin="10">
-				<Hyperlink
+					<Hyperlink
 						Command="{Binding Workspace.NewDefCMD}"
 						Style="{StaticResource hyperlinkStyle}">
-					New Definition...
-				</Hyperlink>
+						New Definition...
+					</Hyperlink>
 				</TextBlock>
 
 				<ScrollViewer
