@@ -141,6 +141,8 @@ namespace StructuredXmlEditor.View
 
 			Loaded += (e, args) => { redrawTimer.Start(); };
 			Unloaded += (e, args) => { redrawTimer.Stop(); };
+
+			Focusable = true;
 		}
 
 		//-----------------------------------------------------------------------
@@ -191,111 +193,135 @@ namespace StructuredXmlEditor.View
 			var indicatorPen = new Pen(IndicatorBrush, 1);
 			indicatorPen.Freeze();
 
-			Typeface typeface = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
+			Typeface typeface = new Typeface(FontFamily, FontStyle, FontWeights.Normal, FontStretches.Normal);
 
 			double pixelsASecond = ActualWidth / TimelineItem.TimelineRange;
 
 			var sortedKeyframes = TimelineItem.Children.OrderBy(e => (e as KeyframeItem).Time).ToList();
 
+			// Draw interpolated previews
 			if (TimelineItem.Interpolate)
 			{
-				// Draw the colour keyframes interpolated
-				var numColours = TimelineItem.NumColourData();
-				var linePad = 2;
-				var lineHeight = 5;
-				var bottomPad = (ActualHeight - (lineHeight * numColours + (numColours - 1) * linePad)) / 2;
-				for (int i = 0; i < numColours; i++)
-				{
-					var drawPos = bottomPad + (lineHeight + linePad) * i;
-
-					for (int ii = 0; ii < sortedKeyframes.Count - 1; ii++)
-					{
-						var thisKeyframe = sortedKeyframes[ii] as KeyframeItem;
-						var nextKeyframe = sortedKeyframes[ii + 1] as KeyframeItem;
-
-						var thisCol = thisKeyframe.GetColourData(i);
-						var nextCol = nextKeyframe.GetColourData(i);
-
-						var brush = new LinearGradientBrush(thisCol, nextCol, new Point(0, 0), new Point(1, 0));
-
-						var thisDrawPos = thisKeyframe.GetKeyframeTime() * pixelsASecond + TimelineItem.LeftPad;
-						var nextDrawPos = nextKeyframe.GetKeyframeTime() * pixelsASecond + TimelineItem.LeftPad;
-
-						drawingContext.DrawRectangle(brush, indicatorPen, new Rect(thisDrawPos, drawPos, nextDrawPos - thisDrawPos, lineHeight));
-					}
-
-					for (int ii = 0; ii < sortedKeyframes.Count; ii++)
-					{
-						var thisKeyframe = sortedKeyframes[ii] as KeyframeItem;
-
-						var thisCol = thisKeyframe.GetColourData(i);
-
-						var brush = new SolidColorBrush(thisCol);
-
-						var thisDrawPos = thisKeyframe.GetKeyframeTime() * pixelsASecond + TimelineItem.LeftPad;
-
-						drawingContext.DrawRoundedRectangle(brush, indicatorPen, new Rect(thisDrawPos-5, (drawPos+lineHeight/2)-5, 10, 10), 5, 5);
-					}
-				}
-
-				// Draw the number keyframes interpolated
-				var numNumbers = TimelineItem.NumNumberData();
-				var min = float.MaxValue;
-				var max = -float.MaxValue;
-				for (int i = 0; i < numNumbers; i++)
-				{
-					foreach (KeyframeItem keyframe in sortedKeyframes)
-					{
-						var val = keyframe.GetNumberData(i);
-						if (val < min) min = val;
-						if (val > max) max = val;
-					}
-				}
-
-				for (int i = 0; i < numNumbers; i++)
-				{
-					var pen = NumberTrackColours[i];
-
-					for (int ii = 0; ii < sortedKeyframes.Count - 1; ii++)
-					{
-						var thisKeyframe = sortedKeyframes[ii] as KeyframeItem;
-						var nextKeyframe = sortedKeyframes[ii + 1] as KeyframeItem;
-
-						var thisNum = thisKeyframe.GetNumberData(i);
-						var nextNum = nextKeyframe.GetNumberData(i);
-
-						var thisAlpha = (thisNum - min) / (max - min);
-						var nextAlpha = (nextNum - min) / (max - min);
-
-						var thisH = (ActualHeight - 20) - (ActualHeight - 25) * thisAlpha;
-						var nextH = (ActualHeight - 20) - (ActualHeight - 25) * nextAlpha;
-
-						var thisDrawPos = thisKeyframe.GetKeyframeTime() * pixelsASecond + TimelineItem.LeftPad;
-						var nextDrawPos = nextKeyframe.GetKeyframeTime() * pixelsASecond + TimelineItem.LeftPad;
-
-						var borderPen = new Pen(IndicatorBrush, 4);
-						drawingContext.DrawLine(borderPen, new Point(thisDrawPos, thisH), new Point(nextDrawPos, nextH));
-						drawingContext.DrawLine(pen, new Point(thisDrawPos, thisH), new Point(nextDrawPos, nextH));
-					}
-
-					for (int ii = 0; ii < sortedKeyframes.Count; ii++)
-					{
-						var thisKeyframe = sortedKeyframes[ii] as KeyframeItem;
-
-						var thisNum = thisKeyframe.GetNumberData(i);
-
-						var thisAlpha = (thisNum - min) / (max - min);
-
-						var thisH = (ActualHeight - 20) - (ActualHeight - 25) * thisAlpha;
-
-						var thisDrawPos = thisKeyframe.GetKeyframeTime() * pixelsASecond + TimelineItem.LeftPad;
-
-						drawingContext.DrawRoundedRectangle(pen.Brush, indicatorPen, new Rect(thisDrawPos - 5, thisH - 5, 10, 10), 5, 5);
-					}
-				}
+				DrawInterpolatedPreview(drawingContext, indicatorPen, sortedKeyframes, pixelsASecond);
 			}
 
 			// Draw the indicators
+			DrawIndicators(drawingContext, indicatorPen, pixelsASecond, typeface);
+
+			// Draw the keyframe boxes
+			DrawKeyframes(drawingContext, pixelsASecond, typeface);
+
+			// Draw marquee
+			if (isMarqueeSelecting && Math.Abs(marqueeCurrentPos - marqueeStartPos) > 5)
+			{
+				DrawMarquee(drawingContext);
+			}
+
+			isRedrawing = false;
+		}
+
+		//-----------------------------------------------------------------------
+		private void DrawInterpolatedPreview(DrawingContext drawingContext, Pen indicatorPen, List<DataItem> sortedKeyframes, double pixelsASecond)
+		{
+			// Draw the colour keyframes interpolated
+			var numColours = TimelineItem.NumColourData();
+			var linePad = 2;
+			var lineHeight = 5;
+			var bottomPad = (ActualHeight - (lineHeight * numColours + (numColours - 1) * linePad)) / 2;
+			for (int i = 0; i < numColours; i++)
+			{
+				var drawPos = bottomPad + (lineHeight + linePad) * i;
+
+				for (int ii = 0; ii < sortedKeyframes.Count - 1; ii++)
+				{
+					var thisKeyframe = sortedKeyframes[ii] as KeyframeItem;
+					var nextKeyframe = sortedKeyframes[ii + 1] as KeyframeItem;
+
+					var thisCol = thisKeyframe.GetColourData(i);
+					var nextCol = nextKeyframe.GetColourData(i);
+
+					var brush = new LinearGradientBrush(thisCol, nextCol, new Point(0, 0), new Point(1, 0));
+
+					var thisDrawPos = thisKeyframe.GetKeyframeTime() * pixelsASecond + TimelineItem.LeftPad;
+					var nextDrawPos = nextKeyframe.GetKeyframeTime() * pixelsASecond + TimelineItem.LeftPad;
+
+					drawingContext.DrawRectangle(brush, indicatorPen, new Rect(thisDrawPos, drawPos, nextDrawPos - thisDrawPos, lineHeight));
+				}
+
+				for (int ii = 0; ii < sortedKeyframes.Count; ii++)
+				{
+					var thisKeyframe = sortedKeyframes[ii] as KeyframeItem;
+
+					var thisCol = thisKeyframe.GetColourData(i);
+
+					var brush = new SolidColorBrush(thisCol);
+
+					var thisDrawPos = thisKeyframe.GetKeyframeTime() * pixelsASecond + TimelineItem.LeftPad;
+
+					drawingContext.DrawRoundedRectangle(brush, indicatorPen, new Rect(thisDrawPos - 5, (drawPos + lineHeight / 2) - 5, 10, 10), 5, 5);
+				}
+			}
+
+			// Draw the number keyframes interpolated
+			var numNumbers = TimelineItem.NumNumberData();
+			var min = float.MaxValue;
+			var max = -float.MaxValue;
+			for (int i = 0; i < numNumbers; i++)
+			{
+				foreach (KeyframeItem keyframe in sortedKeyframes)
+				{
+					var val = keyframe.GetNumberData(i);
+					if (val < min) min = val;
+					if (val > max) max = val;
+				}
+			}
+
+			for (int i = 0; i < numNumbers; i++)
+			{
+				var pen = NumberTrackColours[i];
+
+				for (int ii = 0; ii < sortedKeyframes.Count - 1; ii++)
+				{
+					var thisKeyframe = sortedKeyframes[ii] as KeyframeItem;
+					var nextKeyframe = sortedKeyframes[ii + 1] as KeyframeItem;
+
+					var thisNum = thisKeyframe.GetNumberData(i);
+					var nextNum = nextKeyframe.GetNumberData(i);
+
+					var thisAlpha = (thisNum - min) / (max - min);
+					var nextAlpha = (nextNum - min) / (max - min);
+
+					var thisH = (ActualHeight - 20) - (ActualHeight - 25) * thisAlpha;
+					var nextH = (ActualHeight - 20) - (ActualHeight - 25) * nextAlpha;
+
+					var thisDrawPos = thisKeyframe.GetKeyframeTime() * pixelsASecond + TimelineItem.LeftPad;
+					var nextDrawPos = nextKeyframe.GetKeyframeTime() * pixelsASecond + TimelineItem.LeftPad;
+
+					var borderPen = new Pen(IndicatorBrush, 4);
+					drawingContext.DrawLine(borderPen, new Point(thisDrawPos, thisH), new Point(nextDrawPos, nextH));
+					drawingContext.DrawLine(pen, new Point(thisDrawPos, thisH), new Point(nextDrawPos, nextH));
+				}
+
+				for (int ii = 0; ii < sortedKeyframes.Count; ii++)
+				{
+					var thisKeyframe = sortedKeyframes[ii] as KeyframeItem;
+
+					var thisNum = thisKeyframe.GetNumberData(i);
+
+					var thisAlpha = (thisNum - min) / (max - min);
+
+					var thisH = (ActualHeight - 20) - (ActualHeight - 25) * thisAlpha;
+
+					var thisDrawPos = thisKeyframe.GetKeyframeTime() * pixelsASecond + TimelineItem.LeftPad;
+
+					drawingContext.DrawRoundedRectangle(pen.Brush, indicatorPen, new Rect(thisDrawPos - 5, thisH - 5, 10, 10), 5, 5);
+				}
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		private void DrawIndicators(DrawingContext drawingContext, Pen indicatorPen, double pixelsASecond, Typeface typeface)
+		{
 			double bestStep = FindBestIndicatorStep();
 			double indicatorStep = bestStep * pixelsASecond;
 			double tpos = TimelineItem.LeftPad;
@@ -329,8 +355,11 @@ namespace StructuredXmlEditor.View
 					drawingContext.DrawLine(indicatorPen, new Point(mpos, 20), new Point(mpos, ActualHeight - 20));
 				}
 			}
+		}
 
-			// Draw the keyframe boxes
+		//-----------------------------------------------------------------------
+		private void DrawKeyframes(DrawingContext drawingContext, double pixelsASecond, Typeface typeface)
+		{
 			foreach (KeyframeItem keyframe in TimelineItem.Children)
 			{
 				var background = keyframe.KeyframeDef.Background;
@@ -350,27 +379,61 @@ namespace StructuredXmlEditor.View
 				}
 				else
 				{
-					drawingContext.DrawRectangle(background, pen, new Rect(keyframe.GetKeyframeTime() * pixelsASecond + TimelineItem.LeftPad, 5, width, ActualHeight - 20));
+					// Draw preview for polymorphic type
+					if (TimelineItem.TimelineDef.KeyframeDefinitions.Count > 1)
+					{
+						var name = keyframe.Name;
+						FormattedText text = new FormattedText(name, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, typeface, 10, FontBrush);
+
+						var rect = new Rect(keyframe.GetKeyframeTime() * pixelsASecond + TimelineItem.LeftPad, text.Height, width, ActualHeight - 15 - text.Height);
+						drawingContext.DrawRectangle(background, pen, rect);
+
+						drawingContext.DrawText(text, new Point(Math.Max(0, (rect.X + rect.Width / 2) - (text.Width / 2.0)), 0));
+					}
+					else
+					{
+						var rect = new Rect(keyframe.GetKeyframeTime() * pixelsASecond + TimelineItem.LeftPad, 5, width, ActualHeight - 20);
+						drawingContext.DrawRectangle(background, pen, rect);
+					}
 				}
 			}
+		}
 
-			if (isMarqueeSelecting && Math.Abs(marqueeCurrentPos - marqueeStartPos) > 5)
+		//-----------------------------------------------------------------------
+		private void DrawMarquee(DrawingContext drawingContext)
+		{
+			var timelineIndex = TimelineItem.TimelineGroup.ToList().IndexOf(TimelineItem);
+			var marqueeMinTimeline = Math.Min(marqueeStartTimeline, marqueeCurrentTimeline);
+			var marqueeMaxTimeline = Math.Max(marqueeStartTimeline, marqueeCurrentTimeline);
+
+			if (timelineIndex >= marqueeMinTimeline && timelineIndex <= marqueeMaxTimeline)
 			{
-				var timelineIndex = TimelineItem.TimelineGroup.ToList().IndexOf(TimelineItem);
-				var marqueeMinTimeline = Math.Min(marqueeStartTimeline, marqueeCurrentTimeline);
-				var marqueeMaxTimeline = Math.Max(marqueeStartTimeline, marqueeCurrentTimeline);
+				// draw marquee box
+				var minPos = Math.Min(marqueeStartPos, marqueeCurrentPos) + TimelineItem.LeftPad;
+				var maxPos = Math.Max(marqueeStartPos, marqueeCurrentPos) + TimelineItem.LeftPad;
 
-				if (timelineIndex >= marqueeMinTimeline && timelineIndex <= marqueeMaxTimeline)
+				drawingContext.DrawRectangle(MarqueeBrush, null, new Rect(minPos, 0, maxPos - minPos, ActualHeight));
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		private Tuple<Geometry, FormattedText> GetTextGeometry(double width, double height, Typeface typeface, string text)
+		{
+			Tuple<Geometry, FormattedText> current = null;
+			for (var i = 0; i < 10; i++)
+			{
+				var size = 15 - i;
+				var formatted = new FormattedText(text, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, typeface, size, FontBrush);
+
+				current = new Tuple<Geometry, FormattedText>(formatted.BuildGeometry(new Point(0, 0)), formatted);
+
+				if (current.Item1.Bounds.Width <= width && current.Item1.Bounds.Height <= height)
 				{
-					// draw marquee box
-					var minPos = Math.Min(marqueeStartPos, marqueeCurrentPos) + TimelineItem.LeftPad;
-					var maxPos = Math.Max(marqueeStartPos, marqueeCurrentPos) + TimelineItem.LeftPad;
-
-					drawingContext.DrawRectangle(MarqueeBrush, null, new Rect(minPos, 0, maxPos - minPos, ActualHeight));
+					break;
 				}
 			}
 
-			isRedrawing = false;
+			return current;
 		}
 
 		//-----------------------------------------------------------------------
@@ -415,6 +478,9 @@ namespace StructuredXmlEditor.View
 
 				e.Handled = true;
 			}
+
+			this.Focus();
+			Keyboard.Focus(this);
 		}
 
 		//-----------------------------------------------------------------------
@@ -503,6 +569,9 @@ namespace StructuredXmlEditor.View
 				marqueeCurrentPos = marqueeStartPos;
 				marqueeCurrentTimeline = marqueeStartTimeline;
 			}
+
+			this.Focus();
+			Keyboard.Focus(this);
 
 			e.Handled = true;
 			dirty = true;
@@ -748,6 +817,25 @@ namespace StructuredXmlEditor.View
 			dirty = true;
 
 			base.OnMouseLeave(e);
+		}
+
+		//-----------------------------------------------------------------------
+		protected override void OnKeyDown(KeyEventArgs args)
+		{
+			if (args.Key == Key.Delete && !TimelineItem.IsAtMin)
+			{
+				var selected = TimelineItem.Children.Where((e) => e.IsSelected).ToList();
+				if (selected.Count != 0)
+				{
+					foreach (var item in selected)
+					{
+						TimelineItem.Remove(item);
+					}
+					dirty = true;
+				}
+			}
+
+			base.OnKeyDown(args);
 		}
 
 		//-----------------------------------------------------------------------
@@ -1077,7 +1165,7 @@ namespace StructuredXmlEditor.View
 			}
 
 			var diff = max - min;
-			if (diff < 1) diff = 1;
+			if (diff < 0.1) diff = 0.1;
 
 			double pixelsASecond = ActualWidth / TimelineItem.TimelineRange;
 
