@@ -14,6 +14,8 @@ namespace UITests
 {
 	class Program
 	{
+		private static int SleepTime = 500;
+
 		static void Main(string[] args)
 		{
 			var installedPath = args[0];
@@ -41,29 +43,84 @@ namespace UITests
 					Thread.Sleep(1000);
 				}
 			}
-			Thread.Sleep(500);
+			Thread.Sleep(SleepTime);
+
 			var cf = new ConditionFactory(new UIA3PropertyLibrary());
-			var el = mainWindow.FindFirstDescendant(cf.ByText("New Definition...")).FindAllChildren().FirstOrDefault();
-			el.Click();
-			Thread.Sleep(500);
+
+			//CreateDefinition(mainWindow, cf);
+			CreateData(mainWindow, cf);
+		}
+
+		public static void CreateDefinition(Window mainWindow, ConditionFactory cf)
+		{
+			mainWindow.FindFirstDescendant(cf.ByText("New Definition...")).FindAllChildren().FirstOrDefault().Click();
+			Thread.Sleep(SleepTime);
 			Keyboard.Type("TestStructure");
-			Thread.Sleep(500);
+			Thread.Sleep(SleepTime);
 			mainWindow.FindFirstDescendant(cf.ByText("Save")).AsButton().Click();
-			Thread.Sleep(500);
+			Thread.Sleep(SleepTime);
+
+			var focusTool = mainWindow.FindFirstDescendant(cf.ByClassName("FocusToolView"));
+
 			mainWindow.FindFirstDescendant(cf.ByHelpText("Add new item")).AsButton().Click();
-			Thread.Sleep(500);
+			Thread.Sleep(SleepTime);
 			mainWindow.FindFirstDescendant(cf.ByHelpText("Create")).AsButton().Click();
-			Thread.Sleep(500);
-			mainWindow.FindAllDescendants(cf.ByHelpText("Add new item")).Last().AsButton().Click();
-			Thread.Sleep(500);
-			mainWindow.FindFirstDescendant(cf.ByText("Name=Struct")).Click();
-			Thread.Sleep(500);
-			mainWindow.FindAllDescendants(cf.ByHelpText("Create")).Last().AsButton().Click();
-			Thread.Sleep(500);
+			Thread.Sleep(SleepTime);
 			mainWindow.FindAllDescendants(cf.ByHelpText("Attributes")).Last().AsButton().Click();
-			Thread.Sleep(500);
-			mainWindow.FindFirstDescendant(cf.ByText("Boolean")).Parent.AsTextBox().Text = "IsAwesome";
-			Thread.Sleep(500);
+			Thread.Sleep(SleepTime);
+
+			focusTool.FindAllDescendants()[3].AsTextBox().Text = "MyAwesomeData";
+			focusTool.FindAllDescendants()[3].AsTextBox().Click();
+			Thread.Sleep(SleepTime);
+
+			mainWindow.FindAllDescendants(cf.ByHelpText("Add new item")).Last().AsButton().Click();
+			Thread.Sleep(SleepTime);
+			mainWindow.FindFirstDescendant(cf.ByText("Name=MyAwesomeData")).Click();
+			Thread.Sleep(SleepTime);
+			mainWindow.FindAllDescendants(cf.ByHelpText("Create")).Last().AsButton().Click();
+			Thread.Sleep(SleepTime);
+			mainWindow.FindAllDescendants(cf.ByHelpText("Attributes")).Last().AsButton().Click();
+			Thread.Sleep(SleepTime);
+
+			focusTool.FindAllDescendants()[3].AsTextBox().Text = "IsAwesome";
+			focusTool.FindAllDescendants()[3].AsTextBox().Click();
+			Thread.Sleep(SleepTime);
+
+			mainWindow.FindAllDescendants(cf.ByHelpText("Add new item")).Last().AsButton().Click();
+			Thread.Sleep(SleepTime);
+
+			mainWindow.FindFirstDescendant(cf.ByClassName("ComboBox")).AsComboBox().Click();
+			Thread.Sleep(SleepTime);
+			mainWindow.Popup.FindFirstDescendant(cf.ByText("String")).Click();
+			Thread.Sleep(SleepTime);
+
+			mainWindow.FindAllDescendants(cf.ByHelpText("Create")).Last().AsButton().Click();
+			Thread.Sleep(SleepTime);
+
+			mainWindow.FindAllDescendants(cf.ByHelpText("Attributes")).Last().AsButton().Click();
+			Thread.Sleep(SleepTime);
+
+			focusTool.FindAllDescendants()[3].AsTextBox().Text = "Description";
+			focusTool.FindAllDescendants()[3].AsTextBox().Click();
+			Thread.Sleep(SleepTime);
+
+			mainWindow.FindFirstDescendant(cf.ByHelpText("Save the current file")).AsButton().Click();
+			Thread.Sleep(SleepTime);
+
+			mainWindow.FindFirstDescendant(cf.ByHelpText("Close")).AsButton().Click();
+			Thread.Sleep(SleepTime);
+		}
+
+		public static void CreateData(Window mainWindow, ConditionFactory cf)
+		{
+			mainWindow.FindFirstDescendant(cf.ByText("New MyAwesomeData File...")).Click();
+			Thread.Sleep(SleepTime);
+			Keyboard.Type("SuperData");
+			Thread.Sleep(SleepTime);
+			mainWindow.FindFirstDescendant(cf.ByText("Save")).AsButton().Click();
+			Thread.Sleep(SleepTime);
+
+			var focusTool = mainWindow.FindFirstDescendant(cf.ByClassName("FocusToolView"));
 		}
 
 		public static string ReadResource(string name)
