@@ -18,7 +18,6 @@ using System.Windows.Media;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
-using WPFFolderBrowser;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -273,10 +272,6 @@ namespace StructuredXmlEditor.Data
 			Tools.Add(new FocusTool(this));
 			Tools.Add(new DataTransformerTool(this));
 
-#if DEBUG
-			Tools.Add(new GitTool(this));
-#endif
-
 			Thread workerThread = new Thread(WorkerThreadLoop);
 			workerThread.IsBackground = true;
 			workerThread.SetApartmentState(ApartmentState.STA);
@@ -396,41 +391,41 @@ namespace StructuredXmlEditor.Data
 			{
 				Message.Show("Pick a folder that will be the root of your resources. This is used as the base to make all the other paths relative to.", "Pick Root Folder", "Ok");
 
-				var dlgRoot = new WPFFolderBrowserDialog();
-				dlgRoot.ShowPlacesList = true;
-				dlgRoot.Title = "Project Root Folder";
-				bool? resultRoot = dlgRoot.ShowDialog();
+				var dlgRoot = new System.Windows.Forms.FolderBrowserDialog();
+				//dlgRoot.ShowPlacesList = true;
+				//dlgRoot.Title = "Project Root Folder";
+				var resultRoot = dlgRoot.ShowDialog();
 
-				if (resultRoot != true && isFailure)
+				if (resultRoot != System.Windows.Forms.DialogResult.OK && isFailure)
 				{
 					Message.Show("Cannot run without a project root file. Shutting down.", "Startup Failed");
 					Environment.Exit(0);
 				}
-				else if (resultRoot != true)
+				else if (resultRoot != System.Windows.Forms.DialogResult.OK)
 				{
 					return null;
 				}
 
 				Message.Show("Now pick the folder to store your resource definitions in.", "Pick Definitions Folder", "Ok");
 
-				var dlgDefs = new WPFFolderBrowserDialog();
-				dlgDefs.ShowPlacesList = true;
-				dlgDefs.Title = "Definitions Folder";
-				bool? resultDefs = dlgDefs.ShowDialog();
+				var dlgDefs = new System.Windows.Forms.FolderBrowserDialog();
+				//dlgDefs.ShowPlacesList = true;
+				//dlgDefs.Title = "Definitions Folder";
+				var resultDefs = dlgDefs.ShowDialog();
 
-				if (resultDefs != true && isFailure)
+				if (resultRoot != System.Windows.Forms.DialogResult.OK && isFailure)
 				{
 					Message.Show("Cannot run without a project root file. Shutting down.", "Startup Failed");
 					Environment.Exit(0);
 				}
-				else if (resultRoot != true)
+				else if (resultRoot != System.Windows.Forms.DialogResult.OK)
 				{
 					return null;
 				}
 
 				// make relative
-				var projRoot = Path.Combine(dlgRoot.FileName, "ProjectRoot.xml");
-				var definitions = Path.Combine(dlgDefs.FileName, "fakefile.fake");
+				var projRoot = Path.Combine(dlgRoot.SelectedPath, "ProjectRoot.xml");
+				var definitions = Path.Combine(dlgDefs.SelectedPath, "fakefile.fake");
 
 				Uri path1 = new Uri(definitions);
 				Uri path2 = new Uri(projRoot);

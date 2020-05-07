@@ -19,9 +19,9 @@ using System.ComponentModel;
 using StructuredXmlEditor.Tools;
 using System.Windows.Threading;
 using System.IO;
-using Xceed.Wpf.AvalonDock.Layout.Serialization;
 using StructuredXmlEditor.View;
 using static StructuredXmlEditor.Tools.ToolBase;
+using AvalonDock.Layout.Serialization;
 
 namespace StructuredXmlEditor
 {

@@ -6,8 +6,7 @@
 	xmlns:d="clr-namespace:StructuredXmlEditor.Data"
 	xmlns:v="clr-namespace:StructuredXmlEditor.View"
 	xmlns:t="clr-namespace:StructuredXmlEditor.Tools"
-	xmlns:dock="http://schemas.xceed.com/wpf/xaml/avalondock"
-	xmlns:dockctrl="clr-namespace:Xceed.Wpf.AvalonDock.Controls;assembly=Xceed.Wpf.AvalonDock"
+	xmlns:dock="https://github.com/Dirkster99/AvalonDock"
 	WindowStartupLocation="CenterScreen"
 	TextOptions.TextFormattingMode="Display"
 	Icon="pack://application:,,,/StructuredXmlEditor;component/Resources/Icon.png"
@@ -333,11 +332,6 @@
 					<DataTemplate
 						DataType="{x:Type t:TemplateCreatorTool}">
 						<v:TemplateCreatorToolView />
-					</DataTemplate>
-					<DataTemplate
-						DataType="{x:Type t:GitTool}">
-						<ContentPresenter
-							Content="{Binding View}" />
 					</DataTemplate>
 				</dock:DockingManager.Resources>
 
