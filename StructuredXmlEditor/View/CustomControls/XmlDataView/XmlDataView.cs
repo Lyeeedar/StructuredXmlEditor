@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -135,6 +136,58 @@ namespace StructuredXmlEditor.View
 		#region Methods
 
 		//-----------------------------------------------------------------------
+		private TextBlock exampleTextBlock = null;
+		private Typeface exampleTypeface = null;
+		private double CalculateTextBlockWidth(String displayed)
+		{
+			if (exampleTextBlock == null)
+			{
+				exampleTextBlock = new TextBlock();
+				exampleTypeface = new Typeface(exampleTextBlock.FontFamily, exampleTextBlock.FontStyle, exampleTextBlock.FontWeight, exampleTextBlock.FontStretch);
+			}
+
+			return new FormattedText(
+					displayed,
+					CultureInfo.CurrentUICulture,
+					FlowDirection.LeftToRight,
+					exampleTypeface,
+					exampleTextBlock.FontSize,
+					Brushes.Black).Width;
+		}
+
+		//-----------------------------------------------------------------------
+		private void CalculateSensibleHeaderColumnWidth()
+		{
+			var width = 150.0;
+
+			for (int i = 0; i < Items.Count; i++)
+			{
+				var item = Items[i];
+
+				var indentation = item.Depth * 14;
+				var nameLength = CalculateTextBlockWidth(item.DataItem.Name);
+
+				var itemWidth = indentation + nameLength + 16 + 50; // expander and padding
+				if (item.DataItem.CanReorder)
+				{
+					itemWidth += 16;
+				}
+
+				if (itemWidth > width)
+				{
+					width = itemWidth;
+				}
+			}
+
+			width = Math.Max(150, Math.Min(width, ActualWidth - 100));
+
+			if (width != HeaderColumnWidth)
+			{
+				SetCurrentValue(HeaderColumnWidthProperty, width);
+			}
+		}
+
+		//-----------------------------------------------------------------------
 		public void DeferRefresh()
 		{
 			if (!isRefreshing)
@@ -167,6 +220,8 @@ namespace StructuredXmlEditor.View
 			isRefreshing = false;
 
 			Items.EndChange();
+
+			CalculateSensibleHeaderColumnWidth();
 		}
 
 		//-----------------------------------------------------------------------
