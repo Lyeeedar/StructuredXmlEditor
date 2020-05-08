@@ -21,12 +21,13 @@ jobs:
       run: dotnet publish StructuredXmlEditor /p:PublishProfile=StructuredXmlEditor/Properties/PublishProfiles/linux64.pubxml
     
     - name: Write runsettings
-      run: echo "<RunSettings><TestRunParameters><Parameter name=\"config\" value=\"win64\"/></TestRunParameters></RunSettings>" > test.runsettings
+      run: echo '<RunSettings><TestRunParameters><Parameter name="config" value="win64"/></TestRunParameters></RunSettings>' > test.runsettings
     
     - name: Test
       run: dotnet test -s test.runsettings
       
     - uses: actions/upload-artifact@v2
+      if: failure()
       with:
         name: videos
         path: testvideo
