@@ -25,6 +25,8 @@ namespace AutomatedUITests
 		private string settingsPath;
 		private string defFolder;
 
+		protected override string TestsMediaPath => Path.GetFullPath("../../../../testvideo");
+
 		public MainFlowTest()
 		{
 			projectDataFolder = Path.GetFullPath("TestData");
@@ -42,7 +44,8 @@ namespace AutomatedUITests
 
 		protected override Application StartApplication()
 		{
-			var path = Path.GetFullPath(TestContext.Parameters["exe"]);
+			var config = TestContext.Parameters["config"];
+			var path = Path.GetFullPath("../../../../StructuredXmlEditor/publish/" + config + "/StructuredXmlEditor.exe");
 			Assert.IsTrue(File.Exists(path), "Exe doesnt exist at: " + path);
 
 			var app = Application.Launch(path);

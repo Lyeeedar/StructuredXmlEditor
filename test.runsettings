@@ -1,5 +1,1 @@
-<RunSettings>
-	<TestRunParameters>
-		<Parameter name="exe" value="../../../../StructuredXmlEditor/publish/win32/StructuredXmlEditor.exe" />
-	</TestRunParameters>
-</RunSettings>
+<RunSettings><TestRunParameters><Parameter name="config" value="win32"/></TestRunParameters></RunSettings>
