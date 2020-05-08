@@ -1,0 +1,32 @@
+name: Build & Test
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.101
+    
+    - name: Install dependencies
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet publish StructuredXmlEditor /p:PublishProfile=StructuredXmlEditor/Properties/PublishProfiles/linux64.pubxml
+    
+    - name: Write runsettings
+      run: echo "<RunSettings><TestRunParameters><Parameter name=\"config\" value=\"linux\"/></TestRunParameters></RunSettings>" > test.runsettings
+    
+    - name: Test
+      run: dotnet test -s test.runsettings
+      
+    - uses: actions/upload-artifact@v2
+      with:
+        name: videos
+        path: testvideo
