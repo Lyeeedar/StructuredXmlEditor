@@ -1,6 +1,9 @@
 .vs
 packages
-StructuredXmlEditor/bin
-StructuredXmlEditor/obj
-Updater/bin
-Updater/obj
+**/bin
+**/obj
+*.user
+*.old
+*.vspx
+*.exe
+*.pdb
