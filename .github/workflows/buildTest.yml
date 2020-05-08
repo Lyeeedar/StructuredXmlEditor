@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v2
@@ -21,7 +21,7 @@ jobs:
       run: dotnet publish StructuredXmlEditor /p:PublishProfile=StructuredXmlEditor/Properties/PublishProfiles/linux64.pubxml
     
     - name: Write runsettings
-      run: echo "<RunSettings><TestRunParameters><Parameter name=\"config\" value=\"linux\"/></TestRunParameters></RunSettings>" > test.runsettings
+      run: echo "<RunSettings><TestRunParameters><Parameter name=\"config\" value=\"win64\"/></TestRunParameters></RunSettings>" > test.runsettings
     
     - name: Test
       run: dotnet test -s test.runsettings
