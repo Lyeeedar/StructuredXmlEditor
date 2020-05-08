@@ -18,7 +18,6 @@ namespace AutomatedUITests
 	[TestFixture]
 	class MainFlowTest : FlaUITestBase
 	{
-		private string installedPath = @"D:\Users\Philip\workspace\StructuredXmlEditor\StructuredXmlEditor\bin\Release\netcoreapp3.1\publish\StructuredXmlEditor.exe";
 		private static int SleepTime = 500;
 
 		private string projectDataFolder;
@@ -43,7 +42,10 @@ namespace AutomatedUITests
 
 		protected override Application StartApplication()
 		{
-			var app = Application.Launch(installedPath);
+			var path = Path.GetFullPath(TestContext.Parameters["exe"]);
+			Assert.IsTrue(File.Exists(path), "Exe doesnt exist at: " + path);
+
+			var app = Application.Launch(path);
 
 			var count = 0;
 			while (app.GetAllTopLevelWindows(Automation).FirstOrDefault() == null)
