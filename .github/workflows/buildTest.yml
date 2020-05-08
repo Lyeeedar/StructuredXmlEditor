@@ -18,7 +18,7 @@ jobs:
       run: dotnet restore
     
     - name: Build
-      run: dotnet publish StructuredXmlEditor /p:PublishProfile=StructuredXmlEditor/Properties/PublishProfiles/linux64.pubxml
+      run: dotnet publish StructuredXmlEditor /p:PublishProfile=StructuredXmlEditor/Properties/PublishProfiles/win64.pubxml
     
     - name: Write runsettings
       run: echo '<RunSettings><TestRunParameters><Parameter name="config" value="win64"/></TestRunParameters></RunSettings>' > test.runsettings
