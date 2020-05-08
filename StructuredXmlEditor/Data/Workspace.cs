@@ -48,7 +48,7 @@ namespace StructuredXmlEditor.Data
 				}
 			}
 		}
-		private bool m_isWorkspaceActive;
+		private bool m_isWorkspaceActive = true;
 
 		//--------------------------------------------------------------------------
 		private bool NeedsLoadDefinitions { get; set; }
