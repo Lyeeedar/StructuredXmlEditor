@@ -32,7 +32,7 @@ namespace StructuredXmlEditor.Plugin
 				{
 					var assembly = Assembly.LoadFile(pluginDll);
 
-					LoadViewProviders(assembly, pluginLoadFailures);
+					LoadViewProviders(workspace, assembly, pluginLoadFailures);
 				}
 				catch (Exception ex)
 				{
@@ -52,14 +52,14 @@ namespace StructuredXmlEditor.Plugin
 			}
 		}
 
-		private void LoadViewProviders(Assembly assembly, List<String> pluginLoadFailures)
+		private void LoadViewProviders(Workspace workspace, Assembly assembly, List<String> pluginLoadFailures)
 		{
 			foreach (var providerType in assembly.GetTypes().Where(e => e.GetInterface(typeof(IResourceViewProvider).Name) != null))
 			{
 				try
 				{
-					var constructor = providerType.GetConstructor(Type.EmptyTypes);
-					var provider = constructor.Invoke(new object[0]);
+					var constructor = providerType.GetConstructor(new Type[] { typeof(object) });
+					var provider = constructor.Invoke(new object[] { workspace });
 
 					ResourceViewProviders.Add(provider);
 				}
