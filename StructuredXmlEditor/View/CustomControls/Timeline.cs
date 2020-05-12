@@ -336,7 +336,7 @@ namespace StructuredXmlEditor.View
 			{
 				var time = Math.Round(((tpos - TimelineItem.LeftPad) / pixelsASecond) / bestStep) * bestStep;
 
-				string timeText = time.ToString();
+				string timeText = time.ToString("0.####");
 				FormattedText text = new FormattedText(timeText, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, typeface, 10, FontBrush);
 
 				drawingContext.DrawText(text, new Point(tpos - (text.Width / 2.0), ActualHeight - text.Height));
