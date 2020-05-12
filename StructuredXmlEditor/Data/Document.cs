@@ -87,6 +87,15 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		public String ResourceType
+		{
+			get
+			{
+				return Data.RootItems.FirstOrDefault().Name;
+			}
+		}
+
+		//-----------------------------------------------------------------------
 		public Document(string path, Workspace workspace)
 		{
 			this.Path = path;

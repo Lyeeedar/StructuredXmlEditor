@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using StructuredXmlEditor.Definition;
+using StructuredXmlEditor.Plugin;
 using StructuredXmlEditor.Tools;
 using StructuredXmlEditor.View;
 using System;
@@ -78,6 +79,14 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		public string ProjectRoot { get; set; }
 		public string DefsFolder { get; set; }
+
+		public string ProjectFolder
+		{
+			get
+			{
+				return Path.GetDirectoryName(ProjectRoot);
+			}
+		}
 
 		//-----------------------------------------------------------------------
 		public Dictionary<string, Dictionary<string, DataDefinition>> ReferenceableDefinitions = new Dictionary<string, Dictionary<string, DataDefinition>>();
@@ -167,6 +176,9 @@ namespace StructuredXmlEditor.Data
 
 		public delegate void RenamedHandler(String oldPath, String newPath);
 		public event RenamedHandler FileRenamed;
+
+		//-----------------------------------------------------------------------
+		public PluginManager PluginManager { get; } = new PluginManager();
 
 		//-----------------------------------------------------------------------
 		public Workspace()
@@ -271,6 +283,7 @@ namespace StructuredXmlEditor.Data
 			Tools.Add(new TemplateCreatorTool(this));
 			Tools.Add(new FocusTool(this));
 			Tools.Add(new DataTransformerTool(this));
+			Tools.Add(new ResourceViewTool(this));
 
 			Thread workerThread = new Thread(WorkerThreadLoop);
 			workerThread.IsBackground = true;
@@ -279,6 +292,8 @@ namespace StructuredXmlEditor.Data
 			workerThread.Start();
 
 			SetupFileChangeHandlers();
+
+			PluginManager.LoadPlugins(this);
 		}
 
 		//-----------------------------------------------------------------------
@@ -355,6 +370,8 @@ namespace StructuredXmlEditor.Data
 			StoreSetting("RecentFiles", RecentFiles.Select(e => e.Path).ToArray());
 
 			LoadDefinitions();
+
+			PluginManager.LoadPlugins(this);
 		}
 
 		//-----------------------------------------------------------------------

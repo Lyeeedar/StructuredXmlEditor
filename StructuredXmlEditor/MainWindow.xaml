@@ -333,6 +333,10 @@
 						DataType="{x:Type t:TemplateCreatorTool}">
 						<v:TemplateCreatorToolView />
 					</DataTemplate>
+					<DataTemplate
+						DataType="{x:Type t:ResourceViewTool}">
+						<v:ResourceViewToolView />
+					</DataTemplate>
 				</dock:DockingManager.Resources>
 
 				<dock:DockingManager.LayoutItemContainerStyleSelector>
