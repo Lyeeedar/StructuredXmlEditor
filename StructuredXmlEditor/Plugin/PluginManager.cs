@@ -26,6 +26,8 @@ namespace StructuredXmlEditor.Plugin
 			var pluginLoadFailures = new List<String>();
 
 			var pluginsFolder = Path.Combine(workspace.ProjectFolder, "SXEPlugins");
+			if (!Directory.Exists(pluginsFolder)) return;
+
 			foreach (var pluginDll in Directory.EnumerateFiles(pluginsFolder, "*.dll", SearchOption.AllDirectories))
 			{
 				try
