@@ -572,49 +572,8 @@ namespace StructuredXmlEditor.Data
 		{
 			Directory.CreateDirectory(Path.GetDirectoryName(path));
 
-			XDocument doc = new XDocument();
-
-			XElement fakeRoot = new XElement("FAKE_ROOT");
-			foreach (var item in m_storedRootItems)
-			{
-				item.Definition.SaveData(fakeRoot, item, true);
-			}
-			foreach (var el in fakeRoot.Elements())
-			{
-				doc.Add(el);
-			}
-
-			if (doc.Elements().Count() == 0) return;
-
-			doc.Elements().First().SetAttributeValue(XNamespace.Xmlns + "meta", DataDefinition.MetaNS);
-
-			var saveableComments = GraphCommentItems.Where(e => e.Nodes.Count > 0).ToList();
-			if (saveableComments.Count > 0)
-			{
-				var commentStr = string.Join("%", saveableComments.Select(e => e.GUID + "$" + e.Title + "$" + e.ToolTip + "$" + e.Colour.ToCSV()));
-				doc.Elements().First().SetAttributeValue(DataDefinition.MetaNS + "GraphCommentData", commentStr);
-			}
-
-			if (FlattenData)
-			{
-				var nodeEl = new XElement(GraphNodeDefinition.NodeStoreName);
-
-				if (IsJson || IsYaml)
-				{
-					nodeEl.SetAttributeValue(XNamespace.Xmlns + "json", DataDefinition.JsonNS);
-					nodeEl.SetAttributeValue(DataDefinition.JsonNS + "Array", "true");
-				}
-
-				foreach (var node in GraphNodeItems)
-				{
-					if (m_storedRootItems.Contains(node) || node.LinkParents.Count == 0) continue;
-
-					node.Definition.SaveData(nodeEl, node);
-				}
-
-				doc.Elements().First().Add(nodeEl);
-			}
-
+			var doc = WriteToDocument();
+			
 			if (IsYaml)
 			{
 				string json = JsonConvert.SerializeXNode(doc, Newtonsoft.Json.Formatting.Indented);
@@ -651,6 +610,55 @@ namespace StructuredXmlEditor.Data
 					doc.Save(writer);
 				}
 			}
+		}
+
+		//-----------------------------------------------------------------------
+		public XDocument WriteToDocument()
+		{
+			XDocument doc = new XDocument();
+
+			XElement fakeRoot = new XElement("FAKE_ROOT");
+			foreach (var item in m_storedRootItems)
+			{
+				item.Definition.SaveData(fakeRoot, item, true);
+			}
+			foreach (var el in fakeRoot.Elements())
+			{
+				doc.Add(el);
+			}
+
+			if (doc.Elements().Count() == 0) return doc;
+
+			doc.Elements().First().SetAttributeValue(XNamespace.Xmlns + "meta", DataDefinition.MetaNS);
+
+			var saveableComments = GraphCommentItems.Where(e => e.Nodes.Count > 0).ToList();
+			if (saveableComments.Count > 0)
+			{
+				var commentStr = string.Join("%", saveableComments.Select(e => e.GUID + "$" + e.Title + "$" + e.ToolTip + "$" + e.Colour.ToCSV()));
+				doc.Elements().First().SetAttributeValue(DataDefinition.MetaNS + "GraphCommentData", commentStr);
+			}
+
+			if (FlattenData)
+			{
+				var nodeEl = new XElement(GraphNodeDefinition.NodeStoreName);
+
+				if (IsJson || IsYaml)
+				{
+					nodeEl.SetAttributeValue(XNamespace.Xmlns + "json", DataDefinition.JsonNS);
+					nodeEl.SetAttributeValue(DataDefinition.JsonNS + "Array", "true");
+				}
+
+				foreach (var node in GraphNodeItems)
+				{
+					if (m_storedRootItems.Contains(node) || node.LinkParents.Count == 0) continue;
+
+					node.Definition.SaveData(nodeEl, node);
+				}
+
+				doc.Elements().First().Add(nodeEl);
+			}
+
+			return doc;
 		}
 
 		//-----------------------------------------------------------------------
