@@ -168,16 +168,6 @@ namespace StructuredXmlEditor.Data
 			}
 		}
 
-		//--------------------------------------------------------------------------
-		public delegate void ChangedHandler(String path);
-		public event ChangedHandler FileChanged;
-		public event ChangedHandler FileCreated;
-		public event ChangedHandler FileDeleted;
-
-		public delegate void RenamedHandler(String oldPath, String newPath);
-		public event RenamedHandler FileRenamed;
-		private bool m_skipProjectViewEvents = false;
-
 		//-----------------------------------------------------------------------
 		public PluginManager PluginManager { get; } = new PluginManager();
 		public List<Tuple<string, Action>> PluginMenuItems { get; } = new List<Tuple<string, Action>>();
@@ -293,64 +283,64 @@ namespace StructuredXmlEditor.Data
 			workerThread.Name = "FileChangeEventProcessor";
 			workerThread.Start();
 
-			SetupFileChangeHandlers();
-
 			LoadPlugins();
 		}
 
 		//-----------------------------------------------------------------------
-		public void SetupFileChangeHandlers()
+		public void ProcessFileEvents(List<FileSystemEventArgs> events)
 		{
-			FileChanged += (path) =>
-			{
-				if (Path.GetExtension(path) == ".xmldef")
-				{
-					QueueLoadDefinitions();
-				}
+			var needsLoadDefinitions = false;
+			var needsProjectRefresh = events.Count > 20;
 
-				var open = Documents.FirstOrDefault(e => e.Path == path);
-				if (open != null)
+			foreach (var args in events)
+			{
+				var path = args.FullPath;
+				needsLoadDefinitions = needsLoadDefinitions || args.FullPath.EndsWith(".xmldef");
+
+				if (args.ChangeType == WatcherChangeTypes.Changed)
 				{
-					open.NeedsReload = true;
-					if (IsWorkspaceActive)
+					var open = Documents.FirstOrDefault(e => e.Path == path);
+					if (open != null)
 					{
-						open.PromptForReload();
+						open.NeedsReload = true;
+						if (IsWorkspaceActive)
+						{
+							open.PromptForReload();
+						}
 					}
 				}
 
-				if (!m_skipProjectViewEvents) ProjectViewTool.Instance.Add(path);
-			};
-
-			FileCreated += (path) =>
-			{
-				if (Path.GetExtension(path) == ".xmldef")
+				if (!needsProjectRefresh)
 				{
-					QueueLoadDefinitions();
+					if (args.ChangeType == WatcherChangeTypes.Changed)
+					{
+						ProjectViewTool.Instance.Add(path);
+					}
+					else if (args.ChangeType == WatcherChangeTypes.Created)
+					{
+						ProjectViewTool.Instance.Add(path);
+					}
+					else if (args.ChangeType == WatcherChangeTypes.Deleted)
+					{
+						ProjectViewTool.Instance.Remove(path);
+					}
+					else if (args.ChangeType == WatcherChangeTypes.Renamed)
+					{
+						RenamedEventArgs renameArgs = (RenamedEventArgs)args;
+						ProjectViewTool.Instance.Remove(renameArgs.OldFullPath);
+						ProjectViewTool.Instance.Add(renameArgs.FullPath);
+					}
 				}
+			}
 
-				if (!m_skipProjectViewEvents) ProjectViewTool.Instance.Add(path);
-			};
-
-			FileDeleted += (path) =>
+			if (needsLoadDefinitions)
 			{
-				if (Path.GetExtension(path) == ".xmldef")
-				{
-					QueueLoadDefinitions();
-				}
-
-				if (!m_skipProjectViewEvents) ProjectViewTool.Instance.Remove(path);
-			};
-
-			FileRenamed += (oldPath, newPath) =>
+				QueueLoadDefinitions();
+			}
+			if (needsProjectRefresh)
 			{
-				if (Path.GetExtension(oldPath) == ".xmldef" || Path.GetExtension(newPath) == ".xmldef")
-				{
-					QueueLoadDefinitions();
-				}
-
-				if (!m_skipProjectViewEvents) ProjectViewTool.Instance.Remove(oldPath);
-				if (!m_skipProjectViewEvents) ProjectViewTool.Instance.Add(newPath);
-			};
+				ProjectViewTool.Instance.Reload();
+			}
 		}
 
 		//-----------------------------------------------------------------------
@@ -775,9 +765,9 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
-		private List<FileSystemEventArgs> m_queuedArgs = new List<FileSystemEventArgs>();
 		private void WorkerThreadLoop()
 		{
+			var queuedArgs = new List<FileSystemEventArgs>();
 			FileSystemEventArgs args = null;
 
 			while (!m_concurrentQueue.IsAddingCompleted)
@@ -791,72 +781,18 @@ namespace StructuredXmlEditor.Data
 					break;
 				}
 
-				lock (m_queuedArgs)
+				lock (queuedArgs)
 				{
-					m_queuedArgs.Add(args);
+					queuedArgs.Add(args);
 				}
 
 				Future.SafeCall(() => 
 				{
-					lock (m_queuedArgs)
+					lock (queuedArgs)
 					{
-						if (m_queuedArgs.Count > 200)
-						{
-							m_queuedArgs.Clear();
-							ProjectViewTool.Instance.Reload();
-						}
-						else
-						{
-
-							if (m_queuedArgs.Count > 10)
-							{
-								m_skipProjectViewEvents = true;
-							}
-
-							foreach (var args in m_queuedArgs)
-							{
-								if (args.ChangeType == WatcherChangeTypes.Changed)
-								{
-									System.Diagnostics.Debug.WriteLine("File Change: " + args.FullPath);
-
-									FileChanged?.Invoke(args.FullPath);
-								}
-								else if (args.ChangeType == WatcherChangeTypes.Created)
-								{
-									System.Diagnostics.Debug.WriteLine("File Created: " + args.FullPath);
-
-									FileCreated?.Invoke(args.FullPath);
-								}
-								else if (args.ChangeType == WatcherChangeTypes.Deleted)
-								{
-									System.Diagnostics.Debug.WriteLine("File Deleted: " + args.FullPath);
-
-									FileDeleted?.Invoke(args.FullPath);
-								}
-								else if (args.ChangeType == WatcherChangeTypes.Renamed)
-								{
-									RenamedEventArgs renameArgs = (RenamedEventArgs)args;
-
-									System.Diagnostics.Debug.WriteLine("File Renamed: " + renameArgs.OldFullPath + " -> " + renameArgs.FullPath);
-
-									FileRenamed?.Invoke(renameArgs.OldFullPath, renameArgs.FullPath);
-								}
-								else
-								{
-									System.Diagnostics.Debug.WriteLine("Unknown Event!");
-								}
-							}
-
-							m_queuedArgs.Clear();
-
-							if (m_skipProjectViewEvents)
-							{
-								m_skipProjectViewEvents = false;
-								ProjectViewTool.Instance.Reload();
-							}
-						}
+						ProcessFileEvents(queuedArgs);
 					}
-				}, 100, m_queuedArgs);
+				}, 500, queuedArgs);
 			}
 		}
 
