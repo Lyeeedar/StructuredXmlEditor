@@ -40,7 +40,7 @@ namespace StructuredXmlEditor.Definition
 
 				try
 				{
-					item.LocalisationID = id.Split(':')[1];
+					item.LocalisationID = id;
 
 					item.Value = Localisation.GetLocalisation(LocalisationFile, id);
 				}
@@ -96,14 +96,12 @@ namespace StructuredXmlEditor.Definition
 					si.LocalisationID = Guid.NewGuid().ToString();
 				}
 
-				var pathToRoot = si.GetPathToRoot();
-
-				var fullID = $"{pathToRoot}:{si.LocalisationID}";
-
-				el = new XElement(Name, fullID);
+				el = new XElement(Name, si.LocalisationID);
 				parent.Add(el);
 
-				Localisation.StoreLocalisation(LocalisationFile, fullID, si.Value);
+				var pathToRoot = si.GetPathToRoot();
+
+				Localisation.StoreLocalisation(LocalisationFile, si.LocalisationID, si.Value, pathToRoot);
 			}
 			else
 			{

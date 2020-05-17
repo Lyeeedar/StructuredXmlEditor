@@ -13,7 +13,7 @@ namespace StructuredXmlEditor.Util
 {
 	public static class Localisation
 	{
-		private static Dictionary<string, string> LoadLocalisationFile(string file)
+		private static Dictionary<string, LocalisationEntry> LoadLocalisationFile(string file)
 		{
 			var workspaceRoot = Workspace.Instance.ProjectRoot;
 			var workspaceFolder = Path.GetDirectoryName(workspaceRoot);
@@ -22,25 +22,31 @@ namespace StructuredXmlEditor.Util
 
 			if (!File.Exists(localisationFile))
 			{
-				return new Dictionary<string, string>();
+				return new Dictionary<string, LocalisationEntry>();
 			}
 
 			var contents = XDocument.Load(localisationFile);
 
-			var output = new Dictionary<string, string>();
+			var output = new Dictionary<string, LocalisationEntry>();
 
 			foreach (var el in contents.Root.Elements())
 			{
 				var id = el.Attribute("ID").Value;
+				var context = el.Attribute("Context")?.Value ?? "";
 				var text = el.Value;
 
-				output[id] = text;
+				var entry = new LocalisationEntry();
+				entry.ID = id;
+				entry.Context = context;
+				entry.Text = text;
+
+				output[id] = entry;
 			}
 
 			return output;
 		}
 
-		private static void SaveLocalisationFile(string file, Dictionary<string, string> contents)
+		private static void SaveLocalisationFile(string file, Dictionary<string, LocalisationEntry> contents)
 		{
 			var workspaceRoot = Workspace.Instance.ProjectRoot;
 			var workspaceFolder = Path.GetDirectoryName(workspaceRoot);
@@ -55,10 +61,11 @@ namespace StructuredXmlEditor.Util
 			doc.Add(rootEl);
 			doc.Elements().First().SetAttributeValue(XNamespace.Xmlns + "meta", DataDefinition.MetaNS);
 
-			foreach (var item in contents.OrderBy(e => e.Key.Split(':')[0]).ThenBy(e => e.Key.Split(':')[1]))
+			foreach (var item in contents.OrderBy(e => e.Value.Context).ThenBy(e => e.Value.ID))
 			{
-				var el = new XElement("Text", item.Value);
-				el.SetAttributeValue("ID", item.Key);
+				var el = new XElement("Text", item.Value.Text);
+				el.SetAttributeValue("ID", item.Value.ID);
+				el.SetAttributeValue("Context", item.Value.Context);
 
 				rootEl.Add(el);
 			}
@@ -88,15 +95,31 @@ namespace StructuredXmlEditor.Util
 		public static string GetLocalisation(string file, string id)
 		{
 			var contents = LoadLocalisationFile(file);
-			return contents[id];
+			return contents[id].Text;
 		}
 
-		public static void StoreLocalisation(string file, string id, string text)
+		public static void StoreLocalisation(string file, string id, string text, string context)
 		{
 			var contents = LoadLocalisationFile(file);
-			contents[id] = text;
+
+			LocalisationEntry entry;
+			if (!contents.TryGetValue(id, out entry))
+			{
+				entry = new LocalisationEntry();
+				contents[id] = entry;
+			}
+
+			entry.Text = text;
+			entry.Context = context;
 
 			SaveLocalisationFile(file, contents);
 		}
+	}
+
+	public class LocalisationEntry
+	{
+		public string Text { get; set; }
+		public string ID { get; set; }
+		public string Context { get; set; }
 	}
 }
