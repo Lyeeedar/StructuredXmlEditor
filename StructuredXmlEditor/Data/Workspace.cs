@@ -176,9 +176,11 @@ namespace StructuredXmlEditor.Data
 
 		public delegate void RenamedHandler(String oldPath, String newPath);
 		public event RenamedHandler FileRenamed;
+		private bool m_skipProjectViewEvents = false;
 
 		//-----------------------------------------------------------------------
 		public PluginManager PluginManager { get; } = new PluginManager();
+		public List<Tuple<string, Action>> PluginMenuItems { get; } = new List<Tuple<string, Action>>();
 
 		//-----------------------------------------------------------------------
 		public Workspace()
@@ -293,7 +295,7 @@ namespace StructuredXmlEditor.Data
 
 			SetupFileChangeHandlers();
 
-			PluginManager.LoadPlugins(this);
+			LoadPlugins();
 		}
 
 		//-----------------------------------------------------------------------
@@ -316,7 +318,7 @@ namespace StructuredXmlEditor.Data
 					}
 				}
 
-				ProjectViewTool.Instance.Add(path);
+				if (!m_skipProjectViewEvents) ProjectViewTool.Instance.Add(path);
 			};
 
 			FileCreated += (path) =>
@@ -326,7 +328,7 @@ namespace StructuredXmlEditor.Data
 					QueueLoadDefinitions();
 				}
 
-				ProjectViewTool.Instance.Add(path);
+				if (!m_skipProjectViewEvents) ProjectViewTool.Instance.Add(path);
 			};
 
 			FileDeleted += (path) =>
@@ -336,7 +338,7 @@ namespace StructuredXmlEditor.Data
 					QueueLoadDefinitions();
 				}
 
-				ProjectViewTool.Instance.Remove(path);
+				if (!m_skipProjectViewEvents) ProjectViewTool.Instance.Remove(path);
 			};
 
 			FileRenamed += (oldPath, newPath) =>
@@ -346,8 +348,8 @@ namespace StructuredXmlEditor.Data
 					QueueLoadDefinitions();
 				}
 
-				ProjectViewTool.Instance.Remove(oldPath);
-				ProjectViewTool.Instance.Add(newPath);
+				if (!m_skipProjectViewEvents) ProjectViewTool.Instance.Remove(oldPath);
+				if (!m_skipProjectViewEvents) ProjectViewTool.Instance.Add(newPath);
 			};
 		}
 
@@ -371,7 +373,22 @@ namespace StructuredXmlEditor.Data
 
 			LoadDefinitions();
 
+			LoadPlugins();
+		}
+
+		//-----------------------------------------------------------------------
+		private void LoadPlugins()
+		{
 			PluginManager.LoadPlugins(this);
+
+			PluginMenuItems.Clear();
+			foreach (var providerObj in PluginManager.MenuItemProviders)
+			{
+				dynamic provider = providerObj;
+				Tuple<string, Action> item = provider.GetMenuItem();
+
+				PluginMenuItems.Add(item);
+			}
 		}
 
 		//-----------------------------------------------------------------------
@@ -749,7 +766,7 @@ namespace StructuredXmlEditor.Data
 				InternalBufferSize = 16384
 			};
 
-			Watcher.Error += (e, args) => { System.Diagnostics.Debug.WriteLine("File watcher error!" + args.GetException().Message); };
+			Watcher.Error += (e, args) => { System.Diagnostics.Debug.WriteLine("File watcher error! " + args.GetException().Message); };
 			Watcher.Created += (e, args) => { if (!DisableFileEvents) m_concurrentQueue.Add(args); };
 			Watcher.Deleted += (e, args) => { if (!DisableFileEvents) m_concurrentQueue.Add(args); };
 			Watcher.Renamed += (e, args) => { if (!DisableFileEvents) m_concurrentQueue.Add(args); };
@@ -758,6 +775,7 @@ namespace StructuredXmlEditor.Data
 		}
 
 		//-----------------------------------------------------------------------
+		private List<FileSystemEventArgs> m_queuedArgs = new List<FileSystemEventArgs>();
 		private void WorkerThreadLoop()
 		{
 			FileSystemEventArgs args = null;
@@ -773,41 +791,72 @@ namespace StructuredXmlEditor.Data
 					break;
 				}
 
-				Application.Current.Dispatcher.Invoke(new Action(() => 
+				lock (m_queuedArgs)
 				{
-					
+					m_queuedArgs.Add(args);
+				}
 
-					if (args.ChangeType == WatcherChangeTypes.Changed)
+				Future.SafeCall(() => 
+				{
+					lock (m_queuedArgs)
 					{
-						System.Diagnostics.Debug.WriteLine("File Change: " + args.FullPath);
+						if (m_queuedArgs.Count > 200)
+						{
+							m_queuedArgs.Clear();
+							ProjectViewTool.Instance.Reload();
+						}
+						else
+						{
 
-						FileChanged?.Invoke(args.FullPath);
-					}
-					else if (args.ChangeType == WatcherChangeTypes.Created)
-					{
-						System.Diagnostics.Debug.WriteLine("File Created: " + args.FullPath);
+							if (m_queuedArgs.Count > 10)
+							{
+								m_skipProjectViewEvents = true;
+							}
 
-						FileCreated?.Invoke(args.FullPath);
-					}
-					else if (args.ChangeType == WatcherChangeTypes.Deleted)
-					{
-						System.Diagnostics.Debug.WriteLine("File Deleted: " + args.FullPath);
+							foreach (var args in m_queuedArgs)
+							{
+								if (args.ChangeType == WatcherChangeTypes.Changed)
+								{
+									System.Diagnostics.Debug.WriteLine("File Change: " + args.FullPath);
 
-						FileDeleted?.Invoke(args.FullPath);
-					}
-					else if (args.ChangeType == WatcherChangeTypes.Renamed)
-					{
-						RenamedEventArgs renameArgs = (RenamedEventArgs)args;
+									FileChanged?.Invoke(args.FullPath);
+								}
+								else if (args.ChangeType == WatcherChangeTypes.Created)
+								{
+									System.Diagnostics.Debug.WriteLine("File Created: " + args.FullPath);
 
-						System.Diagnostics.Debug.WriteLine("File Renamed: " + renameArgs.OldFullPath + " -> " + renameArgs.FullPath);
+									FileCreated?.Invoke(args.FullPath);
+								}
+								else if (args.ChangeType == WatcherChangeTypes.Deleted)
+								{
+									System.Diagnostics.Debug.WriteLine("File Deleted: " + args.FullPath);
 
-						FileRenamed?.Invoke(renameArgs.OldFullPath, renameArgs.FullPath);
+									FileDeleted?.Invoke(args.FullPath);
+								}
+								else if (args.ChangeType == WatcherChangeTypes.Renamed)
+								{
+									RenamedEventArgs renameArgs = (RenamedEventArgs)args;
+
+									System.Diagnostics.Debug.WriteLine("File Renamed: " + renameArgs.OldFullPath + " -> " + renameArgs.FullPath);
+
+									FileRenamed?.Invoke(renameArgs.OldFullPath, renameArgs.FullPath);
+								}
+								else
+								{
+									System.Diagnostics.Debug.WriteLine("Unknown Event!");
+								}
+							}
+
+							m_queuedArgs.Clear();
+
+							if (m_skipProjectViewEvents)
+							{
+								m_skipProjectViewEvents = false;
+								ProjectViewTool.Instance.Reload();
+							}
+						}
 					}
-					else
-					{
-						System.Diagnostics.Debug.WriteLine("Unknown Event!");
-					}
-				}));
+				}, 100, m_queuedArgs);
 			}
 		}
 

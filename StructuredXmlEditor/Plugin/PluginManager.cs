@@ -13,6 +13,7 @@ namespace StructuredXmlEditor.Plugin
 	public class PluginManager
 	{
 		public List<object> ResourceViewProviders { get; } = new List<object>();
+		public List<object> MenuItemProviders { get; } = new List<object>();
 
 		public PluginManager()
 		{
@@ -28,13 +29,16 @@ namespace StructuredXmlEditor.Plugin
 			var pluginsFolder = Path.Combine(workspace.ProjectFolder, "SXEPlugins");
 			if (!Directory.Exists(pluginsFolder)) return;
 
-			foreach (var pluginDll in Directory.EnumerateFiles(pluginsFolder, "*.dll", SearchOption.AllDirectories))
+			AddFolderToAssemblyResolve(pluginsFolder);
+
+			foreach (var pluginDll in Directory.EnumerateFiles(pluginsFolder, "*Plugin.dll", SearchOption.AllDirectories))
 			{
 				try
 				{
 					var assembly = Assembly.LoadFile(pluginDll);
 
 					LoadViewProviders(workspace, assembly, pluginLoadFailures);
+					LoadMenuItemProviders(workspace, assembly, pluginLoadFailures);
 				}
 				catch (Exception ex)
 				{
@@ -54,6 +58,20 @@ namespace StructuredXmlEditor.Plugin
 			}
 		}
 
+		private void AddFolderToAssemblyResolve(string folder)
+		{
+			AppDomain currentDomain = AppDomain.CurrentDomain;
+			currentDomain.AssemblyResolve += (sender, args) =>
+			{
+				string assemblyPath = Path.Combine(folder, new AssemblyName(args.Name).Name + ".dll");
+
+				if (!File.Exists(assemblyPath)) return null;
+
+				Assembly assembly = Assembly.LoadFrom(assemblyPath);
+				return assembly;
+			};
+		}
+
 		private void LoadViewProviders(Workspace workspace, Assembly assembly, List<String> pluginLoadFailures)
 		{
 			foreach (var providerType in assembly.GetTypes().Where(e => e.GetInterface(typeof(IResourceViewProvider).Name) != null))
@@ -64,6 +82,29 @@ namespace StructuredXmlEditor.Plugin
 					var provider = constructor.Invoke(new object[] { workspace });
 
 					ResourceViewProviders.Add(provider);
+				}
+				catch (Exception ex)
+				{
+					if (ex is TargetInvocationException)
+					{
+						ex = ex.InnerException;
+					}
+
+					pluginLoadFailures.Add(providerType.Name + " Failed to load: " + ex.ToString());
+				}
+			}
+		}
+
+		private void LoadMenuItemProviders(Workspace workspace, Assembly assembly, List<String> pluginLoadFailures)
+		{
+			foreach (var providerType in assembly.GetTypes().Where(e => e.GetInterface(typeof(IMenuItemProvider).Name) != null))
+			{
+				try
+				{
+					var constructor = providerType.GetConstructor(new Type[] { typeof(object) });
+					var provider = constructor.Invoke(new object[] { workspace });
+
+					MenuItemProviders.Add(provider);
 				}
 				catch (Exception ex)
 				{

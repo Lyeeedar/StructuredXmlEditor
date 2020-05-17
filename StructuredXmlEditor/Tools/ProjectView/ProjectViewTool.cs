@@ -87,6 +87,9 @@ namespace StructuredXmlEditor.Tools
 		public Command<object> ClearFilterCMD { get { return new Command<object>((e) => Filter = null); } }
 
 		//-----------------------------------------------------------------------
+		public Command<object> SyncCMD { get { return new Command<object>((e) => Sync()) ; } }
+
+		//-----------------------------------------------------------------------
 		public ProjectViewTool(Workspace workspace) : base(workspace, "Project View")
 		{
 			DefaultPositionDocument = ToolPosition.ProjectView;
@@ -94,6 +97,39 @@ namespace StructuredXmlEditor.Tools
 
 			Instance = this;
 			Reload();
+		}
+
+		//-----------------------------------------------------------------------
+		private void Sync()
+		{
+			var currentPath = Workspace.Current?.Path;
+			if (currentPath != null)
+			{
+				SyncToRecursive(Root, currentPath);
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		private bool SyncToRecursive(ProjectItem current, string path)
+		{
+			if (current.FullPath == path)
+			{
+				current.IsSelected = true;
+				return true;
+			}
+			else
+			{
+				foreach (var child in current.Children)
+				{
+					if (SyncToRecursive(child, path))
+					{
+						current.IsExpanded = true;
+						return true;
+					}
+				}
+
+				return false;
+			}
 		}
 
 		//-----------------------------------------------------------------------

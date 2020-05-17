@@ -16,6 +16,9 @@
     <StartupObject>StructuredXmlEditor.App</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Resources\Sync.png" />
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Core.xmldef">
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -34,6 +37,7 @@
     <Resource Include="Resources\SaveAs.png" />
     <Resource Include="Resources\Settings.png" />
     <Resource Include="Resources\Shuffle.png" />
+    <Resource Include="Resources\Sync.png" />
     <Resource Include="Resources\Undo.png" />
     <Resource Include="Resources\Warning.png" />
   </ItemGroup>

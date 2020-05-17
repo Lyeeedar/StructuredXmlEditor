@@ -16,6 +16,19 @@
 		<DockPanel
 			Margin="2,5,2,5">
 
+			<Button
+				DockPanel.Dock="Right"
+				Focusable="False"
+				ToolTip="Sync project view to the current file"
+				Command="{Binding SyncCMD}"
+				IsEnabled="{Binding Workspace.Current, Converter={v:NullOrZeroConverter}, ConverterParameter=Not}">
+				<Image
+					Source="/Resources/Sync.png"
+					RenderOptions.BitmapScalingMode="NearestNeighbor"
+					Height="16"
+					Width="16" />
+			</Button>
+			
 			<v:ContentPopup
 				x:Name="FilterPopupToggle"
 				VerticalAlignment="Center"

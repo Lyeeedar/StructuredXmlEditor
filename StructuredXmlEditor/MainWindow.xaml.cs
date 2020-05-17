@@ -302,6 +302,12 @@ namespace StructuredXmlEditor
 				Message.Show(e.Message, "Failed to load layout!", "Ok");
 			}
 		}
+
+		private void PluginMenuItemClick(object sender, RoutedEventArgs e)
+		{
+			var actionPair = (sender as FrameworkElement).DataContext as Tuple<string, Action>;
+			actionPair.Item2.Invoke();
+		}
 	}
 
 	public class ViewStyleSelector : StyleSelector

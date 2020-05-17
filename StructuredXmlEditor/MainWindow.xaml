@@ -35,7 +35,7 @@
 								<RowDefinition
 									Height="Auto" />
 							</Grid.RowDefinitions>
-							
+
 							<TextBox
 								Text="{Binding Feedback}" />
 							<Button
@@ -45,7 +45,7 @@
 						</Grid>
 					</v:ContentPopup.PopupContent>
 				</v:ContentPopup>
-				
+
 				<Menu>
 					<MenuItem
 						Header="_File">
@@ -209,10 +209,20 @@
 							Header="_Reset To Default Layout"
 							Click="ResetToDefaultLayoutClick" />
 					</MenuItem>
+					<MenuItem
+						Header="_Plugin"
+						Visibility="{Binding PluginMenuItems.Count, Converter={v:NullOrZeroConverter}, ConverterParameter=Not}"
+						ItemsSource="{Binding PluginMenuItems}">
+						<MenuItem.ItemTemplate>
+							<DataTemplate>
+								<MenuItem
+									Header="{Binding Item1}"
+									Click="PluginMenuItemClick" />
+							</DataTemplate>
+						</MenuItem.ItemTemplate>
+					</MenuItem>
 				</Menu>
 			</DockPanel>
-			
-			
 
 			<Border
 				BorderThickness="1"
