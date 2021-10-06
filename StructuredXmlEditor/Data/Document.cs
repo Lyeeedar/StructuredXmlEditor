@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -22,6 +23,7 @@ namespace StructuredXmlEditor.Data
 		public Workspace Workspace { get; set; }
 		public bool IsBackup { get; set; }
 		public bool NeedsReload { get; set; }
+		private String openedHash { get; set; }
 
 		//-----------------------------------------------------------------------
 		public List<Document> MultieditDocs { get; set; }
@@ -108,6 +110,8 @@ namespace StructuredXmlEditor.Data
 			backupTimer.Elapsed += (e, a) => DoBackup();
 			backupTimer.AutoReset = true;
 			backupTimer.Start();
+
+			openedHash = getFileHash();
 		}
 
 		//-----------------------------------------------------------------------
@@ -117,12 +121,30 @@ namespace StructuredXmlEditor.Data
 			{
 				NeedsReload = false;
 
-				string response = Message.Show("This document changed on disk, do you want to reload it? Clicking Yes will discard any local changes.", "Document Changed On Disk", "Yes", "No");
-
-				if (response == "Yes")
+				string hash = getFileHash();
+				if (hash != openedHash)
 				{
-					Close(true);
-					Workspace.Open(Path);
+					string response = Message.Show("This document changed on disk, do you want to reload it? Clicking Yes will discard any local changes.", "Document Changed On Disk", "Yes", "No");
+
+					if (response == "Yes")
+					{
+						Close(true);
+						Workspace.Open(Path);
+					}
+				}
+			}
+		}
+
+		//-----------------------------------------------------------------------
+		private String getFileHash()
+		{
+			using (var md5 = MD5.Create())
+			{
+				using (var stream = File.OpenRead(Path))
+				{
+					var hash = md5.ComputeHash(stream);
+					return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+
 				}
 			}
 		}
@@ -250,7 +272,12 @@ namespace StructuredXmlEditor.Data
 			Workspace.DisableFileEvents = true;
 
 			Data.Save(path);
-			if (!isBackup) ProjectViewTool.Instance.Add(path);
+
+			if (!isBackup)
+			{
+				openedHash = getFileHash();
+				ProjectViewTool.Instance.Add(path);
+			}
 			
 			Workspace.DisableFileEvents = false;
 
