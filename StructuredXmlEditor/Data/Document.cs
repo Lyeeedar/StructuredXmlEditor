@@ -138,15 +138,19 @@ namespace StructuredXmlEditor.Data
 		//-----------------------------------------------------------------------
 		private String getFileHash()
 		{
-			using (var md5 = MD5.Create())
+			if (File.Exists(Path))
 			{
-				using (var stream = File.OpenRead(Path))
+				using (var md5 = MD5.Create())
 				{
-					var hash = md5.ComputeHash(stream);
-					return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+					using (var stream = File.OpenRead(Path))
+					{
+						var hash = md5.ComputeHash(stream);
+						return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
 
+					}
 				}
 			}
+			return null;
 		}
 
 		//-----------------------------------------------------------------------
