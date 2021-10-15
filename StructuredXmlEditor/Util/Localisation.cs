@@ -112,6 +112,7 @@ namespace StructuredXmlEditor.Util
 			if (!contents.TryGetValue(id, out entry))
 			{
 				entry = new LocalisationEntry();
+				entry.ID = id;
 				contents[id] = entry;
 			}
 
