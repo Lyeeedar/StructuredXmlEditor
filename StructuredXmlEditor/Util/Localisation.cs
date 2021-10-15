@@ -31,7 +31,13 @@ namespace StructuredXmlEditor.Util
 
 			foreach (var el in contents.Root.Elements())
 			{
-				var id = el.Attribute("ID").Value;
+				var idEl = el.Attribute("ID");
+				if (idEl == null)
+				{
+					continue;
+				}
+
+				var id = idEl.Value;
 				var context = el.Attribute("Context")?.Value ?? "";
 				var text = el.Value;
 
